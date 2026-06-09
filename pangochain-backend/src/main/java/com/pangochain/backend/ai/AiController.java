@@ -1,5 +1,6 @@
 package com.pangochain.backend.ai;
 
+import com.pangochain.backend.cases.CaseRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,6 +24,7 @@ public class AiController {
     private final AiDocumentService documentService;
     private final AiCaseService caseService;
     private final AiAvailability availability;
+    private final CaseRepository caseRepository;
 
     @GetMapping("/health")
     public ResponseEntity<Map<String, Object>> health() {
@@ -48,5 +50,18 @@ public class AiController {
     @PreAuthorize("hasAnyRole('LAWYER', 'MANAGING_PARTNER', 'IT_ADMIN', 'PARTNER_SENIOR', 'PARTNER_JUNIOR', 'ASSOCIATE_SENIOR', 'ASSOCIATE_JUNIOR')")
     public ResponseEntity<AiCaseService.EvidenceGapResult> analyzeEvidenceGaps(@PathVariable UUID caseId) {
         return ResponseEntity.ok(caseService.analyzeEvidenceGaps(caseId));
+    }
+
+    @GetMapping("/hearings/{hearingId}/prep")
+    @PreAuthorize("hasAnyRole('LAWYER', 'MANAGING_PARTNER', 'PARTNER_SENIOR', 'PARTNER_JUNIOR', 'ASSOCIATE_SENIOR', 'ASSOCIATE_JUNIOR')")
+    public ResponseEntity<AiCaseService.HearingPrepBrief> hearingPrep(@PathVariable UUID hearingId) {
+        return ResponseEntity.ok(caseService.generateHearingPrep(hearingId));
+    }
+
+    @PostMapping("/draft")
+    @PreAuthorize("hasAnyRole('LAWYER', 'MANAGING_PARTNER', 'PARTNER_SENIOR', 'PARTNER_JUNIOR', 'ASSOCIATE_SENIOR', 'ASSOCIATE_JUNIOR')")
+    public ResponseEntity<AiDocumentService.DraftResult> draftDocument(@RequestBody AiDocumentService.DraftRequest req) {
+        var legalCase = caseRepository.findById(req.caseId()).orElseThrow();
+        return ResponseEntity.ok(documentService.draftDocument(req, legalCase.getTitle()));
     }
 }

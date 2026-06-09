@@ -80,4 +80,43 @@ public class AiDocumentService {
                 .call()
                 .entity(DocumentAnalysis.class);
     }
+
+    public DraftResult draftDocument(DraftRequest req, String caseTitle) {
+        availability.requireAvailable();
+
+        String factsFormatted = req.keyFacts() != null && req.keyFacts().length > 0
+                ? String.join("\n- ", req.keyFacts())
+                : "None provided";
+
+        String prompt = """
+                Draft a professional legal document of type: %s
+
+                Case: %s (ID: %s)
+
+                User instructions: %s
+
+                Key facts to incorporate:
+                - %s
+
+                Requirements:
+                - Use proper legal document formatting and language
+                - Include standard boilerplate for this document type
+                - Leave [PLACEHOLDER] where specific details are missing
+                - Keep it professional and court-ready
+
+                Return JSON with:
+                - title: document title
+                - draftText: the complete draft document text (use \\n for newlines)
+                - notes: array of notes for the lawyer (what to verify, fill in, customize)
+
+                Respond ONLY with valid JSON.
+                """.formatted(req.documentType(), caseTitle, req.caseId(), safe(req.instructions()), factsFormatted);
+
+        return chatClient.orElseThrow(() -> new AiUnavailableException("AI features require OPENAI_API_KEY to be configured."))
+                .prompt()
+                .system("You are an expert legal drafter. Produce professional-quality legal documents.")
+                .user(prompt)
+                .call()
+                .entity(DraftResult.class);
+    }
 }

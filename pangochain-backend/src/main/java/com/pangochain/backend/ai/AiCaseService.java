@@ -11,16 +11,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class AiCaseService {
 
     protected final Optional<ChatClient> chatClient;
@@ -56,6 +59,17 @@ public class AiCaseService {
             String evidenceNeeded,
             String reason,
             String priority
+    ) {}
+
+    public record HearingPrepBrief(
+            String caseBackground,
+            String hearingObjective,
+            String[] keyFacts,
+            String[] documentsToReview,
+            String[] suggestedArguments,
+            String[] anticipatedCounterArguments,
+            String[] questionsToAddress,
+            String[] actionItemsBeforeHearing
     ) {}
 
     public TimelineCheckResult checkTimeline(UUID caseId) {
@@ -167,5 +181,61 @@ public class AiCaseService {
                 .user(prompt)
                 .call()
                 .entity(EvidenceGapResult.class);
+    }
+
+    public HearingPrepBrief generateHearingPrep(UUID hearingId) {
+        availability.requireAvailable();
+
+        var hearing = hearingRepository.findById(hearingId).orElseThrow();
+        var legalCase = hearing.getLegalCase();
+        List<CaseEvent> events = new ArrayList<>(caseEventRepository.findByLegalCaseIdOrderByCreatedAtDesc(legalCase.getId()));
+        Collections.reverse(events);
+        var documents = documentRepository.findByLegalCaseIdAndStatus(legalCase.getId(), DocStatus.ACTIVE);
+
+        String context = """
+                Case: %s | Type: %s | Status: %s
+                Hearing Date: %s | Type: %s | Court: %s | Location: %s
+
+                Case Events:
+                %s
+
+                Available Documents:
+                %s
+                """.formatted(
+                legalCase.getTitle(), legalCase.getCaseType(), legalCase.getStatus(),
+                hearing.getHearingDate(), hearing.getHearingType(), hearing.getCourtName(), hearing.getLocation(),
+                events.stream()
+                        .map(e -> "- " + e.getCreatedAt() + ": " + e.getTitle()
+                                + (e.getDescription() == null ? "" : " - " + e.getDescription()))
+                        .collect(Collectors.joining("\n")),
+                documents.stream()
+                        .map(d -> "- " + d.getFileName() + " [" + d.getCategory() + "]")
+                        .collect(Collectors.joining("\n"))
+        );
+
+        String prompt = """
+                Generate a comprehensive hearing preparation brief for the following hearing.
+
+                %s
+
+                Return JSON with:
+                - caseBackground: 2-sentence case summary
+                - hearingObjective: what needs to be achieved at this hearing
+                - keyFacts: array of the most important facts to remember
+                - documentsToReview: array of document names to review before the hearing
+                - suggestedArguments: array of key arguments to make
+                - anticipatedCounterArguments: array of expected opposing arguments with brief rebuttals
+                - questionsToAddress: array of questions the judge might ask
+                - actionItemsBeforeHearing: array of tasks to complete before the hearing date
+
+                Respond ONLY with valid JSON.
+                """.formatted(context);
+
+        return chatClient.orElseThrow(() -> new AiUnavailableException("AI features require OPENAI_API_KEY to be configured."))
+                .prompt()
+                .system("You are a senior litigator with 20 years of court experience. Be tactical and specific.")
+                .user(prompt)
+                .call()
+                .entity(HearingPrepBrief.class);
     }
 }
