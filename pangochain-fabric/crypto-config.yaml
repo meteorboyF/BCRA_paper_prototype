@@ -1,0 +1,42 @@
+OrdererOrgs:
+  - Name: Orderer
+    Domain: pangochain.com
+    EnableNodeOUs: true
+    Specs:
+      - Hostname: orderer1
+        SANS:
+          - localhost
+          - orderer1.pangochain.com
+      - Hostname: orderer2
+        SANS:
+          - localhost
+          - orderer2.pangochain.com
+      - Hostname: orderer3
+        SANS:
+          - localhost
+          - orderer3.pangochain.com
+
+PeerOrgs:
+  - Name: FirmA
+    Domain: firma.pangochain.com
+    EnableNodeOUs: true
+    Template:
+      Count: 1
+    Users:
+      Count: 2
+
+  - Name: FirmB
+    Domain: firmb.pangochain.com
+    EnableNodeOUs: true
+    Template:
+      Count: 1
+    Users:
+      Count: 2
+
+  - Name: Regulator
+    Domain: regulator.pangochain.com
+    EnableNodeOUs: true
+    Template:
+      Count: 1
+    Users:
+      Count: 1

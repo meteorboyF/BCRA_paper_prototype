@@ -1,0 +1,192 @@
+---
+Organizations:
+  - &OrdererOrg
+    Name: OrdererOrg
+    ID: OrdererMSP
+    MSPDir: crypto-config/ordererOrganizations/pangochain.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('OrdererMSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('OrdererMSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('OrdererMSP.admin')"
+
+  - &FirmA
+    Name: FirmAMSP
+    ID: FirmAMSP
+    MSPDir: crypto-config/peerOrganizations/firma.pangochain.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('FirmAMSP.admin', 'FirmAMSP.peer', 'FirmAMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('FirmAMSP.admin', 'FirmAMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('FirmAMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('FirmAMSP.peer')"
+    AnchorPeers:
+      - Host: peer0.firma.pangochain.com
+        Port: 7051
+
+  - &FirmB
+    Name: FirmBMSP
+    ID: FirmBMSP
+    MSPDir: crypto-config/peerOrganizations/firmb.pangochain.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('FirmBMSP.admin', 'FirmBMSP.peer', 'FirmBMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('FirmBMSP.admin', 'FirmBMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('FirmBMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('FirmBMSP.peer')"
+    AnchorPeers:
+      - Host: peer0.firmb.pangochain.com
+        Port: 8051
+
+  - &RegulatorOrg
+    Name: RegulatorMSP
+    ID: RegulatorMSP
+    MSPDir: crypto-config/peerOrganizations/regulator.pangochain.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('RegulatorMSP.admin', 'RegulatorMSP.peer', 'RegulatorMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('RegulatorMSP.admin', 'RegulatorMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('RegulatorMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('RegulatorMSP.peer')"
+    AnchorPeers:
+      - Host: peer0.regulator.pangochain.com
+        Port: 9051
+
+Capabilities:
+  Channel: &ChannelCapabilities
+    V2_0: true
+  Orderer: &OrdererCapabilities
+    V2_0: true
+  Application: &ApplicationCapabilities
+    V2_0: true
+
+Application: &ApplicationDefaults
+  Organizations:
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+    LifecycleEndorsement:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Endorsement"
+    Endorsement:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Endorsement"
+  Capabilities:
+    <<: *ApplicationCapabilities
+
+Orderer: &OrdererDefaults
+  OrdererType: etcdraft
+  Addresses:
+    - orderer1.pangochain.com:7050
+    - orderer2.pangochain.com:8050
+    - orderer3.pangochain.com:9050
+  BatchTimeout: 2s
+  BatchSize:
+    MaxMessageCount: 500
+    AbsoluteMaxBytes: 99 MB
+    PreferredMaxBytes: 2 MB
+  EtcdRaft:
+    Consenters:
+      - Host: orderer1.pangochain.com
+        Port: 7050
+        ClientTLSCert: crypto-config/ordererOrganizations/pangochain.com/orderers/orderer1.pangochain.com/tls/server.crt
+        ServerTLSCert: crypto-config/ordererOrganizations/pangochain.com/orderers/orderer1.pangochain.com/tls/server.crt
+      - Host: orderer2.pangochain.com
+        Port: 8050
+        ClientTLSCert: crypto-config/ordererOrganizations/pangochain.com/orderers/orderer2.pangochain.com/tls/server.crt
+        ServerTLSCert: crypto-config/ordererOrganizations/pangochain.com/orderers/orderer2.pangochain.com/tls/server.crt
+      - Host: orderer3.pangochain.com
+        Port: 9050
+        ClientTLSCert: crypto-config/ordererOrganizations/pangochain.com/orderers/orderer3.pangochain.com/tls/server.crt
+        ServerTLSCert: crypto-config/ordererOrganizations/pangochain.com/orderers/orderer3.pangochain.com/tls/server.crt
+  Organizations:
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+    BlockValidation:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+  Capabilities:
+    <<: *OrdererCapabilities
+
+Channel: &ChannelDefaults
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+  Capabilities:
+    <<: *ChannelCapabilities
+
+Profiles:
+  # Genesis block profile — used to bootstrap the orderer system channel
+  LegalOrdererGenesis:
+    <<: *ChannelDefaults
+    Orderer:
+      <<: *OrdererDefaults
+      Organizations:
+        - *OrdererOrg
+    Consortiums:
+      LegalConsortium:
+        Organizations:
+          - *FirmA
+          - *FirmB
+          - *RegulatorOrg
+
+  # Application channel profile
+  LegalChannel:
+    Consortium: LegalConsortium
+    <<: *ChannelDefaults
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - *FirmA
+        - *FirmB
+        - *RegulatorOrg
+      Capabilities:
+        <<: *ApplicationCapabilities
