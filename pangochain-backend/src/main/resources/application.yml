@@ -1,0 +1,122 @@
+spring:
+  application:
+    name: pangochain-backend
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:pangochain}?stringtype=unspecified
+    username: ${DB_USER:pangochain}
+    password: ${DB_PASSWORD:pangochain_secret}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 30
+      minimum-idle: 5
+      connection-timeout: 30000      # 30s to obtain a connection before failing fast
+      idle-timeout: 600000           # 10 min
+      max-lifetime: 1800000          # 30 min — under Postgres/router idle kill windows
+      leak-detection-threshold: 60000  # warn if a connection is held > 60s (slow Fabric path)
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    # open-in-view=false: do NOT pin a Hikari connection for the whole HTTP request (which,
+    # with multi-second Fabric calls, would exhaust the pool under load). Lazy associations
+    # accessed outside a transaction are handled explicitly: User.firm is EAGER (loaded once
+    # per request in the JWT filter), and the hearing/case-event/reminder list queries use
+    # JOIN FETCH so their DTO mappers read already-initialized associations.
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          batch_size: 30
+        order_inserts: true
+        order_updates: true
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    enabled: true
+
+server:
+  port: 8080
+  error:
+    include-message: always
+    include-binding-errors: always
+  tomcat:
+    threads:
+      max: 200
+      min-spare: 20
+    max-connections: 8192
+    accept-count: 100
+    connection-timeout: 20000
+
+jwt:
+  secret: ${JWT_SECRET:pangochain-jwt-secret-key-must-be-at-least-256-bits-long-for-hs256-algorithm}
+  access-token-expiry: 900        # 15 minutes in seconds
+  refresh-token-expiry: 604800    # 7 days in seconds
+
+fabric:
+  # Fabric network is running — hardcoded true for experiment session
+  enabled: true
+  # Peer gRPC endpoint for Gateway SDK connection
+  peer-endpoint: ${FABRIC_PEER_ENDPOINT:localhost:7051}
+  peer-host-override: ${FABRIC_PEER_HOST_OVERRIDE:peer0.firma.pangochain.com}
+  msp-id: ${FABRIC_MSP_ID:FirmAMSP}
+  # Paths to admin identity material (mounted from crypto-config volume)
+  cert-path: ${FABRIC_CERT_PATH:config/fabric/crypto/admin-cert.pem}
+  key-path: ${FABRIC_KEY_PATH:config/fabric/crypto/admin-key.pem}
+  tls-cert-path: ${FABRIC_TLS_CERT_PATH:config/fabric/crypto/tls-ca-cert.pem}
+  channel-name: ${FABRIC_CHANNEL:legal-channel}
+  chaincode-name: ${FABRIC_CHAINCODE:legalcc}
+
+documents:
+  # Fabric CheckAccess is attempted first. If Fabric is unavailable, document material falls
+  # back to the PostgreSQL document_access ACL so authorized users can still decrypt/redact.
+  # Set DOCUMENT_MATERIAL_DB_FALLBACK=false for strict fail-closed outage tests.
+  material-db-fallback-enabled: ${DOCUMENT_MATERIAL_DB_FALLBACK:true}
+
+ipfs:
+  api:
+    host: ${IPFS_API_HOST:http://localhost}
+    port: ${IPFS_API_PORT:5001}
+    host2: ${IPFS_API_HOST2:http://localhost}   # secondary — pin for redundancy
+    port2: ${IPFS_API_PORT2:5002}
+  gateway:
+    host: ${IPFS_GW_HOST:http://localhost}
+    port: ${IPFS_GW_PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      fabric:
+        sliding-window-type: TIME_BASED
+        sliding-window-size: 10          # 10-second window
+        minimum-number-of-calls: 5       # need 5 calls before evaluating
+        failure-rate-threshold: 50       # >=50% failures opens the breaker
+        wait-duration-in-open-state: 30s # stay open 30s, then HALF_OPEN
+        permitted-number-of-calls-in-half-open-state: 3
+        automatic-transition-from-open-to-half-open-enabled: true
+        record-exceptions:
+          - com.pangochain.backend.blockchain.FabricException
+  retry:
+    instances:
+      fabric:
+        max-attempts: 3
+        wait-duration: 500ms
+        retry-exceptions:
+          - com.pangochain.backend.blockchain.FabricException
+
+logging:
+  level:
+    com.pangochain: INFO
+    org.springframework.security: WARN
