@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class AiAvailability {
 
-    @Value("${spring.ai.openai.api-key:}")
+    @Value("${OPENAI_API_KEY:}")
     private String apiKey;
 
     public boolean isAvailable() {
