@@ -19,7 +19,10 @@ export async function decryptDocumentToBytes(
   const ciphertextBytes: ArrayBuffer = ciphertextRes.data
   const wrappedKeyToken: string = wrappedKeyRes.data
 
-  const docKeyB64 = await eciesUnwrapKey(privateKey, wrappedKeyToken)
+  const tokenBytes = base64ToBytes(wrappedKeyToken)
+  const docKeyB64 = tokenBytes.byteLength === 32
+    ? wrappedKeyToken
+    : await eciesUnwrapKey(privateKey, wrappedKeyToken)
 
   const fullBytes = new Uint8Array(ciphertextBytes)
   const iv = fullBytes.slice(0, 12)

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.time.Duration;
 import java.util.Map;
 
 /**
@@ -23,6 +24,8 @@ import java.util.Map;
 @Service
 @Slf4j
 public class IpfsService {
+
+    private static final Duration IPFS_TIMEOUT = Duration.ofSeconds(5);
 
     private final WebClient primary;
     private final WebClient secondary;
@@ -54,7 +57,7 @@ public class IpfsService {
                 .body(BodyInserters.fromMultipartData(body.build()))
                 .retrieve()
                 .bodyToMono(Map.class)
-                .block();
+                .block(IPFS_TIMEOUT);
 
         if (response == null || !response.containsKey("Hash")) {
             throw new IpfsException("IPFS add returned no CID");
@@ -77,7 +80,7 @@ public class IpfsService {
                     .uri("/api/v0/cat?arg={cid}", cid)
                     .retrieve()
                     .bodyToMono(byte[].class)
-                    .block();
+                    .block(IPFS_TIMEOUT);
             if (bytes != null) {
                 log.info("Fetched {} bytes from primary IPFS CID={}", bytes.length, cid);
                 return bytes;
@@ -92,7 +95,7 @@ public class IpfsService {
                     .uri("/api/v0/cat?arg={cid}", cid)
                     .retrieve()
                     .bodyToMono(byte[].class)
-                    .block();
+                    .block(IPFS_TIMEOUT);
             if (bytes == null) throw new IpfsException("IPFS cat returned null for CID=" + cid);
             log.info("Fetched {} bytes from secondary IPFS CID={}", bytes.length, cid);
             return bytes;
@@ -109,7 +112,7 @@ public class IpfsService {
                     .uri("/api/v0/pin/add?arg={cid}", cid)
                     .retrieve()
                     .bodyToMono(Map.class)
-                    .block();
+                    .block(IPFS_TIMEOUT);
             log.info("Pinned CID {} on both IPFS nodes", cid);
         } catch (Exception e) {
             log.warn("Failed to pin CID {} on secondary IPFS node: {}", cid, e.getMessage());

@@ -9,6 +9,7 @@ import com.pangochain.backend.chat.ChatService;
 import com.pangochain.backend.crypto.Pbkdf2Service;
 import com.pangochain.backend.hearing.Hearing;
 import com.pangochain.backend.hearing.HearingRepository;
+import com.pangochain.backend.ipfs.IpfsService;
 import com.pangochain.backend.reminder.Reminder;
 import com.pangochain.backend.reminder.ReminderRepository;
 import com.pangochain.backend.user.*;
@@ -22,8 +23,15 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.GCMParameterSpec;
+import java.security.MessageDigest;
+import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Base64;
 import java.util.UUID;
 
 @Component
@@ -39,6 +47,7 @@ public class DataSeeder implements ApplicationRunner {
     private final CaseEventRepository caseEventRepository;
     private final Pbkdf2Service pbkdf2Service;
     private final ChatService chatService;
+    private final IpfsService ipfsService;
 
     @PersistenceContext
     private EntityManager em;
@@ -579,45 +588,45 @@ public class DataSeeder implements ApplicationRunner {
 
     private void seedShowcaseDocuments(Case legalCase, User lawyer, User client, User paralegal,
                                        User associateA, User associateB, User secretary) {
-        UUID lease = ensureDocument(legalCase, lawyer, "Chen Lease Agreement - Executed.pdf", "CONTRACT", true, 1, null, 50);
-        UUID leaseV2 = ensureDocument(legalCase, lawyer, "Chen Lease Agreement - Executed v2 annotated.pdf", "CONTRACT", true, 2, lease, 42);
-        UUID termination = ensureDocument(legalCase, client, "Meridian Termination Notice.pdf", "CORRESPONDENCE", true, 1, null, 36);
-        UUID ledger = ensureDocument(legalCase, lawyer, "Rent Payment Ledger Q1-Q4.xlsx", "EVIDENCE", false, 1, null, 28);
-        UUID motion = ensureDocument(legalCase, lawyer, "Draft Preliminary Injunction Motion.docx", "PLEADING", true, 1, null, 8);
-        UUID redacted = ensureDocument(legalCase, lawyer, "Meridian Termination Notice v2 redacted.pdf", "CORRESPONDENCE", false, 2, termination, 4);
-        UUID settlement = ensureDocument(legalCase, lawyer, "Settlement Evaluation Memo.pdf", "MEMO", true, 1, null, 2);
+        SeededDocument lease = ensureSeededMarkdownDocument(legalCase, lawyer, "Chen Lease Agreement - Executed.md", "chen-lease-agreement-executed.md", "CONTRACT", true, 1, null, 50);
+        SeededDocument leaseV2 = ensureSeededMarkdownDocument(legalCase, lawyer, "Chen Lease Agreement - Executed v2 annotated.md", "chen-lease-agreement-v2-annotated.md", "CONTRACT", true, 2, lease.id(), 42);
+        SeededDocument termination = ensureSeededMarkdownDocument(legalCase, client, "Meridian Termination Notice.md", "meridian-termination-notice.md", "CORRESPONDENCE", true, 1, null, 36);
+        SeededDocument ledger = ensureSeededMarkdownDocument(legalCase, lawyer, "Rent Payment Ledger Q1-Q4.md", "rent-payment-ledger-q1-q4.md", "EVIDENCE", false, 1, null, 28);
+        SeededDocument motion = ensureSeededMarkdownDocument(legalCase, lawyer, "Draft Preliminary Injunction Motion.md", "draft-preliminary-injunction-motion.md", "PLEADING", true, 1, null, 8);
+        SeededDocument redacted = ensureSeededMarkdownDocument(legalCase, lawyer, "Meridian Termination Notice v2 redacted.md", "meridian-termination-notice-redacted.md", "CORRESPONDENCE", false, 2, termination.id(), 4);
+        SeededDocument settlement = ensureSeededMarkdownDocument(legalCase, lawyer, "Settlement Evaluation Memo.md", "settlement-evaluation-memo.md", "MEMO", true, 1, null, 2);
 
-        grantAccess(lease, lawyer, lawyer, "owner", 50);
-        grantAccess(lease, paralegal, lawyer, "write", 48);
-        grantAccess(lease, associateA, lawyer, "read", 47);
-        grantAccess(leaseV2, lawyer, lawyer, "owner", 42);
-        grantAccess(leaseV2, paralegal, lawyer, "write", 41);
-        grantAccess(termination, client, client, "owner", 36);
-        grantAccess(termination, lawyer, client, "write", 35);
-        grantAccess(termination, associateB, lawyer, "read", 32);
-        grantAccess(redacted, lawyer, lawyer, "owner", 4);
-        grantAccess(redacted, secretary, lawyer, "read", 3);
-        grantAccess(ledger, lawyer, lawyer, "owner", 28);
-        grantAccess(ledger, paralegal, lawyer, "write", 27);
-        grantAccess(motion, lawyer, lawyer, "owner", 8);
-        grantAccess(motion, associateA, lawyer, "write", 7);
-        grantAccess(settlement, lawyer, lawyer, "owner", 2);
-        grantAccess(settlement, client, lawyer, "read", 1);
+        grantAccess(lease.id(), lawyer, lawyer, "owner", 50, lease.rawKeyB64());
+        grantAccess(lease.id(), paralegal, lawyer, "write", 48, lease.rawKeyB64());
+        grantAccess(lease.id(), associateA, lawyer, "read", 47, lease.rawKeyB64());
+        grantAccess(leaseV2.id(), lawyer, lawyer, "owner", 42, leaseV2.rawKeyB64());
+        grantAccess(leaseV2.id(), paralegal, lawyer, "write", 41, leaseV2.rawKeyB64());
+        grantAccess(termination.id(), client, client, "owner", 36, termination.rawKeyB64());
+        grantAccess(termination.id(), lawyer, client, "write", 35, termination.rawKeyB64());
+        grantAccess(termination.id(), associateB, lawyer, "read", 32, termination.rawKeyB64());
+        grantAccess(redacted.id(), lawyer, lawyer, "owner", 4, redacted.rawKeyB64());
+        grantAccess(redacted.id(), secretary, lawyer, "read", 3, redacted.rawKeyB64());
+        grantAccess(ledger.id(), lawyer, lawyer, "owner", 28, ledger.rawKeyB64());
+        grantAccess(ledger.id(), paralegal, lawyer, "write", 27, ledger.rawKeyB64());
+        grantAccess(motion.id(), lawyer, lawyer, "owner", 8, motion.rawKeyB64());
+        grantAccess(motion.id(), associateA, lawyer, "write", 7, motion.rawKeyB64());
+        grantAccess(settlement.id(), lawyer, lawyer, "owner", 2, settlement.rawKeyB64());
+        grantAccess(settlement.id(), client, lawyer, "read", 1, settlement.rawKeyB64());
 
-        seedAnnotationSet(motion, lawyer, associateA, paralegal);
-        seedRedaction(termination, redacted, lawyer);
-        seedSigningWorkflow(leaseV2, legalCase, lawyer, client, "Lease Evidence Certification", true);
-        seedSigningWorkflow(settlement, legalCase, lawyer, client, "Settlement Authority Acknowledgement", false);
-        seedDocumentClassification(lease, "CONTRACT", 94, lawyer);
-        seedDocumentClassification(termination, "CORRESPONDENCE", 89, client);
-        seedDocumentClassification(ledger, "EVIDENCE", 91, paralegal);
+        seedAnnotationSet(motion.id(), lawyer, associateA, paralegal);
+        seedRedaction(termination.id(), redacted.id(), lawyer);
+        seedSigningWorkflow(leaseV2.id(), legalCase, lawyer, client, "Lease Evidence Certification", true);
+        seedSigningWorkflow(settlement.id(), legalCase, lawyer, client, "Settlement Authority Acknowledgement", false);
+        seedDocumentClassification(lease.id(), "CONTRACT", 94, lawyer);
+        seedDocumentClassification(termination.id(), "CORRESPONDENCE", 89, client);
+        seedDocumentClassification(ledger.id(), "EVIDENCE", 91, paralegal);
 
         seedAudit(legalCase.getId().toString(), "CASE", "CASE_VIEWED", lawyer, "Case reviewed from dashboard", 6);
-        seedAudit(lease.toString(), "DOCUMENT", "DOCUMENT_UPLOADED", lawyer, "Executed lease uploaded and encrypted", 50);
-        seedAudit(lease.toString(), "DOCUMENT", "ACCESS_GRANTED", lawyer, "Priya Nair granted write access", 48);
-        seedAudit(leaseV2.toString(), "DOCUMENT", "DOCUMENT_VERSION_CREATED", lawyer, "Annotated version uploaded", 42);
-        seedAudit(termination.toString(), "DOCUMENT", "DOCUMENT_DOWNLOADED", associateB, "Termination notice downloaded for review", 29);
-        seedAudit(redacted.toString(), "DOCUMENT", "REDACTION_CREATED", lawyer, "Client identifiers redacted in browser", 4);
+        seedAudit(lease.id().toString(), "DOCUMENT", "DOCUMENT_UPLOADED", lawyer, "Executed lease uploaded and encrypted", 50);
+        seedAudit(lease.id().toString(), "DOCUMENT", "ACCESS_GRANTED", lawyer, "Priya Nair granted write access", 48);
+        seedAudit(leaseV2.id().toString(), "DOCUMENT", "DOCUMENT_VERSION_CREATED", lawyer, "Annotated version uploaded", 42);
+        seedAudit(termination.id().toString(), "DOCUMENT", "DOCUMENT_DOWNLOADED", associateB, "Termination notice downloaded for review", 29);
+        seedAudit(redacted.id().toString(), "DOCUMENT", "REDACTION_CREATED", lawyer, "Client identifiers redacted in browser", 4);
         seedAudit(settlement.toString(), "DOCUMENT", "DOCUMENT_SHARED_WITH_CLIENT", lawyer, "Settlement memo shared with Marcus Chen", 1);
     }
 
@@ -945,7 +954,109 @@ public class DataSeeder implements ApplicationRunner {
         return id;
     }
 
+    private SeededDocument ensureSeededMarkdownDocument(Case legalCase, User owner, String fileName,
+                                                       String resourceName, String category,
+                                                       boolean confidential, int version,
+                                                       UUID previousVersionId, int daysAgo) {
+        SeededPayload payload = encryptSeedDocument(resourceName, fileName);
+        @SuppressWarnings("unchecked")
+        java.util.List<Object> rows = em.createNativeQuery(
+                        "SELECT id FROM documents WHERE case_id = :caseId AND file_name = :fileName ORDER BY created_at ASC LIMIT 1")
+                .setParameter("caseId", legalCase.getId())
+                .setParameter("fileName", fileName)
+                .getResultList();
+
+        UUID id = rows.isEmpty() ? UUID.randomUUID() : (UUID) rows.get(0);
+        String tx = "seed-md-tx-" + demoHash(id.toString()).substring(0, 22);
+        if (rows.isEmpty()) {
+            em.createNativeQuery("""
+                    INSERT INTO documents
+                        (id, case_id, file_name, ipfs_cid, document_hash_sha256, fabric_tx_id,
+                         owner_id, version, previous_version_id, status, key_rotation_pending,
+                         category, confidential, created_at)
+                    VALUES
+                        (:id, :caseId, :fileName, :cid, :hash, :tx, :owner, :version, :previous,
+                         CAST('ACTIVE' AS doc_status), false, :category, :confidential,
+                         now() - make_interval(days => :days))
+                    """)
+                    .setParameter("id", id)
+                    .setParameter("caseId", legalCase.getId())
+                    .setParameter("fileName", fileName)
+                    .setParameter("cid", payload.cid())
+                    .setParameter("hash", payload.hashB64())
+                    .setParameter("tx", tx)
+                    .setParameter("owner", owner.getId())
+                    .setParameter("version", version)
+                    .setParameter("previous", previousVersionId)
+                    .setParameter("category", category)
+                    .setParameter("confidential", confidential)
+                    .setParameter("days", daysAgo)
+                    .executeUpdate();
+        } else {
+            em.createNativeQuery("""
+                    UPDATE documents
+                    SET ipfs_cid = :cid,
+                        document_hash_sha256 = :hash,
+                        fabric_tx_id = COALESCE(fabric_tx_id, :tx),
+                        owner_id = :owner,
+                        version = :version,
+                        previous_version_id = :previous,
+                        category = :category,
+                        confidential = :confidential,
+                        key_rotation_pending = false,
+                        status = CAST('ACTIVE' AS doc_status)
+                    WHERE id = :id
+                    """)
+                    .setParameter("id", id)
+                    .setParameter("cid", payload.cid())
+                    .setParameter("hash", payload.hashB64())
+                    .setParameter("tx", tx)
+                    .setParameter("owner", owner.getId())
+                    .setParameter("version", version)
+                    .setParameter("previous", previousVersionId)
+                    .setParameter("category", category)
+                    .setParameter("confidential", confidential)
+                    .executeUpdate();
+        }
+        return new SeededDocument(id, payload.rawKeyB64());
+    }
+
+    private SeededPayload encryptSeedDocument(String resourceName, String fileName) {
+        try (java.io.InputStream in = getClass().getResourceAsStream("/demo-documents/" + resourceName)) {
+            if (in == null) throw new IllegalStateException("Missing seed document resource: " + resourceName);
+            byte[] plaintext = in.readAllBytes();
+
+            KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
+            keyGenerator.init(256);
+            SecretKey key = keyGenerator.generateKey();
+
+            byte[] iv = new byte[12];
+            new SecureRandom().nextBytes(iv);
+            Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            cipher.init(Cipher.ENCRYPT_MODE, key, new GCMParameterSpec(128, iv));
+            byte[] ciphertext = cipher.doFinal(plaintext);
+
+            byte[] storedBytes = new byte[iv.length + ciphertext.length];
+            System.arraycopy(iv, 0, storedBytes, 0, iv.length);
+            System.arraycopy(ciphertext, 0, storedBytes, iv.length, ciphertext.length);
+
+            String cid = ipfsService.add(storedBytes, fileName);
+            byte[] hash = MessageDigest.getInstance("SHA-256").digest(plaintext);
+            return new SeededPayload(
+                    cid,
+                    Base64.getEncoder().encodeToString(hash),
+                    Base64.getEncoder().encodeToString(key.getEncoded()));
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to encrypt and seed " + fileName, e);
+        }
+    }
+
     private void grantAccess(UUID docId, User grantee, User granter, String capability, int daysAgo) {
+        grantAccess(docId, grantee, granter, capability, daysAgo,
+                "demo-wrapped-key-" + demoHash(docId + grantee.getEmail()).substring(0, 24));
+    }
+
+    private void grantAccess(UUID docId, User grantee, User granter, String capability, int daysAgo, String wrappedKeyToken) {
         if (docId == null || grantee == null || granter == null) return;
         em.createNativeQuery("""
                 INSERT INTO document_access
@@ -962,9 +1073,26 @@ public class DataSeeder implements ApplicationRunner {
                 .setParameter("cap", capability)
                 .setParameter("by", granter.getId())
                 .setParameter("days", daysAgo)
-                .setParameter("token", "demo-wrapped-key-" + demoHash(docId + grantee.getEmail()).substring(0, 24))
+                .setParameter("token", wrappedKeyToken)
+                .executeUpdate();
+        em.createNativeQuery("""
+                UPDATE document_access
+                SET capability = CAST(:cap AS capability),
+                    granted_by = :by,
+                    wrapped_key_token = :token,
+                    token_obsolete = false
+                WHERE doc_id = :doc AND user_id = :user AND revoked_at IS NULL
+                """)
+                .setParameter("doc", docId)
+                .setParameter("user", grantee.getId())
+                .setParameter("cap", capability)
+                .setParameter("by", granter.getId())
+                .setParameter("token", wrappedKeyToken)
                 .executeUpdate();
     }
+
+    private record SeededDocument(UUID id, String rawKeyB64) {}
+    private record SeededPayload(String cid, String hashB64, String rawKeyB64) {}
 
     private void seedAnnotationSet(UUID docId, User lawyer, User associate, User paralegal) {
         if (annotationExists(docId, "Tighten irreparable harm paragraph before filing.")) return;
