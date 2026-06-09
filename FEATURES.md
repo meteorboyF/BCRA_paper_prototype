@@ -1,5 +1,18 @@
 # PangoChain — Feature Status
 
+## AI Features (OpenAI GPT-4o)
+
+| Feature | Description |
+|---|---|
+| AI Legal Chat | Lawyer-side chat over selected decrypted documents, with conversation history per matter. |
+| Client Case Chatbot | Plain-English client Q&A from structured case, hearing, milestone, and document metadata. |
+| Hearing Prep Brief | One-click court prep brief with objectives, facts, arguments, questions, and action items. |
+| Contract Risk Scanner | User-triggered decrypted document analysis with summary, parties, obligations, and risk flags. |
+| Timeline Contradiction Detector | Metadata-only scan for date conflicts, suspicious gaps, and logical inconsistencies. |
+| Evidence Gap Analyzer | Strategic gap analysis showing available evidence and missing proof priorities. |
+| AI Document Drafter | Draft demand letters, affidavits, settlement letters, and other legal documents from instructions. |
+| Smart Classification | GPT-4o document category suggestions with keyword fallback when AI is unavailable. |
+
 > IEEE Access manuscript Access-2026-02049 · Stack: React 18 + Spring Boot 3 + PostgreSQL 16 + Hyperledger Fabric 2.4 + IPFS Kubo
 
 ---

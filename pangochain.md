@@ -62,4 +62,4 @@ React 18 + TypeScript · Spring Boot 3.2.5 + Java 17 · PostgreSQL 16 · Hyperle
 
 ## Status
 
-Core platform (blockchain, IPFS, E2E encryption, case management, document workflows, client portal) is fully implemented. OpenAI integration is actively being wired into existing AI scaffold pages (`AiAssistant`, `ClientAssistant`, `classification` module) using the $50 OpenAI credits awarded by the hackathon.
+Core platform fully implemented (blockchain, IPFS, E2E encryption). OpenAI features fully integrated: 8 AI-powered features including RAG legal chat, contract risk scanner, hearing prep brief, timeline contradiction detector, evidence gap analyzer, AI document drafter, smart classification, and client chatbot.

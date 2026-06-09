@@ -181,6 +181,26 @@ Requires `MANAGING_PARTNER`, `IT_ADMIN`, or `REGULATOR`.
 
 ---
 
+## AI Endpoints (`/api/ai`)
+
+All AI endpoints require a JWT. If `OPENAI_API_KEY` is not configured, they return `503` with `{"error":"AI_UNAVAILABLE"}`.
+
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| GET | `/api/ai/health` | Authenticated | Returns `{"available":true/false,"model":"gpt-4o"}` |
+| POST | `/api/ai/chat` | Legal professionals | Lawyer RAG chat. Body: `{caseId, question, documents:[{documentId,fileName,text}]}` |
+| GET | `/api/ai/cases/{caseId}/chat-history` | Legal professionals | Recent AI chat messages for the case and caller |
+| POST | `/api/ai/client/chat` | Client roles | Plain-English client Q&A from case/hearing/milestone/document metadata |
+| POST | `/api/ai/documents/analyze` | Legal professionals/paralegals | Analyze decrypted document text. Body: `{fileName,text,documentId}` |
+| GET | `/api/ai/cases/{caseId}/timeline-check` | Legal professionals/admin | Detect timeline contradictions from structured case metadata |
+| GET | `/api/ai/cases/{caseId}/evidence-gaps` | Legal professionals/admin | Analyze available evidence metadata and missing proof |
+| GET | `/api/ai/hearings/{hearingId}/prep` | Lawyers/partners | Generate a hearing preparation brief |
+| POST | `/api/ai/draft` | Lawyers/partners | Generate a legal draft. Body: `{caseId,documentType,instructions,keyFacts}` |
+
+Related endpoint: `POST /api/documents/classify` now uses GPT-4o when configured and falls back to the keyword classifier otherwise.
+
+---
+
 ## Error Responses
 
 | Status | Condition |

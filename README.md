@@ -33,15 +33,30 @@ Legal professionals manage thousands of sensitive documents across fragmented, i
 
 ## OpenAI Integration
 
-| Feature | Implementation | OpenAI Capability Used |
+| Feature | Endpoint | OpenAI Capability |
 |---|---|---|
-| **AI Legal Assistant** | RAG pipeline over case documents; lawyers chat with their files | GPT-4o + Assistants API (file threading, document retrieval) |
-| **Client Assistant** | Translates legal filings into plain English for clients | GPT-4o (instruction-following, tone adaptation) |
-| **Smart Document Classification** | Auto-categorizes uploads as CONTRACT, EVIDENCE, MEDICAL, FINANCIAL, etc. | GPT-4o function-calling (structured JSON output) |
-| **Case Insights** | AI-generated risk summary and outcome assessment per case | GPT-4o (legal reasoning, chain-of-thought) |
+| AI Legal Chat | `POST /api/ai/chat` | GPT-4o chat completions with document context |
+| Client Case Chatbot | `POST /api/ai/client/chat` | GPT-4o with structured DB context |
+| Hearing Prep Brief | `GET /api/ai/hearings/{id}/prep` | GPT-4o + case/hearing metadata |
+| Contract Risk Scanner | `POST /api/ai/documents/analyze` | GPT-4o structured output |
+| Timeline Contradiction | `GET /api/ai/cases/{id}/timeline-check` | GPT-4o forensic analysis |
+| Evidence Gap Analysis | `GET /api/ai/cases/{id}/evidence-gaps` | GPT-4o strategic analysis |
+| AI Document Drafter | `POST /api/ai/draft` | GPT-4o generation |
+| Smart Classification | `POST /api/documents/classify` | GPT-4o structured JSON classification |
 
 **Why GPT-4o?**
 Legal document understanding requires nuanced reasoning over long, dense text. GPT-4o's 128k context window handles full contracts, the Assistants API's file threading enables multi-document RAG without preprocessing, and function-calling produces reliable structured output for classification pipelines. No other model matches this combination for legal workflows.
+
+## AI Features Setup
+
+Set your OpenAI API key before running:
+
+```bash
+export OPENAI_API_KEY=sk-proj-your-key-here
+bash scripts/dev.sh
+```
+
+AI features gracefully degrade to "unavailable" mode if the key is not set.
 
 ---
 
@@ -186,9 +201,9 @@ See [SETUP.md](SETUP.md) for full environment setup including Fabric network.
 ## OpenAI Usage Summary (Hackathon Submission)
 
 - **Models used:** GPT-4o via OpenAI API
-- **Platform features:** Assistants API (file threading for RAG), function-calling (structured classification output), chat completions (case insights, client assistant)
-- **Integration points:** `AiAssistant` page (lawyer RAG chat), `ClientAssistant` page (plain-language client portal), `classification` backend module (auto-categorization on upload), `CaseInsights` page (risk analysis)
-- **Why these capabilities:** GPT-4o's long context handles full legal contracts; Assistants API eliminates custom RAG infrastructure; function-calling ensures reliable structured output for document classification pipelines
+- **Platform features:** chat completions with structured JSON outputs, document-context prompting, and guarded metadata-only case analysis
+- **Integration points:** `AiAssistant`, `ClientAssistant`, `CaseInsights`, `HearingManager`, `Documents`, `TemplateEngine`, and backend `classification`
+- **Why these capabilities:** GPT-4o handles dense legal context, produces reliable structured analysis, and lets PangoChain keep decrypted text user-initiated rather than automatic.
 
 ---
 
