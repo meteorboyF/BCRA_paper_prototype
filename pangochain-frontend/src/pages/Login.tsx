@@ -1,12 +1,11 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Eye, EyeOff, Loader2, ShieldCheck, Lock, Zap } from 'lucide-react'
+import { ArrowLeft, Eye, EyeOff, Loader2, Lock } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { ThemeToggle } from '../components/ui/ThemeToggle'
 import api from '../lib/api'
 import { useAuthStore } from '../store/authStore'
 import toast from 'react-hot-toast'
-import { DEMO_USER } from '../lib/mockData'
 import { ensureUserKeys } from '../lib/provisionKeys'
 import { ScalesSvg, ChainLinkSvg } from '../components/ui/SvgAssets'
 
@@ -30,12 +29,6 @@ export default function Login() {
 
   const mfaStep = loginStage === 'mfa_code'
 
-  const handleDemo = () => {
-    setAuth('demo-access-token', 'demo-refresh-token', DEMO_USER)
-    toast.success('Welcome to the demo, Sarah!')
-    navigate('/dashboard')
-  }
-
   const storeAndRedirect = async (data: any) => {
     setAuth(data.accessToken, data.refreshToken, {
       id: data.userId,
@@ -57,14 +50,6 @@ export default function Login() {
     e.preventDefault()
     setError('')
     setLoading(true)
-
-    // Demo shortcut
-    if (email === 'demo@pangochain.com' && password === 'demo123') {
-      setAuth('demo-access-token', 'demo-refresh-token', DEMO_USER)
-      toast.success('Welcome to the demo!')
-      navigate('/dashboard')
-      return
-    }
 
     try {
       if (loginStage === 'mfa_code') {
@@ -142,7 +127,7 @@ export default function Login() {
             }}
             className="w-80 h-80 flex items-center justify-center"
           >
-            <ScalesSvg className="w-full h-full text-gold-500/45 stroke-[1] drop-shadow-[0_0_15px_rgba(201,168,76,0.25)]" />
+            <ScalesSvg className="gold-engraving-svg w-full h-full text-gold-500/80 stroke-[1.35]" />
           </motion.div>
           
           <div className="max-w-md text-center mt-8">
@@ -317,18 +302,6 @@ export default function Login() {
               </button>
             </form>
           )}
-
-          {/* Quick Demo Access */}
-          <div className="mt-6 pt-5 border-t border-gold-500/10">
-            <button
-              type="button"
-              onClick={handleDemo}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-gold-500/20 bg-gold-500/5 text-gold-300 text-xs font-bold uppercase tracking-wider hover:bg-gold-500/10 transition-all duration-300"
-            >
-              <Zap className="w-4 h-4 text-gold-500 fill-current" />
-              Demo Portal Access
-            </button>
-          </div>
 
           <p className="mt-5 text-center text-xs text-text-secondary font-semibold">
             Unregistered?{' '}

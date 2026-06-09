@@ -3,9 +3,9 @@
 @tailwind utilities;
 
 :root {
-  --color-navy-950-rgb: 5, 10, 24;
-  --color-navy-900-rgb: 8, 14, 32;
-  --color-navy-800-rgb: 13, 21, 38;
+  --color-navy-950-rgb: 18, 28, 48;
+  --color-navy-900-rgb: 24, 38, 64;
+  --color-navy-800-rgb: 36, 52, 82;
   
   --color-gold-300-rgb: 232, 213, 163;
   --color-gold-400-rgb: 212, 185, 106;
@@ -16,23 +16,23 @@
   --color-slate-800-rgb: 22, 32, 48;
 
   --color-primary-default-rgb: 201, 168, 76;
-  --color-primary-50-rgb: 13, 21, 38;
-  --color-primary-100-rgb: 30, 42, 58;
+  --color-primary-50-rgb: 36, 52, 82;
+  --color-primary-100-rgb: 50, 66, 96;
   --color-primary-500-rgb: 201, 168, 76;
   --color-primary-600-rgb: 168, 137, 60;
-  --color-primary-900-rgb: 5, 10, 24;
+  --color-primary-900-rgb: 18, 28, 48;
 
   --color-accent-rgb: 201, 168, 76;
 
-  --color-surface-default-rgb: 5, 10, 24;
-  --color-surface-card-rgb: 8, 14, 32;
-  --color-surface-muted-rgb: 13, 21, 38;
+  --color-surface-default-rgb: 18, 28, 48;
+  --color-surface-card-rgb: 24, 38, 64;
+  --color-surface-muted-rgb: 36, 52, 82;
 
   --color-text-primary-rgb: 245, 240, 232;
-  --color-text-secondary-rgb: 138, 155, 176;
-  --color-text-muted-rgb: 100, 116, 139;
+  --color-text-secondary-rgb: 174, 188, 208;
+  --color-text-muted-rgb: 128, 146, 170;
 
-  --color-border: rgba(201, 168, 76, 0.15);
+  --color-border: rgba(201, 168, 76, 0.2);
   --color-border-rgb: 201, 168, 76;
   
   --color-success-rgb: 26, 92, 74;
@@ -48,15 +48,15 @@
   --color-rose-500-rgb: 244, 63, 94;
 
   /* Custom radial layers & gradients */
-  --radial-at-0: rgba(13, 21, 38, 0.65);
-  --radial-at-50: rgba(201, 168, 76, 0.06);
-  --radial-at-100: rgba(26, 92, 74, 0.05);
-  --etched-line-color: rgba(201, 168, 76, 0.012);
+  --radial-at-0: rgba(36, 52, 82, 0.72);
+  --radial-at-50: rgba(201, 168, 76, 0.105);
+  --radial-at-100: rgba(42, 117, 99, 0.075);
+  --etched-line-color: rgba(201, 168, 76, 0.03);
   
-  --custom-shadow-sm: 0 0 8px rgba(201, 168, 76, 0.2);
-  --custom-shadow-md: 0 0 20px rgba(201, 168, 76, 0.3);
-  --custom-shadow-lg: 0 0 40px rgba(201, 168, 76, 0.4);
-  --glass-glow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --custom-shadow-sm: 0 0 10px rgba(201, 168, 76, 0.26);
+  --custom-shadow-md: 0 0 24px rgba(201, 168, 76, 0.34);
+  --custom-shadow-lg: 0 0 46px rgba(201, 168, 76, 0.42);
+  --glass-glow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .light {
@@ -105,10 +105,10 @@
   --color-rose-500-rgb: 136, 19, 55;
 
   /* Custom radial layers & gradients */
-  --radial-at-0: rgba(201, 168, 76, 0.06);
-  --radial-at-50: rgba(26, 92, 74, 0.02);
-  --radial-at-100: rgba(13, 21, 38, 0.01);
-  --etched-line-color: rgba(201, 168, 76, 0.025);
+  --radial-at-0: rgba(201, 168, 76, 0.105);
+  --radial-at-50: rgba(26, 92, 74, 0.045);
+  --radial-at-100: rgba(13, 21, 38, 0.025);
+  --etched-line-color: rgba(168, 137, 60, 0.06);
   
   --custom-shadow-sm: 0 0 8px rgba(201, 168, 76, 0.1);
   --custom-shadow-md: 0 0 20px rgba(201, 168, 76, 0.15);
@@ -147,6 +147,17 @@
   h1, h2, h3, h4, h5, h6 {
     @apply font-serif font-medium tracking-wide text-gold-300;
     font-feature-settings: "liga" on, "kern" on;
+  }
+
+  .gold-engraving-svg {
+    filter:
+      drop-shadow(0 0 10px rgba(201, 168, 76, 0.5))
+      drop-shadow(0 0 26px rgba(201, 168, 76, 0.24));
+    animation: engravingGlow 7s ease-in-out infinite;
+  }
+
+  .gold-engraving-svg * {
+    vector-effect: non-scaling-stroke;
   }
 }
 
@@ -316,6 +327,21 @@
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes engravingGlow {
+  0%, 100% {
+    opacity: 0.76;
+    filter:
+      drop-shadow(0 0 8px rgba(201, 168, 76, 0.42))
+      drop-shadow(0 0 20px rgba(201, 168, 76, 0.18));
+  }
+  50% {
+    opacity: 0.98;
+    filter:
+      drop-shadow(0 0 14px rgba(232, 213, 163, 0.6))
+      drop-shadow(0 0 34px rgba(201, 168, 76, 0.32));
+  }
 }
 
 /* Gold shimmer shine effect */

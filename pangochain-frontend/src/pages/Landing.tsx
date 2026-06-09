@@ -90,7 +90,7 @@ function Hero() {
 
       {/* Half-viewport geometric Lady Justice SVG on the right */}
       <div className="absolute right-0 bottom-0 top-16 w-full lg:w-1/2 opacity-45 lg:opacity-85 pointer-events-none flex items-center justify-end z-0">
-        <JusticeSvg className="w-full h-full max-h-[85vh] text-gold-500/35 stroke-current animate-drift drop-shadow-[0_0_12px_rgba(201,168,76,0.3)]" />
+        <JusticeSvg className="gold-engraving-svg w-full h-full max-h-[85vh] text-gold-500/80 stroke-current animate-drift" />
       </div>
 
       {/* Radial shade */}
