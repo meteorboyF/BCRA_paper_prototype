@@ -1,6 +1,18 @@
-.pango-dev/
+# Environment / secrets - NEVER COMMIT
+.env
+.env.local
+.env.*.local
+*.env
+application-local.yml
+application-local.properties
+*.local.yml
+*.local.properties
 
 # Build outputs
+pangochain-backend/target/
+pangochain-frontend/node_modules/
+pangochain-frontend/dist/
+pangochain-frontend/.vite/
 target/
 **/target/
 dist/
@@ -9,7 +21,18 @@ build/
 # Dependencies
 node_modules/
 
-# Logs and local env
+# Dev state
+.pango-dev/
+*.pid
+
+# IDE
+.idea/
+*.iml
+.vscode/settings.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
 *.log
-.env
-.env.*
