@@ -1,0 +1,15 @@
+.pango-dev/
+
+# Build outputs
+target/
+**/target/
+dist/
+build/
+
+# Dependencies
+node_modules/
+
+# Logs and local env
+*.log
+.env
+.env.*
