@@ -7,6 +7,7 @@ import {
 import api from '../lib/api'
 import { queryKeys } from '../lib/queryKeys'
 import toast from 'react-hot-toast'
+import { HearingPrepModal } from '../components/HearingPrepModal'
 
 interface CaseDto { id: string; title: string; status: string }
 interface Hearing {
@@ -20,6 +21,17 @@ interface Hearing {
   hearingType: string
   notes: string
   createdAt: string
+}
+
+interface HearingPrepBrief {
+  caseBackground: string
+  hearingObjective: string
+  keyFacts: string[]
+  documentsToReview: string[]
+  suggestedArguments: string[]
+  anticipatedCounterArguments: string[]
+  questionsToAddress: string[]
+  actionItemsBeforeHearing: string[]
 }
 
 const HEARING_TYPES = [
@@ -47,6 +59,10 @@ export default function HearingManager() {
   const [reminderRecipient, setReminderRecipient] = useState('')
   const [reminderBody, setReminderBody] = useState('')
   const [sendingReminder, setSendingReminder] = useState(false)
+  const [prepTarget, setPrepTarget] = useState<Hearing | null>(null)
+  const [prepBrief, setPrepBrief] = useState<HearingPrepBrief | null>(null)
+  const [prepLoading, setPrepLoading] = useState(false)
+  const [prepError, setPrepError] = useState('')
 
   const hearingsQuery = useQuery({
     queryKey: queryKeys.hearingsUpcoming(),
@@ -114,6 +130,23 @@ export default function HearingManager() {
       toast.error(e.response?.data?.detail ?? 'Failed to send reminder')
     } finally {
       setSendingReminder(false)
+    }
+  }
+
+  const handlePrep = async (hearing: Hearing) => {
+    setPrepTarget(hearing)
+    setPrepBrief(null)
+    setPrepError('')
+    setPrepLoading(true)
+    try {
+      const { data } = await api.get<HearingPrepBrief>(`/ai/hearings/${hearing.id}/prep`)
+      setPrepBrief(data)
+    } catch (e: any) {
+      setPrepError(e.response?.status === 503
+        ? 'AI features are not configured. Set OPENAI_API_KEY and restart the backend.'
+        : e.response?.data?.message ?? e.message ?? 'Failed to generate prep brief')
+    } finally {
+      setPrepLoading(false)
     }
   }
 
@@ -221,6 +254,7 @@ export default function HearingManager() {
                 hearing={h}
                 onDelete={handleDelete}
                 onRemind={() => setReminderHearing(h)}
+                onPrep={() => handlePrep(h)}
               />
             ))}
           </div>
@@ -280,14 +314,24 @@ export default function HearingManager() {
           </div>
         </div>
       )}
+      {prepTarget && (
+        <HearingPrepModal
+          title={`${prepTarget.hearingType.replace(/_/g, ' ')} on ${new Date(prepTarget.hearingDate).toLocaleString()}`}
+          brief={prepBrief}
+          loading={prepLoading}
+          error={prepError}
+          onClose={() => setPrepTarget(null)}
+        />
+      )}
     </div>
   )
 }
 
-function HearingCard({ hearing, onDelete, onRemind, past }: {
+function HearingCard({ hearing, onDelete, onRemind, onPrep, past }: {
   hearing: Hearing
   onDelete: (id: string) => void
   onRemind?: () => void
+  onPrep?: () => void
   past?: boolean
 }) {
   const date = new Date(hearing.hearingDate)
@@ -328,6 +372,16 @@ function HearingCard({ hearing, onDelete, onRemind, past }: {
 
         <div className="flex items-center gap-1 shrink-0">
           {!past && onRemind && (
+            <>
+            {onPrep && (
+              <button
+                onClick={onPrep}
+                className="px-2 py-1.5 rounded-lg bg-gold-500/10 border border-gold-500/20 text-[10px] font-bold uppercase tracking-wider text-gold-300 hover:bg-gold-500/15 transition-colors"
+                title="Generate AI prep brief"
+              >
+                Prep Brief
+              </button>
+            )}
             <button
               onClick={onRemind}
               className="p-2 rounded-lg hover:bg-gold-500/10 text-text-secondary hover:text-gold-300 transition-colors"
@@ -335,6 +389,7 @@ function HearingCard({ hearing, onDelete, onRemind, past }: {
             >
               <Bell className="w-4.5 h-4.5" />
             </button>
+            </>
           )}
           <button
             onClick={() => onDelete(hearing.id)}

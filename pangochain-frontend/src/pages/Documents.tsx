@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { FileText, Search, Download, Shield, Clock, History, PenTool, Network, AlertCircle, Plus, Folder, Lock, MessageCircle, Eraser, Share2, Eye, Hash } from 'lucide-react'
+import { FileText, Search, Download, Shield, Clock, History, PenTool, Network, AlertCircle, Plus, Folder, Lock, MessageCircle, Eraser, Share2, Eye, Hash, Sparkles } from 'lucide-react'
 import { DocumentUploadDropzone } from '../components/DocumentUploadDropzone'
 import { SecureDownloadModal } from '../components/SecureDownloadModal'
 import { SignDocumentModal } from '../components/SignDocumentModal'
@@ -9,6 +9,7 @@ import { ChainOfCustodyModal } from '../components/ChainOfCustodyModal'
 import { AnnotationModal } from '../components/AnnotationModal'
 import { RedactionModal } from '../components/RedactionModal'
 import { DocumentEditorModal } from '../components/DocumentEditorModal'
+import { DocumentAnalysisModal } from '../components/DocumentAnalysisModal'
 import { TeamAccessPanel } from '../components/TeamAccessPanel'
 import { ListSkeleton } from '../components/ui/Skeleton'
 import api from '../lib/api'
@@ -16,6 +17,9 @@ import { queryKeys } from '../lib/queryKeys'
 import { PageHero, QuickActionGrid } from '../components/ui/PageChrome'
 import { Tooltip } from '../components/ui/Tooltip'
 import { DocumentSealSvg } from '../components/ui/SvgAssets'
+import { bytesToTextIfPrintable, decryptDocumentToBytes } from '../lib/decryptDoc'
+import { loadWrappedPrivateKey, unwrapPrivateKey } from '../lib/crypto'
+import { useAuthStore } from '../store/authStore'
 
 type DocCategory = 'ALL' | 'GENERAL' | 'CONTRACT' | 'EVIDENCE' | 'PLEADING' | 'CORRESPONDENCE'
 
@@ -44,6 +48,14 @@ interface DocumentDto {
 }
 
 interface Page<T> { content: T[]; totalElements: number }
+interface DocumentAnalysis {
+  summary: string
+  keyParties: string[]
+  keyDates: string[]
+  obligations: string[]
+  riskFlags: { clause: string; concern: string; severity: 'LOW' | 'MEDIUM' | 'HIGH' }[]
+  overallRiskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
+}
 
 function fileIcon(name: string) {
   const ext = name.split('.').pop()?.toLowerCase()
@@ -59,6 +71,7 @@ function shortHash(hash?: string) {
 }
 
 export default function Documents() {
+  const { user } = useAuthStore()
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState<DocCategory>('ALL')
   const [debouncedSearch, setDebouncedSearch] = useState('')
@@ -71,6 +84,10 @@ export default function Documents() {
   const [redactTarget, setRedactTarget] = useState<DocumentDto | null>(null)
   const [editTarget, setEditTarget] = useState<DocumentDto | null>(null)
   const [accessTarget, setAccessTarget] = useState<DocumentDto | null>(null)
+  const [analysisTarget, setAnalysisTarget] = useState<DocumentDto | null>(null)
+  const [analysis, setAnalysis] = useState<DocumentAnalysis | null>(null)
+  const [analysisLoading, setAnalysisLoading] = useState(false)
+  const [analysisError, setAnalysisError] = useState('')
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(search.trim()), search ? 300 : 0)
@@ -91,6 +108,35 @@ export default function Documents() {
 
   const error = isError ? 'Failed to load documents' : ''
   const docs = page?.content ?? []
+
+  const handleAnalyze = async (doc: DocumentDto) => {
+    setAnalysisTarget(doc)
+    setAnalysis(null)
+    setAnalysisError('')
+    setAnalysisLoading(true)
+    try {
+      const stored = user?.id ? loadWrappedPrivateKey(user.id) : null
+      if (!stored) throw new Error('No private key found on this device. Log in again to provision your keys.')
+      const password = window.prompt('Enter your account password to decrypt this document for AI analysis')
+      if (!password) throw new Error('Password is required to decrypt the document.')
+      const privateKey = await unwrapPrivateKey(password, stored.saltB64, stored.ivB64, stored.encryptedB64)
+      const bytes = await decryptDocumentToBytes(doc.id, privateKey, doc.documentHash)
+      const text = bytesToTextIfPrintable(bytes)
+      if (!text) throw new Error('This document is not readable text. Use Markdown/text demo documents for AI analysis.')
+      const { data } = await api.post<DocumentAnalysis>('/ai/documents/analyze', {
+        documentId: doc.id,
+        fileName: doc.fileName,
+        text,
+      })
+      setAnalysis(data)
+    } catch (err: any) {
+      setAnalysisError(err?.response?.status === 503
+        ? 'AI features are not configured. Set OPENAI_API_KEY and restart the backend.'
+        : err?.response?.data?.message ?? err?.message ?? 'AI document analysis failed.')
+    } finally {
+      setAnalysisLoading(false)
+    }
+  }
 
   return (
     <div className="space-y-6 animate-fade-in text-text-primary">
@@ -267,6 +313,14 @@ export default function Documents() {
                             <Eye className="w-3 h-3" />
                           </button>
                         </Tooltip>
+                        <Tooltip content="Analyze with AI" side="top">
+                          <button
+                            onClick={() => handleAnalyze(doc)}
+                            className="p-1.5 rounded-lg border border-[#1d6464]/20 bg-[#1d6464]/10 hover:bg-[#1d6464]/20 text-cyan-300 transition-all"
+                          >
+                            <Sparkles className="w-3 h-3" />
+                          </button>
+                        </Tooltip>
                         <Tooltip content="Annotate / comments" side="top">
                           <button
                             onClick={() => setAnnotateTarget(doc)}
@@ -412,6 +466,15 @@ export default function Documents() {
             <TeamAccessPanel docId={accessTarget.id} docName={accessTarget.fileName} />
           </div>
         </div>
+      )}
+      {analysisTarget && (
+        <DocumentAnalysisModal
+          fileName={analysisTarget.fileName}
+          analysis={analysis}
+          loading={analysisLoading}
+          error={analysisError}
+          onClose={() => setAnalysisTarget(null)}
+        />
       )}
     </div>
   )

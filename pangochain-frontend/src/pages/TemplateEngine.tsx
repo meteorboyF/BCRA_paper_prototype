@@ -32,6 +32,7 @@ interface CaseDto {
 }
 
 interface Page<T> { content: T[] }
+interface DraftResult { title: string; draftText: string; notes: string[] }
 
 type Stage = 'idle' | 'encrypting' | 'wrapping' | 'uploading' | 'anchoring' | 'done' | 'error'
 
@@ -64,6 +65,13 @@ export default function TemplateEngine() {
   const [quillAnimating, setQuillAnimating] = useState(false)
   const [documentName, setDocumentName] = useState('')
   const [editableBody, setEditableBody] = useState('')
+  const [aiCaseId, setAiCaseId] = useState('')
+  const [aiDocType, setAiDocType] = useState('DEMAND_LETTER')
+  const [aiInstructions, setAiInstructions] = useState('')
+  const [aiFacts, setAiFacts] = useState('')
+  const [aiDraft, setAiDraft] = useState<DraftResult | null>(null)
+  const [aiDrafting, setAiDrafting] = useState(false)
+  const [aiError, setAiError] = useState('')
 
   const { data: templates, isLoading: tLoading, isError: tError } = useQuery({
     queryKey: queryKeys.templates(),
@@ -154,6 +162,29 @@ export default function TemplateEngine() {
     }
   }
 
+  const handleAiDraft = async () => {
+    if (!aiCaseId || !aiInstructions.trim()) return
+    setAiDrafting(true)
+    setAiError('')
+    setAiDraft(null)
+    try {
+      const { data } = await api.post<DraftResult>('/ai/draft', {
+        caseId: aiCaseId,
+        documentType: aiDocType,
+        instructions: aiInstructions,
+        keyFacts: aiFacts.split('\n').map((f) => f.trim()).filter(Boolean),
+      })
+      setAiDraft(data)
+      toast.success('AI draft generated')
+    } catch (err: any) {
+      setAiError(err.response?.status === 503
+        ? 'AI features are not configured. Set OPENAI_API_KEY and restart the backend.'
+        : err.response?.data?.message ?? err.message ?? 'AI draft failed')
+    } finally {
+      setAiDrafting(false)
+    }
+  }
+
   const busy = ['encrypting', 'wrapping', 'uploading', 'anchoring'].includes(stage)
   const stageLabel: Record<Stage, string> = {
     idle: '', encrypting: 'Encrypting with AES-256-GCM…', wrapping: 'Wrapping key with ECIES P-256…',
@@ -182,6 +213,84 @@ export default function TemplateEngine() {
           <AlertCircle className="w-4 h-4" /> Failed to load templates.
         </div>
       )}
+
+      <section className="card border-[#1d6464]/25 bg-navy-900/70 p-5">
+        <div className="mb-4 flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#1d6464]/30 bg-[#1d6464]/15">
+            <Sparkles className="h-5 w-5 text-cyan-300" />
+          </div>
+          <div>
+            <h2 className="font-serif text-xl font-bold text-gold-200">AI Draft</h2>
+            <p className="text-xs text-text-secondary">Describe the document you need, then review and customize the generated draft.</p>
+          </div>
+        </div>
+        <div className="grid gap-4 lg:grid-cols-[1fr_1fr]">
+          <div className="space-y-3">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <label className="label">Case</label>
+                <select className="input bg-navy-950 text-xs" value={aiCaseId} onChange={(e) => setAiCaseId(e.target.value)}>
+                  <option value="">Select case</option>
+                  {cases?.map((c) => <option key={c.id} value={c.id}>{c.title}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="label">Document Type</label>
+                <select className="input bg-navy-950 text-xs" value={aiDocType} onChange={(e) => setAiDocType(e.target.value)}>
+                  {['DEMAND_LETTER', 'MOTION_TO_DISMISS', 'AFFIDAVIT', 'LETTER_OF_INTENT', 'SETTLEMENT_LETTER', 'OTHER'].map((t) => <option key={t}>{t}</option>)}
+                </select>
+              </div>
+            </div>
+            <div>
+              <label className="label">Instructions</label>
+              <textarea
+                className="input min-h-[90px] bg-navy-950 text-xs"
+                value={aiInstructions}
+                onChange={(e) => setAiInstructions(e.target.value)}
+                placeholder="Describe what this document should accomplish..."
+              />
+            </div>
+            <div>
+              <label className="label">Key Facts</label>
+              <textarea
+                className="input min-h-[90px] bg-navy-950 text-xs"
+                value={aiFacts}
+                onChange={(e) => setAiFacts(e.target.value)}
+                placeholder="One fact per line"
+              />
+            </div>
+            {aiError && <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-300">{aiError}</div>}
+            <button onClick={handleAiDraft} disabled={!aiCaseId || !aiInstructions.trim() || aiDrafting} className="btn-primary w-full justify-center text-xs">
+              {aiDrafting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+              Generate Draft
+            </button>
+          </div>
+          <div className="rounded-xl border border-gold-500/10 bg-navy-950/70 p-4">
+            {aiDraft ? (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between gap-3">
+                  <h3 className="font-serif font-bold text-gold-300">{aiDraft.title}</h3>
+                  <button
+                    onClick={() => { navigator.clipboard.writeText(aiDraft.draftText); toast.success('Draft copied') }}
+                    className="btn-secondary text-xs"
+                  >
+                    Copy
+                  </button>
+                </div>
+                <textarea className="input min-h-[260px] bg-navy-950 text-xs font-mono leading-relaxed" value={aiDraft.draftText} readOnly />
+                <div>
+                  <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-gold-400">Lawyer Notes</p>
+                  <ul className="space-y-1 text-xs text-text-secondary">{aiDraft.notes?.map((n) => <li key={n}>• {n}</li>)}</ul>
+                </div>
+              </div>
+            ) : (
+              <div className="flex min-h-[260px] items-center justify-center text-center text-xs text-text-secondary">
+                Generated draft text and review notes will appear here.
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
 
       {/* Grid: 3 columns (Template Library list, Editor Console, Live Document Preview) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
