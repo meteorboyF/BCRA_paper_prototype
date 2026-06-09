@@ -7,6 +7,8 @@ import { queryKeys } from '../lib/queryKeys'
 import { useAuthStore } from '../store/authStore'
 import { encryptDocument, eciesWrapKey, bufferToHex } from '../lib/crypto'
 import toast from 'react-hot-toast'
+import { useAiAvailable } from '../lib/useAiAvailable'
+import { AiUnavailableBanner } from '../components/ui/AiUnavailableBanner'
 
 interface TemplateField {
   name: string
@@ -57,6 +59,7 @@ function highlightSyntax(body: string) {
 
 export default function TemplateEngine() {
   const { user } = useAuthStore()
+  const aiAvailable = useAiAvailable()
   const [selectedId, setSelectedId] = useState<string>('')
   const [caseId, setCaseId] = useState<string>('')
   const [values, setValues] = useState<Record<string, string>>({})
@@ -213,6 +216,7 @@ export default function TemplateEngine() {
           <AlertCircle className="w-4 h-4" /> Failed to load templates.
         </div>
       )}
+      {!aiAvailable && <AiUnavailableBanner />}
 
       <section className="card border-[#1d6464]/25 bg-navy-900/70 p-5">
         <div className="mb-4 flex items-center gap-3">

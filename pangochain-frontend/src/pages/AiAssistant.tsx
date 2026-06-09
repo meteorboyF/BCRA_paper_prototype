@@ -5,6 +5,8 @@ import api from '../lib/api'
 import { bytesToTextIfPrintable, decryptDocumentToBytes } from '../lib/decryptDoc'
 import { loadWrappedPrivateKey, unwrapPrivateKey } from '../lib/crypto'
 import { useAuthStore } from '../store/authStore'
+import { useAiAvailable } from '../lib/useAiAvailable'
+import { AiUnavailableBanner } from '../components/ui/AiUnavailableBanner'
 
 interface CaseDto {
   id: string
@@ -45,6 +47,7 @@ const safeTruncate = (text: string, maxChars = 12000) =>
 
 export default function AiAssistant() {
   const { user } = useAuthStore()
+  const aiAvailable = useAiAvailable()
   const [selectedCaseId, setSelectedCaseId] = useState('')
   const [selectedDocIds, setSelectedDocIds] = useState<string[]>([])
   const [decryptedDocs, setDecryptedDocs] = useState<Record<string, DecryptedDocument>>({})
@@ -183,7 +186,9 @@ export default function AiAssistant() {
   }
 
   return (
-    <div className="grid h-[calc(100vh-8rem)] grid-cols-1 gap-4 text-text-primary lg:grid-cols-[20rem_1fr]">
+    <div className="space-y-3 text-text-primary">
+      {!aiAvailable && <AiUnavailableBanner />}
+      <div className="grid h-[calc(100vh-11rem)] grid-cols-1 gap-4 lg:grid-cols-[20rem_1fr]">
       <aside className="card flex min-h-0 flex-col gap-4 border-gold-500/10 bg-navy-900/70 p-4">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-widest text-gold-400">Matter</p>
@@ -315,6 +320,7 @@ export default function AiAssistant() {
           </div>
         </div>
       </main>
+      </div>
     </div>
   )
 }

@@ -3,6 +3,8 @@ import { useQuery } from '@tanstack/react-query'
 import { AlertTriangle, CheckCircle2, ClipboardList, Loader2, RefreshCcw, Search, TrendingUp } from 'lucide-react'
 import api from '../lib/api'
 import { PageHero } from '../components/ui/PageChrome'
+import { useAiAvailable } from '../lib/useAiAvailable'
+import { AiUnavailableBanner } from '../components/ui/AiUnavailableBanner'
 
 interface CaseDto {
   id: string
@@ -40,6 +42,7 @@ const priorityStyles: Record<string, string> = {
 }
 
 export default function CaseInsights() {
+  const aiAvailable = useAiAvailable()
   const [selectedCaseId, setSelectedCaseId] = useState('')
   const [timeline, setTimeline] = useState<TimelineResult | null>(null)
   const [evidence, setEvidence] = useState<EvidenceGapResult | null>(null)
@@ -101,6 +104,7 @@ export default function CaseInsights() {
         description="Run GPT-powered forensic checks over case metadata, document inventories, hearings, and milestones."
         icon={TrendingUp}
       />
+      {!aiAvailable && <AiUnavailableBanner />}
 
       <div className="card flex flex-col gap-3 border-gold-500/10 bg-navy-900/70 p-4 md:flex-row md:items-center">
         <div className="flex-1">

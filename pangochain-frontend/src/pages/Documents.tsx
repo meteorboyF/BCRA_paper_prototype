@@ -20,6 +20,8 @@ import { DocumentSealSvg } from '../components/ui/SvgAssets'
 import { bytesToTextIfPrintable, decryptDocumentToBytes } from '../lib/decryptDoc'
 import { loadWrappedPrivateKey, unwrapPrivateKey } from '../lib/crypto'
 import { useAuthStore } from '../store/authStore'
+import { useAiAvailable } from '../lib/useAiAvailable'
+import { AiUnavailableBanner } from '../components/ui/AiUnavailableBanner'
 
 type DocCategory = 'ALL' | 'GENERAL' | 'CONTRACT' | 'EVIDENCE' | 'PLEADING' | 'CORRESPONDENCE'
 
@@ -72,6 +74,7 @@ function shortHash(hash?: string) {
 
 export default function Documents() {
   const { user } = useAuthStore()
+  const aiAvailable = useAiAvailable()
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState<DocCategory>('ALL')
   const [debouncedSearch, setDebouncedSearch] = useState('')
@@ -165,6 +168,7 @@ export default function Documents() {
           ]}
         />
       </PageHero>
+      {!aiAvailable && <AiUnavailableBanner />}
 
       {/* Vault explorer structure */}
       <div className="grid grid-cols-1 lg:grid-cols-[18rem_1fr] gap-6 items-start">

@@ -8,6 +8,8 @@ import api from '../lib/api'
 import { queryKeys } from '../lib/queryKeys'
 import toast from 'react-hot-toast'
 import { HearingPrepModal } from '../components/HearingPrepModal'
+import { useAiAvailable } from '../lib/useAiAvailable'
+import { AiUnavailableBanner } from '../components/ui/AiUnavailableBanner'
 
 interface CaseDto { id: string; title: string; status: string }
 interface Hearing {
@@ -41,6 +43,7 @@ const HEARING_TYPES = [
 
 export default function HearingManager() {
   const queryClient = useQueryClient()
+  const aiAvailable = useAiAvailable()
   const [showForm, setShowForm] = useState(false)
   const [submitting, setSubmitting] = useState(false)
 
@@ -164,6 +167,7 @@ export default function HearingManager() {
           <Plus className="w-4 h-4" /> Schedule Hearing
         </button>
       </div>
+      {!aiAvailable && <AiUnavailableBanner />}
 
       {/* ── Create Form ───────────────────────────────────────────────────────── */}
       {showForm && (

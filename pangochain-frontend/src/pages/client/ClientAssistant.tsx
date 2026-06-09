@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { Bot, Loader2, MessageCircle, Send, UserRound } from 'lucide-react'
 import api from '../../lib/api'
+import { useAiAvailable } from '../../lib/useAiAvailable'
+import { AiUnavailableBanner } from '../../components/ui/AiUnavailableBanner'
 
 interface Message {
   id: string
@@ -17,6 +19,7 @@ const suggestions = [
 ]
 
 export default function ClientAssistant() {
+  const aiAvailable = useAiAvailable()
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 'welcome',
@@ -53,7 +56,9 @@ export default function ClientAssistant() {
   }
 
   return (
-    <div className="mx-auto flex h-[calc(100vh-9rem)] max-w-4xl flex-col rounded-2xl border border-[#1d6464]/15 bg-white/90 shadow-sm">
+    <div className="mx-auto max-w-4xl space-y-3">
+      {!aiAvailable && <AiUnavailableBanner />}
+      <div className="flex h-[calc(100vh-12rem)] flex-col rounded-2xl border border-[#1d6464]/15 bg-white/90 shadow-sm">
       <div className="border-b border-[#1d6464]/10 px-5 py-4">
         <div className="flex items-center gap-3">
           <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#1d6464]/10 text-[#1d6464]">
@@ -136,6 +141,7 @@ export default function ClientAssistant() {
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
           </button>
         </div>
+      </div>
       </div>
     </div>
   )
