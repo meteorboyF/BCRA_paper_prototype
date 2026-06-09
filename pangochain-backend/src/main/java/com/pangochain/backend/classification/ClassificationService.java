@@ -1,13 +1,17 @@
 package com.pangochain.backend.classification;
 
+import com.pangochain.backend.ai.AiAvailability;
 import com.pangochain.backend.user.User;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Document category classifier. The scoring model here is a transparent keyword/extension
@@ -19,6 +23,7 @@ import java.util.Map;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ClassificationService {
 
     public record Suggestion(String category, int confidence, String rationale) {}
@@ -34,9 +39,53 @@ public class ClassificationService {
     }};
 
     private final DocumentClassificationLogRepository logRepository;
+    private final Optional<ChatClient> chatClient;
+    private final AiAvailability aiAvailability;
 
     @Transactional
     public Suggestion classify(String fileName, String previewText, User requester) {
+        if (aiAvailability.isAvailable() && previewText != null && previewText.length() > 50 && chatClient.isPresent()) {
+            try {
+                return gptClassify(fileName, previewText, requester);
+            } catch (Exception e) {
+                log.warn("GPT classification failed, falling back to keyword heuristic: {}", e.getMessage());
+            }
+        }
+        return keywordClassify(fileName, previewText, requester);
+    }
+
+    private Suggestion gptClassify(String fileName, String previewText, User requester) {
+        record GptResult(String category, int confidence, String rationale) {}
+
+        String prompt = """
+                Classify the following legal document excerpt.
+                Filename: %s
+
+                Document text (first ~500 words):
+                %s
+
+                Return JSON with exactly these fields:
+                - category: one of CONTRACT, EVIDENCE, CONFESSION, MEDICAL, FINANCIAL, CORRESPONDENCE, GENERAL
+                - confidence: integer 0-100
+                - rationale: one sentence explaining the classification
+                """.formatted(fileName == null ? "unknown" : fileName,
+                previewText.substring(0, Math.min(previewText.length(), 2_000)));
+
+        GptResult result = chatClient.get().prompt()
+                .system("You are a legal document classifier. Respond ONLY with valid JSON, no markdown.")
+                .user(prompt)
+                .call()
+                .entity(GptResult.class);
+
+        String category = result.category() == null ? "GENERAL" : result.category().toUpperCase();
+        int confidence = Math.max(0, Math.min(100, result.confidence()));
+        String rationale = result.rationale() == null ? "GPT classified the document from the provided preview." : result.rationale();
+
+        persistLog(fileName, category, confidence, requester);
+        return new Suggestion(category, confidence, rationale);
+    }
+
+    private Suggestion keywordClassify(String fileName, String previewText, User requester) {
         String haystack = ((fileName == null ? "" : fileName) + " " + (previewText == null ? "" : previewText))
                 .toLowerCase();
 
@@ -58,13 +107,16 @@ public class ClassificationService {
                 ? "No strong category signals — defaulting to General."
                 : "Matched " + bestHits + " signal" + (bestHits == 1 ? "" : "s") + " (e.g. \"" + bestSignal + "\").";
 
+        persistLog(fileName, best, confidence, requester);
+        return new Suggestion(best, confidence, rationale);
+    }
+
+    private void persistLog(String fileName, String category, int confidence, User requester) {
         logRepository.save(DocumentClassificationLog.builder()
                 .fileName(fileName)
-                .suggestedCategory(best)
+                .suggestedCategory(category)
                 .confidence(confidence)
                 .requestedBy(requester != null ? requester.getId() : null)
                 .build());
-
-        return new Suggestion(best, confidence, rationale);
     }
 }
