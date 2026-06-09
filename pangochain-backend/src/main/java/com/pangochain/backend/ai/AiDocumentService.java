@@ -25,4 +25,59 @@ public class AiDocumentService {
                 ? text.substring(0, MAX_CHARS_PER_DOC) + "\n[... truncated]"
                 : text;
     }
+
+    public record DocumentAnalysis(
+            String summary,
+            String[] keyParties,
+            String[] keyDates,
+            String[] obligations,
+            RiskFlag[] riskFlags,
+            String overallRiskLevel
+    ) {}
+
+    public record RiskFlag(
+            String clause,
+            String concern,
+            String severity
+    ) {}
+
+    public record DraftRequest(
+            java.util.UUID caseId,
+            String documentType,
+            String instructions,
+            String[] keyFacts
+    ) {}
+
+    public record DraftResult(String title, String draftText, String[] notes) {}
+
+    public DocumentAnalysis analyzeDocument(String fileName, String documentText) {
+        availability.requireAvailable();
+
+        String prompt = """
+                Analyze this legal document and extract structured information.
+
+                Document name: %s
+
+                Document text:
+                %s
+
+                Return a JSON object with:
+                - summary: 2-3 sentence executive summary
+                - keyParties: array of party names mentioned
+                - keyDates: array of important dates mentioned (as strings)
+                - obligations: array of key obligations/commitments
+                - riskFlags: array of objects {clause: "...", concern: "...", severity: "LOW|MEDIUM|HIGH"}
+                  Focus on: unusual clauses, missing standard terms, one-sided terms, liability exposures
+                - overallRiskLevel: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL"
+
+                Respond ONLY with valid JSON.
+                """.formatted(fileName == null ? "Untitled document" : fileName, safe(documentText));
+
+        return chatClient.orElseThrow(() -> new AiUnavailableException("AI features require OPENAI_API_KEY to be configured."))
+                .prompt()
+                .system("You are a senior legal analyst. Identify risks that a junior lawyer might miss. Be specific.")
+                .user(prompt)
+                .call()
+                .entity(DocumentAnalysis.class);
+    }
 }
