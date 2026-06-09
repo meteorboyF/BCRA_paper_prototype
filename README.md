@@ -52,7 +52,7 @@ Legal document understanding requires nuanced reasoning over long, dense text. G
 Set your OpenAI API key before running:
 
 ```bash
-export OPENAI_API_KEY=sk-proj-your-key-here
+export OPENAI_API_KEY=your-openai-api-key-here
 bash scripts/dev.sh
 ```
 
