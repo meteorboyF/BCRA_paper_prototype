@@ -4,6 +4,8 @@ import com.pangochain.backend.cases.CaseRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 import java.util.UUID;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/ai")
@@ -63,5 +66,21 @@ public class AiController {
     public ResponseEntity<AiDocumentService.DraftResult> draftDocument(@RequestBody AiDocumentService.DraftRequest req) {
         var legalCase = caseRepository.findById(req.caseId()).orElseThrow();
         return ResponseEntity.ok(documentService.draftDocument(req, legalCase.getTitle()));
+    }
+
+    @PostMapping("/chat")
+    @PreAuthorize("hasAnyRole('LAWYER', 'MANAGING_PARTNER', 'PARALEGAL', 'PARTNER_SENIOR', 'PARTNER_JUNIOR', 'ASSOCIATE_SENIOR', 'ASSOCIATE_JUNIOR')")
+    public ResponseEntity<AiChatService.ChatResponse> chat(
+            @RequestBody AiChatService.ChatRequest req,
+            @AuthenticationPrincipal UserDetails principal) {
+        return ResponseEntity.ok(chatService.chat(req, principal.getUsername()));
+    }
+
+    @GetMapping("/cases/{caseId}/chat-history")
+    @PreAuthorize("hasAnyRole('LAWYER', 'MANAGING_PARTNER', 'PARALEGAL', 'PARTNER_SENIOR', 'PARTNER_JUNIOR', 'ASSOCIATE_SENIOR', 'ASSOCIATE_JUNIOR')")
+    public ResponseEntity<List<AiChatService.ConversationMessage>> chatHistory(
+            @PathVariable UUID caseId,
+            @AuthenticationPrincipal UserDetails principal) {
+        return ResponseEntity.ok(chatService.getHistory(caseId, principal.getUsername()));
     }
 }
