@@ -3,6 +3,7 @@ package com.pangochain.backend.config;
 import com.pangochain.backend.auth.InvalidMfaCodeException;
 import com.pangochain.backend.auth.MfaChallengeRequiredException;
 import com.pangochain.backend.auth.MfaSetupRequiredException;
+import com.pangochain.backend.ai.AiUnavailableException;
 import com.pangochain.backend.blockchain.FabricException;
 import com.pangochain.backend.document.DocumentService;
 import com.pangochain.backend.ipfs.IpfsException;
@@ -85,6 +86,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleAuthentication(AuthenticationException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(Map.of("error", "UNAUTHORIZED", "message", ex.getMessage()));
+    }
+
+    @ExceptionHandler(AiUnavailableException.class)
+    public ResponseEntity<Map<String, String>> handleAiUnavailable(AiUnavailableException ex) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(Map.of(
+                "error", "AI_UNAVAILABLE",
+                "message", ex.getMessage()
+        ));
     }
 
     @ExceptionHandler({NoSuchElementException.class, IllegalArgumentException.class})

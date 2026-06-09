@@ -22,6 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *   POST /api/auth/login    10/min
  *   POST /api/auth/refresh  20/min
  *   POST /api/auth/mfa/**    5/min  (TOTP brute-force protection)
+ *   *    /api/ai/**          5/min  (AI spend protection)
  */
 @Component
 @Order(1) // before the JWT filter
@@ -34,7 +35,8 @@ public class RateLimitFilter extends OncePerRequestFilter {
     private static final List<Rule> RULES = List.of(
             new Rule("POST", "/api/auth/login",   10, MIN),
             new Rule("POST", "/api/auth/refresh",  20, MIN),
-            new Rule("POST", "/api/auth/mfa",       5, MIN)
+            new Rule("POST", "/api/auth/mfa",       5, MIN),
+            new Rule("*",    "/api/ai",             5, MIN)
     );
 
     // key = ruleIndex + "|" + clientIp
@@ -68,7 +70,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
         String uri = request.getRequestURI();
         String method = request.getMethod();
         for (Rule r : RULES) {
-            if (r.method().equals(method) && uri.startsWith(r.prefix())) return r;
+            if (("*".equals(r.method()) || r.method().equals(method)) && uri.startsWith(r.prefix())) return r;
         }
         return null;
     }
