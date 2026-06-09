@@ -1,11 +1,22 @@
 package com.pangochain.backend.ai;
 
+import com.pangochain.backend.caseevent.CaseEvent;
+import com.pangochain.backend.caseevent.CaseEventRepository;
+import com.pangochain.backend.cases.CaseRepository;
+import com.pangochain.backend.document.DocStatus;
+import com.pangochain.backend.document.DocumentRepository;
+import com.pangochain.backend.hearing.HearingRepository;
+import com.pangochain.backend.milestone.CaseMilestoneRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -14,4 +25,147 @@ public class AiCaseService {
 
     protected final Optional<ChatClient> chatClient;
     protected final AiAvailability availability;
+    private final CaseRepository caseRepository;
+    private final CaseEventRepository caseEventRepository;
+    private final DocumentRepository documentRepository;
+    private final HearingRepository hearingRepository;
+    private final CaseMilestoneRepository milestoneRepository;
+    private final AiCaseInsightsRepository insightsRepository;
+
+    public record TimelineCheckResult(
+            String summary,
+            Contradiction[] contradictions,
+            String overallAssessment
+    ) {}
+
+    public record Contradiction(
+            String description,
+            String event1,
+            String event2,
+            String severity
+    ) {}
+
+    public record EvidenceGapResult(
+            String caseTheory,
+            String[] availableEvidence,
+            EvidenceGap[] gaps,
+            String priorityRecommendation
+    ) {}
+
+    public record EvidenceGap(
+            String evidenceNeeded,
+            String reason,
+            String priority
+    ) {}
+
+    public TimelineCheckResult checkTimeline(UUID caseId) {
+        availability.requireAvailable();
+
+        var legalCase = caseRepository.findById(caseId).orElseThrow();
+        List<CaseEvent> events = new ArrayList<>(caseEventRepository.findByLegalCaseIdOrderByCreatedAtDesc(caseId));
+        Collections.reverse(events);
+        var milestones = milestoneRepository.findByCaseIdOrderBySortOrderAscCreatedAtAsc(caseId);
+        var hearings = hearingRepository.findByLegalCaseIdOrderByHearingDateAsc(caseId);
+        var documents = documentRepository.findByLegalCaseIdAndStatus(caseId, DocStatus.ACTIVE);
+
+        StringBuilder context = new StringBuilder();
+        context.append("Case: ").append(legalCase.getTitle()).append(" (").append(legalCase.getCaseType()).append(")\n");
+        context.append("Status: ").append(legalCase.getStatus()).append("\n");
+        context.append("Description: ").append(legalCase.getDescription() == null ? "N/A" : legalCase.getDescription()).append("\n\n");
+
+        context.append("== CASE EVENTS ==\n");
+        events.forEach(e -> context.append(e.getCreatedAt())
+                .append(": ").append(e.getTitle())
+                .append(" - ").append(e.getDescription() == null ? "" : e.getDescription())
+                .append("\n"));
+
+        context.append("\n== HEARINGS ==\n");
+        hearings.forEach(h -> context.append(h.getHearingDate())
+                .append(": ").append(h.getHearingType())
+                .append(" at ").append(h.getCourtName() == null ? h.getLocation() : h.getCourtName())
+                .append("\n"));
+
+        context.append("\n== MILESTONES ==\n");
+        milestones.forEach(m -> context.append(m.getCompletedAt() != null ? m.getCompletedAt() : "PENDING")
+                .append(": ").append(m.getTitle())
+                .append(" [").append(m.getStatus()).append("]")
+                .append("\n"));
+
+        context.append("\n== DOCUMENTS (metadata only) ==\n");
+        documents.forEach(d -> context.append(d.getCreatedAt())
+                .append(": ").append(d.getFileName())
+                .append(" [").append(d.getCategory()).append("]\n"));
+
+        String prompt = """
+                Analyze this case timeline for contradictions, inconsistencies, or suspicious gaps.
+
+                %s
+
+                Identify:
+                1. Date contradictions
+                2. Logical inconsistencies
+                3. Suspicious gaps in the timeline
+
+                Return JSON with:
+                - summary: overall assessment in 1-2 sentences
+                - contradictions: array of {description, event1, event2, severity: "LOW|MEDIUM|HIGH"}
+                - overallAssessment: "CLEAN" | "MINOR_ISSUES" | "SIGNIFICANT_ISSUES" | "CRITICAL_ISSUES"
+
+                Respond ONLY with valid JSON.
+                """.formatted(context);
+
+        return chatClient.orElseThrow(() -> new AiUnavailableException("AI features require OPENAI_API_KEY to be configured."))
+                .prompt()
+                .system("You are a forensic legal analyst specializing in timeline analysis. Be specific and cite exact events.")
+                .user(prompt)
+                .call()
+                .entity(TimelineCheckResult.class);
+    }
+
+    public EvidenceGapResult analyzeEvidenceGaps(UUID caseId) {
+        availability.requireAvailable();
+
+        var legalCase = caseRepository.findById(caseId).orElseThrow();
+        var documents = documentRepository.findByLegalCaseIdAndStatus(caseId, DocStatus.ACTIVE);
+
+        StringBuilder context = new StringBuilder();
+        context.append("Case Type: ").append(legalCase.getCaseType()).append("\n");
+        context.append("Case Title: ").append(legalCase.getTitle()).append("\n");
+        context.append("Client: ").append(legalCase.getClientName()).append("\n");
+        context.append("Opposing Party: ").append(legalCase.getOpposingParty()).append("\n");
+        context.append("Description: ").append(legalCase.getDescription() == null ? "N/A" : legalCase.getDescription()).append("\n\n");
+
+        context.append("Available Evidence (document metadata):\n");
+        documents.forEach(d -> context.append("- ").append(d.getFileName())
+                .append(" [").append(d.getCategory()).append("]")
+                .append(d.isConfidential() ? " [CONFIDENTIAL]" : "")
+                .append("\n"));
+
+        String prompt = """
+                For this legal case, analyze what evidence is currently available and identify strategic gaps.
+
+                %s
+
+                Based on the case type and available documents:
+                1. State the apparent case theory
+                2. List what evidence is available
+                3. Identify what evidence is typically needed but appears to be missing
+                4. Prioritize gaps by importance
+
+                Return JSON with:
+                - caseTheory: the apparent legal theory being pursued (1 sentence)
+                - availableEvidence: array of available evidence descriptions
+                - gaps: array of {evidenceNeeded, reason, priority: "HIGH|MEDIUM|LOW"}
+                - priorityRecommendation: the single most important next step
+
+                Respond ONLY with valid JSON.
+                """.formatted(context);
+
+        return chatClient.orElseThrow(() -> new AiUnavailableException("AI features require OPENAI_API_KEY to be configured."))
+                .prompt()
+                .system("You are a strategic litigation consultant. Think like a winning trial lawyer.")
+                .user(prompt)
+                .call()
+                .entity(EvidenceGapResult.class);
+    }
 }
