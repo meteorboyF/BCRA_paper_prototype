@@ -14,6 +14,7 @@ interface Props {
   fileName: string
   category?: string
   version?: number
+  ipfsCid?: string
   documentHashSha256?: string
   onClose: () => void
   onSaved?: () => void
@@ -30,20 +31,41 @@ function normalizeEditedName(fileName: string, nextVersion: number, format: Sour
   return `${base} v${nextVersion} edited${ext}`
 }
 
+const isDemoDoc = (ipfsCid?: string) => !!ipfsCid?.startsWith('QmDemo')
+
+function demoEditorText(fileName: string) {
+  return [
+    `PangoChain demo browser preview for ${fileName}`,
+    '',
+    'This is a seeded showcase document. Its metadata, access grants, custody events, signatures, and audit trail are stored in the local database, but the original encrypted payload was not copied into your fresh IPFS node.',
+    '',
+    'Upload a new document from this workspace to exercise the full browser-only decrypt, edit, re-encrypt, and versioning flow.',
+  ].join('\n')
+}
+
 export function DocumentEditorModal({
-  docId, caseId, fileName, category, version = 1, documentHashSha256, onClose, onSaved,
+  docId, caseId, fileName, category, version = 1, ipfsCid, documentHashSha256, onClose, onSaved,
 }: Props) {
   const { user } = useAuthStore()
+  const demoMode = isDemoDoc(ipfsCid)
   const [password, setPassword] = useState('')
-  const [stage, setStage] = useState<Stage>('unlock')
-  const [text, setText] = useState('')
-  const [originalText, setOriginalText] = useState('')
+  const [stage, setStage] = useState<Stage>(demoMode ? 'editing' : 'unlock')
+  const [text, setText] = useState(demoMode ? demoEditorText(fileName) : '')
+  const [originalText, setOriginalText] = useState(demoMode ? demoEditorText(fileName) : '')
   const [sourceFormat, setSourceFormat] = useState<SourceFormat>('text')
   const [error, setError] = useState('')
   const taRef = useRef<HTMLTextAreaElement>(null)
 
   const open = async () => {
     setError('')
+    if (demoMode) {
+      const preview = demoEditorText(fileName)
+      setText(preview)
+      setOriginalText(preview)
+      setStage('editing')
+      setTimeout(() => taRef.current?.focus(), 50)
+      return
+    }
     try {
       const stored = loadWrappedPrivateKey(user!.id)
       if (!stored) { setError('No private key on this device. Log in again to provision your keys.'); return }
@@ -69,6 +91,7 @@ export function DocumentEditorModal({
   }
 
   const save = async () => {
+    if (demoMode) { setError('Seeded showcase documents are metadata-only. Upload a real document to save edited versions.'); return }
     if (text === originalText) { setError('Make an edit before saving a new version.'); return }
     setStage('saving')
     setError('')
@@ -139,7 +162,9 @@ export function DocumentEditorModal({
           {(stage === 'editing' || stage === 'saving' || (stage === 'error' && text)) && (
             <div className="space-y-3">
               <p className="text-xs text-text-secondary">
-                Edits are made locally in your browser. Saving creates v{version + 1} with a fresh hash.
+                {demoMode
+                  ? 'This seeded showcase document is metadata-only in local dev. Upload a new document to test real browser decryption and version saving.'
+                  : `Edits are made locally in your browser. Saving creates v${version + 1} with a fresh hash.`}
                 {sourceFormat === 'docx' ? ' Word files are saved as edited text copies.' : ''}
               </p>
               <textarea

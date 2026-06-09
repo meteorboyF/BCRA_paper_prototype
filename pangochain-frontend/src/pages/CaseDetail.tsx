@@ -625,6 +625,7 @@ export default function CaseDetail() {
           fileName={editTarget.fileName}
           category={editTarget.category}
           version={editTarget.version}
+          ipfsCid={editTarget.ipfsCid}
           documentHashSha256={docHash(editTarget)}
           onClose={() => setEditTarget(null)}
           onSaved={() => { setEditTarget(null); loadData() }}

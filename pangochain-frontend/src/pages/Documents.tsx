@@ -400,6 +400,7 @@ export default function Documents() {
           fileName={editTarget.fileName}
           category={editTarget.category}
           version={editTarget.version}
+          ipfsCid={editTarget.ipfsCid}
           documentHashSha256={editTarget.documentHash}
           onClose={() => setEditTarget(null)}
           onSaved={() => { setEditTarget(null); refetch() }}

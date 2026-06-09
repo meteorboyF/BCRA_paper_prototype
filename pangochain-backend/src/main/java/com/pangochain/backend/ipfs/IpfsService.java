@@ -71,6 +71,7 @@ public class IpfsService {
      * Tries primary first; falls back to secondary if primary fails.
      */
     public byte[] cat(String cid) {
+        Exception primaryFailure = null;
         try {
             byte[] bytes = primary.post()
                     .uri("/api/v0/cat?arg={cid}", cid)
@@ -82,17 +83,24 @@ public class IpfsService {
                 return bytes;
             }
         } catch (Exception e) {
+            primaryFailure = e;
             log.warn("Primary IPFS unavailable for CID={}, trying secondary: {}", cid, e.getMessage());
         }
 
-        byte[] bytes = secondary.post()
-                .uri("/api/v0/cat?arg={cid}", cid)
-                .retrieve()
-                .bodyToMono(byte[].class)
-                .block();
-        if (bytes == null) throw new IpfsException("IPFS cat returned null for CID=" + cid);
-        log.info("Fetched {} bytes from secondary IPFS CID={}", bytes.length, cid);
-        return bytes;
+        try {
+            byte[] bytes = secondary.post()
+                    .uri("/api/v0/cat?arg={cid}", cid)
+                    .retrieve()
+                    .bodyToMono(byte[].class)
+                    .block();
+            if (bytes == null) throw new IpfsException("IPFS cat returned null for CID=" + cid);
+            log.info("Fetched {} bytes from secondary IPFS CID={}", bytes.length, cid);
+            return bytes;
+        } catch (Exception e) {
+            log.warn("Secondary IPFS unavailable for CID={}: {}", cid, e.getMessage());
+            throw new IpfsException("Document payload is not available in IPFS for CID=" + cid,
+                    primaryFailure != null ? primaryFailure : e);
+        }
     }
 
     private void pinOnSecondary(String cid) {
