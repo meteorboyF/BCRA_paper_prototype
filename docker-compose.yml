@@ -1,0 +1,100 @@
+version: '3.9'
+
+services:
+  # ─── PostgreSQL 16 ───────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: pangochain-postgres
+    environment:
+      POSTGRES_DB: pangochain
+      POSTGRES_USER: pangochain
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-pangochain_secret}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pangochain -d pangochain"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pangochain-net
+
+  # ─── IPFS (Kubo) — 2-node private swarm ─────────────────────────────────────
+  ipfs:
+    image: ipfs/kubo:v0.27.0
+    container_name: pangochain-ipfs
+    environment:
+      IPFS_PROFILE: server
+    ports:
+      - "5001:5001"   # API
+      - "8081:8080"   # Gateway
+      - "4001:4001"   # Swarm
+    volumes:
+      - ipfs_data:/data/ipfs
+    networks:
+      - pangochain-net
+    restart: unless-stopped
+
+  ipfs2:
+    image: ipfs/kubo:v0.27.0
+    container_name: pangochain-ipfs2
+    environment:
+      IPFS_PROFILE: server
+    ports:
+      - "5002:5001"   # API (secondary)
+      - "8082:8080"   # Gateway (secondary)
+      - "4002:4001"   # Swarm (secondary)
+    volumes:
+      - ipfs2_data:/data/ipfs
+    networks:
+      - pangochain-net
+    depends_on:
+      - ipfs
+    restart: unless-stopped
+
+  # ─── Spring Boot Backend (optional — can run with ./mvnw instead) ─────────────
+  pangochain-backend:
+    image: eclipse-temurin:21-jre
+    container_name: pangochain-backend
+    working_dir: /app
+    entrypoint: ["java", "-jar", "app.jar"]
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: pangochain
+      DB_USER: pangochain
+      DB_PASSWORD: ${DB_PASSWORD:-pangochain_secret}
+      JWT_SECRET: ${JWT_SECRET:-pangochain-jwt-secret-key-must-be-at-least-256-bits-long-for-hs256}
+      IPFS_API_HOST: http://ipfs
+      IPFS_API_PORT: 5001
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - pangochain-net
+    profiles:
+      - full
+
+  # ─── React Frontend (optional — can run with npm run dev instead) ─────────────
+  pangochain-frontend:
+    image: nginx:alpine
+    container_name: pangochain-frontend
+    ports:
+      - "3000:80"
+    networks:
+      - pangochain-net
+    profiles:
+      - full
+
+volumes:
+  postgres_data:
+  ipfs_data:
+  ipfs2_data:
+
+networks:
+  pangochain-net:
+    driver: bridge
