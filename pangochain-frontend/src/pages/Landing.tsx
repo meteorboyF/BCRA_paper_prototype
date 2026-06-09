@@ -101,13 +101,13 @@ function Hero() {
         <div>
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gold-500/10 border border-gold-500/20 text-gold-300 text-xs font-semibold mb-8 backdrop-blur-sm">
             <span className="w-1.5 h-1.5 rounded-full bg-gold-400 animate-pulse shadow-gold-sm" />
-            THE COGNITIVE LEDGER MATTERS PLATFORM
+            AI-POWERED BLOCKCHAIN LEGAL PLATFORM
           </div>
 
           <h1 className="font-serif text-5xl md:text-7xl font-bold leading-[1.05] tracking-tight mb-8 text-text-primary">
-            Justice, <br />
+            PangoChain <br />
             <span className="relative inline-block text-gold-300">
-              Engineered.
+              AI-Powered Blockchain Legal Platform
               <svg className="absolute left-0 bottom-[-8px] w-full h-2 text-gold-500" viewBox="0 0 100 10" preserveAspectRatio="none">
                 <path d="M0,5 Q50,0 100,5" stroke="currentColor" strokeWidth="2" fill="none" className="stroke-draw-line"
                   style={{ strokeDasharray: '1000', strokeDashoffset: '1000', animation: 'draw-line 2s ease-out forwards 0.5s' }} />
@@ -116,7 +116,7 @@ function Hero() {
           </h1>
 
           <p className="text-base md:text-lg text-text-secondary leading-relaxed mb-10 max-w-lg">
-            A premium cognitive legal infrastructure connecting multi-firm vaults, immutable blockchain audit events, and defense-grade client portals.
+            Upload, encrypt, analyze, and prove legal documents with OpenAI intelligence, Hyperledger Fabric audit trails, IPFS storage, and browser-side cryptography.
           </p>
 
           <div className="flex flex-wrap items-center gap-4">
