@@ -1,6 +1,10 @@
 package com.pangochain.backend.ai;
 
 import com.pangochain.backend.cases.CaseRepository;
+import com.pangochain.backend.document.DocStatus;
+import com.pangochain.backend.document.DocumentRepository;
+import com.pangochain.backend.hearing.HearingRepository;
+import com.pangochain.backend.milestone.CaseMilestoneRepository;
 import com.pangochain.backend.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -27,6 +32,9 @@ public class AiChatService {
     private final AiConversationRepository conversationRepo;
     private final CaseRepository caseRepository;
     private final UserRepository userRepository;
+    private final HearingRepository hearingRepository;
+    private final CaseMilestoneRepository milestoneRepository;
+    private final DocumentRepository documentRepository;
 
     protected String safe(String text) {
         if (text == null) {
@@ -42,6 +50,8 @@ public class AiChatService {
     public record ChatRequest(UUID caseId, String question, List<DocumentContext> documents) {}
 
     public record ChatResponse(String answer, String[] citations) {}
+
+    public record ClientChatRequest(String question) {}
 
     public record ConversationMessage(String role, String content, Instant createdAt) {}
 
@@ -112,5 +122,65 @@ public class AiChatService {
                 .stream()
                 .map(h -> new ConversationMessage(h.getRole(), h.getContent(), h.getCreatedAt()))
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public ChatResponse clientChat(ClientChatRequest req, String clientEmail) {
+        availability.requireAvailable();
+
+        var user = userRepository.findByEmail(clientEmail).orElseThrow();
+        var clientCases = caseRepository.findByClientId(user.getId());
+        if (clientCases.isEmpty()) {
+            return new ChatResponse("I don't see any active cases for your account. Please contact your lawyer.", new String[0]);
+        }
+
+        var legalCase = clientCases.get(0);
+        var hearings = hearingRepository.findByLegalCaseIdOrderByHearingDateAsc(legalCase.getId());
+        var milestones = milestoneRepository.findByCaseIdOrderBySortOrderAscCreatedAtAsc(legalCase.getId());
+        var documents = documentRepository.findByLegalCaseIdAndStatus(legalCase.getId(), DocStatus.ACTIVE);
+
+        String context = """
+                Today's date: %s
+
+                Your case: %s
+                Type: %s | Status: %s
+
+                Upcoming hearings:
+                %s
+
+                Case milestones:
+                %s
+
+                Documents in your vault (names only):
+                %s
+                """.formatted(
+                LocalDate.now(),
+                legalCase.getTitle(), legalCase.getCaseType(), legalCase.getStatus(),
+                hearings.stream()
+                        .map(h -> "- " + h.getHearingDate() + ": " + h.getHearingType() + " at " + h.getCourtName())
+                        .collect(Collectors.joining("\n")),
+                milestones.stream()
+                        .map(m -> "- " + m.getTitle() + ": "
+                                + (m.getCompletedAt() != null ? "Completed " + m.getCompletedAt() : m.getStatus()))
+                        .collect(Collectors.joining("\n")),
+                documents.stream().map(d -> "- " + d.getFileName()).collect(Collectors.joining("\n"))
+        );
+
+        String answer = chatClient.orElseThrow(() -> new AiUnavailableException("AI features require OPENAI_API_KEY to be configured."))
+                .prompt()
+                .system("""
+                        You are a friendly legal case assistant helping a client understand their case.
+                        Use plain English. Avoid legal jargon.
+                        Be warm, reassuring, and honest.
+                        Never give legal advice beyond explaining their specific case facts.
+                        If a question requires a lawyer's judgment, say "Your lawyer will be best placed to answer this."
+
+                        Case context:
+                        """ + context)
+                .user(req.question())
+                .call()
+                .content();
+
+        return new ChatResponse(answer, new String[0]);
     }
 }

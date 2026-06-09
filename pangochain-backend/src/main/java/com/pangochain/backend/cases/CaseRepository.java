@@ -51,6 +51,14 @@ public interface CaseRepository extends JpaRepository<Case, UUID> {
         """)
     List<Case> findByMember(@Param("userId") UUID userId);
 
+    @Query(value = """
+        SELECT c.* FROM cases c
+        JOIN case_clients cc ON cc.case_id = c.id
+        WHERE cc.client_id = :clientId
+        ORDER BY c.created_at DESC
+        """, nativeQuery = true)
+    List<Case> findByClientId(@Param("clientId") UUID clientId);
+
     long countByFirmIdAndStatus(UUID firmId, CaseStatus status);
 
     /** All cases in a firm — used by the conflict-of-interest scan. */

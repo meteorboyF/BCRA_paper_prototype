@@ -83,4 +83,12 @@ public class AiController {
             @AuthenticationPrincipal UserDetails principal) {
         return ResponseEntity.ok(chatService.getHistory(caseId, principal.getUsername()));
     }
+
+    @PostMapping("/client/chat")
+    @PreAuthorize("hasAnyRole('CLIENT_PRIMARY', 'CLIENT_SECONDARY', 'CLIENT_CORP_ADMIN', 'LAWYER', 'MANAGING_PARTNER', 'PARTNER_SENIOR', 'PARTNER_JUNIOR', 'ASSOCIATE_SENIOR', 'ASSOCIATE_JUNIOR')")
+    public ResponseEntity<AiChatService.ChatResponse> clientChat(
+            @RequestBody AiChatService.ClientChatRequest req,
+            @AuthenticationPrincipal UserDetails principal) {
+        return ResponseEntity.ok(chatService.clientChat(req, principal.getUsername()));
+    }
 }
