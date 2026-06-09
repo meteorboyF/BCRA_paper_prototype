@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { Upload, X, FileText, Lock, CheckCircle, AlertCircle, Loader2, Shield, Sparkles } from 'lucide-react'
 import { encryptDocument, eciesWrapKey, bytesToBase64 } from '../lib/crypto'
 import { useAuthStore } from '../store/authStore'
@@ -15,9 +15,28 @@ interface Props {
 
 type Stage = 'idle' | 'encrypting' | 'wrapping' | 'uploading' | 'done' | 'error'
 
+interface CaseOption {
+  id: string
+  title: string
+  status: string
+}
+
+function uploadErrorMessage(err: any) {
+  const data = err?.response?.data
+  if (data?.errors && typeof data.errors === 'object') {
+    return Object.entries(data.errors)
+      .map(([field, message]) => `${field}: ${message}`)
+      .join(', ')
+  }
+  return data?.detail ?? data?.message ?? err.message ?? 'Upload failed'
+}
+
 export function DocumentUploadDropzone({ caseId, onClose, onUploaded, previousVersionId }: Props) {
   const { user } = useAuthStore()
   const [file, setFile] = useState<File | null>(null)
+  const [selectedCaseId, setSelectedCaseId] = useState(caseId)
+  const [caseOptions, setCaseOptions] = useState<CaseOption[]>([])
+  const [casesLoading, setCasesLoading] = useState(false)
   const [category, setCategory] = useState('GENERAL')
   const [confidential, setConfidential] = useState(false)
   const [suggestion, setSuggestion] = useState<{ category: string; confidence: number; rationale: string } | null>(null)
@@ -27,6 +46,31 @@ export function DocumentUploadDropzone({ caseId, onClose, onUploaded, previousVe
   const fileRef = useRef<HTMLInputElement>(null)
 
   const CATEGORIES = ['GENERAL', 'EVIDENCE', 'CONTRACT', 'CORRESPONDENCE', 'CONFESSION', 'MEDICAL', 'FINANCIAL']
+  const needsCaseSelection = !caseId
+
+  useEffect(() => {
+    setSelectedCaseId(caseId)
+  }, [caseId])
+
+  useEffect(() => {
+    if (!needsCaseSelection) return
+    let alive = true
+    setCasesLoading(true)
+    api.get('/cases', { params: { status: 'ACTIVE', size: 100 } })
+      .then(({ data }) => {
+        if (!alive) return
+        const options = (data?.content ?? []) as CaseOption[]
+        setCaseOptions(options)
+        setSelectedCaseId((current) => current || options[0]?.id || '')
+      })
+      .catch(() => {
+        if (alive) setErrorMsg('Could not load matters. Open a case and upload from its Documents tab.')
+      })
+      .finally(() => {
+        if (alive) setCasesLoading(false)
+      })
+    return () => { alive = false }
+  }, [needsCaseSelection])
 
   // AI auto-tagging on file select — sends filename + a plaintext-side preview (text files only).
   const pickFile = async (picked: File | null) => {
@@ -53,6 +97,11 @@ export function DocumentUploadDropzone({ caseId, onClose, onUploaded, previousVe
 
   const handleUpload = async () => {
     if (!file) return
+    if (!selectedCaseId) {
+      setStage('error')
+      setErrorMsg('Choose a matter before uploading this document.')
+      return
+    }
     setStage('encrypting')
     setErrorMsg('')
 
@@ -86,7 +135,7 @@ export function DocumentUploadDropzone({ caseId, onClose, onUploaded, previousVe
       }
 
       await api.post('/documents/upload', {
-        caseId,
+        caseId: selectedCaseId,
         fileName: file.name,
         ciphertextBase64: encrypted.ciphertextB64,
         ivBase64: encrypted.ivB64,
@@ -102,7 +151,7 @@ export function DocumentUploadDropzone({ caseId, onClose, onUploaded, previousVe
       setTimeout(onUploaded, 800)
     } catch (err: any) {
       setStage('error')
-      setErrorMsg(err.response?.data?.detail ?? err.message ?? 'Upload failed')
+      setErrorMsg(uploadErrorMessage(err))
     }
   }
 
@@ -174,6 +223,21 @@ export function DocumentUploadDropzone({ caseId, onClose, onUploaded, previousVe
           {/* Category + AI auto-tagging suggestion */}
           {file && stage === 'idle' && (
             <div>
+              {needsCaseSelection && (
+                <div className="mb-3">
+                  <label className="label">Matter</label>
+                  <select
+                    className="input bg-navy-950 text-text-primary border-gold-500/20"
+                    value={selectedCaseId}
+                    onChange={(e) => setSelectedCaseId(e.target.value)}
+                    disabled={casesLoading || caseOptions.length === 0}
+                  >
+                    {casesLoading && <option value="">Loading matters...</option>}
+                    {!casesLoading && caseOptions.length === 0 && <option value="">No active matters available</option>}
+                    {caseOptions.map((c) => <option key={c.id} value={c.id}>{c.title}</option>)}
+                  </select>
+                </div>
+              )}
               <label className="label">Category</label>
               <select className="input bg-navy-950 text-text-primary border-gold-500/20" value={category} onChange={(e) => setCategory(e.target.value)}>
                 {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
@@ -226,7 +290,7 @@ export function DocumentUploadDropzone({ caseId, onClose, onUploaded, previousVe
           </button>
           <button
             onClick={handleUpload}
-            disabled={!file || stage === 'encrypting' || stage === 'wrapping' || stage === 'uploading' || stage === 'done'}
+            disabled={!file || !selectedCaseId || stage === 'encrypting' || stage === 'wrapping' || stage === 'uploading' || stage === 'done'}
             className="flex-1 btn-primary py-2.5 justify-center disabled:opacity-50"
           >
             {['encrypting', 'wrapping', 'uploading'].includes(stage)
