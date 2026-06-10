@@ -37,8 +37,8 @@ export default function Profile() {
         <div className="space-y-3">
           <div className="flex items-center justify-between py-3 border-b border-border">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-[#1d6464]/10 rounded-lg flex items-center justify-center">
-                <Shield className="w-4 h-4 text-[#1d6464]" />
+              <div className="w-8 h-8 bg-[#C9A84C]/10 rounded-lg flex items-center justify-center">
+                <Shield className="w-4 h-4 text-[#C9A84C]" />
               </div>
               <div>
                 <p className="text-sm font-medium text-text-primary">Two-Factor Authentication</p>
@@ -52,8 +52,8 @@ export default function Profile() {
 
           <div className="flex items-center justify-between py-3 border-b border-border">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-[#1d6464]/10 rounded-lg flex items-center justify-center">
-                <Key className="w-4 h-4 text-[#1d6464]" />
+              <div className="w-8 h-8 bg-[#C9A84C]/10 rounded-lg flex items-center justify-center">
+                <Key className="w-4 h-4 text-[#C9A84C]" />
               </div>
               <div>
                 <p className="text-sm font-medium text-text-primary">ECIES P-256 Private Key</p>
@@ -67,8 +67,8 @@ export default function Profile() {
 
           <div className="flex items-center justify-between py-3">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-[#1d6464]/10 rounded-lg flex items-center justify-center">
-                <Lock className="w-4 h-4 text-[#1d6464]" />
+              <div className="w-8 h-8 bg-[#C9A84C]/10 rounded-lg flex items-center justify-center">
+                <Lock className="w-4 h-4 text-[#C9A84C]" />
               </div>
               <div>
                 <p className="text-sm font-medium text-text-primary">Document Encryption</p>

@@ -218,9 +218,9 @@ export default function TemplateEngine() {
       )}
       {!aiAvailable && <AiUnavailableBanner />}
 
-      <section className="card border-[#1d6464]/25 bg-navy-900/70 p-5">
+      <section className="card border-[#C9A84C]/25 bg-navy-900/70 p-5">
         <div className="mb-4 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#1d6464]/30 bg-[#1d6464]/15">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#C9A84C]/30 bg-[#C9A84C]/15">
             <Sparkles className="h-5 w-5 text-cyan-300" />
           </div>
           <div>

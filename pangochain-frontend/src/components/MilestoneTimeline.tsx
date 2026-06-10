@@ -93,10 +93,10 @@ export function MilestoneTimeline({ caseId, canEdit = false }: Props) {
     <div>
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-heading font-semibold text-text-primary flex items-center gap-2">
-          <MilestoneIcon className="w-4 h-4 text-[#1d6464]" /> Case Progress
+          <MilestoneIcon className="w-4 h-4 text-[#C9A84C]" /> Case Progress
         </h2>
         {canEdit && (
-          <button onClick={() => setShowAdd((v) => !v)} className="inline-flex items-center gap-1 text-xs font-medium text-[#1d6464] hover:bg-[#1d6464]/10 rounded-lg px-2 py-1">
+          <button onClick={() => setShowAdd((v) => !v)} className="inline-flex items-center gap-1 text-xs font-medium text-[#C9A84C] hover:bg-[#C9A84C]/10 rounded-lg px-2 py-1">
             <Plus className="w-3.5 h-3.5" /> Add milestone
           </button>
         )}
@@ -106,7 +106,7 @@ export function MilestoneTimeline({ caseId, canEdit = false }: Props) {
         <div className="mb-4 rounded-xl border border-border bg-surface-muted/50 p-3 space-y-2">
           <div className="flex flex-wrap gap-1.5">
             {SUGGESTED.map((s) => (
-              <button key={s} onClick={() => setTitle(s)} className="text-[11px] px-2 py-0.5 rounded-full border border-border bg-white hover:border-[#1d6464]/40 text-text-secondary">{s}</button>
+              <button key={s} onClick={() => setTitle(s)} className="text-[11px] px-2 py-0.5 rounded-full border border-border bg-white hover:border-[#C9A84C]/40 text-text-secondary">{s}</button>
             ))}
           </div>
           <input className="input" placeholder="Milestone title" value={title} onChange={(e) => setTitle(e.target.value)} />
@@ -122,7 +122,7 @@ export function MilestoneTimeline({ caseId, canEdit = false }: Props) {
       )}
 
       {loading ? (
-        <div className="flex justify-center py-8"><Loader2 className="w-5 h-5 animate-spin text-[#1d6464]" /></div>
+        <div className="flex justify-center py-8"><Loader2 className="w-5 h-5 animate-spin text-[#C9A84C]" /></div>
       ) : milestones.length === 0 ? (
         <p className="text-sm text-text-muted py-4">No milestones yet{canEdit ? ' — add the first to give your client a progress view.' : '.'}</p>
       ) : (
@@ -146,7 +146,7 @@ export function MilestoneTimeline({ caseId, canEdit = false }: Props) {
                 </div>
                 {canEdit && (
                   <div className="flex items-center gap-1 shrink-0">
-                    <button onClick={() => cycleStatus(m)} className="text-[11px] text-[#1d6464] hover:bg-[#1d6464]/10 rounded px-1.5 py-1" title="Advance status">advance</button>
+                    <button onClick={() => cycleStatus(m)} className="text-[11px] text-[#C9A84C] hover:bg-[#C9A84C]/10 rounded px-1.5 py-1" title="Advance status">advance</button>
                     <button onClick={() => remove(m)} className="p-1 text-text-muted hover:text-error" title="Delete"><Trash2 className="w-3.5 h-3.5" /></button>
                   </div>
                 )}

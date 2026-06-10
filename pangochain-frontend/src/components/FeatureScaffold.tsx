@@ -21,7 +21,7 @@ export function FeatureScaffold({ icon, title, tagline, capabilities, dependenci
   return (
     <div className="space-y-6 animate-fade-in max-w-3xl">
       <div className="flex items-start gap-3">
-        <div className="w-11 h-11 rounded-xl bg-[#1d6464]/10 flex items-center justify-center shrink-0">{icon}</div>
+        <div className="w-11 h-11 rounded-xl bg-[#C9A84C]/10 flex items-center justify-center shrink-0">{icon}</div>
         <div>
           <div className="flex items-center gap-2">
             <h1 className="font-heading text-2xl font-bold text-text-primary">{title}</h1>
@@ -33,12 +33,12 @@ export function FeatureScaffold({ icon, title, tagline, capabilities, dependenci
 
       <div className="card p-5">
         <h2 className="font-heading font-semibold text-text-primary flex items-center gap-2 mb-3">
-          <Sparkles className="w-4 h-4 text-[#1d6464]" /> Planned capabilities
+          <Sparkles className="w-4 h-4 text-[#C9A84C]" /> Planned capabilities
         </h2>
         <ul className="space-y-2">
           {capabilities.map((c) => (
             <li key={c} className="flex items-start gap-2 text-sm text-text-secondary">
-              <Check className="w-4 h-4 text-[#1d6464] shrink-0 mt-0.5" /> {c}
+              <Check className="w-4 h-4 text-[#C9A84C] shrink-0 mt-0.5" /> {c}
             </li>
           ))}
         </ul>
@@ -49,7 +49,7 @@ export function FeatureScaffold({ icon, title, tagline, capabilities, dependenci
           <h3 className="text-[11px] font-bold text-text-muted uppercase tracking-wider mb-2">Builds on</h3>
           <div className="flex flex-wrap gap-1.5">
             {dependencies.map((d) => (
-              <span key={d} className="text-xs bg-[#1d6464]/5 text-[#1d6464] border border-[#1d6464]/20 px-2 py-1 rounded-lg">{d}</span>
+              <span key={d} className="text-xs bg-[#C9A84C]/5 text-[#C9A84C] border border-[#C9A84C]/20 px-2 py-1 rounded-lg">{d}</span>
             ))}
           </div>
         </div>

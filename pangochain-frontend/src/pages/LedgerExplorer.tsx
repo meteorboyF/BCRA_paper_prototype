@@ -22,7 +22,7 @@ const EVENT_COLORS: Record<string, string> = {
   DOC_VIEWED:        'bg-cyan-50 text-cyan-700',
   ACCESS_GRANTED:    'bg-emerald-50 text-emerald-700',
   ACCESS_REVOKED:    'bg-red-50 text-red-700',
-  CASE_REGISTERED:   'bg-[#1d6464]/10 text-[#1d6464]',
+  CASE_REGISTERED:   'bg-[#C9A84C]/10 text-[#C9A84C]',
   HEARING_SCHEDULED: 'bg-purple-50 text-purple-700',
   USER_LOGIN:        'bg-gray-100 text-gray-700',
   DOC_UPDATED:       'bg-amber-50 text-amber-700',
@@ -66,7 +66,7 @@ export default function LedgerExplorer() {
             Immutable audit trail · anchored on Hyperledger Fabric 2.4
           </p>
         </div>
-        <div className="flex items-center gap-2 bg-[#1d6464]/10 text-[#1d6464] rounded-lg px-3 py-1.5 text-xs font-semibold">
+        <div className="flex items-center gap-2 bg-[#C9A84C]/10 text-[#C9A84C] rounded-lg px-3 py-1.5 text-xs font-semibold">
           <Activity className="w-3.5 h-3.5" /> {entries.length} records
         </div>
       </div>
@@ -94,7 +94,7 @@ export default function LedgerExplorer() {
         </div>
       </div>
 
-      {loading && <div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-[#1d6464]" /></div>}
+      {loading && <div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-[#C9A84C]" /></div>}
       {error && !loading && (
         <div className="flex items-center gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-error">
           <AlertCircle className="w-4 h-4" /> {error}
@@ -136,7 +136,7 @@ export default function LedgerExplorer() {
                     </td>
                     <td className="px-4 py-3 hidden xl:table-cell">
                       {e.fabricTxId ? (
-                        <p className="text-[10px] font-mono text-[#1d6464] truncate max-w-[100px]">{e.fabricTxId.slice(0, 10)}…</p>
+                        <p className="text-[10px] font-mono text-[#C9A84C] truncate max-w-[100px]">{e.fabricTxId.slice(0, 10)}…</p>
                       ) : (
                         <span className="text-[10px] text-text-muted">DB only</span>
                       )}
@@ -162,7 +162,7 @@ export default function LedgerExplorer() {
                           {e.fabricTxId && (
                             <div className="md:col-span-2">
                               <p className="text-text-muted font-semibold mb-1">Fabric Transaction ID</p>
-                              <p className="font-mono text-[#1d6464] break-all">{e.fabricTxId}</p>
+                              <p className="font-mono text-[#C9A84C] break-all">{e.fabricTxId}</p>
                             </div>
                           )}
                           {e.contextJson && e.contextJson !== '{}' && (

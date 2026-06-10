@@ -96,7 +96,7 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex bg-navy-950 text-text-primary selection:bg-gold-500/20 selection:text-gold-300">
+    <div className="min-h-screen flex bg-navy-950/40 text-text-primary selection:bg-gold-500/20 selection:text-gold-300">
       
       {/* ── Left panel: Abstract breathing geometric art ─────────────────── */}
       <div className="hidden lg:flex w-[50%] relative flex-col justify-between p-16 overflow-hidden border-r border-gold-500/10 bg-navy-900/40">
@@ -145,7 +145,7 @@ export default function Login() {
       </div>
 
       {/* ── Right panel: Login form ─────────────────────────────────────── */}
-      <div className="flex-1 relative flex items-center justify-center p-8 bg-navy-950">
+      <div className="flex-1 relative flex items-center justify-center p-8">
         
         {/* Decorative elements */}
         <div className="pointer-events-none absolute inset-0">

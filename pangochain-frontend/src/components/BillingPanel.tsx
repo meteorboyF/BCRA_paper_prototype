@@ -111,7 +111,7 @@ export function BillingPanel({ caseId, canEdit = false }: Props) {
     toast.success(`Mock payment completed for ${inv.invoiceNumber}`)
   }
 
-  if (loading) return <div className="flex justify-center py-10"><Loader2 className="w-6 h-6 animate-spin text-[#1d6464]" /></div>
+  if (loading) return <div className="flex justify-center py-10"><Loader2 className="w-6 h-6 animate-spin text-[#C9A84C]" /></div>
   if (!summary) return <p className="text-sm text-text-muted">Billing unavailable.</p>
 
   return (
@@ -134,11 +134,11 @@ export function BillingPanel({ caseId, canEdit = false }: Props) {
 
       {canEdit && (
         <div className="flex items-center gap-2">
-          <button onClick={() => setShowAdd((v) => !v)} className="inline-flex items-center gap-1 text-xs font-medium text-[#1d6464] hover:bg-[#1d6464]/10 rounded-lg px-2.5 py-1.5">
+          <button onClick={() => setShowAdd((v) => !v)} className="inline-flex items-center gap-1 text-xs font-medium text-[#C9A84C] hover:bg-[#C9A84C]/10 rounded-lg px-2.5 py-1.5">
             <Plus className="w-3.5 h-3.5" /> Log time
           </button>
           <button onClick={generateInvoice} disabled={invoicing || summary.unbilledAmountCents === 0}
-            className="inline-flex items-center gap-1 text-xs font-medium text-[#1d6464] border border-[#1d6464]/40 hover:bg-[#1d6464]/10 rounded-lg px-2.5 py-1.5 disabled:opacity-50">
+            className="inline-flex items-center gap-1 text-xs font-medium text-[#C9A84C] border border-[#C9A84C]/40 hover:bg-[#C9A84C]/10 rounded-lg px-2.5 py-1.5 disabled:opacity-50">
             {invoicing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Receipt className="w-3.5 h-3.5" />} Generate invoice
           </button>
         </div>
@@ -187,7 +187,7 @@ export function BillingPanel({ caseId, canEdit = false }: Props) {
           <ul className="space-y-1.5">
             {summary.invoices.map((inv) => (
               <li key={inv.id} className="flex flex-wrap items-center gap-2 text-sm rounded-lg border border-gold-500/15 bg-navy-950/30 px-3 py-2">
-                <FileText className="w-4 h-4 text-[#1d6464]" />
+                <FileText className="w-4 h-4 text-[#C9A84C]" />
                 <span className="font-medium text-text-primary">{inv.invoiceNumber}</span>
                 <span className="text-xs text-text-muted">{hrs(inv.minutesTotal)} · {new Date(inv.issuedAt).toLocaleDateString()}</span>
                 <span className="ml-auto font-semibold text-text-primary">{money(inv.amountCents)}</span>

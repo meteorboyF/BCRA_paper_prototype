@@ -320,7 +320,7 @@ export default function Documents() {
                         <Tooltip content="Analyze with AI" side="top">
                           <button
                             onClick={() => handleAnalyze(doc)}
-                            className="p-1.5 rounded-lg border border-[#1d6464]/20 bg-[#1d6464]/10 hover:bg-[#1d6464]/20 text-cyan-300 transition-all"
+                            className="p-1.5 rounded-lg border border-[#C9A84C]/20 bg-[#C9A84C]/10 hover:bg-[#C9A84C]/20 text-cyan-300 transition-all"
                           >
                             <Sparkles className="w-3 h-3" />
                           </button>

@@ -3,6 +3,7 @@ import { useAuthStore, isClient } from './store/authStore'
 import { MainLayout } from './layout/MainLayout'
 import { Suspense } from 'react'
 import ParticleBackground from './components/ui/ParticleBackground'
+import { GoldEngravingBackdrop } from './components/ui/GoldEngravingArt'
 import { ErrorBoundary } from './components/ui/ErrorBoundary'
 import Landing from './pages/Landing'
 import Login from './pages/Login'
@@ -56,7 +57,7 @@ function PublicOnly({ children }: { children: React.ReactNode }) {
 function PageLoader() {
   return (
     <div className="flex items-center justify-center h-full min-h-[200px]">
-      <div className="w-6 h-6 border-2 border-[#1d6464] border-t-transparent rounded-full animate-spin" />
+      <div className="w-6 h-6 border-2 border-gold-500 border-t-transparent rounded-full animate-spin" />
     </div>
   )
 }
@@ -64,7 +65,8 @@ function PageLoader() {
 export default function App() {
   return (
     <ErrorBoundary>
-      {/* Global particle canvas — fixed, z-0, pointer-events none. Mounted once outside Routes. */}
+      {/* Global art layers — fixed, z-0, pointer-events none. Mounted once outside Routes. */}
+      <GoldEngravingBackdrop />
       <ParticleBackground />
 
       {/* All page content sits at z-10+ so it renders above the particle layer */}

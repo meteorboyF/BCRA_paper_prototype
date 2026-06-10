@@ -4,7 +4,7 @@ import { FeatureScaffold } from '../components/FeatureScaffold'
 export default function DataRooms() {
   return (
     <FeatureScaffold
-      icon={<DoorOpen className="w-5 h-5 text-[#1d6464]" />}
+      icon={<DoorOpen className="w-5 h-5 text-[#C9A84C]" />}
       title="Cross-Firm Secure Data Room"
       tagline="Share discovery documents with external counsel through a sandboxed, audited viewer."
       capabilities={[

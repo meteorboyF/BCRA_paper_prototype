@@ -4,7 +4,7 @@ import { FeatureScaffold } from '../components/FeatureScaffold'
 export default function VideoConsultations() {
   return (
     <FeatureScaffold
-      icon={<Video className="w-5 h-5 text-[#1d6464]" />}
+      icon={<Video className="w-5 h-5 text-[#C9A84C]" />}
       title="Secure Video Consultation"
       tagline="Encrypted lawyer–client video meetings booked and joined inside the platform."
       capabilities={[

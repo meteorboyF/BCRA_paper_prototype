@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom'
 import { useInView } from 'react-intersection-observer'
 import { ChevronDown, ArrowRight, Shield, Activity, Award, CheckCircle2 } from 'lucide-react'
 import {
-  JusticeSvg, ScalesSvg, WaxSealSvg, ChainLinkSvg,
-  ColumnDividerSvg, DocumentSealSvg, VaultSvg, ConstellationBg
+  ScalesSvg, WaxSealSvg,
+  DocumentSealSvg, VaultSvg, ConstellationBg
 } from '../components/ui/SvgAssets'
+import { EngravedJusticeSvg, FiligreeCornerSvg } from '../components/ui/GoldEngravingArt'
 import { ThemeToggle } from '../components/ui/ThemeToggle'
 
 // Self-counting stats component on mount or inView
@@ -88,10 +89,15 @@ function Hero() {
       {/* Background Constellation stars */}
       <ConstellationBg density={50} />
 
-      {/* Half-viewport geometric Lady Justice SVG on the right */}
-      <div className="absolute right-0 bottom-0 top-16 w-full lg:w-1/2 opacity-45 lg:opacity-85 pointer-events-none flex items-center justify-end z-0">
-        <JusticeSvg className="gold-engraving-svg w-full h-full max-h-[85vh] text-gold-500/80 stroke-current animate-drift" />
+      {/* Half-viewport engraved Lady Justice on the right */}
+      <div className="absolute right-0 bottom-0 top-16 w-full lg:w-1/2 opacity-40 lg:opacity-80 pointer-events-none flex items-center justify-end z-0">
+        <EngravedJusticeSvg idPrefix="hero-justice" className="gold-engraving-svg w-full h-full max-h-[88vh] animate-drift" />
       </div>
+
+      {/* Engraved filigree frame corners */}
+      <FiligreeCornerSvg className="pointer-events-none absolute left-4 top-24 z-0 h-32 w-32 opacity-50 md:h-44 md:w-44" />
+      <FiligreeCornerSvg className="pointer-events-none absolute bottom-4 left-4 z-0 h-32 w-32 opacity-50 -scale-y-100 md:h-44 md:w-44" />
+      <FiligreeCornerSvg className="pointer-events-none absolute right-4 top-24 z-0 hidden h-44 w-44 opacity-40 -scale-x-100 lg:block" />
 
       {/* Radial shade */}
       <div className="absolute inset-0 bg-gradient-to-tr from-navy-950 via-navy-950/90 to-transparent pointer-events-none z-0" />

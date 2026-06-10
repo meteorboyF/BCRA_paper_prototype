@@ -159,6 +159,27 @@
   .gold-engraving-svg * {
     vector-effect: non-scaling-stroke;
   }
+
+  /* Full-viewport engraved law scene (fixed, z-0) */
+  .engraving-backdrop {
+    opacity: 0.38;
+    animation: engravingBreath 16s ease-in-out infinite;
+  }
+
+  .engraving-corner {
+    opacity: 0.5;
+    filter: drop-shadow(0 0 8px rgba(201, 168, 76, 0.22));
+  }
+
+  .light .engraving-backdrop {
+    opacity: 0.26;
+    animation: none;
+  }
+
+  .light .engraving-corner {
+    opacity: 0.4;
+    filter: none;
+  }
 }
 
 @layer components {
@@ -189,6 +210,15 @@
            text-sm font-semibold text-gold-300 shadow-sm transition-all duration-300 backdrop-blur-sm
            hover:-translate-y-0.5 hover:bg-gold-500/10 hover:text-gold-300 hover:border-gold-500/60
            focus:outline-none focus:ring-2 focus:ring-gold-500/50 focus:ring-offset-2 focus:ring-offset-navy-950
+           disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  /* Ghost Button (quiet, gold on hover) */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2
+           text-sm font-medium text-text-secondary transition-all duration-300
+           hover:bg-gold-500/10 hover:text-gold-300
+           focus:outline-none focus:ring-2 focus:ring-gold-500/30
            disabled:cursor-not-allowed disabled:opacity-50;
   }
 
@@ -327,6 +357,11 @@
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes engravingBreath {
+  0%, 100% { opacity: 0.32; }
+  50% { opacity: 0.46; }
 }
 
 @keyframes engravingGlow {

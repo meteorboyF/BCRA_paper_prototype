@@ -158,7 +158,7 @@ export default function DistributeAccess() {
     }
   }
 
-  if (loading) return <div className="flex justify-center py-20"><Loader2 className="w-6 h-6 animate-spin text-[#1d6464]" /></div>
+  if (loading) return <div className="flex justify-center py-20"><Loader2 className="w-6 h-6 animate-spin text-[#C9A84C]" /></div>
   if (error) return (
     <div className="flex items-center gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-error">
       <AlertCircle className="w-4 h-4" /> {error}
@@ -168,11 +168,11 @@ export default function DistributeAccess() {
   return (
     <div className="space-y-6 animate-fade-in">
       <div>
-        <Link to={`/cases/${caseId}`} className="inline-flex items-center gap-1 text-sm text-text-muted hover:text-[#1d6464] mb-2">
+        <Link to={`/cases/${caseId}`} className="inline-flex items-center gap-1 text-sm text-text-muted hover:text-[#C9A84C] mb-2">
           <ArrowLeft className="w-4 h-4" /> Back to case
         </Link>
         <div className="flex items-center gap-2">
-          <Share2 className="w-5 h-5 text-[#1d6464]" />
+          <Share2 className="w-5 h-5 text-[#C9A84C]" />
           <h1 className="font-heading text-2xl font-bold text-text-primary">Distribute Document Access</h1>
         </div>
         <p className="text-text-muted text-sm mt-0.5">
@@ -249,7 +249,7 @@ export default function DistributeAccess() {
                 {grantees.map((g) => (
                   <th key={g.userId} className="px-3 py-2 text-center">
                     <div className="font-medium text-text-primary text-xs truncate max-w-[8rem] mx-auto" title={g.email}>{g.fullName}</div>
-                    <button onClick={() => toggleColumn(g.userId, true)} className="text-[10px] text-[#1d6464] hover:underline mt-0.5">all</button>
+                    <button onClick={() => toggleColumn(g.userId, true)} className="text-[10px] text-[#C9A84C] hover:underline mt-0.5">all</button>
                   </th>
                 ))}
               </tr>
@@ -259,15 +259,15 @@ export default function DistributeAccess() {
                 <tr key={d.id} className="border-b border-border/60 hover:bg-surface-muted/40">
                   <td className="py-2 pr-4">
                     <div className="flex items-center gap-2">
-                      {d.confidential ? <Lock className="w-4 h-4 text-red-500 shrink-0" /> : <FileText className="w-4 h-4 text-[#1d6464] shrink-0" />}
+                      {d.confidential ? <Lock className="w-4 h-4 text-red-500 shrink-0" /> : <FileText className="w-4 h-4 text-[#C9A84C] shrink-0" />}
                       <span className="truncate max-w-[14rem]" title={d.fileName}>{d.fileName}</span>
                       {isDemoDoc(d) && <span className="text-[9px] text-gold-300 border border-gold-500/20 rounded px-1">demo</span>}
-                      <button onClick={() => toggleRow(d.id, true)} className="text-[10px] text-[#1d6464] hover:underline ml-1">all</button>
+                      <button onClick={() => toggleRow(d.id, true)} className="text-[10px] text-[#C9A84C] hover:underline ml-1">all</button>
                     </div>
                   </td>
                   {grantees.map((g) => (
                     <td key={g.userId} className="px-3 py-2 text-center">
-                      <input type="checkbox" className="w-4 h-4 accent-[#1d6464] cursor-pointer"
+                      <input type="checkbox" className="w-4 h-4 accent-[#C9A84C] cursor-pointer"
                         checked={!!selected[cellKey(d.id, g.userId)]}
                         onChange={() => toggle(d.id, g.userId)} />
                     </td>

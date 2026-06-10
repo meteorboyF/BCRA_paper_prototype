@@ -98,7 +98,7 @@ export function SettlementOffersPanel({ caseId, canManage, canRespond }: Props) 
     <div className="card p-5">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Scale className="w-5 h-5 text-[#1d6464]" />
+          <Scale className="w-5 h-5 text-[#C9A84C]" />
           <h2 className="font-heading font-semibold text-text-primary">Settlement Offers</h2>
         </div>
         {canManage && (
@@ -146,7 +146,7 @@ export function SettlementOffersPanel({ caseId, canManage, canRespond }: Props) 
       )}
 
       {loading ? (
-        <div className="flex justify-center py-8"><Loader2 className="w-5 h-5 animate-spin text-[#1d6464]" /></div>
+        <div className="flex justify-center py-8"><Loader2 className="w-5 h-5 animate-spin text-[#C9A84C]" /></div>
       ) : error ? (
         <div className="flex items-center gap-2 text-error text-sm"><AlertCircle className="w-4 h-4" /> {error}</div>
       ) : offers.length === 0 ? (
@@ -157,14 +157,14 @@ export function SettlementOffersPanel({ caseId, canManage, canRespond }: Props) 
             <div key={o.id} className={`border rounded-xl p-4 ${
               o.status === 'ACCEPTED' ? 'border-success/40 bg-success/5'
                 : o.status === 'REJECTED' ? 'border-border bg-surface-muted/40 opacity-70'
-                : 'border-[#1d6464]/30'
+                : 'border-[#C9A84C]/30'
             }`}>
               <div className="flex items-start justify-between gap-2">
                 <p className="font-semibold text-text-primary text-sm">{o.title}</p>
                 {o.status === 'ACCEPTED' && <span className="inline-flex items-center gap-1 text-[10px] font-bold text-success"><CheckCircle className="w-3 h-3" /> ACCEPTED</span>}
                 {o.status === 'REJECTED' && <span className="inline-flex items-center gap-1 text-[10px] font-bold text-text-muted"><Ban className="w-3 h-3" /> REJECTED</span>}
               </div>
-              <p className="text-2xl font-bold text-[#1d6464] mt-1">{money(o.monetaryValueCents, o.currency)}</p>
+              <p className="text-2xl font-bold text-[#C9A84C] mt-1">{money(o.monetaryValueCents, o.currency)}</p>
               {o.nonMonetaryTerms && (
                 <div className="mt-2">
                   <p className="text-[10px] font-bold text-text-muted uppercase">Non-monetary terms</p>

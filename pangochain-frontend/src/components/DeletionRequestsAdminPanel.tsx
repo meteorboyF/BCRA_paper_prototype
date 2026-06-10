@@ -47,11 +47,11 @@ export function DeletionRequestsAdminPanel() {
   return (
     <div className="card">
       <h2 className="font-heading font-semibold text-text-primary flex items-center gap-2 mb-4">
-        <ShieldCheck className="w-4 h-4 text-[#1d6464]" /> GDPR Erasure Requests
+        <ShieldCheck className="w-4 h-4 text-[#C9A84C]" /> GDPR Erasure Requests
         {open.length > 0 && <span className="text-[10px] font-bold bg-amber-500 text-white rounded-full px-2 py-0.5">{open.length}</span>}
       </h2>
       {loading ? (
-        <div className="flex justify-center py-6"><Loader2 className="w-5 h-5 animate-spin text-[#1d6464]" /></div>
+        <div className="flex justify-center py-6"><Loader2 className="w-5 h-5 animate-spin text-[#C9A84C]" /></div>
       ) : requests.length === 0 ? (
         <p className="text-sm text-text-muted">No erasure requests.</p>
       ) : (

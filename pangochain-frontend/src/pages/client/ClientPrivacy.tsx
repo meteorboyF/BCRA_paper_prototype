@@ -46,13 +46,13 @@ export default function ClientPrivacy() {
     }
   }
 
-  if (loading) return <div className="flex justify-center py-32"><Loader2 className="w-7 h-7 animate-spin text-[#1d6464]" /></div>
+  if (loading) return <div className="flex justify-center py-32"><Loader2 className="w-7 h-7 animate-spin text-[#C9A84C]" /></div>
 
   return (
     <div className="space-y-6 animate-fade-in max-w-3xl">
       <div>
         <h1 className="font-heading text-2xl font-bold text-text-primary flex items-center gap-2">
-          <ShieldCheck className="w-6 h-6 text-[#1d6464]" /> Privacy &amp; Data
+          <ShieldCheck className="w-6 h-6 text-[#C9A84C]" /> Privacy &amp; Data
         </h1>
         <p className="text-text-muted text-sm mt-0.5">Everything the firm holds about you, and your right to erasure (GDPR).</p>
       </div>
@@ -60,7 +60,7 @@ export default function ClientPrivacy() {
       {/* Data inventory */}
       <div className="card">
         <h2 className="font-heading font-semibold text-text-primary flex items-center gap-2 mb-4">
-          <Database className="w-4 h-4 text-[#1d6464]" /> Data we hold about you
+          <Database className="w-4 h-4 text-[#C9A84C]" /> Data we hold about you
         </h2>
         <ul className="divide-y divide-border">
           {inventory.map((it) => (
@@ -88,7 +88,7 @@ export default function ClientPrivacy() {
       <div className="card">
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-heading font-semibold text-text-primary">Erasure requests</h2>
-          <button onClick={() => setShowForm((v) => !v)} className="inline-flex items-center gap-1 text-xs font-medium text-[#1d6464] hover:bg-[#1d6464]/10 rounded-lg px-2.5 py-1.5">
+          <button onClick={() => setShowForm((v) => !v)} className="inline-flex items-center gap-1 text-xs font-medium text-[#C9A84C] hover:bg-[#C9A84C]/10 rounded-lg px-2.5 py-1.5">
             <Trash2 className="w-3.5 h-3.5" /> Request deletion
           </button>
         </div>

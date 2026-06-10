@@ -119,7 +119,7 @@ export default function Register() {
   }
 
   return (
-    <div className="min-h-screen flex bg-navy-950 text-text-primary selection:bg-gold-500/20 selection:text-gold-300">
+    <div className="min-h-screen flex bg-navy-950/40 text-text-primary selection:bg-gold-500/20 selection:text-gold-300">
       
       {/* ── Left panel: Abstract breathing geometric art ─────────────────── */}
       <div className="hidden lg:flex w-[50%] relative flex-col justify-between p-16 overflow-hidden border-r border-gold-500/10 bg-navy-900/40">
@@ -164,7 +164,7 @@ export default function Register() {
       </div>
 
       {/* ── Right panel: Registration wizard ─────────────────────────────── */}
-      <div className="flex-1 relative flex items-center justify-center p-8 bg-navy-950 overflow-y-auto">
+      <div className="flex-1 relative flex items-center justify-center p-8 overflow-y-auto">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute right-0 top-0 w-80 h-80 rounded-bl-[10rem] bg-[radial-gradient(circle_at_top_right,rgba(201,168,76,0.06),transparent_24rem)]" />
           <div className="absolute left-0 bottom-0 w-64 h-64 rounded-tr-[8rem] bg-[radial-gradient(circle_at_bottom_left,rgba(26,92,74,0.04),transparent_20rem)]" />

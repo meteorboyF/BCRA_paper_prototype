@@ -15,8 +15,8 @@ export function MainLayout() {
   const pathnames = location.pathname.split('/').filter((x) => x)
   
   return (
-    <div className="flex h-screen overflow-hidden bg-navy-950 text-text-primary noise-overlay">
-      {/* Background radial gradient layers */}
+    <div className="flex h-screen overflow-hidden bg-navy-950/40 text-text-primary noise-overlay">
+      {/* Background radial gradient layers — translucent so the global engraving backdrop shows through */}
       <div className="pointer-events-none fixed inset-0 z-0">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_8%,rgba(201,168,76,0.08),transparent_32rem),radial-gradient(circle_at_80%_0%,rgba(26,92,74,0.05),transparent_28rem)]" />
       </div>

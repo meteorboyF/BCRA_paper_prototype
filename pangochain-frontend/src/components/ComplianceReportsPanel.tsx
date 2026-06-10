@@ -48,7 +48,7 @@ export function ComplianceReportsPanel() {
   return (
     <div className="card p-5">
       <div className="flex items-center gap-2 mb-4">
-        <FileBarChart className="w-5 h-5 text-[#1d6464]" />
+        <FileBarChart className="w-5 h-5 text-[#C9A84C]" />
         <h2 className="font-heading font-semibold text-text-primary">Compliance Reports</h2>
       </div>
 

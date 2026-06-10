@@ -103,8 +103,8 @@ export default function NewCase() {
 
       <div className="card">
         <div className="flex items-center gap-3 mb-5 pb-5 border-b border-border">
-          <div className="w-10 h-10 rounded-xl bg-[#1d6464]/10 flex items-center justify-center">
-            <FolderOpen className="w-5 h-5 text-[#1d6464]" />
+          <div className="w-10 h-10 rounded-xl bg-[#C9A84C]/10 flex items-center justify-center">
+            <FolderOpen className="w-5 h-5 text-[#C9A84C]" />
           </div>
           <div>
             <p className="font-medium text-text-primary text-sm">Case Registration</p>

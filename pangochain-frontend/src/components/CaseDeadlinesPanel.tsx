@@ -101,10 +101,10 @@ export function CaseDeadlinesPanel({ caseId, canEdit = false }: Props) {
     <div>
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-heading font-semibold text-text-primary flex items-center gap-2">
-          <AlarmClock className="w-4 h-4 text-[#1d6464]" /> Deadlines &amp; Limitations
+          <AlarmClock className="w-4 h-4 text-[#C9A84C]" /> Deadlines &amp; Limitations
         </h2>
         {canEdit && (
-          <button onClick={() => setShowAdd((v) => !v)} className="inline-flex items-center gap-1 text-xs font-medium text-[#1d6464] hover:bg-[#1d6464]/10 rounded-lg px-2 py-1">
+          <button onClick={() => setShowAdd((v) => !v)} className="inline-flex items-center gap-1 text-xs font-medium text-[#C9A84C] hover:bg-[#C9A84C]/10 rounded-lg px-2 py-1">
             <Plus className="w-3.5 h-3.5" /> Add deadline
           </button>
         )}
@@ -129,7 +129,7 @@ export function CaseDeadlinesPanel({ caseId, canEdit = false }: Props) {
       )}
 
       {loading ? (
-        <div className="flex justify-center py-8"><Loader2 className="w-5 h-5 animate-spin text-[#1d6464]" /></div>
+        <div className="flex justify-center py-8"><Loader2 className="w-5 h-5 animate-spin text-[#C9A84C]" /></div>
       ) : deadlines.length === 0 ? (
         <p className="text-sm text-text-muted py-4">No deadlines tracked{canEdit ? ' — add court dates and limitation periods to stay ahead.' : '.'}</p>
       ) : (

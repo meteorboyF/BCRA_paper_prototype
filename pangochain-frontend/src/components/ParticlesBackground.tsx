@@ -24,7 +24,7 @@ const CONFIGS: Record<Variant, Config> = {
     dotOpacity: 0.55,
     linkOpacity: 0.22,
     dotSizeMax: 3.5,
-    colors: ['#1d6464', '#2a8f8f', '#1E3A5F', '#2563EB', '#3ab5b5'],
+    colors: ['#C9A84C', '#E8D5A3', '#A8893C', '#D4B96A', '#8C6F2F'],
   },
   auth: {
     count: 60,
@@ -35,7 +35,7 @@ const CONFIGS: Record<Variant, Config> = {
     dotOpacity: 0.35,
     linkOpacity: 0.14,
     dotSizeMax: 2.8,
-    colors: ['#1d6464', '#2a8f8f', '#1E3A5F'],
+    colors: ['#C9A84C', '#E8D5A3', '#A8893C'],
   },
   app: {
     // Site-wide app background — shows through the transparent layout gutters.
@@ -48,7 +48,7 @@ const CONFIGS: Record<Variant, Config> = {
     dotOpacity: 0.45,
     linkOpacity: 0.2,
     dotSizeMax: 2.6,
-    colors: ['#1d6464', '#2a8f8f', '#0E7490', '#1E3A5F', '#3ab5b5'],
+    colors: ['#C9A84C', '#E8D5A3', '#A8893C', '#D4B96A', '#B89A55'],
   },
 }
 

@@ -62,18 +62,18 @@ export function SecurityAlertsPanel() {
     <div className="card">
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-heading font-semibold text-text-primary flex items-center gap-2">
-          <ShieldAlert className="w-4 h-4 text-[#1d6464]" /> Security Alerts
+          <ShieldAlert className="w-4 h-4 text-[#C9A84C]" /> Security Alerts
           {open.length > 0 && (
             <span className="text-[10px] font-bold bg-red-500 text-white rounded-full px-2 py-0.5">{open.length}</span>
           )}
         </h2>
-        <button onClick={analyze} disabled={analyzing} className="inline-flex items-center gap-1.5 text-xs font-medium text-[#1d6464] hover:bg-[#1d6464]/10 rounded-lg px-2.5 py-1.5 disabled:opacity-50">
+        <button onClick={analyze} disabled={analyzing} className="inline-flex items-center gap-1.5 text-xs font-medium text-[#C9A84C] hover:bg-[#C9A84C]/10 rounded-lg px-2.5 py-1.5 disabled:opacity-50">
           {analyzing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />} Run analysis
         </button>
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-8"><Loader2 className="w-5 h-5 animate-spin text-[#1d6464]" /></div>
+        <div className="flex justify-center py-8"><Loader2 className="w-5 h-5 animate-spin text-[#C9A84C]" /></div>
       ) : alerts.length === 0 ? (
         <div className="flex items-center gap-2 text-sm text-text-muted py-4">
           <Activity className="w-4 h-4" /> No anomalies detected. Run analysis to sweep the audit log now.
@@ -91,11 +91,11 @@ export function SecurityAlertsPanel() {
                   <p className="text-sm text-text-primary mt-0.5">{a.description}</p>
                   <p className="text-[11px] text-text-muted mt-0.5">
                     {new Date(a.detectedAt).toLocaleString()}
-                    {a.fabricTxId && <span className="ml-2 font-mono text-[#1d6464]">tx {a.fabricTxId.slice(0, 12)}…</span>}
+                    {a.fabricTxId && <span className="ml-2 font-mono text-[#C9A84C]">tx {a.fabricTxId.slice(0, 12)}…</span>}
                   </p>
                 </div>
                 {!a.acknowledged && (
-                  <button onClick={() => ack(a.id)} className="shrink-0 inline-flex items-center gap-1 text-xs text-text-secondary hover:text-[#1d6464] rounded px-1.5 py-1" title="Acknowledge">
+                  <button onClick={() => ack(a.id)} className="shrink-0 inline-flex items-center gap-1 text-xs text-text-secondary hover:text-[#C9A84C] rounded px-1.5 py-1" title="Acknowledge">
                     <Check className="w-3.5 h-3.5" /> Ack
                   </button>
                 )}

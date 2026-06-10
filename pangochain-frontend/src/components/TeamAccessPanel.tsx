@@ -30,7 +30,7 @@ interface Props {
 }
 
 const CAPABILITY_COLORS: Record<string, string> = {
-  owner: 'bg-[#1d6464]/10 text-[#1d6464]',
+  owner: 'bg-[#C9A84C]/10 text-[#C9A84C]',
   write: 'bg-blue-50 text-blue-700',
   read:  'bg-emerald-50 text-emerald-700',
 }
@@ -176,7 +176,7 @@ export function TeamAccessPanel({ docId, docName }: Props) {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="font-heading font-semibold text-text-primary flex items-center gap-2 text-sm">
-          <Users className="w-4 h-4 text-[#1d6464]" /> Team Access — {docName}
+          <Users className="w-4 h-4 text-[#C9A84C]" /> Team Access — {docName}
         </h3>
         <button onClick={() => setShowGrant(!showGrant)} className="btn-primary text-xs py-1.5 px-3">
           <Plus className="w-3.5 h-3.5" /> Grant Access
@@ -184,8 +184,8 @@ export function TeamAccessPanel({ docId, docName }: Props) {
       </div>
 
       {showGrant && (
-        <div className="bg-[#1d6464]/5 border border-[#1d6464]/20 rounded-xl p-4 space-y-3">
-          <p className="text-xs font-semibold text-[#1d6464] flex items-center gap-1.5">
+        <div className="bg-[#C9A84C]/5 border border-[#C9A84C]/20 rounded-xl p-4 space-y-3">
+          <p className="text-xs font-semibold text-[#C9A84C] flex items-center gap-1.5">
             <Shield className="w-3.5 h-3.5" /> Grant Encrypted Access
           </p>
           {!privateKey ? (
@@ -268,14 +268,14 @@ export function TeamAccessPanel({ docId, docName }: Props) {
         </div>
       )}
 
-      {loading && <div className="flex justify-center py-6"><Loader2 className="w-5 h-5 animate-spin text-[#1d6464]" /></div>}
+      {loading && <div className="flex justify-center py-6"><Loader2 className="w-5 h-5 animate-spin text-[#C9A84C]" /></div>}
       {error && <div className="flex items-center gap-2 text-xs text-error bg-red-50 border border-red-200 rounded-lg px-3 py-2"><AlertCircle className="w-3.5 h-3.5" /> {error}</div>}
 
       {!loading && !error && (
         <div className="space-y-2">
           {active.map((e) => (
             <div key={e.id} className="flex items-center gap-3 bg-surface-muted rounded-xl px-4 py-3">
-              <div className="w-8 h-8 rounded-full bg-[#1d6464]/10 flex items-center justify-center text-xs font-bold text-[#1d6464]">
+              <div className="w-8 h-8 rounded-full bg-[#C9A84C]/10 flex items-center justify-center text-xs font-bold text-[#C9A84C]">
                 {e.userFullName?.[0]?.toUpperCase() ?? '?'}
               </div>
               <div className="flex-1 min-w-0">
