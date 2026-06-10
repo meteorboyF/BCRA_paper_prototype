@@ -193,8 +193,8 @@ export default function CaseInsights() {
 
           {evidence && !evidenceLoading && (
             <div className="mt-5 space-y-4">
-              <div className="rounded-xl border border-[#1d6464]/30 bg-[#1d6464]/15 px-4 py-3 text-sm text-cyan-100">
-                <span className="font-semibold text-gold-200">Case theory:</span> {evidence.caseTheory}
+              <div className="rounded-xl border border-gold-500/25 bg-gold-500/5 px-4 py-3 text-sm text-text-primary">
+                <span className="font-serif font-semibold text-gold-300">Case theory:</span> {evidence.caseTheory}
               </div>
               <div>
                 <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-gold-400">Available Evidence</p>

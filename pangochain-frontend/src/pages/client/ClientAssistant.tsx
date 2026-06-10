@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
-import { Bot, Loader2, MessageCircle, Send, UserRound } from 'lucide-react'
+import { Loader2, MessageCircle, Scale, Send, Sparkles, UserRound } from 'lucide-react'
 import api from '../../lib/api'
 import { useAiAvailable } from '../../lib/useAiAvailable'
 import { AiUnavailableBanner } from '../../components/ui/AiUnavailableBanner'
+import { AiMarkdown } from '../../components/ui/AiMarkdown'
 
 interface Message {
   id: string
@@ -56,92 +57,110 @@ export default function ClientAssistant() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl space-y-3">
+    <div className="mx-auto max-w-4xl space-y-3 text-text-primary">
       {!aiAvailable && <AiUnavailableBanner />}
-      <div className="flex h-[calc(100vh-12rem)] flex-col rounded-2xl border border-[#1d6464]/15 bg-white/90 shadow-sm">
-      <div className="border-b border-[#1d6464]/10 px-5 py-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#1d6464]/10 text-[#1d6464]">
-            <MessageCircle className="h-5 w-5" />
+      <div className="glass-panel flex h-[calc(100vh-12rem)] flex-col border-gold-500/15 bg-navy-900/70">
+        <div className="border-b border-gold-500/10 px-5 py-4">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-full border border-gold-500/25 bg-gold-500/10 shadow-gold-sm">
+                <MessageCircle className="h-5 w-5 text-gold-300" />
+              </div>
+              <div>
+                <h1 className="font-serif text-lg font-bold text-gold-200">AI Case Assistant</h1>
+                <p className="text-sm text-text-secondary">These responses explain your case. For legal advice, speak with your lawyer.</p>
+              </div>
+            </div>
+            <span className={`hidden items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider sm:inline-flex ${
+              aiAvailable
+                ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300'
+                : 'border-gold-500/30 bg-gold-500/10 text-gold-300'
+            }`}>
+              <span className={`h-1.5 w-1.5 rounded-full ${aiAvailable ? 'animate-pulse bg-emerald-400' : 'bg-gold-400'}`} />
+              {aiAvailable ? 'Assistant online' : 'AI offline'}
+            </span>
           </div>
-          <div>
-            <h1 className="text-lg font-semibold text-slate-900">AI Case Assistant</h1>
-            <p className="text-sm text-slate-600">These responses explain your case. For legal advice, speak with your lawyer.</p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {suggestions.map((s) => (
+              <button
+                key={s}
+                onClick={() => send(s)}
+                disabled={loading}
+                className="inline-flex items-center gap-1.5 rounded-full border border-gold-500/20 bg-gold-500/5 px-3 py-1.5 text-xs font-medium text-gold-300 transition hover:border-gold-500/40 hover:bg-gold-500/10 disabled:opacity-50"
+              >
+                <Sparkles className="h-3 w-3" />
+                {s}
+              </button>
+            ))}
           </div>
         </div>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {suggestions.map((s) => (
+
+        {error && (
+          <div className="mx-5 mt-4 rounded-lg border border-gold-500/30 bg-gold-500/10 px-4 py-3 text-sm text-gold-200">
+            {error === "I don't see any active cases for your account. Please contact your lawyer."
+              ? "It looks like you don't have an active case yet. Please contact your law firm."
+              : error}
+          </div>
+        )}
+
+        <div className="flex-1 overflow-y-auto px-5 py-5 scrollbar-thin">
+          <div className="space-y-5">
+            {messages.map((m) => (
+              <div key={m.id} className={`flex gap-3 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                {m.role === 'assistant' && (
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-gold-500/30 bg-gradient-to-br from-gold-500/20 to-gold-600/5">
+                    <Scale className="h-4 w-4 text-gold-300" />
+                  </div>
+                )}
+                <div className={`max-w-[78%] rounded-2xl border px-4 py-3 ${
+                  m.role === 'user'
+                    ? 'rounded-tr-sm border-gold-500/30 bg-gold-500/10'
+                    : 'rounded-tl-sm border-gold-500/15 bg-navy-950/60'
+                }`}>
+                  {m.role === 'assistant'
+                    ? <AiMarkdown content={m.content} />
+                    : <p className="whitespace-pre-wrap text-sm leading-relaxed text-gold-100">{m.content}</p>}
+                </div>
+                {m.role === 'user' && (
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-gold-500/20 bg-navy-800 text-gold-200">
+                    <UserRound className="h-4 w-4" />
+                  </div>
+                )}
+              </div>
+            ))}
+            {loading && (
+              <div className="flex justify-start gap-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full border border-gold-500/30 bg-gradient-to-br from-gold-500/20 to-gold-600/5">
+                  <Scale className="h-4 w-4 text-gold-300" />
+                </div>
+                <div className="rounded-2xl rounded-tl-sm border border-gold-500/15 bg-navy-950/60 px-4 py-3 text-sm text-gold-300">
+                  <Loader2 className="mr-2 inline h-4 w-4 animate-spin" /> Checking your case…
+                </div>
+              </div>
+            )}
+            <div ref={bottomRef} />
+          </div>
+        </div>
+
+        <div className="border-t border-gold-500/10 p-4">
+          <div className="flex gap-2">
+            <input
+              className="input min-w-0 flex-1"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') send() }}
+              placeholder="Ask a question about your case..."
+            />
             <button
-              key={s}
-              onClick={() => send(s)}
-              disabled={loading}
-              className="rounded-full border border-[#1d6464]/20 bg-[#1d6464]/5 px-3 py-1.5 text-xs font-medium text-[#1d6464] transition hover:bg-[#1d6464]/10 disabled:opacity-50"
+              onClick={() => send()}
+              disabled={!input.trim() || loading}
+              className="btn-primary px-4"
+              aria-label="Send message"
             >
-              {s}
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
             </button>
-          ))}
+          </div>
         </div>
-      </div>
-
-      {error && (
-        <div className="mx-5 mt-4 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-          {error === "I don't see any active cases for your account. Please contact your lawyer."
-            ? "It looks like you don't have an active case yet. Please contact your law firm."
-            : error}
-        </div>
-      )}
-
-      <div className="flex-1 overflow-y-auto px-5 py-5">
-        <div className="space-y-4">
-          {messages.map((m) => (
-            <div key={m.id} className={`flex gap-3 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              {m.role === 'assistant' && (
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#1d6464]/10 text-[#1d6464]">
-                  <Bot className="h-4 w-4" />
-                </div>
-              )}
-              <div className={`max-w-[78%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${m.role === 'user' ? 'bg-[#1d6464] text-white' : 'bg-slate-100 text-slate-800'}`}>
-                <p className="whitespace-pre-wrap">{m.content}</p>
-              </div>
-              {m.role === 'user' && (
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-200 text-slate-700">
-                  <UserRound className="h-4 w-4" />
-                </div>
-              )}
-            </div>
-          ))}
-          {loading && (
-            <div className="flex justify-start gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1d6464]/10 text-[#1d6464]">
-                <Bot className="h-4 w-4" />
-              </div>
-              <div className="rounded-2xl bg-slate-100 px-4 py-3 text-sm text-slate-700">
-                <Loader2 className="mr-2 inline h-4 w-4 animate-spin" /> Checking your case...
-              </div>
-            </div>
-          )}
-          <div ref={bottomRef} />
-        </div>
-      </div>
-
-      <div className="border-t border-[#1d6464]/10 p-4">
-        <div className="flex gap-2">
-          <input
-            className="min-w-0 flex-1 rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none ring-[#1d6464]/20 transition placeholder:text-slate-400 focus:border-[#1d6464] focus:ring-4"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter') send() }}
-            placeholder="Ask a question about your case..."
-          />
-          <button
-            onClick={() => send()}
-            disabled={!input.trim() || loading}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#1d6464] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#174f4f] disabled:opacity-50"
-          >
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-          </button>
-        </div>
-      </div>
       </div>
     </div>
   )

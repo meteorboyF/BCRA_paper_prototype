@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Bot, CheckCircle2, FileText, KeyRound, Loader2, Lock, RefreshCcw, Send, Sparkles, Trash2 } from 'lucide-react'
+import { CheckCircle2, KeyRound, Loader2, Lock, RefreshCcw, Scale, Send, Sparkles, Trash2 } from 'lucide-react'
 import api from '../lib/api'
+import { AiMarkdown } from '../components/ui/AiMarkdown'
 import { bytesToTextIfPrintable, decryptDocumentToBytes } from '../lib/decryptDoc'
 import { loadWrappedPrivateKey, unwrapPrivateKey } from '../lib/crypto'
 import { useAuthStore } from '../store/authStore'
@@ -44,6 +45,29 @@ interface DecryptedDocument {
 
 const safeTruncate = (text: string, maxChars = 12000) =>
   text.length > maxChars ? text.slice(0, maxChars) + '\n[truncated for AI analysis]' : text
+
+const QUICK_PROMPTS = [
+  'Summarize the key facts of this matter',
+  'What does the selected document prove?',
+  'What evidence is missing from this case?',
+  'List the deadlines and obligations I should watch',
+]
+
+function AssistantAvatar() {
+  return (
+    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-gold-500/30 bg-gradient-to-br from-gold-500/20 to-gold-600/5 shadow-gold-sm">
+      <Scale className="h-4 w-4 text-gold-300" />
+    </div>
+  )
+}
+
+function UserAvatar({ name }: { name?: string }) {
+  return (
+    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-gold-500/20 bg-navy-800 text-xs font-bold text-gold-200">
+      {(name ?? 'You').slice(0, 1).toUpperCase()}
+    </div>
+  )
+}
 
 export default function AiAssistant() {
   const { user } = useAuthStore()
@@ -236,7 +260,7 @@ export default function AiAssistant() {
                       <p className="truncate text-xs font-semibold text-gold-100">{doc.fileName}</p>
                       <p className="mt-1 text-[10px] uppercase tracking-wider text-text-muted">{doc.category ?? 'GENERAL'}</p>
                       {dec?.isDecrypting && <span className="mt-2 inline-flex items-center gap-1 text-[10px] text-gold-300"><Loader2 className="h-3 w-3 animate-spin" /> decrypting</span>}
-                      {dec?.text && <span className="mt-2 inline-flex items-center gap-1 text-[10px] text-emerald-300"><CheckCircle2 className="h-3 w-3" /> encrypted to decrypted</span>}
+                      {dec?.text && <span className="mt-2 inline-flex items-center gap-1 text-[10px] text-emerald-300"><CheckCircle2 className="h-3 w-3" /> decrypted · in chat context</span>}
                     </div>
                   </div>
                 </button>
@@ -249,7 +273,7 @@ export default function AiAssistant() {
       <main className="card flex min-h-0 flex-col border-gold-500/10 bg-navy-950/60">
         <div className="flex items-center justify-between border-b border-gold-500/10 p-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-gold-500/25 bg-gold-500/10">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-gold-500/25 bg-gold-500/10 shadow-gold-sm">
               <Sparkles className="h-5 w-5 text-gold-300" />
             </div>
             <div>
@@ -257,9 +281,19 @@ export default function AiAssistant() {
               <p className="text-xs text-text-secondary">{selectedCase?.title ?? 'Select a matter'} · document text stays in memory only</p>
             </div>
           </div>
-          <button onClick={() => setMessages([])} className="btn-ghost text-xs">
-            <Trash2 className="h-4 w-4" /> Clear
-          </button>
+          <div className="flex items-center gap-3">
+            <span className={`hidden items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider sm:inline-flex ${
+              aiAvailable
+                ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300'
+                : 'border-gold-500/30 bg-gold-500/10 text-gold-300'
+            }`}>
+              <span className={`h-1.5 w-1.5 rounded-full ${aiAvailable ? 'animate-pulse bg-emerald-400' : 'bg-gold-400'}`} />
+              {aiAvailable ? 'GPT-4o online' : 'AI offline'}
+            </span>
+            <button onClick={() => setMessages([])} className="btn-ghost text-xs">
+              <Trash2 className="h-4 w-4" /> Clear
+            </button>
+          </div>
         </div>
 
         {error && (
@@ -268,22 +302,50 @@ export default function AiAssistant() {
           </div>
         )}
 
-        <div className="flex-1 overflow-y-auto p-5">
+        <div className="flex-1 overflow-y-auto p-5 scrollbar-thin">
           {messages.length === 0 && (
-            <div className="mx-auto mt-16 max-w-lg text-center">
-              <Bot className="mx-auto h-10 w-10 text-gold-400" />
-              <h2 className="mt-4 font-serif text-xl font-bold text-gold-200">Ask this matter a question</h2>
-              <p className="mt-2 text-sm text-text-secondary">Select documents on the left to give the assistant decrypted context for this chat only.</p>
+            <div className="mx-auto mt-12 max-w-xl text-center">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-gold-500/25 bg-gold-500/5 shadow-gold-sm">
+                <Scale className="h-7 w-7 text-gold-400" />
+              </div>
+              <h2 className="mt-5 font-serif text-2xl font-bold text-gold-200">Ask this matter a question</h2>
+              <p className="mx-auto mt-2 max-w-md text-sm text-text-secondary">
+                Select documents on the left to give the assistant decrypted context for this chat only.
+              </p>
+              <div className="mt-7 grid gap-2 sm:grid-cols-2">
+                {QUICK_PROMPTS.map((q) => (
+                  <button
+                    key={q}
+                    onClick={() => send(q)}
+                    disabled={sending || !selectedCaseId}
+                    className="rounded-xl border border-gold-500/15 bg-navy-900/50 px-4 py-3 text-left text-xs text-text-secondary transition hover:border-gold-500/40 hover:bg-gold-500/5 hover:text-gold-200 disabled:opacity-50"
+                  >
+                    <Sparkles className="mb-1.5 h-3.5 w-3.5 text-gold-400" />
+                    {q}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
-          <div className="space-y-4">
+          <div className="space-y-5">
             {messages.map((m) => (
-              <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[82%] rounded-2xl border px-4 py-3 ${m.role === 'user' ? 'border-[#1d6464]/40 bg-[#1d6464]/30' : 'border-gold-500/15 bg-navy-900/80'}`}>
-                  <pre className="whitespace-pre-wrap break-words font-sans text-sm leading-relaxed">{m.content}</pre>
+              <div key={m.id} className={`flex items-start gap-3 ${m.role === 'user' ? 'flex-row-reverse' : ''}`}>
+                {m.role === 'user' ? <UserAvatar name={user?.fullName ?? user?.email} /> : <AssistantAvatar />}
+                <div className={`max-w-[80%] rounded-2xl border px-4 py-3 ${
+                  m.role === 'user'
+                    ? 'rounded-tr-sm border-gold-500/30 bg-gold-500/10'
+                    : 'rounded-tl-sm border-gold-500/15 bg-navy-900/80'
+                }`}>
+                  {m.role === 'assistant'
+                    ? <AiMarkdown content={m.content} />
+                    : <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-gold-100">{m.content}</p>}
                   {m.citations && m.citations.length > 0 && (
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {m.citations.map((c) => <span key={c} className="rounded-full border border-gold-500/20 px-2 py-0.5 text-[10px] text-gold-300">{c}</span>)}
+                    <div className="mt-3 flex flex-wrap gap-2 border-t border-gold-500/10 pt-2.5">
+                      {m.citations.map((c) => (
+                        <span key={c} className="inline-flex items-center gap-1 rounded-full border border-gold-500/20 bg-gold-500/5 px-2 py-0.5 text-[10px] text-gold-300">
+                          <Lock className="h-2.5 w-2.5" /> {c}
+                        </span>
+                      ))}
                     </div>
                   )}
                   <p className="mt-2 text-[10px] text-text-muted">{m.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
@@ -291,9 +353,15 @@ export default function AiAssistant() {
               </div>
             ))}
             {sending && (
-              <div className="flex justify-start">
-                <div className="rounded-2xl border border-gold-500/15 bg-navy-900/80 px-4 py-3 text-sm text-gold-300">
-                  <Loader2 className="mr-2 inline h-4 w-4 animate-spin" /> Thinking...
+              <div className="flex items-start gap-3">
+                <AssistantAvatar />
+                <div className="rounded-2xl rounded-tl-sm border border-gold-500/15 bg-navy-900/80 px-4 py-3.5">
+                  <span className="flex items-center gap-1.5">
+                    {[0, 150, 300].map((delay) => (
+                      <span key={delay} className="h-1.5 w-1.5 animate-bounce rounded-full bg-gold-400" style={{ animationDelay: `${delay}ms` }} />
+                    ))}
+                    <span className="ml-2 text-xs text-gold-300/80">Reviewing the matter…</span>
+                  </span>
                 </div>
               </div>
             )}
@@ -306,15 +374,21 @@ export default function AiAssistant() {
             <Lock className="h-3.5 w-3.5 text-gold-400" />
             Document text is decrypted in browser memory and sent only when you ask.
           </div>
-          <div className="flex gap-2">
-            <input
-              className="input flex-1"
+          <div className="flex items-end gap-2">
+            <textarea
+              className="input max-h-32 flex-1 resize-none scrollbar-thin"
+              rows={Math.min(4, Math.max(1, input.split('\n').length))}
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter') send() }}
-              placeholder="Ask what the documents prove, what evidence is missing, or what to review next..."
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault()
+                  send()
+                }
+              }}
+              placeholder="Ask what the documents prove, what evidence is missing, or what to review next... (Shift+Enter for a new line)"
             />
-            <button onClick={() => send()} disabled={!input.trim() || sending || !selectedCaseId} className="btn-primary px-4">
+            <button onClick={() => send()} disabled={!input.trim() || sending || !selectedCaseId} className="btn-primary px-4 py-3" aria-label="Send message">
               {sending ? <RefreshCcw className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
             </button>
           </div>
