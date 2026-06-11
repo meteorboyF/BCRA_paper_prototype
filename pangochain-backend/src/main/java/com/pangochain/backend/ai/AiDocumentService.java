@@ -73,12 +73,12 @@ public class AiDocumentService {
                 Respond ONLY with valid JSON.
                 """.formatted(fileName == null ? "Untitled document" : fileName, safe(documentText));
 
-        return chatClient.orElseThrow(() -> new AiUnavailableException("AI features require OPENAI_API_KEY to be configured."))
+        return availability.call(() -> chatClient.orElseThrow(() -> new AiUnavailableException("AI features require OPENAI_API_KEY to be configured."))
                 .prompt()
                 .system("You are a senior legal analyst. Identify risks that a junior lawyer might miss. Be specific.")
                 .user(prompt)
                 .call()
-                .entity(DocumentAnalysis.class);
+                .entity(DocumentAnalysis.class));
     }
 
     public DraftResult draftDocument(DraftRequest req, String caseTitle) {
@@ -112,11 +112,11 @@ public class AiDocumentService {
                 Respond ONLY with valid JSON.
                 """.formatted(req.documentType(), caseTitle, req.caseId(), safe(req.instructions()), factsFormatted);
 
-        return chatClient.orElseThrow(() -> new AiUnavailableException("AI features require OPENAI_API_KEY to be configured."))
+        return availability.call(() -> chatClient.orElseThrow(() -> new AiUnavailableException("AI features require OPENAI_API_KEY to be configured."))
                 .prompt()
                 .system("You are an expert legal drafter. Produce professional-quality legal documents.")
                 .user(prompt)
                 .call()
-                .entity(DraftResult.class);
+                .entity(DraftResult.class));
     }
 }

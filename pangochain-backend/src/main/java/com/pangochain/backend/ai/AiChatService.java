@@ -84,12 +84,12 @@ public class AiChatService {
                 %s
                 """.formatted(legalCase.getTitle(), legalCase.getCaseType(), historyContext, docContext);
 
-        String answer = chatClient.orElseThrow(() -> new AiUnavailableException("AI features require OPENAI_API_KEY to be configured."))
+        String answer = availability.call(() -> chatClient.orElseThrow(() -> new AiUnavailableException("AI features require OPENAI_API_KEY to be configured."))
                 .prompt()
                 .system(system)
                 .user(req.question())
                 .call()
-                .content();
+                .content());
 
         var userMsg = new AiConversation();
         userMsg.setLegalCase(legalCase);
@@ -166,7 +166,7 @@ public class AiChatService {
                 documents.stream().map(d -> "- " + d.getFileName()).collect(Collectors.joining("\n"))
         );
 
-        String answer = chatClient.orElseThrow(() -> new AiUnavailableException("AI features require OPENAI_API_KEY to be configured."))
+        String answer = availability.call(() -> chatClient.orElseThrow(() -> new AiUnavailableException("AI features require OPENAI_API_KEY to be configured."))
                 .prompt()
                 .system("""
                         You are a friendly legal case assistant helping a client understand their case.
@@ -179,7 +179,7 @@ public class AiChatService {
                         """ + context)
                 .user(req.question())
                 .call()
-                .content();
+                .content());
 
         return new ChatResponse(answer, new String[0]);
     }

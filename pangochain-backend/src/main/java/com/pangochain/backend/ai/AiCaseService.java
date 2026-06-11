@@ -128,12 +128,12 @@ public class AiCaseService {
                 Respond ONLY with valid JSON.
                 """.formatted(context);
 
-        return chatClient.orElseThrow(() -> new AiUnavailableException("AI features require OPENAI_API_KEY to be configured."))
+        return availability.call(() -> chatClient.orElseThrow(() -> new AiUnavailableException("AI features require OPENAI_API_KEY to be configured."))
                 .prompt()
                 .system("You are a forensic legal analyst specializing in timeline analysis. Be specific and cite exact events.")
                 .user(prompt)
                 .call()
-                .entity(TimelineCheckResult.class);
+                .entity(TimelineCheckResult.class));
     }
 
     public EvidenceGapResult analyzeEvidenceGaps(UUID caseId) {
@@ -175,12 +175,12 @@ public class AiCaseService {
                 Respond ONLY with valid JSON.
                 """.formatted(context);
 
-        return chatClient.orElseThrow(() -> new AiUnavailableException("AI features require OPENAI_API_KEY to be configured."))
+        return availability.call(() -> chatClient.orElseThrow(() -> new AiUnavailableException("AI features require OPENAI_API_KEY to be configured."))
                 .prompt()
                 .system("You are a strategic litigation consultant. Think like a winning trial lawyer.")
                 .user(prompt)
                 .call()
-                .entity(EvidenceGapResult.class);
+                .entity(EvidenceGapResult.class));
     }
 
     public HearingPrepBrief generateHearingPrep(UUID hearingId) {
@@ -231,11 +231,11 @@ public class AiCaseService {
                 Respond ONLY with valid JSON.
                 """.formatted(context);
 
-        return chatClient.orElseThrow(() -> new AiUnavailableException("AI features require OPENAI_API_KEY to be configured."))
+        return availability.call(() -> chatClient.orElseThrow(() -> new AiUnavailableException("AI features require OPENAI_API_KEY to be configured."))
                 .prompt()
                 .system("You are a senior litigator with 20 years of court experience. Be tactical and specific.")
                 .user(prompt)
                 .call()
-                .entity(HearingPrepBrief.class);
+                .entity(HearingPrepBrief.class));
     }
 }

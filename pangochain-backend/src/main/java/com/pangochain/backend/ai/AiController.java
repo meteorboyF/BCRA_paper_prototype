@@ -31,7 +31,11 @@ public class AiController {
 
     @GetMapping("/health")
     public ResponseEntity<Map<String, Object>> health() {
-        return ResponseEntity.ok(Map.of("available", availability.isAvailable(), "model", "gpt-4o"));
+        return ResponseEntity.ok(Map.of(
+                "available", availability.isAvailable(),
+                "model", "gpt-4o",
+                "message", availability.statusMessage()
+        ));
     }
 
     public record AnalyzeDocRequest(String fileName, String text, UUID documentId) {}
