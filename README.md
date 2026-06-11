@@ -177,9 +177,9 @@ bash scripts/dev.sh
 See [SETUP.md](SETUP.md) for full environment setup including Fabric network.
 
 **Demo users seeded on first startup:**
-- `admin@firmA.com` / `Admin123!` — Managing Partner (MFA required)
-- `lawyer@firmA.com` / `Lawyer123!` — Lawyer
-- `client@example.com` / `Client123!` — Client
+- `admin@pangolawfirm.com` / `Admin123!` — Managing Partner
+- `lawyer@pangolawfirm.com` / `Lawyer123!` — Lawyer
+- `client@demo.com` / `Client123!` — Client
 
 ---
 

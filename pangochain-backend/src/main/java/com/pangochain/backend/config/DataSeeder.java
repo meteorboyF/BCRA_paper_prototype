@@ -595,6 +595,11 @@ public class DataSeeder implements ApplicationRunner {
         SeededDocument motion = ensureSeededMarkdownDocument(legalCase, lawyer, "Draft Preliminary Injunction Motion.md", "draft-preliminary-injunction-motion.md", "PLEADING", true, 1, null, 8);
         SeededDocument redacted = ensureSeededMarkdownDocument(legalCase, lawyer, "Meridian Termination Notice v2 redacted.md", "meridian-termination-notice-redacted.md", "CORRESPONDENCE", false, 2, termination.id(), 4);
         SeededDocument settlement = ensureSeededMarkdownDocument(legalCase, lawyer, "Settlement Evaluation Memo.md", "settlement-evaluation-memo.md", "MEMO", true, 1, null, 2);
+        SeededDocument witness = ensureSeededMarkdownDocument(legalCase, lawyer, "Witness Statement - Maintenance Notice.md", "witness-statement-maintenance-notice.md", "EVIDENCE", true, 1, null, 16);
+        SeededDocument repairThread = ensureSeededMarkdownDocument(legalCase, client, "Repair Notice Email Thread.doc", "repair-notice-email-thread.doc", "CORRESPONDENCE", true, 1, null, 15);
+        SeededDocument serviceAgreement = ensureSeededMarkdownDocument(legalCase, lawyer, "Meridian Supplier Service Agreement.doc", "meridian-supplier-service-agreement.doc", "CONTRACT", true, 1, null, 13);
+        SeededDocument damagesLedger = ensureSeededMarkdownDocument(legalCase, lawyer, "Damages and Mitigation Ledger.md", "damages-and-mitigation-ledger.md", "EVIDENCE", true, 1, null, 11);
+        SeededDocument hearingPack = ensureSeededMarkdownDocument(legalCase, lawyer, "AI Hearing Prep Fact Pack.md", "ai-hearing-prep-fact-pack.md", "MEMO", true, 1, null, 5);
 
         grantAccess(lease.id(), lawyer, lawyer, "owner", 50, lease.rawKeyB64());
         grantAccess(lease.id(), paralegal, lawyer, "write", 48, lease.rawKeyB64());
@@ -612,6 +617,18 @@ public class DataSeeder implements ApplicationRunner {
         grantAccess(motion.id(), associateA, lawyer, "write", 7, motion.rawKeyB64());
         grantAccess(settlement.id(), lawyer, lawyer, "owner", 2, settlement.rawKeyB64());
         grantAccess(settlement.id(), client, lawyer, "read", 1, settlement.rawKeyB64());
+        grantAccess(witness.id(), paralegal, lawyer, "owner", 16, witness.rawKeyB64());
+        grantAccess(witness.id(), lawyer, paralegal, "write", 15, witness.rawKeyB64());
+        grantAccess(witness.id(), associateA, lawyer, "read", 14, witness.rawKeyB64());
+        grantAccess(repairThread.id(), client, client, "owner", 15, repairThread.rawKeyB64());
+        grantAccess(repairThread.id(), lawyer, client, "write", 14, repairThread.rawKeyB64());
+        grantAccess(repairThread.id(), paralegal, lawyer, "read", 13, repairThread.rawKeyB64());
+        grantAccess(serviceAgreement.id(), lawyer, lawyer, "owner", 13, serviceAgreement.rawKeyB64());
+        grantAccess(serviceAgreement.id(), associateB, lawyer, "read", 12, serviceAgreement.rawKeyB64());
+        grantAccess(damagesLedger.id(), lawyer, lawyer, "owner", 11, damagesLedger.rawKeyB64());
+        grantAccess(damagesLedger.id(), client, lawyer, "read", 10, damagesLedger.rawKeyB64());
+        grantAccess(hearingPack.id(), lawyer, lawyer, "owner", 5, hearingPack.rawKeyB64());
+        grantAccess(hearingPack.id(), associateA, lawyer, "write", 4, hearingPack.rawKeyB64());
 
         seedAnnotationSet(motion.id(), lawyer, associateA, paralegal);
         seedRedaction(termination.id(), redacted.id(), lawyer);
@@ -620,6 +637,11 @@ public class DataSeeder implements ApplicationRunner {
         seedDocumentClassification(lease.id(), "CONTRACT", 94, lawyer);
         seedDocumentClassification(termination.id(), "CORRESPONDENCE", 89, client);
         seedDocumentClassification(ledger.id(), "EVIDENCE", 91, paralegal);
+        seedDocumentClassification(witness.id(), "EVIDENCE", 93, paralegal);
+        seedDocumentClassification(repairThread.id(), "CORRESPONDENCE", 95, client);
+        seedDocumentClassification(serviceAgreement.id(), "CONTRACT", 97, lawyer);
+        seedDocumentClassification(damagesLedger.id(), "EVIDENCE", 92, lawyer);
+        seedDocumentClassification(hearingPack.id(), "MEMO", 90, lawyer);
 
         seedAudit(legalCase.getId().toString(), "CASE", "CASE_VIEWED", lawyer, "Case reviewed from dashboard", 6);
         seedAudit(lease.id().toString(), "DOCUMENT", "DOCUMENT_UPLOADED", lawyer, "Executed lease uploaded and encrypted", 50);
@@ -628,6 +650,10 @@ public class DataSeeder implements ApplicationRunner {
         seedAudit(termination.id().toString(), "DOCUMENT", "DOCUMENT_DOWNLOADED", associateB, "Termination notice downloaded for review", 29);
         seedAudit(redacted.id().toString(), "DOCUMENT", "REDACTION_CREATED", lawyer, "Client identifiers redacted in browser", 4);
         seedAudit(settlement.toString(), "DOCUMENT", "DOCUMENT_SHARED_WITH_CLIENT", lawyer, "Settlement memo shared with Marcus Chen", 1);
+        seedAudit(witness.id().toString(), "DOCUMENT", "DOCUMENT_UPLOADED", paralegal, "Witness statement uploaded for AI evidence-gap demo", 14);
+        seedAudit(repairThread.id().toString(), "DOCUMENT", "DOCUMENT_UPLOADED", client, "Repair notice email thread uploaded by client", 13);
+        seedAudit(serviceAgreement.id().toString(), "DOCUMENT", "AI_ANALYSIS_REQUESTED", lawyer, "Risky service agreement analyzed for one-sided clauses", 10);
+        seedAudit(hearingPack.id().toString(), "DOCUMENT", "AI_HEARING_PREP_GENERATED", lawyer, "AI hearing preparation pack generated from seeded evidence", 3);
     }
 
     private void seedShowcaseCaseActivity(Case legalCase, User lawyer, User client, User partner, User secretary) {
@@ -644,6 +670,14 @@ public class DataSeeder implements ApplicationRunner {
                     "Lease evidence certification sent to Marcus Chen for digital signature.", lawyer);
             saveCaseEvent(legalCase, "CLIENT_REMINDER_SENT", "Demo: Client settlement reminder",
                     "Marcus Chen reminded to review settlement authority before conference.", secretary);
+        }
+        if (!caseEventExists(legalCase.getId(), "Demo: AI evidence packet completed")) {
+            saveCaseEvent(legalCase, "DOCUMENT_UPLOADED", "Demo: Repair notice email thread uploaded",
+                    "Client uploaded Jan. 18, Jan. 24, and Feb. 3 repair-notice emails showing Meridian had notice before issuing termination.", client);
+            saveCaseEvent(legalCase, "DOCUMENT_UPLOADED", "Demo: Witness statement uploaded",
+                    "Paralegal added concierge witness statement supporting water intrusion, access requests, and mitigation damages.", lawyer);
+            saveCaseEvent(legalCase, "AI_ANALYSIS_REQUESTED", "Demo: AI evidence packet completed",
+                    "Seeded text documents are ready for AI chat, document analysis, evidence-gap review, hearing prep, and drafting demos.", lawyer);
         }
         if (!reminderExists(client.getId(), "Review settlement authority memo")) {
             insertReminder(legalCase, lawyer, client, "Review settlement authority memo",
