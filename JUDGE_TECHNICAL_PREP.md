@@ -16,6 +16,23 @@ PangoChain is a Spring Boot + React legal platform where PostgreSQL stores appli
 
 ## Docker Setup
 
+## What Docker Does Here
+
+Docker gives PangoChain a reproducible local infrastructure environment. Instead of asking every developer or judge machine to manually install PostgreSQL, IPFS, CouchDB, Fabric orderers, Fabric peers, certificates, ports, and network settings, Docker runs those services as isolated containers.
+
+In this project Docker is used to:
+
+- Start PostgreSQL for application data.
+- Start two IPFS Kubo nodes for encrypted document storage.
+- Start the Hyperledger Fabric network services when full blockchain mode is enabled.
+- Start Fabric orderers, peers, CouchDB state databases, and chaincode containers.
+- Keep all services on predictable ports and Docker networks.
+- Make setup repeatable with `docker compose` and `scripts/dev.sh`.
+
+Simple judge answer:
+
+"Docker is our infrastructure packaging layer. It lets us run PostgreSQL, IPFS, and the optional Hyperledger Fabric network in isolated containers so the demo environment is reproducible and close to a real multi-service deployment."
+
 The root `docker-compose.yml` starts:
 
 - `pangochain-postgres`: PostgreSQL 16, database `pangochain`.
