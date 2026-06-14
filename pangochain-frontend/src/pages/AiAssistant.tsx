@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { CheckCircle2, KeyRound, Loader2, Lock, RefreshCcw, Scale, Send, Sparkles, Trash2 } from 'lucide-react'
+import { CheckCircle2, FileText, KeyRound, Loader2, Lock, RefreshCcw, Scale, Send, Sparkles, Trash2 } from 'lucide-react'
 import api from '../lib/api'
 import { AiMarkdown } from '../components/ui/AiMarkdown'
 import { bytesToTextIfPrintable, decryptDocumentToBytes } from '../lib/decryptDoc'
@@ -53,6 +53,13 @@ const QUICK_PROMPTS = [
   'List the deadlines and obligations I should watch',
 ]
 
+const READABLE_EXTENSIONS = ['.md', '.txt', '.doc']
+
+const isReadableForAi = (fileName: string) => {
+  const lower = fileName.toLowerCase()
+  return READABLE_EXTENSIONS.some((ext) => lower.endsWith(ext))
+}
+
 function AssistantAvatar() {
   return (
     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-gold-500/30 bg-gradient-to-br from-gold-500/20 to-gold-600/5 shadow-gold-sm">
@@ -79,6 +86,7 @@ export default function AiAssistant() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [sending, setSending] = useState(false)
+  const [bulkLoading, setBulkLoading] = useState(false)
   const [error, setError] = useState('')
   const bottomRef = useRef<HTMLDivElement>(null)
 
@@ -125,6 +133,17 @@ export default function AiAssistant() {
 
   const selectedCase = useMemo(() => cases.find((c) => c.id === selectedCaseId), [cases, selectedCaseId])
 
+  async function decryptDocWithStoredKey(doc: DocumentDto, stored: ReturnType<typeof loadWrappedPrivateKey>) {
+    if (!stored) throw new Error('No private key found on this device. Log in again to provision your keys.')
+    if (!password) throw new Error('Enter your account password to unlock your private key before selecting documents.')
+
+    const privateKey = await unwrapPrivateKey(password, stored.saltB64, stored.ivB64, stored.encryptedB64)
+    const bytes = await decryptDocumentToBytes(doc.id, privateKey, doc.documentHashSha256 ?? doc.documentHash)
+    const text = bytesToTextIfPrintable(bytes)
+    if (!text) throw new Error('This file is not readable text. Use Markdown or text documents for AI chat.')
+    return { documentId: doc.id, fileName: doc.fileName, text, isDecrypting: false }
+  }
+
   async function decryptDoc(doc: DocumentDto) {
     if (!user?.id) {
       setError('You must be signed in to decrypt documents.')
@@ -146,13 +165,10 @@ export default function AiAssistant() {
       [doc.id]: { documentId: doc.id, fileName: doc.fileName, text: prev[doc.id]?.text ?? '', isDecrypting: true },
     }))
     try {
-      const privateKey = await unwrapPrivateKey(password, stored.saltB64, stored.ivB64, stored.encryptedB64)
-      const bytes = await decryptDocumentToBytes(doc.id, privateKey, doc.documentHashSha256 ?? doc.documentHash)
-      const text = bytesToTextIfPrintable(bytes)
-      if (!text) throw new Error('This file is not readable text. Use Markdown or text documents for AI chat.')
+      const decrypted = await decryptDocWithStoredKey(doc, stored)
       setDecryptedDocs((prev) => ({
         ...prev,
-        [doc.id]: { documentId: doc.id, fileName: doc.fileName, text, isDecrypting: false },
+        [doc.id]: decrypted,
       }))
     } catch (err: any) {
       setSelectedDocIds((prev) => prev.filter((id) => id !== doc.id))
@@ -179,19 +195,79 @@ export default function AiAssistant() {
     await decryptDoc(doc)
   }
 
+  async function useCaseDocuments() {
+    if (!user?.id) {
+      setError('You must be signed in to decrypt case documents.')
+      return
+    }
+    const stored = loadWrappedPrivateKey(user.id)
+    if (!stored) {
+      setError('No private key found on this device. Log in again to provision your keys.')
+      return
+    }
+    if (!password) {
+      setError('Enter your account password, then click "Use case documents" to decrypt readable case files.')
+      return
+    }
+
+    const candidates = docs.filter((doc) => isReadableForAi(doc.fileName)).slice(0, 10)
+    if (candidates.length === 0) {
+      setError('No readable Markdown/text/.doc documents were found for this case.')
+      return
+    }
+
+    setBulkLoading(true)
+    setError('')
+    const loaded: Record<string, DecryptedDocument> = {}
+    const loadedIds: string[] = []
+    const skipped: string[] = []
+
+    for (const doc of candidates) {
+      setDecryptedDocs((prev) => ({
+        ...prev,
+        [doc.id]: { documentId: doc.id, fileName: doc.fileName, text: prev[doc.id]?.text ?? '', isDecrypting: true },
+      }))
+      try {
+        const decrypted = await decryptDocWithStoredKey(doc, stored)
+        loaded[doc.id] = decrypted
+        loadedIds.push(doc.id)
+        setDecryptedDocs((prev) => ({ ...prev, [doc.id]: decrypted }))
+      } catch {
+        skipped.push(doc.fileName)
+        setDecryptedDocs((prev) => {
+          const next = { ...prev }
+          delete next[doc.id]
+          return next
+        })
+      }
+    }
+
+    setSelectedDocIds(loadedIds)
+    setBulkLoading(false)
+    if (loadedIds.length === 0) {
+      setError('None of the readable case documents could be decrypted with this key/password.')
+    } else if (skipped.length > 0) {
+      setError(`Loaded ${loadedIds.length} readable case document(s). Skipped ${skipped.length} file(s) that could not be decrypted or read as text.`)
+    }
+  }
+
   async function send(text = input) {
     const question = text.trim()
     if (!question || !selectedCaseId || sending) return
     setError('')
+    const documents = selectedDocIds
+      .map((id) => decryptedDocs[id])
+      .filter((d): d is DecryptedDocument => !!d?.text)
+      .map((d) => ({ documentId: d.documentId, fileName: d.fileName, text: safeTruncate(d.text) }))
+    if (documents.length === 0) {
+      setError('Select at least one document or click "Use case documents" first. The assistant only answers from decrypted case context.')
+      return
+    }
     const userMessage: Message = { id: `u-${Date.now()}`, role: 'user', content: question, timestamp: new Date() }
     setMessages((prev) => [...prev, userMessage])
     setInput('')
     setSending(true)
     try {
-      const documents = selectedDocIds
-        .map((id) => decryptedDocs[id])
-        .filter((d): d is DecryptedDocument => !!d?.text)
-        .map((d) => ({ documentId: d.documentId, fileName: d.fileName, text: safeTruncate(d.text) }))
       const { data } = await api.post('/ai/chat', { caseId: selectedCaseId, question, documents })
       setMessages((prev) => [...prev, {
         id: `a-${Date.now()}`,
@@ -244,6 +320,15 @@ export default function AiAssistant() {
             <p className="text-[10px] font-bold uppercase tracking-widest text-gold-400">Document Context</p>
             {docsLoading && <Loader2 className="h-3.5 w-3.5 animate-spin text-gold-400" />}
           </div>
+          <button
+            type="button"
+            onClick={useCaseDocuments}
+            disabled={bulkLoading || docsLoading || !docs.length}
+            className="mb-3 flex w-full items-center justify-center gap-2 rounded-lg border border-gold-500/25 bg-gold-500/10 px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-gold-200 transition hover:bg-gold-500/15 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {bulkLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <FileText className="h-3.5 w-3.5" />}
+            Use case documents
+          </button>
           <div className="space-y-2">
             {docs.map((doc) => {
               const dec = decryptedDocs[doc.id]

@@ -76,7 +76,9 @@ public class AiChatService {
         String system = """
                 You are a legal AI assistant for the case: "%s".
                 Case type: %s
-                Answer questions based on provided documents and case context.
+                Answer questions based on the provided selected documents and case context.
+                If PROVIDED DOCUMENTS are present below, you do have access to that selected document text for this chat.
+                Do not say you cannot access documents when selected document text is provided.
                 Cite specific documents when applicable. If you don't have enough information, say so.
 
                 Recent conversation:
