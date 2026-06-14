@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { CheckCircle2, FileText, KeyRound, Loader2, Lock, RefreshCcw, Scale, Send, Sparkles, Trash2 } from 'lucide-react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { CheckCircle2, FileText, History, KeyRound, Loader2, Lock, MessageSquarePlus, RefreshCcw, Scale, Send, Sparkles, Trash2 } from 'lucide-react'
 import api from '../lib/api'
 import { AiMarkdown } from '../components/ui/AiMarkdown'
 import { bytesToTextIfPrintable, decryptDocumentToBytes } from '../lib/decryptDoc'
@@ -34,6 +34,13 @@ interface Message {
   content: string
   citations?: string[]
   timestamp: Date
+}
+
+interface ChatSession {
+  sessionId: string
+  title: string
+  updatedAt: string
+  messageCount: number
 }
 
 interface DecryptedDocument {
@@ -78,8 +85,10 @@ function UserAvatar({ name }: { name?: string }) {
 
 export default function AiAssistant() {
   const { user } = useAuthStore()
+  const queryClient = useQueryClient()
   const aiAvailable = useAiAvailable()
   const [selectedCaseId, setSelectedCaseId] = useState('')
+  const [currentSessionId, setCurrentSessionId] = useState('')
   const [selectedDocIds, setSelectedDocIds] = useState<string[]>([])
   const [decryptedDocs, setDecryptedDocs] = useState<Record<string, DecryptedDocument>>({})
   const [password, setPassword] = useState('')
@@ -111,9 +120,21 @@ export default function AiAssistant() {
     },
   })
 
+  const { data: sessions = [], isLoading: sessionsLoading } = useQuery({
+    queryKey: ['ai-chat-sessions', selectedCaseId],
+    enabled: !!selectedCaseId,
+    queryFn: async () => {
+      const { data } = await api.get<ChatSession[]>(`/ai/cases/${selectedCaseId}/chat-sessions`)
+      return data ?? []
+    },
+  })
+
   useEffect(() => {
-    if (!selectedCaseId) return
-    api.get(`/ai/cases/${selectedCaseId}/chat-history`)
+    if (!selectedCaseId || !currentSessionId) {
+      setMessages([])
+      return
+    }
+    api.get(`/ai/cases/${selectedCaseId}/chat-history`, { params: { sessionId: currentSessionId } })
       .then(({ data }) => {
         setMessages((data ?? []).map((m: any, index: number) => ({
           id: `${m.createdAt ?? Date.now()}-${index}`,
@@ -125,7 +146,7 @@ export default function AiAssistant() {
       .catch((err) => {
         if (err?.response?.status === 503) setError('AI features are not configured. Contact your administrator.')
       })
-  }, [selectedCaseId])
+  }, [selectedCaseId, currentSessionId])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -251,6 +272,13 @@ export default function AiAssistant() {
     }
   }
 
+  function startNewChat() {
+    setCurrentSessionId('')
+    setMessages([])
+    setInput('')
+    setError('')
+  }
+
   async function send(text = input) {
     const question = text.trim()
     if (!question || !selectedCaseId || sending) return
@@ -268,7 +296,10 @@ export default function AiAssistant() {
     setInput('')
     setSending(true)
     try {
-      const { data } = await api.post('/ai/chat', { caseId: selectedCaseId, question, documents })
+      const sessionId = currentSessionId || crypto.randomUUID()
+      const { data } = await api.post('/ai/chat', { caseId: selectedCaseId, sessionId, question, documents })
+      setCurrentSessionId(data.sessionId ?? sessionId)
+      queryClient.invalidateQueries({ queryKey: ['ai-chat-sessions', selectedCaseId] })
       setMessages((prev) => [...prev, {
         id: `a-${Date.now()}`,
         role: 'assistant',
@@ -295,7 +326,7 @@ export default function AiAssistant() {
           <select
             className="input mt-2 w-full"
             value={selectedCaseId}
-            onChange={(e) => { setSelectedCaseId(e.target.value); setSelectedDocIds([]); setDecryptedDocs({}) }}
+            onChange={(e) => { setSelectedCaseId(e.target.value); setCurrentSessionId(''); setMessages([]); setSelectedDocIds([]); setDecryptedDocs({}) }}
             disabled={casesLoading}
           >
             {cases.map((c) => <option key={c.id} value={c.id}>{c.title}</option>)}
@@ -313,6 +344,46 @@ export default function AiAssistant() {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Required to decrypt selected docs"
           />
+        </div>
+
+        <div>
+          <div className="mb-2 flex items-center justify-between">
+            <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-gold-400">
+              <History className="h-3.5 w-3.5" /> Chats
+            </p>
+            {sessionsLoading && <Loader2 className="h-3.5 w-3.5 animate-spin text-gold-400" />}
+          </div>
+          <button
+            type="button"
+            onClick={startNewChat}
+            className={`mb-2 flex w-full items-center gap-2 rounded-lg border px-3 py-2 text-left text-xs transition ${
+              !currentSessionId
+                ? 'border-gold-500/40 bg-gold-500/10 text-gold-100'
+                : 'border-gold-500/15 bg-navy-950/35 text-text-secondary hover:border-gold-500/30 hover:text-gold-200'
+            }`}
+          >
+            <MessageSquarePlus className="h-3.5 w-3.5 text-gold-300" />
+            New chat
+          </button>
+          <div className="max-h-36 space-y-1 overflow-y-auto pr-1 scrollbar-thin">
+            {sessions.map((session) => (
+              <button
+                key={session.sessionId}
+                type="button"
+                onClick={() => { setCurrentSessionId(session.sessionId); setError('') }}
+                className={`w-full rounded-lg border px-3 py-2 text-left transition ${
+                  currentSessionId === session.sessionId
+                    ? 'border-gold-500/40 bg-gold-500/10'
+                    : 'border-gold-500/10 bg-navy-950/35 hover:border-gold-500/25'
+                }`}
+              >
+                <p className="truncate text-xs font-semibold text-gold-100">{session.title}</p>
+                <p className="mt-1 text-[10px] uppercase tracking-wider text-text-muted">
+                  {session.messageCount} messages · {new Date(session.updatedAt).toLocaleDateString()}
+                </p>
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto">
@@ -377,6 +448,9 @@ export default function AiAssistant() {
             </span>
             <button onClick={() => setMessages([])} className="btn-ghost text-xs">
               <Trash2 className="h-4 w-4" /> Clear
+            </button>
+            <button onClick={startNewChat} className="btn-secondary text-xs">
+              <MessageSquarePlus className="h-4 w-4" /> New Chat
             </button>
           </div>
         </div>

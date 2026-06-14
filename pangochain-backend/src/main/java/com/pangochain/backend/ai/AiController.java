@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
@@ -84,8 +85,17 @@ public class AiController {
     @PreAuthorize("hasAnyRole('LAWYER', 'MANAGING_PARTNER', 'PARALEGAL', 'PARTNER_SENIOR', 'PARTNER_JUNIOR', 'ASSOCIATE_SENIOR', 'ASSOCIATE_JUNIOR')")
     public ResponseEntity<List<AiChatService.ConversationMessage>> chatHistory(
             @PathVariable UUID caseId,
+            @RequestParam(required = false) UUID sessionId,
             @AuthenticationPrincipal UserDetails principal) {
-        return ResponseEntity.ok(chatService.getHistory(caseId, principal.getUsername()));
+        return ResponseEntity.ok(chatService.getHistory(caseId, sessionId, principal.getUsername()));
+    }
+
+    @GetMapping("/cases/{caseId}/chat-sessions")
+    @PreAuthorize("hasAnyRole('LAWYER', 'MANAGING_PARTNER', 'PARALEGAL', 'PARTNER_SENIOR', 'PARTNER_JUNIOR', 'ASSOCIATE_SENIOR', 'ASSOCIATE_JUNIOR')")
+    public ResponseEntity<List<AiChatService.ChatSessionSummary>> chatSessions(
+            @PathVariable UUID caseId,
+            @AuthenticationPrincipal UserDetails principal) {
+        return ResponseEntity.ok(chatService.getSessions(caseId, principal.getUsername()));
     }
 
     @PostMapping("/client/chat")

@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Entity
 @Table(name = "ai_conversations")
@@ -42,6 +43,12 @@ public class AiConversation {
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
+
+    @Column(name = "session_id", nullable = false)
+    private UUID sessionId;
+
+    @Column(name = "session_title", length = 160)
+    private String sessionTitle;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;

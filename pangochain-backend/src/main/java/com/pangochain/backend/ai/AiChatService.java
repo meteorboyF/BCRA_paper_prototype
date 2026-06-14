@@ -6,6 +6,8 @@ import com.pangochain.backend.document.DocumentRepository;
 import com.pangochain.backend.hearing.HearingRepository;
 import com.pangochain.backend.milestone.CaseMilestoneRepository;
 import com.pangochain.backend.user.UserRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
@@ -36,6 +38,9 @@ public class AiChatService {
     private final CaseMilestoneRepository milestoneRepository;
     private final DocumentRepository documentRepository;
 
+    @PersistenceContext
+    private EntityManager em;
+
     protected String safe(String text) {
         if (text == null) {
             return "";
@@ -47,19 +52,23 @@ public class AiChatService {
 
     public record DocumentContext(String documentId, String fileName, String text) {}
 
-    public record ChatRequest(UUID caseId, String question, List<DocumentContext> documents) {}
+    public record ChatRequest(UUID caseId, UUID sessionId, String question, List<DocumentContext> documents) {}
 
-    public record ChatResponse(String answer, String[] citations) {}
+    public record ChatResponse(String answer, String[] citations, UUID sessionId) {}
 
     public record ClientChatRequest(String question) {}
 
     public record ConversationMessage(String role, String content, Instant createdAt) {}
+
+    public record ChatSessionSummary(UUID sessionId, String title, Instant updatedAt, long messageCount) {}
 
     public ChatResponse chat(ChatRequest req, String userEmail) {
         availability.requireAvailable();
 
         var user = userRepository.findByEmail(userEmail).orElseThrow();
         var legalCase = caseRepository.findById(req.caseId()).orElseThrow();
+        UUID sessionId = req.sessionId() != null ? req.sessionId() : UUID.randomUUID();
+        String sessionTitle = titleFrom(req.question());
 
         String docContext = "";
         if (req.documents() != null && !req.documents().isEmpty()) {
@@ -68,7 +77,7 @@ public class AiChatService {
                     .collect(Collectors.joining("\n\n"));
         }
 
-        var history = conversationRepo.findTop20ByLegalCaseIdAndUserIdOrderByCreatedAtAsc(req.caseId(), user.getId());
+        var history = conversationRepo.findTop20ByLegalCaseIdAndUserIdAndSessionIdOrderByCreatedAtAsc(req.caseId(), user.getId(), sessionId);
         String historyContext = history.stream()
                 .map(h -> h.getRole() + ": " + h.getContent())
                 .collect(Collectors.joining("\n"));
@@ -98,6 +107,8 @@ public class AiChatService {
         userMsg.setUser(user);
         userMsg.setRole("user");
         userMsg.setContent(req.question());
+        userMsg.setSessionId(sessionId);
+        userMsg.setSessionTitle(sessionTitle);
         conversationRepo.save(userMsg);
 
         var assistantMsg = new AiConversation();
@@ -105,6 +116,8 @@ public class AiChatService {
         assistantMsg.setUser(user);
         assistantMsg.setRole("assistant");
         assistantMsg.setContent(answer);
+        assistantMsg.setSessionId(sessionId);
+        assistantMsg.setSessionTitle(sessionTitle);
         conversationRepo.save(assistantMsg);
 
         String[] citations = req.documents() != null
@@ -114,15 +127,45 @@ public class AiChatService {
                 .toArray(String[]::new)
                 : new String[0];
 
-        return new ChatResponse(answer, citations);
+        return new ChatResponse(answer, citations, sessionId);
     }
 
     @Transactional(readOnly = true)
-    public List<ConversationMessage> getHistory(UUID caseId, String userEmail) {
+    public List<ConversationMessage> getHistory(UUID caseId, UUID sessionId, String userEmail) {
         var user = userRepository.findByEmail(userEmail).orElseThrow();
-        return conversationRepo.findTop20ByLegalCaseIdAndUserIdOrderByCreatedAtAsc(caseId, user.getId())
+        List<AiConversation> messages = sessionId != null
+                ? conversationRepo.findTop20ByLegalCaseIdAndUserIdAndSessionIdOrderByCreatedAtAsc(caseId, user.getId(), sessionId)
+                : conversationRepo.findTop20ByLegalCaseIdAndUserIdOrderByCreatedAtAsc(caseId, user.getId());
+        return messages
                 .stream()
                 .map(h -> new ConversationMessage(h.getRole(), h.getContent(), h.getCreatedAt()))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ChatSessionSummary> getSessions(UUID caseId, String userEmail) {
+        var user = userRepository.findByEmail(userEmail).orElseThrow();
+        @SuppressWarnings("unchecked")
+        List<Object[]> rows = em.createNativeQuery("""
+                SELECT session_id,
+                       COALESCE(MAX(session_title), 'AI chat') AS title,
+                       MAX(created_at) AS updated_at,
+                       COUNT(*) AS message_count
+                FROM ai_conversations
+                WHERE case_id = :caseId AND user_id = :userId
+                GROUP BY session_id
+                ORDER BY MAX(created_at) DESC
+                LIMIT 20
+                """)
+                .setParameter("caseId", caseId)
+                .setParameter("userId", user.getId())
+                .getResultList();
+        return rows.stream()
+                .map(row -> new ChatSessionSummary(
+                        (UUID) row[0],
+                        row[1] != null ? row[1].toString() : "AI chat",
+                        toInstant(row[2]),
+                        ((Number) row[3]).longValue()))
                 .toList();
     }
 
@@ -133,7 +176,7 @@ public class AiChatService {
         var user = userRepository.findByEmail(clientEmail).orElseThrow();
         var clientCases = caseRepository.findByClientId(user.getId());
         if (clientCases.isEmpty()) {
-            return new ChatResponse("I don't see any active cases for your account. Please contact your lawyer.", new String[0]);
+            return new ChatResponse("I don't see any active cases for your account. Please contact your lawyer.", new String[0], null);
         }
 
         var legalCase = clientCases.get(0);
@@ -183,6 +226,21 @@ public class AiChatService {
                 .call()
                 .content());
 
-        return new ChatResponse(answer, new String[0]);
+        return new ChatResponse(answer, new String[0], null);
+    }
+
+    private String titleFrom(String question) {
+        if (question == null || question.isBlank()) {
+            return "New AI chat";
+        }
+        String cleaned = question.replaceAll("\\s+", " ").trim();
+        return cleaned.length() > 80 ? cleaned.substring(0, 77) + "..." : cleaned;
+    }
+
+    private Instant toInstant(Object value) {
+        if (value instanceof Instant instant) return instant;
+        if (value instanceof java.sql.Timestamp timestamp) return timestamp.toInstant();
+        if (value instanceof java.time.OffsetDateTime offsetDateTime) return offsetDateTime.toInstant();
+        return Instant.parse(value.toString());
     }
 }

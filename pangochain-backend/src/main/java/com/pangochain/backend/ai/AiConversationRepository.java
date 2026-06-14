@@ -7,4 +7,5 @@ import java.util.UUID;
 
 public interface AiConversationRepository extends JpaRepository<AiConversation, Long> {
     List<AiConversation> findTop20ByLegalCaseIdAndUserIdOrderByCreatedAtAsc(UUID caseId, UUID userId);
+    List<AiConversation> findTop20ByLegalCaseIdAndUserIdAndSessionIdOrderByCreatedAtAsc(UUID caseId, UUID userId, UUID sessionId);
 }
