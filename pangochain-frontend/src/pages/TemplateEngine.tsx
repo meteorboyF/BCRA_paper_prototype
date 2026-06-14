@@ -281,7 +281,11 @@ export default function TemplateEngine() {
                     Copy
                   </button>
                 </div>
-                <textarea className="input min-h-[260px] bg-navy-950 text-xs font-mono leading-relaxed" value={aiDraft.draftText} readOnly />
+                <textarea
+                  className="input min-h-[260px] bg-navy-950 text-xs font-mono leading-relaxed"
+                  value={aiDraft.draftText}
+                  onChange={(e) => setAiDraft((draft) => draft ? { ...draft, draftText: e.target.value } : draft)}
+                />
                 <div>
                   <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-gold-400">Lawyer Notes</p>
                   <ul className="space-y-1 text-xs text-text-secondary">{aiDraft.notes?.map((n) => <li key={n}>• {n}</li>)}</ul>
