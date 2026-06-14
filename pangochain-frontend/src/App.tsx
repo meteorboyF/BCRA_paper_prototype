@@ -18,8 +18,6 @@ import Documents from './pages/Documents'
 import TemplateEngine from './pages/TemplateEngine'
 import AiAssistant from './pages/AiAssistant'
 import CaseInsights from './pages/CaseInsights'
-import DataRooms from './pages/DataRooms'
-import VideoConsultations from './pages/VideoConsultations'
 import ClientAssistant from './pages/client/ClientAssistant'
 import AuditTrail from './pages/AuditTrail'
 import Chat from './pages/Chat'
@@ -99,8 +97,6 @@ export default function App() {
           {/* Planned (Backlog) features — scaffolding pages, routes reserved */}
           <Route path="/assistant" element={<AiAssistant />} />
           <Route path="/insights" element={<CaseInsights />} />
-          <Route path="/data-rooms" element={<DataRooms />} />
-          <Route path="/consultations" element={<VideoConsultations />} />
           <Route path="/client/assistant" element={<ClientAssistant />} />
 
           <Route path="/audit" element={<AuditTrail />} />

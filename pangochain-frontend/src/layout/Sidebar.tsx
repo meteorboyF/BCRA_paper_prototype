@@ -5,7 +5,7 @@ import {
   ClipboardList, Settings, LogOut, Users,
   Activity, Key, Home, ChevronRight, Scale,
   Shield, ShieldCheck, Search, X, FileSignature,
-  Bot, TrendingUp, DoorOpen, Video, MessagesSquare, Gavel
+  Bot, TrendingUp, MessagesSquare, Gavel
 } from 'lucide-react'
 import { useAuthStore, isClient, roleLabel, canViewGlobalAudit } from '../store/authStore'
 import toast from 'react-hot-toast'
@@ -61,12 +61,9 @@ export function Sidebar({ mobileOpen, onClose }: { mobileOpen?: boolean; onClose
   const plannedLegal: NavItem[] = [
     { to: '/assistant', icon: <Bot className="w-4 h-4" />, label: 'AI Assistant', description: 'Ask case-aware questions and get drafting or research support.' },
     { to: '/insights', icon: <TrendingUp className="w-4 h-4" />, label: 'Case Insights', description: 'See workload, risk, deadlines, and matter intelligence.' },
-    { to: '/data-rooms', icon: <DoorOpen className="w-4 h-4" />, label: 'Data Rooms', description: 'Create secure collaboration spaces for opposing counsel or clients.' },
-    { to: '/consultations', icon: <Video className="w-4 h-4" />, label: 'Video Consults', description: 'Schedule and join confidential legal consultations.' },
   ]
   const plannedClient: NavItem[] = [
     { to: '/client/assistant', icon: <MessagesSquare className="w-4 h-4" />, label: 'AI Assistant', description: 'Get guided answers about your documents and case steps.' },
-    { to: '/consultations', icon: <Video className="w-4 h-4" />, label: 'Video Consults', description: 'Join secure video sessions with your legal team.' },
   ]
 
   const adminItems: NavItem[] = [

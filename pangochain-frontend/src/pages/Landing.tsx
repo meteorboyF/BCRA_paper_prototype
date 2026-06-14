@@ -242,7 +242,7 @@ function HowItWorks() {
             {
               roman: 'I',
               title: 'Ingest & Encrypt',
-              desc: 'Drag evidentiary documents into legal data rooms. Payloads are instantly encrypted client-side using unique AES-256 keys.'
+              desc: 'Upload evidentiary documents into the secure case vault. Payloads are instantly encrypted client-side using unique AES-256 keys.'
             },
             {
               roman: 'II',
