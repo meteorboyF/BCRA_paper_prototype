@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { FileSignature, Lock, Loader2, CheckCircle, AlertCircle, ShieldCheck, PenTool, Sparkles } from 'lucide-react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { FileSignature, Lock, Loader2, CheckCircle, AlertCircle, ShieldCheck, PenTool, Sparkles, Download, FileCheck2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import api from '../lib/api'
 import { queryKeys } from '../lib/queryKeys'
@@ -35,6 +35,13 @@ interface CaseDto {
 
 interface Page<T> { content: T[] }
 interface DraftResult { title: string; draftText: string; notes: string[] }
+interface UploadedDocument {
+  id: string
+  fileName: string
+  documentHash: string
+  ipfsCid?: string
+  fabricTxId?: string
+}
 
 type Stage = 'idle' | 'encrypting' | 'wrapping' | 'uploading' | 'anchoring' | 'done' | 'error'
 
@@ -59,6 +66,7 @@ function highlightSyntax(body: string) {
 
 export default function TemplateEngine() {
   const { user } = useAuthStore()
+  const queryClient = useQueryClient()
   const aiAvailable = useAiAvailable()
   const [selectedId, setSelectedId] = useState<string>('')
   const [caseId, setCaseId] = useState<string>('')
@@ -74,7 +82,10 @@ export default function TemplateEngine() {
   const [aiFacts, setAiFacts] = useState('')
   const [aiDraft, setAiDraft] = useState<DraftResult | null>(null)
   const [aiDrafting, setAiDrafting] = useState(false)
+  const [aiSavingEdited, setAiSavingEdited] = useState(false)
   const [aiError, setAiError] = useState('')
+  const [aiUploadStage, setAiUploadStage] = useState('')
+  const [aiUploadedDoc, setAiUploadedDoc] = useState<UploadedDocument | null>(null)
 
   const { data: templates, isLoading: tLoading, isError: tError } = useQuery({
     queryKey: queryKeys.templates(),
@@ -170,6 +181,8 @@ export default function TemplateEngine() {
     setAiDrafting(true)
     setAiError('')
     setAiDraft(null)
+    setAiUploadedDoc(null)
+    setAiUploadStage('Generating legal draft...')
     try {
       const { data } = await api.post<DraftResult>('/ai/draft', {
         caseId: aiCaseId,
@@ -178,14 +191,103 @@ export default function TemplateEngine() {
         keyFacts: aiFacts.split('\n').map((f) => f.trim()).filter(Boolean),
       })
       setAiDraft(data)
-      toast.success('AI draft generated')
+      setAiUploadStage('Encrypting generated draft...')
+      const uploaded = await uploadAiDraft(data)
+      setAiUploadedDoc(uploaded)
+      setAiUploadStage('Added to encrypted document vault')
+      queryClient.invalidateQueries({ queryKey: queryKeys.documents('all') })
+      queryClient.invalidateQueries({ queryKey: queryKeys.documents(aiCaseId) })
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboardStats() })
+      toast.success('AI draft generated, encrypted, and added to Documents')
     } catch (err: any) {
       setAiError(err.response?.status === 503
         ? 'AI features are not configured. Set OPENAI_API_KEY and restart the backend.'
         : err.response?.data?.message ?? err.message ?? 'AI draft failed')
+      setAiUploadStage('')
     } finally {
       setAiDrafting(false)
     }
+  }
+
+  const uploadAiDraft = async (draft: DraftResult, fileSuffix = ''): Promise<UploadedDocument> => {
+    const plaintext = formatAiDraftForFile(draft)
+    const buffer = new TextEncoder().encode(plaintext).buffer
+    const encrypted = await encryptDocument(buffer as ArrayBuffer)
+
+    setAiUploadStage('Wrapping document key...')
+    let wrappedKeyToken = encrypted.keyB64
+    try {
+      const pkRes = await api.get(`/users/${user!.id}/public-key`)
+      const ownerPubKeyJwk: JsonWebKey = JSON.parse(pkRes.data.publicKeyJwk)
+      wrappedKeyToken = await eciesWrapKey(ownerPubKeyJwk, encrypted.keyB64)
+    } catch { /* demo mode fallback */ }
+
+    setAiUploadStage('Uploading ciphertext and anchoring hash...')
+    const fileName = `${safeFileName(draft.title || aiDocType)}${fileSuffix}.md`
+    const { data } = await api.post<UploadedDocument>('/documents/upload', {
+      caseId: aiCaseId,
+      fileName,
+      ciphertextBase64: encrypted.ciphertextB64,
+      ivBase64: encrypted.ivB64,
+      documentHashSha256: encrypted.hashB64,
+      wrappedKeyTokenForOwner: wrappedKeyToken,
+      previousVersionId: null,
+      category: aiDocCategory(aiDocType),
+      confidential: true,
+    })
+    return data
+  }
+
+  const handleSaveEditedDraft = async () => {
+    if (!aiDraft || !aiCaseId) return
+    setAiSavingEdited(true)
+    setAiError('')
+    try {
+      setAiUploadStage('Saving edited draft as encrypted document...')
+      const uploaded = await uploadAiDraft(aiDraft, '-edited')
+      setAiUploadedDoc(uploaded)
+      setAiUploadStage('Edited draft added to encrypted document vault')
+      queryClient.invalidateQueries({ queryKey: queryKeys.documents('all') })
+      queryClient.invalidateQueries({ queryKey: queryKeys.documents(aiCaseId) })
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboardStats() })
+      toast.success('Edited draft saved to case documents')
+    } catch (err: any) {
+      setAiError(err.response?.data?.message ?? err.message ?? 'Could not save edited draft')
+      setAiUploadStage('')
+    } finally {
+      setAiSavingEdited(false)
+    }
+  }
+
+  const formatAiDraftForFile = (draft: DraftResult) => {
+    const notes = draft.notes?.length
+      ? `\n\n## Lawyer Review Notes\n${draft.notes.map((note) => `- ${note}`).join('\n')}`
+      : ''
+    return `# ${draft.title}\n\n${draft.draftText}${notes}\n`
+  }
+
+  const downloadAiDraft = () => {
+    if (!aiDraft) return
+    const blob = new Blob([formatAiDraftForFile(aiDraft)], { type: 'text/markdown;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${safeFileName(aiDraft.title || aiDocType)}.md`
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    URL.revokeObjectURL(url)
+  }
+
+  const safeFileName = (value: string) =>
+    value.replace(/[^a-z0-9\-_\s]/gi, '').trim().replace(/\s+/g, '-').slice(0, 90) || 'ai-generated-draft'
+
+  const aiDocCategory = (type: string) => {
+    if (type.includes('MOTION')) return 'PLEADING'
+    if (type.includes('AFFIDAVIT')) return 'EVIDENCE'
+    if (type.includes('SETTLEMENT')) return 'SETTLEMENT'
+    if (type.includes('LETTER')) return 'CORRESPONDENCE'
+    return 'DRAFT'
   }
 
   const busy = ['encrypting', 'wrapping', 'uploading', 'anchoring'].includes(stage)
@@ -264,22 +366,58 @@ export default function TemplateEngine() {
               />
             </div>
             {aiError && <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-300">{aiError}</div>}
-            <button onClick={handleAiDraft} disabled={!aiCaseId || !aiInstructions.trim() || aiDrafting} className="btn-primary w-full justify-center text-xs">
-              {aiDrafting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-              Generate Draft
-            </button>
+            {aiUploadStage && !aiError && (
+              <div className="flex items-center gap-2 rounded-lg border border-gold-500/15 bg-gold-500/5 px-3 py-2 text-xs text-gold-200">
+                {aiDrafting || aiSavingEdited ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <CheckCircle className="h-3.5 w-3.5 text-emerald-300" />}
+                {aiUploadStage}
+              </div>
+            )}
+            {aiUploadedDoc && (
+              <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-200">
+                <div className="flex items-center gap-2 font-semibold">
+                  <FileCheck2 className="h-3.5 w-3.5" />
+                  Added to case documents: {aiUploadedDoc.fileName}
+                </div>
+                <p className="mt-1 break-all font-mono text-[10px] text-emerald-300/80">Hash: {aiUploadedDoc.documentHash}</p>
+              </div>
+            )}
+            <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
+              <button onClick={handleAiDraft} disabled={!aiCaseId || !aiInstructions.trim() || aiDrafting} className="btn-primary justify-center text-xs">
+                {aiDrafting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                Generate & Add to Documents
+              </button>
+              <button onClick={downloadAiDraft} disabled={!aiDraft} className="btn-secondary justify-center text-xs">
+                <Download className="h-4 w-4" />
+                Download
+              </button>
+            </div>
           </div>
           <div className="rounded-xl border border-gold-500/10 bg-navy-950/70 p-4">
             {aiDraft ? (
               <div className="space-y-3">
                 <div className="flex items-center justify-between gap-3">
                   <h3 className="font-serif font-bold text-gold-300">{aiDraft.title}</h3>
-                  <button
-                    onClick={() => { navigator.clipboard.writeText(aiDraft.draftText); toast.success('Draft copied') }}
-                    className="btn-secondary text-xs"
-                  >
-                    Copy
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleSaveEditedDraft}
+                      disabled={aiSavingEdited}
+                      className="btn-secondary text-xs"
+                    >
+                      {aiSavingEdited ? 'Saving...' : 'Save Edited'}
+                    </button>
+                    <button
+                      onClick={downloadAiDraft}
+                      className="btn-secondary text-xs"
+                    >
+                      Download
+                    </button>
+                    <button
+                      onClick={() => { navigator.clipboard.writeText(aiDraft.draftText); toast.success('Draft copied') }}
+                      className="btn-secondary text-xs"
+                    >
+                      Copy
+                    </button>
+                  </div>
                 </div>
                 <textarea
                   className="input min-h-[260px] bg-navy-950 text-xs font-mono leading-relaxed"
