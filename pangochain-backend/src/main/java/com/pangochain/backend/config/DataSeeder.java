@@ -657,6 +657,8 @@ public class DataSeeder implements ApplicationRunner {
     }
 
     private void seedShowcaseCaseActivity(Case legalCase, User lawyer, User client, User partner, User secretary) {
+        seedCaseInsightsDemoData(legalCase, lawyer, client);
+
         if (count("hearings", "case_id", legalCase.getId()) < 6) {
             insertHearing(legalCase, lawyer, "Settlement Status Conference", 18, "Zoom - Dept. 12", "Los Angeles Superior Court", "SETTLEMENT_CONFERENCE",
                     "Prepare settlement range, authority memo, and redacted notice exhibit.");
@@ -695,6 +697,40 @@ public class DataSeeder implements ApplicationRunner {
         if (count("time_entries", "case_id", legalCase.getId()) < 8) {
             insertTimeEntry(legalCase.getId(), partner.getId(), "Partner review of injunction strategy", 45, 65_000, false, 0);
             insertTimeEntry(legalCase.getId(), secretary.getId(), "Prepared hearing binder index", 75, 15_000, false, 1);
+        }
+    }
+
+    private void seedCaseInsightsDemoData(Case legalCase, User lawyer, User client) {
+        if (!caseEventExists(legalCase.getId(), "AI Insight: Jan. 18 first repair notice")) {
+            insertCaseInsightEvent(legalCase.getId(), "CLIENT_NOTICE", "AI Insight: Jan. 18 first repair notice",
+                    "Marcus Chen emailed Meridian property management on January 18, 2024 reporting water intrusion, ceiling damage, and business interruption. This supports notice before termination.",
+                    client.getId(), "now() - interval '47 days'");
+            insertCaseInsightEvent(legalCase.getId(), "CLIENT_NOTICE", "AI Insight: Jan. 24 follow-up notice",
+                    "A January 24, 2024 follow-up email asked Meridian for a repair schedule and warned that rent would be escrowed if the defect remained unresolved.",
+                    client.getId(), "now() - interval '42 days'");
+            insertCaseInsightEvent(legalCase.getId(), "WITNESS_STATEMENT", "AI Insight: Feb. 3 witness confirmation",
+                    "Building concierge Dana Park states she saw the leak, logged Marcus Chen's access request on February 3, 2024, and told Meridian's maintenance desk before the termination letter.",
+                    lawyer.getId(), "now() - interval '36 days'");
+            insertCaseInsightEvent(legalCase.getId(), "OPPOSING_PRODUCTION", "AI Insight: Meridian denies pre-Feb. 7 notice",
+                    "Opposing counsel's production cover letter states Meridian has no record of any repair notice before February 7, 2024, contradicting the Jan. 18, Jan. 24, and Feb. 3 evidence.",
+                    lawyer.getId(), "now() - interval '29 days'");
+            insertCaseInsightEvent(legalCase.getId(), "TERMINATION_NOTICE", "AI Insight: Feb. 10 termination notice",
+                    "Meridian issued a February 10, 2024 termination notice citing non-payment and asserting it first learned of repair complaints on February 7, 2024.",
+                    lawyer.getId(), "now() - interval '26 days'");
+            insertCaseInsightEvent(legalCase.getId(), "LOCKOUT", "AI Insight: Feb. 12 lockout before cure packet",
+                    "Meridian changed access credentials on February 12, 2024 before Chen's rent-cure packet and mitigation invoices were acknowledged.",
+                    client.getId(), "now() - interval '24 days'");
+            insertCaseInsightEvent(legalCase.getId(), "EVIDENCE_GAP", "AI Insight: missing source evidence list",
+                    "Open proof gaps: property portal export, original email headers, photos with metadata, repair invoices, rent escrow receipts, and maintenance technician records.",
+                    lawyer.getId(), "now() - interval '6 days'");
+        }
+        if (!caseDeadlineExists(legalCase.getId(), "Evidence gap cure deadline")) {
+            insertDeadline(legalCase.getId(), lawyer.getId(), "Evidence gap cure deadline",
+                    "Collect portal exports, metadata-bearing photos, invoices, receipts, and maintenance technician records before injunction reply.",
+                    "FILING", "now() + interval '3 days'");
+            insertDeadline(legalCase.getId(), lawyer.getId(), "Opposition production deficiency letter",
+                    "Send deficiency letter on Meridian's denial of pre-Feb. 7 notice and request native email headers.",
+                    "DISCOVERY", "now() + interval '6 days'");
         }
     }
 
@@ -1329,6 +1365,30 @@ public class DataSeeder implements ApplicationRunner {
                 .setParameter("title", title)
                 .getSingleResult();
         return ((Number) n).longValue() > 0;
+    }
+
+    private boolean caseDeadlineExists(UUID caseId, String title) {
+        Object n = em.createNativeQuery("SELECT count(*) FROM case_deadlines WHERE case_id = :caseId AND title = :title")
+                .setParameter("caseId", caseId)
+                .setParameter("title", title)
+                .getSingleResult();
+        return ((Number) n).longValue() > 0;
+    }
+
+    private void insertCaseInsightEvent(UUID caseId, String eventType, String title, String description,
+                                        UUID actorId, String createdAtExpr) {
+        em.createNativeQuery("""
+                INSERT INTO case_events (case_id, event_type, title, description, actor_id, fabric_tx_id, created_at)
+                VALUES (:caseId, :eventType, :title, :description, :actorId, :tx, """ + createdAtExpr + """
+                )
+                """)
+                .setParameter("caseId", caseId)
+                .setParameter("eventType", eventType)
+                .setParameter("title", title)
+                .setParameter("description", description)
+                .setParameter("actorId", actorId)
+                .setParameter("tx", "insight-tx-" + demoHash(caseId + title).substring(0, 22))
+                .executeUpdate();
     }
 
     private boolean reminderExists(UUID recipientId, String title) {

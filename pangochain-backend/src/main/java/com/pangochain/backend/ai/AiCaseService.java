@@ -3,6 +3,7 @@ package com.pangochain.backend.ai;
 import com.pangochain.backend.caseevent.CaseEvent;
 import com.pangochain.backend.caseevent.CaseEventRepository;
 import com.pangochain.backend.cases.CaseRepository;
+import com.pangochain.backend.deadline.CaseDeadlineRepository;
 import com.pangochain.backend.document.DocStatus;
 import com.pangochain.backend.document.DocumentRepository;
 import com.pangochain.backend.hearing.HearingRepository;
@@ -33,6 +34,7 @@ public class AiCaseService {
     private final DocumentRepository documentRepository;
     private final HearingRepository hearingRepository;
     private final CaseMilestoneRepository milestoneRepository;
+    private final CaseDeadlineRepository deadlineRepository;
     private final AiCaseInsightsRepository insightsRepository;
 
     public record TimelineCheckResult(
@@ -80,6 +82,7 @@ public class AiCaseService {
         Collections.reverse(events);
         var milestones = milestoneRepository.findByCaseIdOrderBySortOrderAscCreatedAtAsc(caseId);
         var hearings = hearingRepository.findByLegalCaseIdOrderByHearingDateAsc(caseId);
+        var deadlines = deadlineRepository.findByCaseIdOrderByDeadlineDateAsc(caseId);
         var documents = documentRepository.findByLegalCaseIdAndStatus(caseId, DocStatus.ACTIVE);
 
         StringBuilder context = new StringBuilder();
@@ -103,6 +106,15 @@ public class AiCaseService {
         milestones.forEach(m -> context.append(m.getCompletedAt() != null ? m.getCompletedAt() : "PENDING")
                 .append(": ").append(m.getTitle())
                 .append(" [").append(m.getStatus()).append("]")
+                .append(" - ").append(m.getDescription() == null ? "" : m.getDescription())
+                .append("\n"));
+
+        context.append("\n== DEADLINES ==\n");
+        deadlines.forEach(d -> context.append(d.getDeadlineDate())
+                .append(": ").append(d.getTitle())
+                .append(" [").append(d.getDeadlineType()).append("]")
+                .append(d.isCompleted() ? " [COMPLETED]" : " [OPEN]")
+                .append(" - ").append(d.getDescription() == null ? "" : d.getDescription())
                 .append("\n"));
 
         context.append("\n== DOCUMENTS (metadata only) ==\n");
@@ -141,6 +153,11 @@ public class AiCaseService {
 
         var legalCase = caseRepository.findById(caseId).orElseThrow();
         var documents = documentRepository.findByLegalCaseIdAndStatus(caseId, DocStatus.ACTIVE);
+        List<CaseEvent> events = new ArrayList<>(caseEventRepository.findByLegalCaseIdOrderByCreatedAtDesc(caseId));
+        Collections.reverse(events);
+        var hearings = hearingRepository.findByLegalCaseIdOrderByHearingDateAsc(caseId);
+        var milestones = milestoneRepository.findByCaseIdOrderBySortOrderAscCreatedAtAsc(caseId);
+        var deadlines = deadlineRepository.findByCaseIdOrderByDeadlineDateAsc(caseId);
 
         StringBuilder context = new StringBuilder();
         context.append("Case Type: ").append(legalCase.getCaseType()).append("\n");
@@ -153,6 +170,33 @@ public class AiCaseService {
         documents.forEach(d -> context.append("- ").append(d.getFileName())
                 .append(" [").append(d.getCategory()).append("]")
                 .append(d.isConfidential() ? " [CONFIDENTIAL]" : "")
+                .append("\n"));
+
+        context.append("\nCase Events:\n");
+        events.forEach(e -> context.append("- ").append(e.getCreatedAt())
+                .append(": ").append(e.getTitle())
+                .append(" - ").append(e.getDescription() == null ? "" : e.getDescription())
+                .append("\n"));
+
+        context.append("\nUpcoming Hearings:\n");
+        hearings.forEach(h -> context.append("- ").append(h.getHearingDate())
+                .append(": ").append(h.getTitle())
+                .append(" [").append(h.getHearingType()).append("]")
+                .append(" - ").append(h.getNotes() == null ? "" : h.getNotes())
+                .append("\n"));
+
+        context.append("\nMilestones:\n");
+        milestones.forEach(m -> context.append("- ").append(m.getTitle())
+                .append(" [").append(m.getStatus()).append("]")
+                .append(" - ").append(m.getDescription() == null ? "" : m.getDescription())
+                .append("\n"));
+
+        context.append("\nDeadlines:\n");
+        deadlines.forEach(d -> context.append("- ").append(d.getDeadlineDate())
+                .append(": ").append(d.getTitle())
+                .append(" [").append(d.getDeadlineType()).append("]")
+                .append(d.isCompleted() ? " [COMPLETED]" : " [OPEN]")
+                .append(" - ").append(d.getDescription() == null ? "" : d.getDescription())
                 .append("\n"));
 
         String prompt = """
