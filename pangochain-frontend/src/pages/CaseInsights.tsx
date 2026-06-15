@@ -55,6 +55,55 @@ const priorityStyles: Record<string, string> = {
   LOW: 'bg-sky-500/10 text-sky-300 border-sky-500/30',
 }
 
+const seededTimelineFallback: TimelineResult = {
+  overallAssessment: 'SIGNIFICANT_ISSUES',
+  summary: 'The Chen matter has a strong notice contradiction: Meridian denies pre-February 7 notice even though the case record contains January 18, January 24, and February 3 notice signals before the February 10 termination.',
+  contradictions: [
+    {
+      severity: 'HIGH',
+      description: 'Meridian denies receiving repair notice before February 7, 2024, but the case record shows earlier notice events.',
+      event1: 'January 18 and January 24 repair notices, plus February 3 witness confirmation.',
+      event2: 'Meridian termination position says it first learned of repair complaints on February 7 before issuing the February 10 termination notice.',
+    },
+    {
+      severity: 'MEDIUM',
+      description: 'The lockout appears to precede full acknowledgment of the cure and mitigation packet.',
+      event1: 'February 12 access credential lockout.',
+      event2: 'Rent cure packet, invoices, and mitigation documents still require confirmation and preservation.',
+    },
+  ],
+}
+
+const seededEvidenceFallback: EvidenceGapResult = {
+  caseTheory: 'Marcus Chen argues Meridian wrongfully terminated the commercial lease after receiving repeated repair notices and before properly resolving cure, access, and mitigation issues.',
+  availableEvidence: [
+    'Repair Notice Email Thread.doc',
+    'Witness Statement - Maintenance Notice.md',
+    'Meridian Termination Notice.md',
+    'Rent Payment Ledger Q1-Q4.md',
+    'Damages and Mitigation Ledger.md',
+    'Chen Lease Agreement - Executed.md',
+  ],
+  gaps: [
+    {
+      priority: 'HIGH',
+      evidenceNeeded: 'Property portal export',
+      reason: 'Needed to prove when Meridian received and logged maintenance requests.',
+    },
+    {
+      priority: 'HIGH',
+      evidenceNeeded: 'Original email headers and metadata photos',
+      reason: 'Needed to authenticate notice dates and show the condition of the premises before termination.',
+    },
+    {
+      priority: 'MEDIUM',
+      evidenceNeeded: 'Invoices, receipts, and maintenance technician records',
+      reason: 'Needed to support damages, mitigation, and Meridian control over repairs.',
+    },
+  ],
+  priorityRecommendation: 'First obtain the portal export and native email headers, then pair them with the witness statement for the preliminary injunction record.',
+}
+
 export default function CaseInsights() {
   const aiAvailable = useAiAvailable()
   const [selectedCaseId, setSelectedCaseId] = useState('')
@@ -93,7 +142,13 @@ export default function CaseInsights() {
       setTimeline(data)
       setTimelineAt(new Date())
     } catch (err: any) {
-      setError(err?.response?.status === 503 ? 'AI features are not configured. Set OPENAI_API_KEY on the backend.' : err?.message ?? 'Timeline check failed.')
+      if (err?.response?.status === 429) {
+        setTimeline(seededTimelineFallback)
+        setTimelineAt(new Date())
+        setError('OpenAI is rate-limiting right now, so PangoChain is showing the seeded Chen case insight for demo continuity.')
+      } else {
+        setError(err?.response?.status === 503 ? 'AI features are not configured. Set OPENAI_API_KEY on the backend.' : err?.message ?? 'Timeline check failed.')
+      }
     } finally {
       setTimelineLoading(false)
     }
@@ -108,7 +163,13 @@ export default function CaseInsights() {
       setEvidence(data)
       setEvidenceAt(new Date())
     } catch (err: any) {
-      setError(err?.response?.status === 503 ? 'AI features are not configured. Set OPENAI_API_KEY on the backend.' : err?.message ?? 'Evidence gap analysis failed.')
+      if (err?.response?.status === 429) {
+        setEvidence(seededEvidenceFallback)
+        setEvidenceAt(new Date())
+        setError('OpenAI is rate-limiting right now, so PangoChain is showing the seeded Chen case insight for demo continuity.')
+      } else {
+        setError(err?.response?.status === 503 ? 'AI features are not configured. Set OPENAI_API_KEY on the backend.' : err?.message ?? 'Evidence gap analysis failed.')
+      }
     } finally {
       setEvidenceLoading(false)
     }
@@ -116,7 +177,9 @@ export default function CaseInsights() {
 
   async function runFullScan() {
     if (!selectedCaseId || running) return
-    await Promise.all([runTimeline(), runEvidence()])
+    await runTimeline()
+    await new Promise((resolve) => setTimeout(resolve, 700))
+    await runEvidence()
   }
 
   return (
