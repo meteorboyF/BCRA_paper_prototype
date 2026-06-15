@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { Component, type ReactNode, useState, useCallback, useEffect, useRef } from 'react'
 import { Upload, X, FileText, Lock, CheckCircle, AlertCircle, Loader2, Shield, Sparkles } from 'lucide-react'
 import { encryptDocument, eciesWrapKey, bytesToBase64 } from '../lib/crypto'
 import { useAuthStore } from '../store/authStore'
@@ -32,6 +32,52 @@ function uploadErrorMessage(err: any) {
 }
 
 export function DocumentUploadDropzone({ caseId, onClose, onUploaded, previousVersionId }: Props) {
+  return (
+    <UploadDialogErrorBoundary onClose={onClose}>
+      <DocumentUploadDialog
+        caseId={caseId}
+        onClose={onClose}
+        onUploaded={onUploaded}
+        previousVersionId={previousVersionId}
+      />
+    </UploadDialogErrorBoundary>
+  )
+}
+
+class UploadDialogErrorBoundary extends Component<{ children: ReactNode; onClose: () => void }, { error?: Error }> {
+  state: { error?: Error } = {}
+
+  static getDerivedStateFromError(error: Error) {
+    return { error }
+  }
+
+  render() {
+    if (this.state.error) {
+      return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="card w-full max-w-md border border-rose-500/30 bg-navy-900 p-6 shadow-gold-md">
+            <div className="mb-4 flex items-center gap-3 text-rose-300">
+              <AlertCircle className="h-5 w-5" />
+              <h2 className="font-serif text-lg font-semibold">Upload dialog could not open</h2>
+            </div>
+            <p className="text-sm leading-relaxed text-text-secondary">
+              The secure upload panel hit a browser-side error. Close this dialog and try again.
+            </p>
+            <p className="mt-3 rounded-lg border border-rose-500/20 bg-rose-500/10 px-3 py-2 font-mono text-xs text-rose-200">
+              {this.state.error.message}
+            </p>
+            <button onClick={this.props.onClose} className="btn-primary mt-5 w-full justify-center">
+              Close
+            </button>
+          </div>
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
+
+function DocumentUploadDialog({ caseId, onClose, onUploaded, previousVersionId }: Props) {
   const { user } = useAuthStore()
   const [file, setFile] = useState<File | null>(null)
   const [selectedCaseId, setSelectedCaseId] = useState(caseId)
@@ -114,7 +160,8 @@ export function DocumentUploadDropzone({ caseId, onClose, onUploaded, previousVe
       setStage('wrapping')
       let wrappedKeyToken = encrypted.keyB64 // raw key fallback (demo mode)
       try {
-        const pkRes = await api.get(`/users/${user!.id}/public-key`)
+        if (!user?.id) throw new Error('Your session is missing user identity. Please sign in again.')
+        const pkRes = await api.get(`/users/${user.id}/public-key`)
         const ownerPubKeyJwk: JsonWebKey = JSON.parse(pkRes.data.publicKeyJwk)
         wrappedKeyToken = await eciesWrapKey(ownerPubKeyJwk, encrypted.keyB64)
       } catch {
@@ -200,7 +247,7 @@ export function DocumentUploadDropzone({ caseId, onClose, onUploaded, previousVe
             >
               <Upload className="w-8 h-8 text-gold-500/50 mx-auto mb-2" />
               <p className="font-medium text-text-primary text-sm">Drop file here or click to browse</p>
-              <p className="text-text-secondary text-xs mt-1">PDF, DOCX, XLSX, ZIP — up to 50 MB</p>
+              <p className="text-text-secondary text-xs mt-1">PDF, DOCX, MD, TXT, XLSX, ZIP — up to 50 MB</p>
               <input ref={fileRef} type="file" className="hidden" onChange={(e) => pickFile(e.target.files?.[0] ?? null)} />
             </div>
           ) : (
