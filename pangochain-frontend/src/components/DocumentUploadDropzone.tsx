@@ -1,4 +1,5 @@
 import { Component, type ReactNode, useState, useCallback, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { Upload, X, FileText, Lock, CheckCircle, AlertCircle, Loader2, Shield, Sparkles } from 'lucide-react'
 import { encryptDocument, eciesWrapKey, bytesToBase64 } from '../lib/crypto'
 import { useAuthStore } from '../store/authStore'
@@ -32,7 +33,7 @@ function uploadErrorMessage(err: any) {
 }
 
 export function DocumentUploadDropzone({ caseId, onClose, onUploaded, previousVersionId }: Props) {
-  return (
+  const dialog = (
     <UploadDialogErrorBoundary onClose={onClose}>
       <DocumentUploadDialog
         caseId={caseId}
@@ -42,6 +43,7 @@ export function DocumentUploadDropzone({ caseId, onClose, onUploaded, previousVe
       />
     </UploadDialogErrorBoundary>
   )
+  return createPortal(dialog, document.body)
 }
 
 class UploadDialogErrorBoundary extends Component<{ children: ReactNode; onClose: () => void }, { error?: Error }> {
