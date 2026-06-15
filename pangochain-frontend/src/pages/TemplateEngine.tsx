@@ -73,6 +73,7 @@ export default function TemplateEngine() {
   const [values, setValues] = useState<Record<string, string>>({})
   const [stage, setStage] = useState<Stage>('idle')
   const [errorMsg, setErrorMsg] = useState('')
+  const [templateUploadedDoc, setTemplateUploadedDoc] = useState<UploadedDocument | null>(null)
   const [quillAnimating, setQuillAnimating] = useState(false)
   const [documentName, setDocumentName] = useState('')
   const [editableBody, setEditableBody] = useState('')
@@ -114,13 +115,21 @@ export default function TemplateEngine() {
     setValues({})
     setStage('idle')
     setErrorMsg('')
+    setTemplateUploadedDoc(null)
   }
 
   const allFilled = fields.length > 0 && fields.every((f) => (values[f.name] ?? '').trim().length > 0)
 
+  const resetTemplateSaveState = () => {
+    if (stage === 'done' || stage === 'error') setStage('idle')
+    setErrorMsg('')
+    setTemplateUploadedDoc(null)
+  }
+
   const handleGenerate = async () => {
     if (!selected || !caseId) return
     setErrorMsg('')
+    setTemplateUploadedDoc(null)
     setQuillAnimating(true)
     try {
       // 1. Build the plaintext instrument
@@ -143,7 +152,7 @@ export default function TemplateEngine() {
       // 4. Upload
       setStage('uploading')
       const fileName = documentName.trim() || `${selected.name}.txt`
-      const { data: doc } = await api.post('/documents/upload', {
+      const { data: doc } = await api.post<UploadedDocument>('/documents/upload', {
         caseId,
         fileName,
         ciphertextBase64: encrypted.ciphertextB64,
@@ -166,7 +175,11 @@ export default function TemplateEngine() {
         paramHash,
       })
 
+      setTemplateUploadedDoc(doc)
       setStage('done')
+      queryClient.invalidateQueries({ queryKey: queryKeys.documents('all') })
+      queryClient.invalidateQueries({ queryKey: queryKeys.documents(caseId) })
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboardStats() })
       toast.success(`${selected.name} generated, encrypted & anchored on the ledger`)
     } catch (err: any) {
       setStage('error')
@@ -273,6 +286,20 @@ export default function TemplateEngine() {
     const a = document.createElement('a')
     a.href = url
     a.download = `${safeFileName(aiDraft.title || aiDocType)}.md`
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    URL.revokeObjectURL(url)
+  }
+
+  const downloadTemplatePreview = () => {
+    if (!selected) return
+    const fileName = documentName.trim() || `${selected.name}.txt`
+    const blob = new Blob([preview], { type: 'text/plain;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = fileName
     document.body.appendChild(a)
     a.click()
     a.remove()
@@ -480,7 +507,7 @@ export default function TemplateEngine() {
               <div className="card bg-navy-900/60 p-5 border-gold-500/10 space-y-4">
                 <div>
                   <label className="label">Target Matter Case *</label>
-                  <select className="input bg-navy-950 text-xs" value={caseId} onChange={(e) => setCaseId(e.target.value)}>
+                  <select className="input bg-navy-950 text-xs" value={caseId} onChange={(e) => { setCaseId(e.target.value); resetTemplateSaveState() }}>
                     <option value="" className="bg-navy-950">Select Case Dockets...</option>
                     {cases?.map((c) => <option key={c.id} value={c.id} className="bg-navy-950">{c.title}</option>)}
                   </select>
@@ -490,7 +517,7 @@ export default function TemplateEngine() {
                   <input
                     className="input bg-navy-950 text-xs"
                     value={documentName}
-                    onChange={(e) => setDocumentName(e.target.value)}
+                    onChange={(e) => { setDocumentName(e.target.value); resetTemplateSaveState() }}
                     placeholder="e.g. Chen settlement draft v1.txt"
                   />
                 </div>
@@ -502,18 +529,29 @@ export default function TemplateEngine() {
                       <textarea
                         className="input bg-navy-950 text-xs min-h-[72px]"
                         value={values[f.name] ?? ''}
-                        onChange={(e) => setValues((v) => ({ ...v, [f.name]: e.target.value }))}
+                        onChange={(e) => { setValues((v) => ({ ...v, [f.name]: e.target.value })); resetTemplateSaveState() }}
                       />
                     ) : (
                       <input
                         type={f.type === 'number' ? 'number' : f.type === 'date' ? 'date' : 'text'}
                         className="input bg-navy-950 text-xs"
                         value={values[f.name] ?? ''}
-                        onChange={(e) => setValues((v) => ({ ...v, [f.name]: e.target.value }))}
+                        onChange={(e) => { setValues((v) => ({ ...v, [f.name]: e.target.value })); resetTemplateSaveState() }}
                       />
                     )}
                   </div>
                 ))}
+
+                {templateUploadedDoc && (
+                  <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-200">
+                    <div className="flex items-center gap-2 font-semibold">
+                      <FileCheck2 className="h-3.5 w-3.5" />
+                      Added to case documents: {templateUploadedDoc.fileName}
+                    </div>
+                    <p className="mt-1 break-all font-mono text-[10px] text-emerald-300/80">Hash: {templateUploadedDoc.documentHash}</p>
+                    {templateUploadedDoc.ipfsCid && <p className="mt-1 break-all font-mono text-[10px] text-emerald-300/70">IPFS: {templateUploadedDoc.ipfsCid}</p>}
+                  </div>
+                )}
 
                 {stage !== 'idle' && (
                   <div className="flex items-center gap-2 text-xs py-1">
@@ -526,21 +564,30 @@ export default function TemplateEngine() {
                   </div>
                 )}
 
-                {/* Generate button with Quill animations */}
-                <button
-                  onClick={handleGenerate}
-                  disabled={!allFilled || !caseId || !documentName.trim() || busy || stage === 'done'}
-                  className="btn-primary w-full justify-center py-3 text-xs uppercase tracking-wider font-bold relative overflow-hidden"
-                >
-                  <motion.span
-                    animate={quillAnimating ? { rotate: [0, -15, 15, -15, 15, 0], x: [0, 4, -4, 4, -4, 0] } : {}}
-                    transition={{ duration: 1 }}
-                    className="inline-block mr-1.5 shrink-0"
+                <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
+                  <button
+                    onClick={handleGenerate}
+                    disabled={!allFilled || !caseId || !documentName.trim() || busy}
+                    className="btn-primary justify-center py-3 text-xs uppercase tracking-wider font-bold relative overflow-hidden"
                   >
-                    <PenTool className="w-4 h-4 text-navy-950" />
-                  </motion.span>
-                  <span>{busy ? 'Anchoring...' : 'Generate, Encrypt & Anchor'}</span>
-                </button>
+                    <motion.span
+                      animate={quillAnimating ? { rotate: [0, -15, 15, -15, 15, 0], x: [0, 4, -4, 4, -4, 0] } : {}}
+                      transition={{ duration: 1 }}
+                      className="inline-block mr-1.5 shrink-0"
+                    >
+                      <PenTool className="w-4 h-4 text-navy-950" />
+                    </motion.span>
+                    <span>{busy ? 'Anchoring...' : 'Generate & Add to Documents'}</span>
+                  </button>
+                  <button
+                    onClick={downloadTemplatePreview}
+                    disabled={!selected}
+                    className="btn-secondary justify-center text-xs"
+                  >
+                    <Download className="h-4 w-4" />
+                    Download
+                  </button>
+                </div>
               </div>
 
               {/* Code editor preview panel */}
@@ -549,7 +596,7 @@ export default function TemplateEngine() {
                 <textarea
                   className="input min-h-[220px] bg-navy-950 text-xs font-mono leading-relaxed"
                   value={editableBody}
-                  onChange={(e) => setEditableBody(e.target.value)}
+                  onChange={(e) => { setEditableBody(e.target.value); resetTemplateSaveState() }}
                 />
                 <div className="text-[11px] leading-relaxed whitespace-pre-wrap font-mono text-text-secondary max-h-[18vh] overflow-y-auto pr-1 border-t border-gold-500/10 pt-3">
                   {highlightSyntax(editableBody)}
@@ -570,12 +617,17 @@ export default function TemplateEngine() {
               
               <div className="space-y-6 relative z-10">
                 {/* Header of Preview */}
-                <div className="flex justify-between items-center pb-4 border-b border-gold-500/20">
+                <div className="flex flex-wrap justify-between items-center gap-3 pb-4 border-b border-gold-500/20">
                   <div className="flex items-center gap-2">
                     <img src="/logo-mark.png" alt="PangoChain Logo" className="w-6 h-6 filter-gold opacity-60" />
                     <span className="font-serif font-bold text-xs text-gold-500/80">PangoChain Deed Seal</span>
                   </div>
-                  <span className="text-[8px] font-mono text-text-secondary uppercase">Draft preview</span>
+                  <div className="flex items-center gap-2">
+                    <button onClick={downloadTemplatePreview} className="btn-secondary text-xs">
+                      Download
+                    </button>
+                    <span className="text-[8px] font-mono text-text-secondary uppercase">Draft preview</span>
+                  </div>
                 </div>
 
                 {/* Preformatted preview body */}
