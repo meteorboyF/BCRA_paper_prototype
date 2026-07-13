@@ -157,7 +157,7 @@ A Hybrid Approach Using Hyperledger Fabric and IPFS}
             country={Bangladesh}}
 
 \begin{abstract}
-Legal document management systems often centralize trust in privileged administrators, making it difficult for external parties to verify whether access decisions or audit records have been altered. This paper presents a hybrid legal-data management framework that places Hyperledger Fabric on the active document-release path, rather than using it only as a passive audit log. In the proposed architecture, every protected download request must pass a Fabric chaincode access check before ciphertext or wrapped document keys are released. If Fabric is unavailable, the evaluated download path fails closed and returns a denial instead of falling back to a database access-control list. The framework combines browser-side encryption, encrypted off-chain storage in a private IPFS swarm, and on-chain anchoring of document hashes and content identifiers. Experimental evaluation shows that the REST-gateway workload sustains up to 193 transactions per second under the tuned configuration, exceeding the estimated workload baseline for a 1,000-user firm. Fabric-based add no statistically significant interactive delay compared with a database-only access check, and outage simulations confirm that successful downloads drop to zero during Fabric unavailability while service resumes automatically after reconnection. The main contribution is an empirical systems baseline for moving legal-document release decisions from application-only authorization to ledger-verifiable access-control state on the normal download path.
+Legal document management systems typically centralize trust in privileged administrators, making it difficult for external parties to verify whether access decisions or audit records have been altered. This paper presents a hybrid legal-data management framework that places Hyperledger Fabric on the active document-release path rather than using it only as a passive audit log: every protected download must pass a Fabric chaincode access check before ciphertext or wrapped document keys are released. If Fabric is unavailable, the download path fails closed and returns a denial instead of falling back to a database access-control list. The framework combines browser-side encryption, encrypted off-chain storage in a private IPFS swarm, and on-chain anchoring of document hashes and content identifiers. In experimental evaluation, the REST-gateway workload sustains up to 193 transactions per second, exceeding the estimated baseline for a 1,000-user firm; Fabric-based access checks add no statistically significant delay over a database-only check; and outage simulations confirm that successful downloads drop to zero during Fabric unavailability, with service resuming automatically on reconnection. The framework thus provides an empirical systems baseline for moving document-release decisions from application-only authorization to ledger-verifiable access-control state.
 \end{abstract}
 
 \begin{keyword}
@@ -917,7 +917,7 @@ single key is negligible below $2^{32}$ documents
 key generation eliminates cross-document IV-reuse risk entirely: because
 each document uses an independent $k_{enc}$, an IV collision in one
 document has no cryptographic effect on any other document~\cite{nist80038d}.
-Listing~\ref{lst:encrypt} shows the browser implementation.
+Listing~\ref{lst:encrypt} (Appendix~\ref{app:listings}) shows the browser implementation.
 
 \textbf{Protocol composition security.} The ECIES-style key-wrapping construction is
 \emph{intended} to achieve \textsc{IND-CCA2} security under the Gap
@@ -1002,75 +1002,18 @@ The prototype relies on standard assumptions for ECIES-style wrapping, AES-GCM e
 \end{algorithm}
 
 % Listing 1 - Browser AES-256-GCM encryption
-\begin{lstlisting}[language=TypeScript,
-    float=!t,
-    caption={Browser AES-256-GCM document encryption. Fresh 256-bit
-    key and 96-bit IV generated per document via
-    \texttt{window.crypto.getRandomValues}. SHA-256 hash computed of
-    plaintext \emph{before} encryption. Server receives only
-    IV-prepended ciphertext.},
-    label=lst:encrypt]
-// frontend/src/lib/crypto.ts
-export async function encryptDocument(
-    file: ArrayBuffer
-): Promise<EncryptedDocument> {
-  const key = await subtle.generateKey(
-      { name: 'AES-GCM', length: 256 },
-      true, ['encrypt','decrypt'])
-  const iv = crypto.getRandomValues(new Uint8Array(12))
-  const [ciphertext, plainHashBuffer, rawKey] = await Promise.all([
-    subtle.encrypt({ name: 'AES-GCM', iv }, key, file),
-    subtle.digest('SHA-256', file),  // Plaintext hash
-    subtle.exportKey('raw', key),
-  ])
-  // Hash the resulting ciphertext to bind the IPFS payload
-  const ivAndCiphertext = concat(iv, ciphertext)
-  const cipherHashBuffer = await subtle.digest('SHA-256', ivAndCiphertext)
-  return {
-    ciphertextB64: bytesToBase64(new Uint8Array(ciphertext)),
-    ivB64:         bytesToBase64(iv),
-    plainHashB64:  bytesToBase64(new Uint8Array(plainHashBuffer)),
-    cipherHashB64: bytesToBase64(new Uint8Array(cipherHashBuffer)),
-    keyB64:        bytesToBase64(new Uint8Array(rawKey)),
-  }
-}
-\end{lstlisting}
+
 
 \subsubsection{Key Derivation}
 User private keys are protected at rest using PBKDF2-SHA256 at
 600,000 iterations, following current OWASP password-storage guidance~\cite{owaspPasswordStorage2024} and exceeding the minimum work factor recommended by NIST SP~800-132~\cite{nist800132}.
-Listing~\ref{lst:pbkdf2} shows the derivation function. Experiment~\hyperref[sec:exp_crypto]{6} (Section~\ref{sec:exp_crypto}) measures PBKDF2-SHA256 at
+Listing~\ref{lst:pbkdf2} (Appendix~\ref{app:listings}) shows the derivation function. Experiment~\hyperref[sec:exp_crypto]{6} (Section~\ref{sec:exp_crypto}) measures PBKDF2-SHA256 at
 600,000 iterations with a P50 latency of 100.44\,ms over 10 Node.js WebCrypto fallback trials. Browser automation was unavailable in the
 measurement environment, so this timing is reported as a same-API Node
 WebCrypto fallback result rather than a browser-performance claim.
 
 % Listing 2 - PBKDF2
-\begin{lstlisting}[language=TypeScript,
-    float=!t,
-    caption={PBKDF2-SHA256 key derivation at 600,000 iterations (OWASP
-    password-storage guidance; exceeds the NIST SP~800-132 minimum work
-    factor). Derives the AES-256-GCM wrapping key protecting both ECIES
-    and ECDSA private keys in \texttt{localStorage}.},
-    label=lst:pbkdf2]
-// frontend/src/lib/crypto.ts
-const PBKDF2_ITERATIONS = 600000
-export async function derivePbkdf2Key(
-    password: string, saltBase64: string
-): Promise<CryptoKey> {
-  const enc  = new TextEncoder()
-  const salt = base64ToBytes(saltBase64)
-  const base = await subtle.importKey(
-      'raw', enc.encode(password),
-      'PBKDF2', false, ['deriveKey'])
-  return subtle.deriveKey(
-    { name: 'PBKDF2', hash: 'SHA-256',
-      salt: salt.buffer,
-      iterations: PBKDF2_ITERATIONS },
-    base,
-    { name: 'AES-GCM', length: 256 },
-    false, ['encrypt','decrypt'])
-}
-\end{lstlisting}
+
 
 \subsubsection{ECDSA Document Signatures}
 \label{sec:ecdsa}
@@ -1107,42 +1050,9 @@ The resulting signature is a 64-byte IEEE~P1363 raw signature ($r \| s$,
 without format conversion~\cite{fips1865}. Before verification, the
 backend recomputes $\mathcal{H}_C = \text{SHA-256}(IV \| D_{enc})$ from
 the IPFS-retrieved bytes and reconstructs the payload in~\eqref{eq:sigpayload}.
-Listing~\ref{lst:ecdsa} shows the server-side verifier.
+Listing~\ref{lst:ecdsa} (Appendix~\ref{app:listings}) shows the server-side verifier.
 
-\begin{lstlisting}[language=Java,
-    float=!t,
-    caption={Server-side ECDSA P-256 verification.
-    \texttt{SHA256withECDSAinP1363Format} natively consumes
-    WebCrypto's raw $r \| s$ output without format conversion.},
-    label=lst:ecdsa]
-// EcdsaVerifier.java
-public static boolean verify(
-        String compositePayloadB64,
-    String signatureB64,
-    String publicKeyJwkJson) {
-  try {
-    byte[] compositePayload =
-        Base64.getDecoder().decode(compositePayloadB64); 
-    byte[] sig =
-        Base64.getDecoder().decode(signatureB64);
-    PublicKey pub =
-        parseJwkPublicKey(publicKeyJwkJson);
-    Signature s = Signature.getInstance(
-        "SHA256withECDSAinP1363Format");
-    s.initVerify(pub);
-    // P = H_D (32 B) || H_C (32 B) || UTF-8(id_D)
-    // Prototype payload: content hashes + doc ID.
-    // Owner, timestamp, filename not signed in
-    // prototype; full metadata binding is future work.
-    s.update(compositePayload);
-    return s.verify(sig);
-  } catch (Exception e) {
-    log.warn("ECDSA verification error: {}",
-        e.getMessage());
-    return false;
-  }
-}
-\end{lstlisting}
+
 
 \subsubsection{Key Management Lifecycle}
 \label{sec:keymgmt}
@@ -1332,45 +1242,14 @@ failure reason and throws a \texttt{ServiceUnavailableException},
 returning HTTP~503 to the caller. This prevents new document releases
 through this path during the tested Fabric outage and prevents a malicious
 actor from using a Fabric disruption to bypass the chaincode authorization
-layer. Listing~\ref{lst:download} shows the two-layer
+layer. Listing~\ref{lst:download} (Appendix~\ref{app:listings}) shows the two-layer
 enforcement in the download path. If the requester has no firm or MSP binding,
 the service throws \texttt{AccessDeniedException} before invoking the
 Fabric gateway, ensuring the download path is fail-closed
 unconditionally for unauthenticated or incomplete principal bindings.
 
 % Listing 5 - Java two-layer ACL download
-\begin{lstlisting}[language=Java,
-    float=!t,
-    caption={Strict fail-closed ACL in the document download path. Layer 1:
-    Spring Security \texttt{@PreAuthorize}. Layer 2: \texttt{CheckAccess}
-    chaincode. If Fabric is unreachable, the system strictly denies access
-    and logs \texttt{FABRIC\_OUTAGE\_ACCESS\_DENIED}.},
-    label=lst:download]
-// DocumentService.java - downloadCiphertext()
-String requesterMspId = requester.getFirm() == null
-    ? null
-    : requester.getFirm().getMspId();
-if (requesterMspId == null || requesterMspId.isBlank()) {
-  throw new AccessDeniedException(
-      "Requester has no firm/MSP binding.");
-}
-boolean allowed;
-try {
-  allowed = fabricGatewayService.checkAccess(
-      docId.toString(),
-      requester.getId().toString(),
-      requesterMspId);
-} catch (FabricException e) {
-  auditService.log("FABRIC_OUTAGE_ACCESS_DENIED",
-      requester.getId(),
-      "DOCUMENT", docId.toString(), null,
-      "{\"reason\":\"" + e.getMessage() + "\"}");
-  throw new ServiceUnavailableException(
-      "Fabric network unreachable. Access strictly denied.");
-}
-if (!allowed) throw new AccessDeniedException(
-    "Access denied by chaincode.");
-\end{lstlisting}
+
 
 The complete two-layer enforcement path is summarized in
 Fig.~\ref{fig:rbac_acl_pipeline}, and
@@ -1427,7 +1306,7 @@ raises an exception on any UPDATE or DELETE attempt regardless of
 application privileges. A TRUNCATE-prevention trigger closes the
 PostgreSQL DDL bypass gap, and TRUNCATE privilege is revoked from
 all application roles at the schema level.
-Listing~\ref{lst:audittrigger} shows both triggers. These triggers
+Listing~\ref{lst:audittrigger} (Appendix~\ref{app:listings}) shows both triggers. These triggers
 are an \emph{operational convenience} that raises the bar against
 accidental or application-layer modification; they are not a
 security defense against a database administrator with superuser
@@ -1442,53 +1321,7 @@ audit trail via \texttt{GetHistoryForKey} without trusting the
 application server or its database~\cite{androulaki2018hyperledger}.
 
 % Listing 6 - SQL audit triggers
-\begin{lstlisting}[language=SQL,
-    float=!t,
-    caption={INSERT-only enforcement on \texttt{audit\_log}.
-    Row-level triggers block UPDATE and DELETE; a statement-level
-    trigger blocks TRUNCATE (which bypasses row-level triggers in
-    PostgreSQL). TRUNCATE privilege is also revoked from application
-    roles.},
-    label=lst:audittrigger]
--- 001-initial-schema.sql
-CREATE OR REPLACE FUNCTION
-    audit_log_prevent_modification()
-RETURNS TRIGGER LANGUAGE plpgsql AS $$
-BEGIN
-  IF TG_OP = 'UPDATE' THEN
-    RAISE EXCEPTION
-      'audit_log is append-only: UPDATE not permitted';
-  ELSIF TG_OP = 'DELETE' THEN
-    RAISE EXCEPTION
-      'audit_log is append-only: DELETE not permitted';
-  END IF;
-  RETURN NULL;
-END; $$;
 
-CREATE TRIGGER audit_log_no_modify
-  BEFORE UPDATE OR DELETE ON audit_log
-  FOR EACH ROW
-  EXECUTE FUNCTION audit_log_prevent_modification();
-
--- TRUNCATE protection (statement-level;
--- row-level triggers cannot catch TRUNCATE)
-CREATE OR REPLACE FUNCTION
-    audit_log_prevent_truncate()
-RETURNS TRIGGER LANGUAGE plpgsql AS $$
-BEGIN
-  RAISE EXCEPTION
-    'audit_log is append-only: TRUNCATE not permitted';
-  RETURN NULL;
-END; $$;
-
-CREATE TRIGGER audit_log_no_truncate
-  BEFORE TRUNCATE ON audit_log
-  FOR EACH STATEMENT
-  EXECUTE FUNCTION audit_log_prevent_truncate();
-
--- Revoke TRUNCATE from application roles
-REVOKE TRUNCATE ON audit_log FROM app_role;
-\end{lstlisting}
 
 Experiment~\hyperref[sec:exp_audit]{4} (Section~\ref{sec:exp_audit}) measures PostgreSQL
 \texttt{audit\_log} query P50 at 3.9\,ms for 1,000 events on Linux
@@ -2207,79 +2040,30 @@ detail not independently validated in the experiment campaign.
 \subsection{User Interface and Functional Showcase}
 \label{sec:ui}
 
-Figs.~\ref{fig:ui_overview} and~\ref{fig:ui_audit_views} show the
-prototype screens used during a normal user session. The registration
-screen (Fig.~\ref{fig:ui_registration}) collects a username, email
-address, password, and role selection before account creation. The
-dashboard (Fig.~\ref{fig:ui_dashboard}) is the landing page, presenting
-the primary navigation cards for case work, documents, communication,
-and audit-oriented tasks. The case-management view
-(Fig.~\ref{fig:ui_case_management}) displays active matters as cards with
-case titles, client names, status labels, short descriptions, and a
-control for creating a new case.
-
-The document views show the information exposed after a file is selected.
-The document-details dialog (Fig.~\ref{fig:ui_document_details}) lists the
-file name, associated case, owner, content identifier, transaction
-identifier, integrity hash, and available actions. The download dialog
-(Fig.~\ref{fig:ui_document_download}) shows the selected file, access
-status, wrapped-key reference, encrypted-file reference, password prompt,
-and separate controls for downloading the encrypted object or saving the
-decrypted copy.
-
-The transparency views separate record browsing from event review. The
-ledger explorer (Fig.~\ref{fig:ui_ledger_explorer}) groups recent entries
-by block and displays transaction IDs, channels, timestamps, transaction
-types, and document references. The audit-log view
+The prototype exposes the full workflow through a web interface:
+registration with role selection, a navigation dashboard, card-based case
+management, and document dialogs that surface the content identifier,
+Fabric transaction identifier, integrity hash, and wrapped-key reference
+for each file, together with controls for downloading the encrypted
+object or a locally decrypted copy. Because auditability is the central
+claim of this work, Fig.~\ref{fig:ui_audit_views} shows the two
+transparency views. The ledger explorer (Fig.~\ref{fig:ui_ledger_explorer})
+groups recent entries by block and displays transaction IDs, channels,
+timestamps, transaction types, and document references. The audit-log view
 (Fig.~\ref{fig:ui_audit_log}) lists application events with timestamps and
 expanded metadata so administrators can review user activity from within
-the prototype interface.
+the prototype interface. The remaining interface screenshots are provided
+as supplementary material.
 
-\begin{figure*}[!p]
-\centering
-\setlength{\fboxsep}{3pt}%
-\fbox{%
-\begin{minipage}{0.955\textwidth}
-\centering
-\subfloat[Registration]{%
-    \includegraphics[width=0.45\linewidth]{ui_registration.png}%
-    \label{fig:ui_registration}}\hfill
-\subfloat[Dashboard]{%
-    \includegraphics[width=0.45\linewidth]{ui_dashboard.png}%
-    \label{fig:ui_dashboard}}\\[0.25em]
-\subfloat[Case management]{%
-    \includegraphics[width=0.45\linewidth]{ui_case_management.png}%
-    \label{fig:ui_case_management}}\hfill
-\subfloat[Document details (TxID + integrity hash)]{%
-    \includegraphics[width=0.45\linewidth]{ui_document_details.png}%
-    \label{fig:ui_document_details}}
-\end{minipage}%
-}
-\caption{Prototype user interface.}
-\label{fig:ui_overview}
-\vspace{0.15em}
-\setlength{\fboxsep}{3pt}%
-\fbox{%
-\begin{minipage}{0.955\textwidth}
-\centering
-\begin{minipage}[c]{0.34\linewidth}
-\centering
-\subfloat[Document download (ECIES-wrapped key unwrapped client-side)]{%
-    \includegraphics[width=\linewidth]{ui_document_download.png}%
-    \label{fig:ui_document_download}}
-\end{minipage}\hfill
-\begin{minipage}[c]{0.58\linewidth}
+\begin{figure*}[!t]
 \centering
 \subfloat[Ledger explorer]{%
-    \includegraphics[width=0.79\linewidth]{ui_ledger_explorer.png}%
-    \label{fig:ui_ledger_explorer}}\\[0.25em]
+    \includegraphics[width=0.48\linewidth]{ui_ledger_explorer.png}%
+    \label{fig:ui_ledger_explorer}}\hfill
 \subfloat[Audit log]{%
-    \includegraphics[width=0.79\linewidth]{ui_audit_log.png}%
+    \includegraphics[width=0.48\linewidth]{ui_audit_log.png}%
     \label{fig:ui_audit_log}}
-\end{minipage}
-\end{minipage}%
-}
-\caption{Audit and transparency views.}
+\caption{Audit and transparency views of the prototype interface.}
 \label{fig:ui_audit_views}
 \end{figure*}
 % =========================================================================
@@ -3065,103 +2849,39 @@ modification~\cite{fabricChaincodeLifecycleDoc,nist80053}.
 
 \subsection{Future Work}
 \label{sec:future_work}
-
-\subsubsection{Real-Time Anomaly Detection}
-The append-only Fabric audit trail enables continuous monitoring for
-anomalous access patterns. Future work could integrate machine
-learning classifiers trained on \texttt{GetHistoryForKey} query
-sequences to flag unusual access frequency or bulk downloads. The
-append-only \texttt{audit\_log} table provides a low-latency feed
-(3.9\,ms P50) suitable for near-real-time
-analysis~\cite{siddamsetti2024anomaly}.
-
-\subsubsection{Privacy-Preserving Access Verification}
-Future work could investigate privacy-preserving authorization
-mechanisms, including zero-knowledge proofs for selected policy
-checks~\cite{groth2016}, together with batching or cover-traffic
-mechanisms to reduce timing and frequency leakage~\cite{fabricPDCDoc}.
-
-\subsubsection{Formal Verification of Chaincode}
-The \texttt{CheckAccess} and \texttt{RegisterDocument} chaincode
-functions implement security-critical logic. Formal verification
-using model-checking or theorem-proving tools would provide
-machine-checked guarantees of access-control completeness and
-absence of chaincode-level bypasses under the modeled
-policy~\cite{permenev2020verx}.
-
-\subsubsection{Comparative Complexity and Cost Modeling}
-The present evaluation is empirical and prototype-focused. It compares the
-measured Fabric \texttt{CheckAccess} path with a PostgreSQL-only ACL read path
-and reports absolute write latency for the Fabric-backed registration path,
-but it does not provide a formal asymptotic cost model for alternative
-architectures. Future work will develop a comparative complexity and cost
-analysis of application-only authorization, append-only database authorization,
-Fabric-as-audit-log designs, and Fabric-on-path \texttt{CheckAccess}
-authorization. Such a model should account for endorsement, ordering,
-validation, access-check query cost, revocation, audit-history retrieval,
-and failure handling across increasing numbers of documents, users,
-organizations, and policy updates.
-
-
-\subsubsection{Decentralized Identity Integration}
-Replacing the prototype's centralized PostgreSQL identity database
-with W3C Decentralized Identifiers (DIDs)~\cite{sporny2023did}
-would reduce reliance on a single institution's identity store while
-preserving consortium governance. Such integration would need to
-coexist with Fabric MSP enrollment or be bridged through a DID-to-MSP
-credential mapping layer.
-
-\subsubsection{Cross-Network Evidence Collection}
-Future work could develop interoperability protocols enabling evidence
-registered on one consortium's Fabric network to be verified by a
-different consortium without shared channel membership, using
-cross-chain relay mechanisms or verifiable credential
-exchange~\cite{sporny2022vc}.
-
-\subsubsection{Cross-Version CID Chaining}
-Future work could investigate explicit cross-version CID chaining for document-version provenance. In the current prototype, document integrity is established through plaintext-hash anchoring, ciphertext/CID anchoring, and Fabric ledger history rather than through a separate CID chain linking successive document versions.
-
-
-\subsubsection{IPFS Persistence Incentive Mechanism}
-The 2-node private IPFS swarm relies on contractual obligations for
-pinning governance. A formal incentive mechanism for private-swarm
-pinning remains future work; in the evaluated consortium setting,
-availability is instead governed contractually through node-operation
-obligations.
-
-\subsubsection{Hardware Security Module Integration}
-Full production deployment requires HSM integration at two levels:
-HSM-backed Fabric CA enrollment issuing per-user X.509 certificates
-with FIPS~140-3-compliant key storage~\cite{fips1403,fabricCADoc},
-and client-side WebAuthn/FIDO2 hardware authenticators replacing the
-current \texttt{localStorage} key store. Both upgrades require no
-chaincode modification~\cite{nist800634,w3cWebAuthnL3,nist800131a}.
-
-\subsubsection{Key Recovery and Escrow Governance}
 \label{sec:key_recovery_escrow}
-The current prototype does not implement production-grade key recovery.
-Because client private keys are stored in browser \texttt{localStorage}
-under password-derived protection, loss of browser storage or the wrapping
-password can make the corresponding signing or wrapping key unrecoverable.
-Future work will implement a consortium-governed recovery workflow using
-KMS/HSM-backed escrow, threshold administrative approval, auditable recovery
-requests, and secure re-wrapping of recovered keys. Such a workflow must
-avoid giving any single administrator unilateral access to user private keys
-and must be evaluated for insider-abuse resistance before production use.
-
-\subsubsection{Regulator-Facing Compliance Interfaces}
 \label{sec:regulator_interfaces}
-In the current prototype, the Regulator organization participates only as
-an ordering node and a passive channel peer with the same query interface
-available to other consortium members. Future work will add
-application-layer regulatory audit interfaces, dedicated read-only
-compliance dashboards that expose ledger history without granting
-document-release authority, and regulator-specific endorsement policies
-(e.g., \texttt{AND('LawFirmAMSP.peer', 'RegulatorMSP.peer')}) requiring
-joint regulator-firm approval for high-value asset transfers. These
-extensions require no chaincode redesign, since \texttt{CheckAccess} and
-\texttt{GetHistoryForKey} already support additional endorsement and
-query-scope configuration.
+
+Three directions dominate the path to production. First, per-user Fabric
+CA enrollment with HSM-backed or WebAuthn/FIDO2 key
+storage~\cite{fips1403,fabricCADoc,w3cWebAuthnL3} would replace the shared
+administrative MSP identity and the password-protected
+\texttt{localStorage} key store, closing the custodial-attribution gap
+identified in Section~\ref{sec:prototype_scope}; the same infrastructure
+supports a consortium-governed key-recovery workflow with KMS/HSM-backed
+escrow, threshold administrative approval, and auditable re-wrapping of
+recovered keys, so that no single administrator gains unilateral access to
+user private keys. Second, formal verification of the \texttt{CheckAccess}
+and \texttt{RegisterDocument} chaincode functions would provide
+machine-checked guarantees of access-control completeness and absence of
+chaincode-level bypasses under the modeled policy~\cite{permenev2020verx}.
+Third, privacy-preserving access verification, including zero-knowledge
+proofs for selected policy checks and batching or cover-traffic mechanisms
+to reduce timing and frequency leakage, would address the on-chain
+metadata exposure discussed in
+Section~\ref{sec:limitations}~\cite{groth2016,fabricPDCDoc}.
+
+Further directions include regulator-facing compliance interfaces
+(read-only audit dashboards and joint endorsement policies such as
+\texttt{AND('LawFirmAMSP.peer', 'RegulatorMSP.peer')}), real-time anomaly
+detection over the low-latency audit feed~\cite{siddamsetti2024anomaly},
+decentralized identity integration bridged to Fabric MSP
+enrollment~\cite{sporny2023did}, cross-network evidence verification via
+relay mechanisms or verifiable credentials~\cite{sporny2022vc},
+cross-version CID chaining for document-version provenance, formal
+incentive mechanisms for private-swarm pinning, and a comparative
+complexity and cost model spanning application-only, append-only database,
+audit-log, and on-path authorization architectures.
 % =========================================================================
 % SECTION VIII --- CONCLUSION
 % =========================================================================
@@ -3293,17 +3013,13 @@ workload baseline. The fail-closed outage experiment further showed that
 successful downloads fell to zero during Fabric unavailability, confirming
 the evaluated download path's strict denial behavior.
 
-Beyond the quantitative results, this work makes four contributions. First,
-it demonstrates a practical shift in the enforcement boundary from
-application-only trust to ledger-verifiable access-control state on the normal
-document-release path. Second, the prototype implements time-bounded grants
-and revocation logic in chaincode, including expiry evaluation during access
-checks. Third, it introduces a dual-store audit design that separates
-low-latency operational queries from ledger-verifiable history. Fourth, it
-provides an evidence-backed performance evaluation covering throughput,
-latency, file-size effects, audit queries, WAN delay, cryptographic overhead,
-ledger-history depth, \texttt{BatchTimeout} sensitivity, and fail-closed
-outage behavior.
+These results substantiate the contributions set out in
+Section~\ref{sec:contributions}: a measured relocation of the enforcement
+boundary to ledger-verifiable access-control state, chaincode-enforced
+time-bounded grants and revocation, a dual-store audit design separating
+low-latency operational queries from ledger-verifiable history, and a
+nine-experiment evaluation spanning throughput to fail-closed outage
+behavior.
 
 Table~\ref{tab:framework_vs_prototype} documents the gaps between framework
 design and current implementation, bounding the measured prototype relative
@@ -3320,6 +3036,188 @@ key protection, privacy-preserving access verification, formal verification
 of chaincode policy logic, stronger IPFS persistence governance, and
 compliance mechanisms for jurisdictions where append-only on-chain metadata
 raises erasure or data-protection concerns.
+
+
+\appendix
+\section{Implementation listings}
+\label{app:listings}
+
+This appendix collects the implementation listings referenced in the main
+text: browser-side encryption and key derivation, server-side signature
+verification, the fail-closed download path, and the audit-log trigger
+schema.
+
+\begin{lstlisting}[language=TypeScript,
+    caption={Browser AES-256-GCM document encryption. Fresh 256-bit
+    key and 96-bit IV generated per document via
+    \texttt{window.crypto.getRandomValues}. SHA-256 hash computed of
+    plaintext \emph{before} encryption. Server receives only
+    IV-prepended ciphertext.},
+    label=lst:encrypt]
+// frontend/src/lib/crypto.ts
+export async function encryptDocument(
+    file: ArrayBuffer
+): Promise<EncryptedDocument> {
+  const key = await subtle.generateKey(
+      { name: 'AES-GCM', length: 256 },
+      true, ['encrypt','decrypt'])
+  const iv = crypto.getRandomValues(new Uint8Array(12))
+  const [ciphertext, plainHashBuffer, rawKey] = await Promise.all([
+    subtle.encrypt({ name: 'AES-GCM', iv }, key, file),
+    subtle.digest('SHA-256', file),  // Plaintext hash
+    subtle.exportKey('raw', key),
+  ])
+  // Hash the resulting ciphertext to bind the IPFS payload
+  const ivAndCiphertext = concat(iv, ciphertext)
+  const cipherHashBuffer = await subtle.digest('SHA-256', ivAndCiphertext)
+  return {
+    ciphertextB64: bytesToBase64(new Uint8Array(ciphertext)),
+    ivB64:         bytesToBase64(iv),
+    plainHashB64:  bytesToBase64(new Uint8Array(plainHashBuffer)),
+    cipherHashB64: bytesToBase64(new Uint8Array(cipherHashBuffer)),
+    keyB64:        bytesToBase64(new Uint8Array(rawKey)),
+  }
+}
+\end{lstlisting}
+
+\begin{lstlisting}[language=TypeScript,
+    caption={PBKDF2-SHA256 key derivation at 600,000 iterations (OWASP
+    password-storage guidance; exceeds the NIST SP~800-132 minimum work
+    factor). Derives the AES-256-GCM wrapping key protecting both ECIES
+    and ECDSA private keys in \texttt{localStorage}.},
+    label=lst:pbkdf2]
+// frontend/src/lib/crypto.ts
+const PBKDF2_ITERATIONS = 600000
+export async function derivePbkdf2Key(
+    password: string, saltBase64: string
+): Promise<CryptoKey> {
+  const enc  = new TextEncoder()
+  const salt = base64ToBytes(saltBase64)
+  const base = await subtle.importKey(
+      'raw', enc.encode(password),
+      'PBKDF2', false, ['deriveKey'])
+  return subtle.deriveKey(
+    { name: 'PBKDF2', hash: 'SHA-256',
+      salt: salt.buffer,
+      iterations: PBKDF2_ITERATIONS },
+    base,
+    { name: 'AES-GCM', length: 256 },
+    false, ['encrypt','decrypt'])
+}
+\end{lstlisting}
+
+\begin{lstlisting}[language=Java,
+    caption={Server-side ECDSA P-256 verification.
+    \texttt{SHA256withECDSAinP1363Format} natively consumes
+    WebCrypto's raw $r \| s$ output without format conversion.},
+    label=lst:ecdsa]
+// EcdsaVerifier.java
+public static boolean verify(
+        String compositePayloadB64,
+    String signatureB64,
+    String publicKeyJwkJson) {
+  try {
+    byte[] compositePayload =
+        Base64.getDecoder().decode(compositePayloadB64); 
+    byte[] sig =
+        Base64.getDecoder().decode(signatureB64);
+    PublicKey pub =
+        parseJwkPublicKey(publicKeyJwkJson);
+    Signature s = Signature.getInstance(
+        "SHA256withECDSAinP1363Format");
+    s.initVerify(pub);
+    // P = H_D (32 B) || H_C (32 B) || UTF-8(id_D)
+    // Prototype payload: content hashes + doc ID.
+    // Owner, timestamp, filename not signed in
+    // prototype; full metadata binding is future work.
+    s.update(compositePayload);
+    return s.verify(sig);
+  } catch (Exception e) {
+    log.warn("ECDSA verification error: {}",
+        e.getMessage());
+    return false;
+  }
+}
+\end{lstlisting}
+
+\begin{lstlisting}[language=Java,
+    caption={Strict fail-closed ACL in the document download path. Layer 1:
+    Spring Security \texttt{@PreAuthorize}. Layer 2: \texttt{CheckAccess}
+    chaincode. If Fabric is unreachable, the system strictly denies access
+    and logs \texttt{FABRIC\_OUTAGE\_ACCESS\_DENIED}.},
+    label=lst:download]
+// DocumentService.java - downloadCiphertext()
+String requesterMspId = requester.getFirm() == null
+    ? null
+    : requester.getFirm().getMspId();
+if (requesterMspId == null || requesterMspId.isBlank()) {
+  throw new AccessDeniedException(
+      "Requester has no firm/MSP binding.");
+}
+boolean allowed;
+try {
+  allowed = fabricGatewayService.checkAccess(
+      docId.toString(),
+      requester.getId().toString(),
+      requesterMspId);
+} catch (FabricException e) {
+  auditService.log("FABRIC_OUTAGE_ACCESS_DENIED",
+      requester.getId(),
+      "DOCUMENT", docId.toString(), null,
+      "{\"reason\":\"" + e.getMessage() + "\"}");
+  throw new ServiceUnavailableException(
+      "Fabric network unreachable. Access strictly denied.");
+}
+if (!allowed) throw new AccessDeniedException(
+    "Access denied by chaincode.");
+\end{lstlisting}
+
+\begin{lstlisting}[language=SQL,
+    caption={INSERT-only enforcement on \texttt{audit\_log}.
+    Row-level triggers block UPDATE and DELETE; a statement-level
+    trigger blocks TRUNCATE (which bypasses row-level triggers in
+    PostgreSQL). TRUNCATE privilege is also revoked from application
+    roles.},
+    label=lst:audittrigger]
+-- 001-initial-schema.sql
+CREATE OR REPLACE FUNCTION
+    audit_log_prevent_modification()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+BEGIN
+  IF TG_OP = 'UPDATE' THEN
+    RAISE EXCEPTION
+      'audit_log is append-only: UPDATE not permitted';
+  ELSIF TG_OP = 'DELETE' THEN
+    RAISE EXCEPTION
+      'audit_log is append-only: DELETE not permitted';
+  END IF;
+  RETURN NULL;
+END; $$;
+
+CREATE TRIGGER audit_log_no_modify
+  BEFORE UPDATE OR DELETE ON audit_log
+  FOR EACH ROW
+  EXECUTE FUNCTION audit_log_prevent_modification();
+
+-- TRUNCATE protection (statement-level;
+-- row-level triggers cannot catch TRUNCATE)
+CREATE OR REPLACE FUNCTION
+    audit_log_prevent_truncate()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+BEGIN
+  RAISE EXCEPTION
+    'audit_log is append-only: TRUNCATE not permitted';
+  RETURN NULL;
+END; $$;
+
+CREATE TRIGGER audit_log_no_truncate
+  BEFORE TRUNCATE ON audit_log
+  FOR EACH STATEMENT
+  EXECUTE FUNCTION audit_log_prevent_truncate();
+
+-- Revoke TRUNCATE from application roles
+REVOKE TRUNCATE ON audit_log FROM app_role;
+\end{lstlisting}
 
 % =========================================================================
 % ELSEVIER BACK MATTER (required declarations, before the reference list)

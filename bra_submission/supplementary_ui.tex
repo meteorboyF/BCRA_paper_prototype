@@ -1,0 +1,70 @@
+% Supplementary material: prototype user-interface screenshots moved out of
+% the main text (BRA submission). Compile standalone with pdflatex.
+\documentclass[12pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage[caption=false]{subfig}
+\graphicspath{{figures/}}
+\pagestyle{plain}
+
+\title{Supplementary Material: Prototype User Interface\\
+\large A Secure and Auditable Framework for Legal Data Management:\\
+A Hybrid Approach Using Hyperledger Fabric and IPFS}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+This supplement collects the prototype interface screenshots referenced in
+the main text (Section ``User Interface and Functional Showcase''). The
+audit and transparency views (ledger explorer and audit log) appear in the
+main text; the remaining screens are shown here.
+
+The registration screen (Fig.~\ref{fig:s_registration}) collects a
+username, email address, password, and role selection before account
+creation. The dashboard (Fig.~\ref{fig:s_dashboard}) is the landing page,
+presenting the primary navigation cards for case work, documents,
+communication, and audit-oriented tasks. The case-management view
+(Fig.~\ref{fig:s_case_management}) displays active matters as cards with
+case titles, client names, status labels, short descriptions, and a
+control for creating a new case.
+
+The document views show the information exposed after a file is selected.
+The document-details dialog (Fig.~\ref{fig:s_document_details}) lists the
+file name, associated case, owner, content identifier, transaction
+identifier, integrity hash, and available actions. The download dialog
+(Fig.~\ref{fig:s_document_download}) shows the selected file, access
+status, wrapped-key reference, encrypted-file reference, password prompt,
+and separate controls for downloading the encrypted object or saving the
+decrypted copy.
+
+\begin{figure}[p]
+\centering
+\subfloat[Registration]{%
+    \includegraphics[width=0.48\linewidth]{ui_registration.png}%
+    \label{fig:s_registration}}\hfill
+\subfloat[Dashboard]{%
+    \includegraphics[width=0.48\linewidth]{ui_dashboard.png}%
+    \label{fig:s_dashboard}}\\[0.5em]
+\subfloat[Case management]{%
+    \includegraphics[width=0.48\linewidth]{ui_case_management.png}%
+    \label{fig:s_case_management}}\hfill
+\subfloat[Document details (TxID + integrity hash)]{%
+    \includegraphics[width=0.48\linewidth]{ui_document_details.png}%
+    \label{fig:s_document_details}}
+\caption{Prototype user interface: registration, dashboard, case
+management, and document details.}
+\label{fig:s_ui_overview}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\subfloat[Document download (ECIES-wrapped key unwrapped client-side)]{%
+    \includegraphics[width=0.5\linewidth]{ui_document_download.png}%
+    \label{fig:s_document_download}}
+\caption{Document download dialog.}
+\label{fig:s_ui_download}
+\end{figure}
+
+\end{document}

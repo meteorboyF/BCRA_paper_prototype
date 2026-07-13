@@ -580,18 +580,18 @@ M.~Finck, F.~Pallas, They who must not be identified--distinguishing personal
 \newblock \href {https://doi.org/10.1093/idpl/ipz026}
   {\path{doi:10.1093/idpl/ipz026}}.
 
-\bibitem{siddamsetti2024anomaly}
-S.~Siddamsetti, Anomaly detection in blockchain using machine learning, Journal
-  of Electrical Systems 20~(3) (2024) 619--634.
-\newblock \href {https://doi.org/10.52783/jes.2988}
-  {\path{doi:10.52783/jes.2988}}.
-
 \bibitem{permenev2020verx}
 A.~Permenev, D.~Dimitrov, P.~Tsankov, D.~Drachsler-Cohen, M.~Vechev, {VerX}:
   Safety verification of smart contracts, in: 2020 IEEE Symposium on Security
   and Privacy (SP), IEEE, 2020, pp. 1661--1677.
 \newblock \href {https://doi.org/10.1109/SP40000.2020.00024}
   {\path{doi:10.1109/SP40000.2020.00024}}.
+
+\bibitem{siddamsetti2024anomaly}
+S.~Siddamsetti, Anomaly detection in blockchain using machine learning, Journal
+  of Electrical Systems 20~(3) (2024) 619--634.
+\newblock \href {https://doi.org/10.52783/jes.2988}
+  {\path{doi:10.52783/jes.2988}}.
 
 \bibitem{sporny2023did}
 M.~Sporny, A.~Guy, M.~Sabadello, D.~Reed,
