@@ -1,0 +1,17 @@
+% Highlights for "A Secure and Auditable Framework for Legal Data Management:
+% A Hybrid Approach Using Hyperledger Fabric and IPFS"
+% BRA requirement: separate editable file, 3-5 bullets, max 85 characters each
+% (including spaces). All bullets are drawn from claims already in the manuscript.
+\documentclass{article}
+\usepackage[margin=1in]{geometry}
+\pagestyle{empty}
+\begin{document}
+\section*{Highlights}
+\begin{itemize}
+\item Hyperledger Fabric chaincode gates every document release on the download path
+\item Fail-closed design: downloads drop to zero in a Fabric outage, no ACL fallback
+\item On-path ledger access checks add no significant delay over a database baseline
+\item Tuned ordering sustains 193 TPS, above a 1,000-user legal workload estimate
+\item Encrypted IPFS storage keeps ledger commit latency independent of file size
+\end{itemize}
+\end{document}
