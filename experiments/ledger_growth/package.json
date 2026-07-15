@@ -1,0 +1,9 @@
+{
+  "name": "pangochain-ledger-growth",
+  "private": true,
+  "description": "Experiment 12 - document-volume / ledger-growth scaling (IMPROVEMENTS.md item 3.3)",
+  "dependencies": {
+    "@grpc/grpc-js": "^1.10.3",
+    "@hyperledger/fabric-gateway": "^1.5.0"
+  }
+}

@@ -50,3 +50,6 @@ experiments/ipfs_cost/.addrfilters-*.json
 # Experiments: throwaway validation runs — never evidence
 experiments/caliper/results/smoke/
 experiments/ipfs_cost/results/smoke/
+experiments/ledger_growth/node_modules/
+experiments/ledger_growth/crypto/
+experiments/ledger_growth/.state.json

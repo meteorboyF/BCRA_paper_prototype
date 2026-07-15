@@ -9,10 +9,11 @@ Benchmark and evaluation code for the BRA submission. Manuscript lives on the
 |---|---|---|---|---|
 | 10 — IPFS storage/retrieval cost | 3.4 | [`ipfs_cost/RESULTS.md`](ipfs_cost/RESULTS.md) | `ipfs_cost/results/20260715_173114/` | `fig10_ipfs_cost.png/.pdf` |
 | 11 — Caliper direct-Fabric benchmark | 3.1 | [`caliper/RESULTS.md`](caliper/RESULTS.md) | `caliper/results/20260715_180121/` | `fig11_caliper.png/.pdf` |
+| 12 — Ledger-growth scaling (10³–10⁶, complete) | 3.3 | [`ledger_growth/RESULTS.md`](ledger_growth/RESULTS.md) | `ledger_growth/results/20260715_183009/` | `fig12_ledger_growth.png/.pdf` |
 
-Planned next (same pattern, one dir + RESULTS.md each): item 3.3
-ledger-growth scaling, item 3.2 network-size scaling, item 3.5a
-passive-audit-log baseline, item 3.6 consolidated statistics.
+Planned next (same pattern, one dir + RESULTS.md each): item 3.2
+network-size scaling, item 3.5a passive-audit-log baseline, item 3.6
+consolidated statistics.
 
 ## Layout
 
