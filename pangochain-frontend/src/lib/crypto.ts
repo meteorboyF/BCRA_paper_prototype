@@ -93,8 +93,9 @@ export async function unwrapPrivateKey(
 export interface EncryptedDocument {
   ciphertextB64: string
   ivB64: string
-  hashB64: string   // SHA-256 of original plaintext for on-chain anchoring
-  keyB64: string    // raw AES-256 key bytes (base64) — wrap before sending to server
+  hashB64: string             // hD: SHA-256 of original plaintext for on-chain anchoring
+  ciphertextHashB64: string   // hC: SHA-256 of (IV ∥ D_enc) — the exact bytes pinned to IPFS
+  keyB64: string              // raw AES-256 key bytes (base64) — wrap before sending to server
 }
 
 export async function encryptDocument(file: ArrayBuffer): Promise<EncryptedDocument> {
@@ -108,10 +109,19 @@ export async function encryptDocument(file: ArrayBuffer): Promise<EncryptedDocum
     subtle.exportKey('raw', key),
   ])
 
+  // hC = SHA-256(IV ∥ D_enc): hash the exact IPFS payload, which the server assembles as
+  // iv(12) ∥ ciphertext (see DocumentService.storeDocument and SignDocumentModal's iv = first 12 bytes).
+  const ciphertextBytes = new Uint8Array(ciphertext)
+  const ipfsPayload = new Uint8Array(iv.length + ciphertextBytes.length)
+  ipfsPayload.set(iv, 0)
+  ipfsPayload.set(ciphertextBytes, iv.length)
+  const ciphertextHashBuffer = await subtle.digest('SHA-256', ipfsPayload)
+
   return {
-    ciphertextB64: bytesToBase64(new Uint8Array(ciphertext)),
+    ciphertextB64: bytesToBase64(ciphertextBytes),
     ivB64: bytesToBase64(iv),
     hashB64: bytesToBase64(new Uint8Array(hashBuffer)),
+    ciphertextHashB64: bytesToBase64(new Uint8Array(ciphertextHashBuffer)),
     keyB64: bytesToBase64(new Uint8Array(rawKey)),
   }
 }

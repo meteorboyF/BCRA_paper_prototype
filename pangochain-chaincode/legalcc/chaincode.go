@@ -90,7 +90,11 @@ func (c *LegalContract) GrantAccess(
 		return fmt.Errorf("invalid capability %q: must be owner|write|read", capability)
 	}
 
-	now := time.Now().UTC().Format(time.RFC3339)
+	txTimestamp, err := ctx.GetStub().GetTxTimestamp()
+	if err != nil {
+		return fmt.Errorf("failed to get tx timestamp: %w", err)
+	}
+	now := time.Unix(txTimestamp.Seconds, 0).UTC().Format(time.RFC3339)
 	doc.ACL[targetSubject] = &Grant{
 		Capability:    capability,
 		SubjectOrg:    subjectOrg,
@@ -140,7 +144,11 @@ func (c *LegalContract) RevokeAccess(
 		return fmt.Errorf("no access grant found for subject %s", targetSubject)
 	}
 
-	now := time.Now().UTC().Format(time.RFC3339)
+	txTimestamp, err := ctx.GetStub().GetTxTimestamp()
+	if err != nil {
+		return fmt.Errorf("failed to get tx timestamp: %w", err)
+	}
+	now := time.Unix(txTimestamp.Seconds, 0).UTC().Format(time.RFC3339)
 	grant.Status = StatusRevoked
 	grant.RevokedAt = now
 
@@ -178,7 +186,13 @@ func (c *LegalContract) CheckAccess(
 		return "false", nil
 	}
 
-	now := time.Now().UTC()
+	// Derive current time from the Fabric transaction timestamp so the access decision is
+	// deterministic across all endorsing peers (time.Now() would diverge and break endorsement).
+	txTimestamp, err := ctx.GetStub().GetTxTimestamp()
+	if err != nil {
+		return "false", fmt.Errorf("failed to get tx timestamp: %w", err)
+	}
+	now := time.Unix(txTimestamp.Seconds, 0).UTC()
 
 	// Check user-level grant first
 	if grant, ok := doc.ACL[userID]; ok && grant.Status == StatusActive {

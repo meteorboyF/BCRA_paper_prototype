@@ -14,7 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.time.Instant;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -51,7 +54,10 @@ public class ESignatureService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "No signing public key registered — re-register to enable ECDSA signatures");
         }
-        boolean ecdsaValid = EcdsaVerifier.verify(req.documentHashB64(), req.signatureB64(), signerPublicKeyJwk);
+        // The signer binds hD ∥ hC ∥ id_D: verify the signature over SHA-256( documentHashB64 |
+        // ciphertextHashB64 | docId ), matching the composite the browser signs (see SignDocumentModal).
+        String signingCompositeB64 = signingCompositeB64(req.documentHashB64(), req.ciphertextHashB64(), docId);
+        boolean ecdsaValid = EcdsaVerifier.verify(signingCompositeB64, req.signatureB64(), signerPublicKeyJwk);
         if (!ecdsaValid) {
             log.warn("ECDSA verification failed: docId={} signer={}", docId, signer.getEmail());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
@@ -63,8 +69,8 @@ public class ESignatureService {
         try {
             if (fabricGatewayService != null) {
                 String payload = String.format(
-                        "{\"docId\":\"%s\",\"signerId\":\"%s\",\"documentHashB64\":\"%s\",\"timestamp\":\"%s\"}",
-                        docId, signer.getId(), req.documentHashB64(), Instant.now());
+                        "{\"docId\":\"%s\",\"signerId\":\"%s\",\"documentHashB64\":\"%s\",\"ciphertextHashB64\":\"%s\",\"timestamp\":\"%s\"}",
+                        docId, signer.getId(), req.documentHashB64(), req.ciphertextHashB64(), Instant.now());
                 fabricTxId = fabricGatewayService.submitTransaction(
                         "LogAuditEvent",
                         "DOCUMENT_SIGNED",
@@ -95,6 +101,17 @@ public class ESignatureService {
         log.info("ECDSA signature verified and anchored: docId={} signer={} fabricTxId={}",
                 docId, signer.getEmail(), fabricTxId);
         return toDto(sig, signer.getEmail());
+    }
+
+    /** SHA-256( documentHashB64 | ciphertextHashB64 | docId ), base64 — the message the signer signs. */
+    private static String signingCompositeB64(String documentHashB64, String ciphertextHashB64, UUID docId) {
+        try {
+            String composite = documentHashB64 + "|" + ciphertextHashB64 + "|" + docId;
+            byte[] digest = MessageDigest.getInstance("SHA-256").digest(composite.getBytes(StandardCharsets.UTF_8));
+            return Base64.getEncoder().encodeToString(digest);
+        } catch (Exception e) {
+            throw new IllegalStateException("SHA-256 unavailable", e);
+        }
     }
 
     public List<ESignatureDto> listForDocument(UUID docId) {

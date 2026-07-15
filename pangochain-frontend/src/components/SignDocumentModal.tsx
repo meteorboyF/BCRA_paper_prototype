@@ -31,6 +31,7 @@ export function SignDocumentModal({ docId, fileName, onClose, onSigned }: Props)
   const [stage, setStage] = useState<Stage>('idle')
   const [password, setPassword] = useState('')
   const [docHash, setDocHash] = useState('')
+  const [ciphertextHash, setCiphertextHash] = useState('')  // hC = SHA-256(IV ∥ D_enc)
   const [intentName, setIntentName] = useState('')
   const [errorMsg, setErrorMsg] = useState('')
   const [signatures, setSignatures] = useState<ESignatureDto[]>([])
@@ -66,6 +67,10 @@ export function SignDocumentModal({ docId, fileName, onClose, onSigned }: Props)
       const iv = fullBytes.slice(0, 12)
       const ciphertext = fullBytes.slice(12)
       const docKey = base64ToBytes(docKeyB64)
+
+      // hC = SHA-256(IV ∥ D_enc): hash the exact IPFS payload (iv ∥ ciphertext) we just fetched.
+      const ciphertextHashBuffer = await window.crypto.subtle.digest('SHA-256', fullBytes)
+      setCiphertextHash(bytesToBase64(new Uint8Array(ciphertextHashBuffer)))
 
       const cryptoKey = await window.crypto.subtle.importKey(
         'raw', docKey.buffer as ArrayBuffer, { name: 'AES-GCM', length: 256 }, false, ['decrypt'],
@@ -103,11 +108,16 @@ export function SignDocumentModal({ docId, fileName, onClose, onSigned }: Props)
         storedSigningKey.encryptedB64,
       )
 
-      // Sign the document hash with ECDSA P-256 — SHA-256 is applied to docHash bytes internally
-      const signatureB64 = await signDocumentHash(docHash, ecdsaPrivateKey)
+      // Bind the signature to hD ∥ hC ∥ id_D so it cannot be replayed on another document or
+      // detached from its ciphertext. Composite must match the server: SHA-256( hD | hC | docId ).
+      const composite = `${docHash}|${ciphertextHash}|${docId}`
+      const compositeDigest = await window.crypto.subtle.digest('SHA-256', new TextEncoder().encode(composite))
+      const compositeB64 = bytesToBase64(new Uint8Array(compositeDigest))
+      const signatureB64 = await signDocumentHash(compositeB64, ecdsaPrivateKey)
 
       await api.post(`/signatures/${docId}/sign`, {
         documentHashB64: docHash,
+        ciphertextHashB64: ciphertextHash,
         signatureB64,
       })
 
