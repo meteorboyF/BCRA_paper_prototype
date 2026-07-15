@@ -1,0 +1,12 @@
+{
+  "os": "Linux Angkon-Lappy 6.8.0-124-generic #124~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Tue May 26 21:05:19 UTC  x86_64 x86_64 x86_64 GNU/Linux",
+  "cpu": "Intel(R) Core(TM) Ultra 5 125H",
+  "java_version": "openjdk version \"21.0.11\" 2026-04-21",
+  "node_version": "v18.20.8",
+  "docker_version": "Docker version 29.5.0, build 98f1464",
+  "git_commit": "d66f54b6b2adc7752b6b3b39bef809cc70bcffc5",
+  "branch": "main",
+  "backend_port": "8080",
+  "fabric_enabled": true,
+  "fabric_outage_method": "docker stop peers: peer0.firma.pangochain.com peer0.firmb.pangochain.com peer0.regulator.pangochain.com"
+}

@@ -36,3 +36,17 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Fabric generated artifacts (created by pangochain-fabric `make up`, root-owned)
+pangochain-fabric/crypto-config/
+pangochain-fabric/channel-artifacts/
+
+# Experiments: local tooling and regenerated material
+experiments/.venv/
+experiments/caliper/node_modules/
+experiments/caliper/crypto/
+experiments/ipfs_cost/.addrfilters-*.json
+
+# Experiments: throwaway validation runs — never evidence
+experiments/caliper/results/smoke/
+experiments/ipfs_cost/results/smoke/

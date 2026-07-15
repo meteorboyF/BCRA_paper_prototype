@@ -1,0 +1,30 @@
+# Third IPFS node for Experiment 10 (IPFS storage/retrieval cost, IMPROVEMENTS.md item 3.4).
+# Joins the existing app network so it can swarm-peer with pangochain-ipfs / pangochain-ipfs2.
+# The network name is machine-specific (compose project prefix); run.sh exports PANGO_NET.
+#
+#   PANGO_NET=$(docker network ls --format '{{.Name}}' | grep pangochain-net) \
+#     docker compose -f experiments/ipfs_cost/docker-compose.ipfs3.yml up -d
+
+services:
+  ipfs3:
+    image: ipfs/kubo:v0.27.0
+    container_name: pangochain-ipfs3
+    environment:
+      IPFS_PROFILE: server
+    ports:
+      - "5003:5001"   # API (tertiary)
+      - "8083:8080"   # Gateway (tertiary)
+      - "4003:4001"   # Swarm (tertiary)
+    volumes:
+      - ipfs3_data:/data/ipfs
+    networks:
+      - pangochain-net
+    restart: unless-stopped
+
+volumes:
+  ipfs3_data:
+
+networks:
+  pangochain-net:
+    external: true
+    name: ${PANGO_NET:-fardeen_codex_dhaka_meetup_hackathon_pangochain-net}

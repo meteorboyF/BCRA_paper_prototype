@@ -1,0 +1,28 @@
+name: pangochain-network
+version: "2.0"
+
+caliper:
+  blockchain: fabric
+
+channels:
+  - channelName: legal-channel
+    contracts:
+      - id: legalcc
+
+organizations:
+  - mspid: FirmAMSP
+    identities:
+      certificates:
+        - name: admin
+          clientPrivateKey:
+            path: ../../pangochain-fabric/crypto-config/peerOrganizations/firma.pangochain.com/users/Admin@firma.pangochain.com/msp/keystore/priv_sk
+          clientSignedCert:
+            path: ../../pangochain-fabric/crypto-config/peerOrganizations/firma.pangochain.com/users/Admin@firma.pangochain.com/msp/signcerts/Admin@firma.pangochain.com-cert.pem
+    connectionProfile:
+      path: ./connection-firma.yaml
+      discover: true
+
+peers:
+  - url: grpc://localhost:7051
+    tlsCACerts:
+      path: ../../pangochain-fabric/crypto-config/peerOrganizations/firma.pangochain.com/tlsca/tlsca.firma.pangochain.com-cert.pem

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PangoChain Crypto Benchmark — Experiment 6</title>
+  <style>
+    body { font-family: monospace; padding: 2rem; background: #0f2027; color: #4ade80; }
+    h1 { color: #a7f3d0; margin-bottom: 1rem; font-size: 1.2rem; }
+    pre { background: #0d1b12; padding: 1rem; border-radius: 8px; font-size: 0.85rem; line-height: 1.6; white-space: pre-wrap; }
+    button { background: #1d6464; color: white; border: none; padding: 0.6rem 1.5rem; border-radius: 6px; cursor: pointer; font-size: 1rem; margin-bottom: 1rem; }
+    button:hover { background: #2a8a8a; }
+    #results { min-height: 200px; }
+  </style>
+</head>
+<body>
+  <h1>PangoChain — Experiment 6: Crypto Benchmark (WebCrypto API)</h1>
+  <p style="color:#a7f3d0;font-size:0.85rem;">Open DevTools → Console to see all results. Click the button to start.</p>
+  <button onclick="runAll()">▶ Run All Benchmarks</button>
+  <pre id="results">Click "Run All Benchmarks" to start...</pre>
+
+  <script>
+    const out = document.getElementById('results');
+    function log(msg) { out.textContent += msg + '\n'; console.log(msg); }
+    function ms(t) { return t.toFixed(2) + 'ms'; }
+
+    async function time(fn, label, reps = 1) {
+      const results = [];
+      for (let i = 0; i < reps; i++) {
+        const t0 = performance.now();
+        await fn();
+        results.push(performance.now() - t0);
+      }
+      const avg = results.reduce((a, b) => a + b, 0) / reps;
+      const min = Math.min(...results);
+      const max = Math.max(...results);
+      log(`  ${label.padEnd(50)} avg=${ms(avg)}  min=${ms(min)}  max=${ms(max)}`);
+      return avg;
+    }
+
+    async function runAll() {
+      out.textContent = '';
+      log('=== PangoChain Experiment 6 — WebCrypto Benchmark ===');
+      log('Environment: ' + navigator.userAgent.split(') ')[0].split('(')[1]);
+      log('Date: ' + new Date().toISOString());
+      log('');
+
+      // ── PBKDF2 ────────────────────────────────────────────────────────────
+      log('--- PBKDF2 (NIST SP 800-132, 600k iterations, SHA-256) ---');
+      const pwBytes = new TextEncoder().encode('TestPassword123!');
+      const salt = crypto.getRandomValues(new Uint8Array(32));
+      const pbkdf2Time = await time(async () => {
+        const base = await crypto.subtle.importKey('raw', pwBytes, 'PBKDF2', false, ['deriveKey']);
+        await crypto.subtle.deriveKey(
+          { name: 'PBKDF2', hash: 'SHA-256', salt, iterations: 600_000 },
+          base, { name: 'AES-GCM', length: 256 }, false, ['encrypt']
+        );
+      }, 'PBKDF2 600k iter (32-byte salt, AES-256 output)', 3);
+      log(`  Note: should be <1000ms on modern hardware. Paper claims: <800ms p50.`);
+      log('');
+
+      // ── ECIES P-256 ────────────────────────────────────────────────────────
+      log('--- ECIES P-256 Key Generation and Wrapping ---');
+      const eciesKeygenTime = await time(async () => {
+        await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, ['deriveKey']);
+      }, 'ECDH P-256 keygen', 10);
+
+      const recipientKp = await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, ['deriveKey']);
+      const docKey = crypto.getRandomValues(new Uint8Array(32));
+      const ephPubRaw = new Uint8Array(65);  // uncompressed P-256 point
+
+      const eciesWrapTime = await time(async () => {
+        const ephemeral = await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, ['deriveKey']);
+        const wk = await crypto.subtle.deriveKey(
+          { name: 'ECDH', public: recipientKp.publicKey },
+          ephemeral.privateKey,
+          { name: 'AES-GCM', length: 256 }, false, ['encrypt']
+        );
+        const iv = crypto.getRandomValues(new Uint8Array(12));
+        const wrapped = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, wk, docKey);
+        const pub = await crypto.subtle.exportKey('raw', ephemeral.publicKey);
+        const total = new Uint8Array(pub.byteLength + iv.length + wrapped.byteLength);
+        total.set(new Uint8Array(pub), 0);
+        total.set(iv, pub.byteLength);
+        total.set(new Uint8Array(wrapped), pub.byteLength + iv.length);
+        // total.length = 65 (ephPub) + 12 (iv) + 48 (wrapped AES key) = 125 bytes
+        return total;
+      }, 'ECIES wrap 32-byte doc key (P-256)', 20);
+
+      log('');
+      log('  ECIES wrapped token size: 65 (ephPubRaw) + 12 (iv) + 48 (ciphertext+tag) = 125 bytes');
+      log('  RSA-OAEP 2048 wrapped key size would be: 256 bytes');
+      log('  Reduction: (256 - 125) / 256 = 51.2% smaller token');
+      log('');
+
+      // ── AES-256-GCM Document Encrypt ───────────────────────────────────────
+      log('--- AES-256-GCM Document Encryption ---');
+      for (const [label, sizeBytes] of [['1MB', 1024*1024], ['10MB', 10*1024*1024], ['50MB', 50*1024*1024]]) {
+        const plaintext = crypto.getRandomValues(new Uint8Array(sizeBytes));
+        const aesKey = await crypto.subtle.generateKey({ name: 'AES-GCM', length: 256 }, false, ['encrypt']);
+        const iv = crypto.getRandomValues(new Uint8Array(12));
+        await time(async () => {
+          await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, aesKey, plaintext);
+        }, `AES-256-GCM encrypt ${label}`, 3);
+      }
+      log('');
+
+      // ── RSA-OAEP 2048 comparison ───────────────────────────────────────────
+      log('--- RSA-OAEP 2048 key wrap (for comparison) ---');
+      const rsaKp = await crypto.subtle.generateKey(
+        { name: 'RSA-OAEP', modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: 'SHA-256' },
+        false, ['encrypt', 'decrypt']
+      );
+      const rsaWrapTime = await time(async () => {
+        await crypto.subtle.encrypt({ name: 'RSA-OAEP' }, rsaKp.publicKey, docKey);
+      }, 'RSA-OAEP 2048 wrap 32-byte doc key', 20);
+      log('');
+
+      // ── Summary ────────────────────────────────────────────────────────────
+      log('=== Summary for Paper ===');
+      log(`  PBKDF2 600k iterations:          ${ms(pbkdf2Time)}`);
+      log(`  ECIES P-256 keygen:              ${ms(eciesKeygenTime)}`);
+      log(`  ECIES P-256 key wrap:            ${ms(eciesWrapTime)}`);
+      log(`  RSA-OAEP 2048 key wrap:          ${ms(rsaWrapTime)}`);
+      log(`  ECIES vs RSA speedup:            ${(rsaWrapTime / eciesWrapTime).toFixed(1)}x faster`);
+      log(`  ECIES token size:                125 bytes`);
+      log(`  RSA-OAEP 2048 token size:        256 bytes`);
+      log(`  Token size reduction:            51.2%`);
+      log('');
+      log('Copy these results into experiment_results.md under Experiment 6.');
+    }
+  </script>
+</body>
+</html>

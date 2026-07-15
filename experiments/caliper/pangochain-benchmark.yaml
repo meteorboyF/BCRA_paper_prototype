@@ -1,0 +1,101 @@
+# Hyperledger Caliper v0.5 benchmark configuration for PangoChain
+# Targets the Spring Boot REST API (not the Fabric peer directly)
+# See: https://hyperledger.github.io/caliper/v0.5.0/
+
+test:
+  name: PangoChain Load Test
+  description: >
+    Measures TPS and latency for the PangoChain document management API.
+    Traffic mix: 20% RegisterDocument writes, 80% CheckAccess reads.
+
+  workers:
+    number: 10
+
+  rounds:
+    - label: "50 clients"
+      txNumber: 500
+      rateControl:
+        type: fixed-load
+        opts:
+          transactionLoad: 50
+      workload:
+        module: workload/pangochain-workload.js
+        arguments:
+          targetTps: 50
+
+    - label: "100 clients"
+      txNumber: 1000
+      rateControl:
+        type: fixed-load
+        opts:
+          transactionLoad: 100
+      workload:
+        module: workload/pangochain-workload.js
+        arguments:
+          targetTps: 100
+
+    - label: "150 clients"
+      txNumber: 1500
+      rateControl:
+        type: fixed-load
+        opts:
+          transactionLoad: 150
+      workload:
+        module: workload/pangochain-workload.js
+        arguments:
+          targetTps: 150
+
+    - label: "200 clients"
+      txNumber: 2000
+      rateControl:
+        type: fixed-load
+        opts:
+          transactionLoad: 200
+      workload:
+        module: workload/pangochain-workload.js
+        arguments:
+          targetTps: 200
+
+    - label: "300 clients"
+      txNumber: 3000
+      rateControl:
+        type: fixed-load
+        opts:
+          transactionLoad: 300
+      workload:
+        module: workload/pangochain-workload.js
+        arguments:
+          targetTps: 300
+
+    - label: "400 clients"
+      txNumber: 4000
+      rateControl:
+        type: fixed-load
+        opts:
+          transactionLoad: 400
+      workload:
+        module: workload/pangochain-workload.js
+        arguments:
+          targetTps: 400
+
+    - label: "500 clients"
+      txNumber: 5000
+      rateControl:
+        type: fixed-load
+        opts:
+          transactionLoad: 500
+      workload:
+        module: workload/pangochain-workload.js
+        arguments:
+          targetTps: 500
+
+    - label: "600 clients"
+      txNumber: 6000
+      rateControl:
+        type: fixed-load
+        opts:
+          transactionLoad: 600
+      workload:
+        module: workload/pangochain-workload.js
+        arguments:
+          targetTps: 600

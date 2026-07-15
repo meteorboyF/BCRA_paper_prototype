@@ -1,0 +1,15 @@
+# Tiny smoke config — validates the Caliper->peer-gateway path in <1 min.
+test:
+  name: PangoChain Caliper smoke
+  description: connectivity check only, not evidence
+  workers:
+    number: 2
+  rounds:
+    - label: checkaccess-10
+      txNumber: 40
+      rateControl: { type: fixed-load, opts: { transactionLoad: 10 } }
+      workload: { module: workload/check-access.js }
+    - label: register-10
+      txNumber: 40
+      rateControl: { type: fixed-load, opts: { transactionLoad: 10 } }
+      workload: { module: workload/register-document.js }

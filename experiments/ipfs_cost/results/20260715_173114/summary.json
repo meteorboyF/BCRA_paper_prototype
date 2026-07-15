@@ -1,0 +1,56 @@
+{
+  "started_utc": "2026-07-15T17:31:22Z",
+  "config": {
+    "phases": "retrieval,replication,storage,nodedown",
+    "sizes": [
+      1,
+      10,
+      25,
+      50
+    ],
+    "concurrency": [
+      1,
+      8,
+      24
+    ],
+    "reps": 24,
+    "repl_reps": 5,
+    "nodedown_size": 10,
+    "nodedown_reps": 10,
+    "timeout": 120,
+    "dead_timeout": 10,
+    "api1": "http://localhost:5001",
+    "api2": "http://localhost:5002",
+    "api3": "http://localhost:5003",
+    "node1_container": "pangochain-ipfs",
+    "node2_container": "pangochain-ipfs2"
+  },
+  "retrieval": {
+    "requests": 576,
+    "failed": 0,
+    "p50_ms_all": 492.0
+  },
+  "phase_seconds": {
+    "retrieval": 115.2,
+    "replication": 11.5,
+    "storage": 1.0,
+    "nodedown": 128.9
+  },
+  "replication": {
+    "pins": 40
+  },
+  "storage": {
+    "sizes": [
+      1,
+      10,
+      25,
+      50
+    ]
+  },
+  "nodedown": {
+    "one_replica_down_ok": 10,
+    "all_replicas_down_served": 0,
+    "recovery_ok": 10
+  },
+  "finished_utc": "2026-07-15T17:35:39Z"
+}

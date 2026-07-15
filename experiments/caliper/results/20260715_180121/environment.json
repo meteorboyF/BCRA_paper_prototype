@@ -1,0 +1,10 @@
+{
+  "os": "Linux pop-os 7.0.11-76070011-generic #202606011647~1780583645~24.04~5c4cc15 SMP PREEMPT_DYNAMIC Thu J x86_64 x86_64 x86_64 GNU/Linux",
+  "node_version": "v20.20.2",
+  "caliper": "0.6.0",
+  "docker_version": "Docker version 29.6.1, build 8900f1d",
+  "git_commit": "1a1ca87b67ff7066537a573996f90a3733adb45b",
+  "branch": "prototype-fixes",
+  "topology": "3 orgs x 1 peer, 3 Raft orderers, CouchDB, majority endorsement",
+  "sut": "legalcc via peer-gateway (grpcs://localhost:7051)"
+}

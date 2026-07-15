@@ -1,0 +1,8 @@
+{
+  "os": "Linux-7.0.11-76070011-generic-x86_64-with-glibc2.39",
+  "python": "3.12.3",
+  "kubo": "0.27.0",
+  "docker": "Docker version 29.6.1, build 8900f1d",
+  "git_commit": "1a1ca87b67ff7066537a573996f90a3733adb45b",
+  "branch": "prototype-fixes"
+}

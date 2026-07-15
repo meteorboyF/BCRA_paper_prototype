@@ -1,0 +1,23 @@
+{
+  "experiment": "fail_closed_fabric_outage",
+  "git_commit": "d66f54b6b2adc7752b6b3b39bef809cc70bcffc5",
+  "timestamp_utc": "2026-06-08T12:57:16.234977+00:00",
+  "pre_outage_seconds": 30,
+  "outage_seconds": 45,
+  "post_recovery_seconds": 60,
+  "concurrency": 50,
+  "fabric_outage_method": "docker stop peers: peer0.firma.pangochain.com peer0.firmb.pangochain.com peer0.regulator.pangochain.com",
+  "total_requests": 3458,
+  "pre_outage_success": 451,
+  "outage_success": 0,
+  "outage_http_503": 1340,
+  "outage_http_403": 0,
+  "outage_other_5xx": 0,
+  "outage_unexpected_200": 0,
+  "outage_protected_bytes_returned": 0,
+  "post_recovery_success": 988,
+  "fabric_outage_access_denied_rows": 2013,
+  "acl_fabric_fallback_rows": 0,
+  "pass_fail_closed": true,
+  "notes": []
+}

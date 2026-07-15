@@ -1,0 +1,80 @@
+# Experiment 11 — Hyperledger Caliper benchmark, direct Fabric SUT
+# (IMPROVEMENTS.md item 3.1). Offered-load range mirrors Exp 1's 50-600
+# client sweep; fixed-load keeps N transactions in flight, matching the
+# closed-loop client model of the gateway load generator.
+test:
+  name: PangoChain legalcc Caliper benchmark
+  description: >
+    Direct chaincode benchmark via the Fabric peer-gateway API.
+    CheckAccess (evaluate, read path) and RegisterDocument (submit,
+    write path with majority endorsement) at fixed loads 50-600.
+
+  workers:
+    number: 10
+
+  rounds:
+    - label: checkaccess-50
+      txNumber: 500
+      rateControl: { type: fixed-load, opts: { transactionLoad: 50 } }
+      workload: { module: workload/check-access.js }
+    - label: checkaccess-100
+      txNumber: 1000
+      rateControl: { type: fixed-load, opts: { transactionLoad: 100 } }
+      workload: { module: workload/check-access.js }
+    - label: checkaccess-150
+      txNumber: 1500
+      rateControl: { type: fixed-load, opts: { transactionLoad: 150 } }
+      workload: { module: workload/check-access.js }
+    - label: checkaccess-200
+      txNumber: 2000
+      rateControl: { type: fixed-load, opts: { transactionLoad: 200 } }
+      workload: { module: workload/check-access.js }
+    - label: checkaccess-300
+      txNumber: 3000
+      rateControl: { type: fixed-load, opts: { transactionLoad: 300 } }
+      workload: { module: workload/check-access.js }
+    - label: checkaccess-400
+      txNumber: 4000
+      rateControl: { type: fixed-load, opts: { transactionLoad: 400 } }
+      workload: { module: workload/check-access.js }
+    - label: checkaccess-500
+      txNumber: 5000
+      rateControl: { type: fixed-load, opts: { transactionLoad: 500 } }
+      workload: { module: workload/check-access.js }
+    - label: checkaccess-600
+      txNumber: 6000
+      rateControl: { type: fixed-load, opts: { transactionLoad: 600 } }
+      workload: { module: workload/check-access.js }
+
+    - label: register-50
+      txNumber: 500
+      rateControl: { type: fixed-load, opts: { transactionLoad: 50 } }
+      workload: { module: workload/register-document.js }
+    - label: register-100
+      txNumber: 1000
+      rateControl: { type: fixed-load, opts: { transactionLoad: 100 } }
+      workload: { module: workload/register-document.js }
+    - label: register-150
+      txNumber: 1500
+      rateControl: { type: fixed-load, opts: { transactionLoad: 150 } }
+      workload: { module: workload/register-document.js }
+    - label: register-200
+      txNumber: 2000
+      rateControl: { type: fixed-load, opts: { transactionLoad: 200 } }
+      workload: { module: workload/register-document.js }
+    - label: register-300
+      txNumber: 3000
+      rateControl: { type: fixed-load, opts: { transactionLoad: 300 } }
+      workload: { module: workload/register-document.js }
+    - label: register-400
+      txNumber: 4000
+      rateControl: { type: fixed-load, opts: { transactionLoad: 400 } }
+      workload: { module: workload/register-document.js }
+    - label: register-500
+      txNumber: 5000
+      rateControl: { type: fixed-load, opts: { transactionLoad: 500 } }
+      workload: { module: workload/register-document.js }
+    - label: register-600
+      txNumber: 6000
+      rateControl: { type: fixed-load, opts: { transactionLoad: 600 } }
+      workload: { module: workload/register-document.js }

@@ -1,0 +1,24 @@
+# Minimal connection profile for FirmA — Caliper connects to the FirmA gateway
+# peer only; the Fabric peer-gateway service collects majority endorsements
+# from FirmB/Regulator peers over the docker network (same pattern as the
+# Spring backend: localhost:7051 + TLS host override).
+name: connection-firma
+version: '1.0.0'
+client:
+  organization: FirmA
+
+organizations:
+  FirmA:
+    mspid: FirmAMSP
+    peers:
+      - peer0.firma.pangochain.com
+
+peers:
+  peer0.firma.pangochain.com:
+    url: grpcs://localhost:7051
+    tlsCACerts:
+      # Materialized by run-fabric-benchmark.sh (root-owned on disk).
+      path: crypto/tlsca-cert.pem
+    grpcOptions:
+      ssl-target-name-override: peer0.firma.pangochain.com
+      grpc.ssl_target_name_override: peer0.firma.pangochain.com

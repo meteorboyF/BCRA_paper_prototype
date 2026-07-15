@@ -1,0 +1,30 @@
+# Caliper network config — direct Fabric SUT via peer-gateway binding.
+# Experiment 11 (IMPROVEMENTS.md item 3.1). Paths relative to the Caliper
+# workspace (experiments/caliper).
+name: pangochain-fabric-direct
+version: '2.0.0'
+
+caliper:
+  blockchain: fabric
+  sutOptions:
+    mutualTls: false
+
+channels:
+  - channelName: legal-channel
+    contracts:
+      - id: legalcc
+
+organizations:
+  - mspid: FirmAMSP
+    identities:
+      certificates:
+        - name: admin
+          # Materialized from the fabric-cli container by run-fabric-benchmark.sh
+          # (crypto-config on disk is root-owned).
+          clientPrivateKey:
+            path: crypto/admin-key.pem
+          clientSignedCert:
+            path: crypto/admin-cert.pem
+    connectionProfile:
+      path: networks/connection-firma.yaml
+      discover: false

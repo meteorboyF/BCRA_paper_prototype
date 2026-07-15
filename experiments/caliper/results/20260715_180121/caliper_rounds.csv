@@ -1,0 +1,17 @@
+label,function,offered_load,succ,fail,send_rate_tps,max_latency_s,min_latency_s,avg_latency_s,throughput_tps
+checkaccess-50,checkaccess,50,500,0,190.2,0.09,0.01,0.03,189.6
+checkaccess-100,checkaccess,100,1000,0,337.0,0.05,0.01,0.02,336.4
+checkaccess-150,checkaccess,150,1500,0,453.3,0.05,0.01,0.02,452.6
+checkaccess-200,checkaccess,200,2000,0,547.9,0.04,0.01,0.02,547.2
+checkaccess-300,checkaccess,300,3000,0,671.0,0.06,0.01,0.02,670.2
+checkaccess-400,checkaccess,400,4000,0,771.5,0.08,0.01,0.02,770.7
+checkaccess-500,checkaccess,500,5000,0,800.3,0.06,0.01,0.02,799.2
+checkaccess-600,checkaccess,600,6000,0,875.7,0.08,0.01,0.02,874.9
+register-50,register,50,500,0,17.1,2.23,0.12,1.66,16.1
+register-100,register,100,1000,0,29.7,2.35,0.41,2.05,28.0
+register-150,register,150,1500,0,49.5,2.52,0.12,1.79,48.1
+register-200,register,200,2000,0,58.3,2.62,0.11,1.66,55.5
+register-300,register,300,3000,0,83.2,2.89,0.11,1.68,80.5
+register-400,register,400,4000,0,103.4,3.19,0.11,1.73,98.9
+register-500,register,500,4813,187,135.6,3.21,0.11,2.03,128.3
+register-600,register,600,4381,1619,173.7,4.03,0.1,1.98,172.0
