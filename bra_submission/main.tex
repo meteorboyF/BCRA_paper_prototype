@@ -1421,11 +1421,14 @@ This section defines the operational security assumptions under which
 the framework is evaluated. The goal is not to present a new
 cryptographic proof, but to make explicit which adversaries are in
 scope, which trust boundaries are enforced by Fabric, and which risks
-remain in the measured prototype. The analysis covers consortium
-governance assumptions, Raft crash-fault-tolerant ordering limits,
-endorsement-policy limits, application and browser compromise,
-identity-management boundaries, on-chain metadata leakage, and
-residual risks requiring production hardening.
+remain in the measured prototype. The analysis is organized in four
+parts: per-component trust assumptions
+(Section~\ref{sec:trust_assumptions}), an adversary capability matrix
+(Section~\ref{sec:adversary_matrix}), stated security properties with
+attack-scenario walk-throughs traced to mechanisms and experiments
+(Sections~\ref{sec:security_properties}--\ref{sec:attack_scenarios}),
+and explicitly out-of-scope attacks
+(Section~\ref{sec:out_of_scope}).
 
 The deployment model is a permissioned legal consortium consisting of
 known, legally bound institutions such as law firms and a regulator.
@@ -1436,42 +1439,54 @@ evaluated through the \texttt{CheckAccess} chaincode before protected
 material is released. On the evaluated document-download path, Fabric
 unavailability causes HTTP~503 denial and no database ACL fallback. Other
 Fabric-gateway paths follow the same fail-closed pattern by design but
-were not independently outage-tested. The threat
-model therefore identifies the custodial Fabric identity and
-\texttt{localStorage}-based key handling as the primary residual
-prototype limitations, not a database fallback.
+were not independently outage-tested.
 
-\textbf{Bounded adversary assumption.} Two independent bounds apply:
-(1)~\emph{CFT orderer bound}: with a 3-node Raft cluster ($n=3$),
-the crash-fault tolerance bound is $f \leq \lfloor(n-1)/2\rfloor =
-1$; the cluster tolerates failure of any single ordering node while
-maintaining consensus progress~\cite{Ongaro2014}. This bound applies
-to node crashes, not Byzantine behavior. (2)~\emph{Endorsement
-policy bound}: when a deployment requires
-\texttt{AND(}\allowbreak\texttt{'LawFirmAMSP.peer',}\allowbreak
-\texttt{'RegulatorMSP.peer')}, an adversary
-cannot satisfy that policy by controlling a single organization,
-because both organizations' peer endorsement is required
-independently. These bounds are independent: orderer
-quorum governs block formation; endorsement policy governs state
-write validity. The adversary may be adaptive but cannot break the
-cryptographic primitives (AES-256-GCM, ECDSA~P-256, SHA-256) under
+\subsubsection{Trust Assumptions per Component}
+\label{sec:trust_assumptions}
+
+The security properties in Section~\ref{sec:security_properties} are
+argued under the following explicit assumptions. Each names the
+component whose honesty or integrity is presumed, so that every
+scenario in Section~\ref{sec:attack_scenarios} can be read as the
+violation of a specific assumption.
+
+\begin{description}
+\item[A1 (Cryptographic primitives).] The adversary may be adaptive
+but cannot break AES-256-GCM, ECDSA/ECDH P-256, or SHA-256 under
 their standard hardness assumptions.
+\item[A2 (Ordering service, CFT bound).] With a 3-node Raft cluster
+($n{=}3$), at most $f \leq \lfloor(n-1)/2\rfloor = 1$ ordering node
+crash-fails; no orderer behaves Byzantinely~\cite{Ongaro2014}.
+Orderer quorum governs block formation only.
+\item[A3 (Endorsement quorum).] No coalition of organizations
+sufficient to satisfy the channel endorsement policy colludes: e.g.,
+under \texttt{AND(}\allowbreak\texttt{'LawFirmAMSP.peer',}\allowbreak
+\texttt{'RegulatorMSP.peer')}, a single organization cannot
+fabricate valid state writes, because committing peers independently
+validate endorsement signatures and read-write sets. A2 and A3 are
+independent bounds.
+\item[A4 (Storage-tier availability).] At least one honest IPFS node
+pinning a document's ciphertext remains reachable. Integrity does
+\emph{not} depend on A4 (hash anchoring detects tampering under A1);
+only availability does.
+\item[A5 (Identity-table integrity).] The PostgreSQL identity table
+binding users to public keys (\texttt{pk\_ecies}, \texttt{pk\_sign})
+has not been maliciously modified. This is deliberately the weakest
+assumption in the prototype --- its violation is walked through as
+Scenario~S3 --- and is discharged in the production design by
+ledger-anchoring key registrations.
+\item[A6 (Client endpoint).] The user's browser is uncompromised
+while keys are unlocked and plaintext is present. Endpoint
+compromise is analyzed as out of scope
+(Section~\ref{sec:out_of_scope}).
+\end{description}
 
-The prototype's ECIES grants are ledger-recorded but depend on an
-off-chain identity-to-key binding: PostgreSQL stores each user's
-\texttt{pk\_ecies} and \texttt{pk\_sign}. Until these public keys are
-anchored by a \texttt{RegisterIdentity}-style ledger transaction, a
-database or API adversary who substitutes \texttt{pk\_ecies} before a
-grant is formed can cause future \texttt{GrantAccess} operations to
-wrap $k_{enc}$ to an attacker-controlled key. Fabric would then commit
-a cryptographically valid transaction whose recipient key binding is
-semantically wrong. This threat is distinct from direct ledger
-tampering and is treated as a highest-priority production hardening
-requirement.
+\subsubsection{Adversary Capability Matrix}
+\label{sec:adversary_matrix}
 
 Table~\ref{tab:threat_model} identifies seven adversary classes
-relevant to the legal consortium deployment.
+relevant to the legal consortium deployment, the property each
+threatens, the mechanism that resists it, and the residual risk.
 
 
 
@@ -1675,6 +1690,132 @@ CFT does not stop Byzantine ordering; SmartBFT is the documented high-threat pro
 \end{table}
 
 Table~\ref{tab:security_claims} summarizes the principal security claims, their architectural support, and the residual risks left by the current prototype.
+
+\subsubsection{Security Properties}
+\label{sec:security_properties}
+
+The architectural claims are stated as four properties. Each is argued
+informally under the assumptions of
+Section~\ref{sec:trust_assumptions}; machine-checked verification
+(e.g., Tamarin or ProVerif models of the wrapping and grant protocol)
+is future work, but the property set is fixed here so that such
+verification has a target.
+
+\begin{description}
+\item[P1 (No release without a ledger-evaluated grant).] Under
+A1--A3, A5, and A6, no protected ciphertext or wrapped document key is
+returned on the evaluated download path unless a \texttt{CheckAccess}
+evaluation against committed ledger state authorizes the requester at
+request time. \emph{Argument:} the release handler invokes chaincode
+before returning material (Experiment~\hyperref[sec:exp_latency]{2}
+measures this decision at 6.51\,ms P50); the decision reads
+world-state grants committed under A3; expiry is evaluated against
+the deterministic transaction timestamp. \emph{Evidence:}
+Experiments~\hyperref[sec:exp_failclosed]{9}
+and~\hyperref[sec:exp_baseline]{14}.
+\item[P2 (Fail-closed under ledger unavailability).] Under A1, if the
+ledger cannot be consulted, the download path denies rather than
+falling back to database state. \emph{Evidence:}
+Experiment~\hyperref[sec:exp_failclosed]{9}: zero successful
+downloads and zero protected bytes over a 45\,s outage under load,
+with denial audit rows; the storage tier behaves analogously
+(Experiment~\hyperref[sec:exp_ipfscost]{10}: total replica loss
+yields clean timeouts, never stale substitute content).
+\item[P3 (Tamper evidence for stored content).] Under A1, any
+modification of off-chain ciphertext is detected before use: the
+plaintext hash anchored at registration cannot be matched by altered
+content without breaking SHA-256. Availability, by contrast, depends
+on A4.
+\item[P4 (Attributable ledger actions).] Under A1--A3, every grant,
+revocation, and anchored audit event is attributable to the
+submitting organization via MSP signatures, and document commitments
+are additionally bound to user-level ECDSA keys --- subject to the
+custodial-identity caveat of the prototype, and to A5 for the
+binding between users and their published keys.
+\end{description}
+
+\subsubsection{Attack-Scenario Walk-Throughs}
+\label{sec:attack_scenarios}
+
+Four scenarios trace concrete attacks through the design, each
+identified with the assumption it targets, the mechanism that stops it
+(or the residual risk it exposes), and the experiment or argument that
+evidences the outcome.
+
+\paragraph{S1: Revoked-credential replay.} A formerly authorized user
+(or an API client holding their bearer token) requests a document
+after the owner has revoked the grant or its \texttt{ExpiresAt} has
+passed. The application cannot serve from cached state: P1 places
+\texttt{CheckAccess} on the request itself, and the chaincode
+evaluates grant status and expiry against committed world state at
+the deterministic transaction timestamp. The request is denied and
+audited. \emph{Traces to:} P1 mechanism;
+Experiment~\hyperref[sec:exp_latency]{2} (decision cost) and chaincode
+unit tests in the released artifact.
+
+\paragraph{S2: Induced-outage fallback attack.} A malicious insider
+with infrastructure access (e.g., the database administrator of
+Table~\ref{tab:threat_model}) deliberately disrupts Fabric
+connectivity, expecting the application to fall back to the
+PostgreSQL ACL that the insider can edit. The design refuses the
+trade: under P2 the path fails closed.
+\emph{Traces to:} Experiment~\hyperref[sec:exp_failclosed]{9} ---
+1{,}340 HTTP~503 denials, zero protected bytes released during the
+induced outage, denial events audited; the analogous storage-tier
+attack (disabling IPFS replicas) degrades availability but never
+substitutes content (Experiment~\hyperref[sec:exp_ipfscost]{10}, P3).
+
+\paragraph{S3: Public-key substitution.} This scenario is promoted
+from the prototype-limitations discussion because it is the sharpest
+residual risk. A database or API adversary violating A5 replaces a
+legitimate user's \texttt{pk\_ecies} before a grant is formed.
+Subsequent \texttt{GrantAccess} operations wrap the document key
+$k_{enc}$ under the attacker's key, and the ledger commits a
+cryptographically valid transaction whose recipient binding is
+semantically wrong: P1 holds mechanically while its authorization is
+subverted upstream. This is the highest-priority hardening item
+precisely because no ledger mechanism currently witnesses the
+user-to-key binding. \emph{Mitigation path:} anchor key registrations
+via a \texttt{RegisterIdentity} chaincode function at enrollment, so
+any post-registration substitution is detectable by any consortium
+peer; deferred to future work alongside per-user X.509 enrollment
+(Section~\ref{sec:future_work}). \emph{Traces to:} violation of A5;
+residual-risk rows of Tables~\ref{tab:threat_model}
+and~\ref{tab:security_claims}.
+
+\paragraph{S4: Storage-tier content substitution.} A compromised IPFS
+node (or an attacker who obtains swarm access) serves modified
+ciphertext for a known CID. Content addressing already makes this
+awkward (the CID is a hash of the stored ciphertext), and P3
+backstops it end to end: the client verifies the decrypted plaintext
+against the on-chain anchored hash before accepting the document, so
+substitution is detected under A1 regardless of how many storage
+nodes collude. The attack degrades into denial of availability,
+which A4 and the replication measurements of
+Experiment~\hyperref[sec:exp_ipfscost]{10} address (single-replica
+loss: no measurable penalty; total loss: clean timeout).
+
+\subsubsection{Out-of-Scope Attacks}
+\label{sec:out_of_scope}
+
+The following are explicitly out of scope for the evaluated
+prototype, with the assumption they would violate noted:
+(i)~\emph{Byzantine ordering} (violates A2): two colluding Raft
+orderers can censor or reorder transactions; the SmartBFT migration
+path is discussed below. (ii)~\emph{Endorsement-quorum collusion}
+(violates A3): a coalition satisfying the endorsement policy can
+write attacker-chosen state; governance and policy breadth are the
+controls. (iii)~\emph{Endpoint compromise} (violates A6): XSS or
+malware in the user's browser can capture passwords, unlocked keys,
+or plaintext during use; mitigations (CSP, WebAuthn/FIDO2,
+supply-chain controls) are production hardening, not evaluated
+here. (iv)~\emph{Traffic analysis of on-chain metadata}: access
+frequency and CID patterns leak to channel members even with private
+data collections, as analyzed in Table~\ref{tab:threat_model};
+cryptographic pattern hiding is future work. (v)~\emph{Network-layer
+denial of service} against gateways, peers, or IPFS nodes beyond the
+measured outage scenarios. (vi)~\emph{Side-channel attacks} on the
+cryptographic implementations.
 
 The framework uses Raft, a Crash Fault
 Tolerant (CFT) protocol. CFT tolerates node failures but not
@@ -3148,7 +3289,20 @@ AAL2 and AAL3 upgrade without chaincode modification.
 
 \subsubsection{Identity Database Public Key Integrity}
 
-The PostgreSQL identity database stores each user's public keys (\texttt{pk\_ecies}, \texttt{pk\_sign}). The audit architecture protects the \texttt{audit\_log} table against modification, but the identity table is not subject to equivalent cryptographic protection. A database administrator with write access could substitute a malicious public key for a legitimate user's \texttt{pk\_ecies}; subsequent \texttt{GrantAccess} invocations would wrap $k_{enc}$ under the attacker's key and commit this subverted grant to the ledger as a valid transaction. The ledger would record a cryptographically correct but semantically compromised key exchange. The production mitigation is to anchor public key registrations to the Fabric ledger at enrollment time, for example by invoking a \texttt{RegisterIdentity} chaincode function that commits each user's public keys as a ledger asset, making any post-registration key substitution detectable by any consortium peer. This is deferred to future work alongside full per-user X.509 enrollment (Section~\ref{sec:future_work}).
+The PostgreSQL identity database stores each user's public keys
+(\texttt{pk\_ecies}, \texttt{pk\_sign}). The audit architecture
+protects the \texttt{audit\_log} table against modification, but the
+identity table is not subject to equivalent cryptographic protection.
+The resulting public-key substitution attack is analyzed as
+Scenario~S3 of the threat model
+(Section~\ref{sec:attack_scenarios}): a database administrator who
+replaces a user's \texttt{pk\_ecies} causes subsequent grants to wrap
+$k_{enc}$ under an attacker key while the ledger commits an apparently
+valid transaction. The production mitigation --- ledger-anchoring key
+registrations via a \texttt{RegisterIdentity} chaincode function so
+any post-registration substitution is detectable by any consortium
+peer --- is deferred to future work alongside full per-user X.509
+enrollment (Section~\ref{sec:future_work}).
 
 \subsubsection{IPFS Retrieval Timeout and Thread Management}
 
