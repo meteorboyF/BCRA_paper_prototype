@@ -64,11 +64,20 @@ that no prior row has all of the last four):
 | System | Off-chain encrypted storage | On-path chaincode ACL at release time | Fail-closed under ledger outage (measured) | On-path latency cost quantified | Time-bounded grants + revocation on ledger | User-level signature binding | Legal-domain workflow mapping |
 |---|---|---|---|---|---|---|---|
 | Liu & Zheng 2024 | Y | N (audit anchor) | N | N | P | N | P (judicial) |
-| Liu/Lu/Ren BRA 2026 (IPFS ACL) | Y | P (scheme-level, not measured on release path) | N | N | Y (traceable) | N | N |
+| Liu/Lu/Ren BRA 2026 (IPFS ACL) | Y | Y (measured: root-CID authorization on retrieval, 146-156 ms e2e under 50 ms emulated WAN; contract 1-2 ms) | N | Y (146-156 ms figure) | Y (traceable) | N | N |
 | Mukta et al. BRA 2026 (zero trust) | N/A | P (delegation logic) | N | P | Y | P | N |
 | Peelam et al. BRA 2026 (evidence/fog) | Y | N | N | N | N | P | P (evidence) |
 | FileWallet CMES 2022 | Y | P | N | N | N | N | N |
 | **This work** | **Y** | **Y (CheckAccess on download)** | **Y (Exp 9)** | **Y (Exp 2: 6.51 vs 7.16 ms P50)** | **Y** | **Y (ECDSA P-256)** | **Y** |
+
+_Correction (2026-07-16, PDF verification for item 3.5b): the published
+Liu/Lu/Ren pre-proof DOES measure on-path authorization (Caliper +
+prototype; see `experiments/comparison/COMPARISON_TABLE.md` on the
+prototype-fixes branch for page cites). Their row's two cells were updated
+P->Y and N->Y accordingly. The gap statement therefore narrows to the
+last-three-column pairing: no prior row, including theirs, has measured
+fail-closed outage behavior, and none quantifies the enforcement premium
+against an architectural baseline (Exp 14) or carries CI-grade statistics._
 
 Action items:
 - Pull PDFs of #2, #3, #4; verify what they actually claim/measure; fill P/N cells
