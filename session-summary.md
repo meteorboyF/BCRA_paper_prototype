@@ -198,8 +198,12 @@ ready pre-proof re-checks. See MANUSCRIPT_TODO.md on bra-submission.
 2. Data availability: pick variant B1 (GitHub, active) or B2 (Zenodo DOI,
    commented placeholder) — if B2, deposit a release and fill the DOI.
 3. `seoBlockchain2024`: verified correct but uncited — cite or delete.
-4. Optional: fig1–fig8 composition-matched swap (upgrade
-   `experiments/legacy_figures/regen_figs.py` first).
+4. ~~fig1–fig8 composition-matched swap~~ — DONE post-wrap-up
+   (prototype-fixes 0770a8b: upgraded regen script; bra-submission
+   406f306: all eight swapped, captions rewritten with CI methods,
+   fig7 switched to measured-only strip plot with projection moved to
+   prose). Every manuscript figure is now regenerated from released
+   raw data.
 5. Camera-ready: re-verify pre-proof page cites (RBAC-IPFS, Liu & Zheng,
    Notash) against versions of record; RBAC-IPFS numbers cited in main.tex
    also come from the pre-proof.
