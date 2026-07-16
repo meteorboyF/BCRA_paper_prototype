@@ -11,9 +11,10 @@ Benchmark and evaluation code for the BRA submission. Manuscript lives on the
 | 11 — Caliper direct-Fabric benchmark | 3.1 | [`caliper/RESULTS.md`](caliper/RESULTS.md) | `caliper/results/20260715_180121/` | `fig11_caliper.png/.pdf` |
 | 12 — Ledger-growth scaling (10³–10⁶, complete) | 3.3 | [`ledger_growth/RESULTS.md`](ledger_growth/RESULTS.md) | `ledger_growth/results/20260715_183009/` | `fig12_ledger_growth.png/.pdf` |
 | 13 — Network-size scaling (2–7 orgs × policy) | 3.2 | [`network_scaling/RESULTS.md`](network_scaling/RESULTS.md) | `network_scaling/results/20260715_225854/` (+ `o7verify/`) | `fig13_network_scaling.png/.pdf` |
+| 14 — Passive-audit-log baseline (+ async-executor bug fix) | 3.5a | [`baseline_auditlog/RESULTS.md`](baseline_auditlog/RESULTS.md) | `baseline_auditlog/results/20260716_122821/` | `fig14_baseline.png/.pdf` |
 
-Planned next (same pattern, one dir + RESULTS.md each): item 3.5a
-passive-audit-log baseline, item 3.6 consolidated statistics.
+Planned next (same pattern, one dir + RESULTS.md each): item 3.5b
+comparison table, item 3.6 CIs + consolidated evidence table.
 
 ## Layout
 

@@ -3,7 +3,7 @@
 Registers a benchmark test user, creates a case, uploads a document.
 Outputs shell-eval-able lines: JWT=..., CASE_ID=..., DOC_ID=...
 """
-import json, sys, time, urllib.request, urllib.error
+import json, os, sys, time, urllib.request, urllib.error
 
 BASE = "http://localhost:8080/api"
 EMAIL    = "bench@pangochain.test"
@@ -41,7 +41,9 @@ import subprocess
 data, code = req("POST", "/auth/register", {
     "email": EMAIL, "password": PASSWORD, "fullName": FULL_NAME,
     "role": "ASSOCIATE_JUNIOR", "publicKeyJwk": PUBLIC_KEY_JWK,
-    "firmId": "5c86b39f-f353-4d0b-bfda-f448fe9d38bc",
+    # Firm UUIDs are gen_random_uuid() seeds, so they differ per database;
+    # PANGOCHAIN_FIRM_ID overrides the original machine's hardcoded value.
+    "firmId": os.environ.get("PANGOCHAIN_FIRM_ID", "5c86b39f-f353-4d0b-bfda-f448fe9d38bc"),
 })
 if code not in (200, 201, 409):
     print(f"WARN: register returned {code}: {data}", file=sys.stderr)

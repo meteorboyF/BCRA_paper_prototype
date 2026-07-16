@@ -14,6 +14,8 @@ import com.pangochain.backend.ipfs.IpfsService;
 import com.pangochain.backend.user.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -41,6 +43,7 @@ public class DocumentService {
     private boolean materialDbFallbackEnabled = true;
     private final AuditService auditService;
     private final ObjectMapper objectMapper;
+    private final Environment environment;
 
     /**
      * Phase 3 core upload flow:
@@ -435,6 +438,21 @@ public class DocumentService {
      * access is audited. Strict fail-closed mode is available by disabling materialDbFallbackEnabled.
      */
     private void enforceFabricAccessOrFailClosed(UUID docId, User requester) throws FabricException {
+        // EXPERIMENTAL BASELINE (Spring profile "audit-log-only", default OFF):
+        // Fabric-as-passive-audit-log — the architecture the paper argues against.
+        // Authorization comes from the local PostgreSQL ACL only (same query as
+        // the fallback path); the ledger is NOT consulted on the release path.
+        // The decision is recorded through AuditService.log, which is @Async and
+        // anchors a LogAuditEvent transaction to Fabric off the request path.
+        // Used by experiments/baseline_auditlog/ (IMPROVEMENTS.md item 3.5a).
+        if (environment.acceptsProfiles(Profiles.of("audit-log-only"))) {
+            boolean allowed = accessRepository.findActiveEntry(docId, requester.getId()).isPresent();
+            auditService.log("ACL_AUDIT_LOG_ONLY", requester.getId(), "DOCUMENT", docId.toString(), null,
+                    toJson(Map.of("mode", "audit_log_only", "decision", allowed ? "allow" : "deny")));
+            if (!allowed) throw new AccessDeniedException("Access denied for document " + docId);
+            return;
+        }
+
         if (fabricGatewayService == null) {
             FabricException e = new FabricException("Fabric authorization service is not configured");
             if (allowDbAclFallback(docId, requester, e)) return;

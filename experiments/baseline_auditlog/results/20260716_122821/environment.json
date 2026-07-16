@@ -1,0 +1,9 @@
+{
+  "os": "Linux pop-os 7.0.11-76070011-generic #202606011647~1780583645~24.04~5c4cc15 SMP PREEMPT_DYNAMIC Thu J x86_64 x86_64 x86_64 GNU/Linux",
+  "java": "openjdk version \"21.0.11\" 2026-04-21",
+  "node_version": "v20.20.2",
+  "git_commit": "44f8c6aef7b44ef25f5cc976f952a4177510004a",
+  "branch": "prototype-fixes",
+  "topology": "3 orgs x 1 peer, CouchDB, majority endorsement (reference network)",
+  "modes": "onpath (default profile) vs auditlog (SPRING_PROFILES_ACTIVE=audit-log-only)"
+}

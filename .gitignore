@@ -56,3 +56,6 @@ experiments/ledger_growth/.state.json
 experiments/network_scaling/node_modules/
 experiments/network_scaling/crypto/
 experiments/network_scaling/generated/
+
+# Backend Fabric identity material (synced from fabric-cli by experiment runners)
+pangochain-backend/config/fabric/crypto/
