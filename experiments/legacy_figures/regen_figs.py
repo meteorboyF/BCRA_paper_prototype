@@ -106,10 +106,17 @@ errbar(ax, xs, [mean_ci(fab[c]) for c in xs], AMBER, "o",
 pxs = sorted(pg)
 errbar(ax, pxs, [mean_ci(pg[c]) for c in pxs], BLUE, "s",
        "PostgreSQL-only (valid region, conc ≤ 100)", ls="--")
+# client-side saturation region: PG rows at conc >= 150 are self-flagged
+# harness-invalid (closed-loop socket saturation), per DELTAS.md
+ax.axvspan(150, 600, color=GOLD, alpha=0.12,
+           label="PostgreSQL-mode client-side saturation (harness-invalid)")
+# Exp 8 BatchTimeout tuning reference: 193.0 TPS at 500 ms
+ax.axhline(193.0, color=GREEN, linewidth=1.5, linestyle=":",
+           label="Exp 8 tuning reference: 193 TPS @500 ms BatchTimeout")
 ax.set_xlabel("Concurrent clients")
 ax.set_ylabel("Gateway throughput (TPS)")
 ax.set_title("Exp 1 — Throughput vs concurrency, mean with 95% CI")
-ax.legend(fontsize=9)
+ax.legend(fontsize=8)
 style(ax)
 save(fig, "fig1_scalability")
 
@@ -118,33 +125,29 @@ e2 = defaultdict(list)
 for r in rows(R / "exp2_latency.csv"):
     if int(r["sample_idx"]) > 20:
         e2[(r["operation"], r["mode"])].append(float(r["latency_ms"]))
-fig, (axl, axr) = plt.subplots(1, 2, figsize=(10, 4.8),
-                               gridspec_kw={"width_ratios": [2, 1]})
-bars = [("CheckAccess\nFabric evaluate", e2[("checkaccess", "fabric")], AMBER),
-        ("CheckAccess\nPostgreSQL ACL", e2[("checkaccess", "db_only")], BLUE)]
+e4pre = defaultdict(list)
+for r in rows(R / "exp4_audit.csv"):
+    e4pre[r["method"]].append(float(r["ms"]))
+fig, ax = plt.subplots(figsize=(10, 4.8))
+bars = [("CheckAccess\nFabric evaluate\n(n=100)", e2[("checkaccess", "fabric")], AMBER),
+        ("CheckAccess\nPostgreSQL ACL\n(n=100)", e2[("checkaccess", "db_only")], BLUE),
+        ("RegisterDocument\nendorse+order+commit\n(n=100)", e2[("registerdoc", "fabric")], AMBER),
+        ("Audit query\nPostgreSQL, 1000 ev.\n(n=10)", e4pre["pg_query_1000"], BLUE),
+        ("Audit verify\nCSV+SHA-256 chain\n(n=10)", e4pre["csv_sha256_chain_1000"], GREEN)]
 for i, (lbl, vals, color) in enumerate(bars):
     m, lo, hi = med_ci(vals)
-    axl.bar(i, m, width=0.6, color=color)
-    axl.errorbar([i], [m], yerr=[[m - lo], [hi - m]], color=INK, capsize=4,
-                 linewidth=1.5)
-    axl.annotate(f"{m:.2f}", (i, hi), ha="center", va="bottom", fontsize=9,
-                 color=INK)
-axl.set_xticks(range(len(bars)))
-axl.set_xticklabels([b[0] for b in bars], fontsize=9)
-axl.set_ylabel("Latency P50 (ms)")
-axl.set_title("(a) ACL check, warmed (n=100), bootstrap 95% CI")
-m, lo, hi = med_ci(e2[("registerdoc", "fabric")])
-axr.bar(0, m, width=0.5, color=AMBER)
-axr.errorbar([0], [m], yerr=[[m - lo], [hi - m]], color=INK, capsize=4,
-             linewidth=1.5)
-axr.annotate(f"{m:.0f}", (0, hi), ha="center", va="bottom", fontsize=9, color=INK)
-axr.set_xticks([0])
-axr.set_xticklabels(["RegisterDocument\n(endorse+order+commit)"], fontsize=9)
-axr.set_title("(b) Write path (n=100)")
-axr.set_ylabel("Latency P50 (ms)")
-for ax in (axl, axr):
-    style(ax)
-fig.suptitle("Exp 2 — Function-level latency", fontsize=12)
+    ax.bar(i, m, width=0.62, color=color)
+    ax.errorbar([i], [m], yerr=[[m - lo], [hi - m]], color=INK, capsize=4,
+                linewidth=1.5)
+    ax.annotate(f"{m:.2f}" if m < 100 else f"{m:.0f}", (i, hi), ha="center",
+                va="bottom", fontsize=9, color=INK)
+ax.set_xticks(range(len(bars)))
+ax.set_xticklabels([b[0] for b in bars], fontsize=8)
+ax.set_yscale("log")
+ax.set_ylabel("Latency P50 (ms, log scale)")
+ax.set_title("Exp 2 — Function-level latency with audit baselines, "
+             "P50 with bootstrap 95% CI")
+style(ax)
 save(fig, "fig2_latency")
 
 # ── fig3 — Exp 3 file-size independence ─────────────────────────────────────
@@ -158,6 +161,9 @@ errbar(ax, sizes, [med_ci(e3[("ipfs_add", str(s))]) for s in sizes],
 fc, fc_lo, fc_hi = med_ci(e3[("fabric_commit", "")])
 ax.axhline(fc, color=AMBER, linewidth=2, label=f"Fabric commit constant ({fc:.0f} ms, n=5)")
 ax.axhspan(fc_lo, fc_hi, color=AMBER, alpha=0.12)
+e2e = [fc + st.median(e3[("ipfs_add", str(s))]) for s in sizes]
+ax.plot(sizes, e2e, color=GREEN, marker="^", markersize=5, linewidth=1.6,
+        linestyle="-.", label="End-to-end upload (derived: commit + IPFS P50)")
 ax.set_yscale("log")
 ax.set_xlabel("File size (MB)")
 ax.set_ylabel("Latency (ms, log scale)")
@@ -171,8 +177,10 @@ e4 = defaultdict(list)
 for r in rows(R / "exp4_audit.csv"):
     e4[r["method"]].append(float(r["ms"]))
 fig, ax = plt.subplots(figsize=(10, 4.8))
-bars = [("PostgreSQL indexed query\n(1000 events)", e4["pg_query_1000"], BLUE),
-        ("CSV + SHA-256 hash chain\n(1000 events)", e4["csv_sha256_chain_1000"], AMBER)]
+e7pre = [float(r["latency_ms"]) for r in rows(R / "exp7_history.csv")]
+bars = [("PostgreSQL indexed query\n(1000 events, n=10)", e4["pg_query_1000"], BLUE),
+        ("CSV + SHA-256 hash chain\n(1000 events, n=10)", e4["csv_sha256_chain_1000"], AMBER),
+        ("Fabric GetHistoryForKey\n(depth 107, n=10)", e7pre, GREEN)]
 for i, (lbl, vals, color) in enumerate(bars):
     m, lo, hi = med_ci(vals)
     ax.bar(i, m, width=0.55, color=color)
@@ -189,19 +197,28 @@ save(fig, "fig4_audit")
 
 # ── fig5 — Exp 5 WAN sweep ──────────────────────────────────────────────────
 e5 = defaultdict(list)
+e5l = defaultdict(list)
 for r in rows(R / "exp5_wan.csv"):
     e5[(r["config"], int(r["rtt_ms"]))].append(float(r["tps"]))
-fig, ax = plt.subplots(figsize=(10, 4.8))
+    e5l[(r["config"], int(r["rtt_ms"]))].append(float(r["p50_ms"]))
+fig, (axt, axl2) = plt.subplots(1, 2, figsize=(10, 4.8))
 for cfg, color, marker, lbl in (
         ("bridge", AMBER, "o", "bridge (delay on docker bridge)"),
         ("bridge_veth", BLUE, "s", "bridge_veth (+ per-orderer veth delay)")):
     rtts = sorted(r for (c, r) in e5 if c == cfg)
-    errbar(ax, rtts, [mean_ci(e5[(cfg, r)]) for r in rtts], color, marker, lbl)
-ax.set_xlabel("Injected round-trip time (ms)")
-ax.set_ylabel("Gateway throughput (TPS)")
-ax.set_title("Exp 5 — WAN sensitivity (duration60s, conc 200, n=5/point), mean with 95% CI")
-ax.legend(fontsize=9)
-style(ax)
+    errbar(axt, rtts, [mean_ci(e5[(cfg, r)]) for r in rtts], color, marker, lbl)
+    errbar(axl2, rtts, [med_ci(e5l[(cfg, r)]) for r in rtts], color, marker, lbl)
+axt.set_xlabel("Injected round-trip time (ms)")
+axt.set_ylabel("Gateway throughput (TPS)")
+axt.set_title("(a) Throughput, mean with t 95% CI", fontsize=10)
+axl2.set_xlabel("Injected round-trip time (ms)")
+axl2.set_ylabel("Request latency P50 (ms)")
+axl2.set_title("(b) Latency, median with bootstrap 95% CI", fontsize=10)
+for ax in (axt, axl2):
+    ax.legend(fontsize=8)
+    style(ax)
+fig.suptitle("Exp 5 — WAN sensitivity (duration60s, conc 200, n=5/point)",
+             fontsize=12)
 save(fig, "fig5_wan")
 
 # ── fig6 — Exp 6 crypto primitives ──────────────────────────────────────────
@@ -238,6 +255,11 @@ ax.invert_yaxis()
 ax.set_xscale("log")
 ax.set_xlabel("Latency P50 (ms, log scale)")
 ax.set_title("Exp 6 — Client-side crypto primitives (Node WebCrypto runtime, n=10), bootstrap 95% CI")
+ax.annotate("Wrapped-key token size:\nECIES P-256 125 B vs. RSA-OAEP-2048 256 B\n(51.2% reduction)",
+            xy=(0.97, 0.72), xycoords="axes fraction", ha="right",
+            fontsize=8, color=INK,
+            bbox={"boxstyle": "round,pad=0.4", "facecolor": "white",
+                  "edgecolor": GRAY})
 style(ax)
 save(fig, "fig6_crypto")
 
