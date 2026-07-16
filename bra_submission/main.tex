@@ -787,13 +787,168 @@ The proposed framework separates three cryptographically distinct
 concerns: document confidentiality (AES-256-GCM client-side
 encryption), access policy enforcement (chaincode-authoritative ACL),
 and audit integrity (dual-store: Fabric ledger and PostgreSQL
-append-only log). This section describes the operational workflows,
-the cryptographic layer, the two-layer access control architecture,
-and the audit architecture. Governance, consensus, and the formal
+append-only log). This section first grounds the design in a concrete
+legal scenario (Section~\ref{sec:scenario}), then describes the
+operational workflows the scenario exercises, the cryptographic layer,
+the two-layer access control architecture, and the audit architecture.
+Governance, consensus, and the formal
 threat model are in Section~\ref{sec:governance_security}.
+
+\subsection{Motivating Scenario: A Cross-Firm E-Discovery Exchange}
+\label{sec:scenario}
+
+The following scenario motivates every workflow in this section using
+only mechanisms the prototype implements. It follows a document
+production between opposing law firms --- the setting in which the
+trust problem this paper addresses is sharpest, because the parties
+are professionally adverse yet legally obliged to exchange and
+safeguard each other's materials.
+
+\emph{Setting.} LawFirmA represents the producing party in civil
+litigation; LawFirmB represents the requesting party. Under discovery
+rules such as FRCP~26 and~34 in the United States, LawFirmA must
+produce responsive documents, many privileged-reviewed and
+confidential, subject to a protective order that limits who may view
+them and for how long; comparable disclosure duties arise in other
+jurisdictions, and cross-border variants increasingly involve
+electronic-evidence production regimes such as Regulation~(EU)
+2023/1543~\cite{euEvidence2023}. A regulator (or court-appointed
+special master) may later audit how the production was handled. The
+EDRM model describes this lifecycle --- identification through
+preservation, collection, review, and production~\cite{edrm2023}; the
+framework's role begins where reviewed documents leave the producing
+firm's custody.
+
+\emph{Production.} A LawFirmA associate uploads each reviewed document
+through the upload workflow
+(Section~\ref{sec:workflows}): the browser encrypts the
+plaintext under a fresh AES-256-GCM key before it leaves the machine
+--- the lawyer's confidentiality duty under ABA Model Rule~1.6 and its
+``reasonable efforts'' gloss in Formal Opinion~477R attaches to
+exactly this transmission step~\cite{aba477r} --- the ciphertext is
+stored in the private IPFS swarm, and \texttt{RegisterDocument}
+anchors the plaintext hash and content identifier on the consortium
+ledger. The anchored hash is what later authenticates the production:
+FRE~902(13)--(14) make electronically generated records and
+hash-verified copies self-authenticating by certification rather than
+live testimony, and the ledger supplies precisely the
+process record and ``digital identification'' those rules
+contemplate~\cite{fre902}.
+
+\emph{Time-bounded access.} LawFirmA then issues grants to the named
+LawFirmB reviewers with \texttt{ExpiresAt} set to the protective
+order's review window, wrapping the document key per recipient. Every
+LawFirmB download passes \texttt{CheckAccess} on the release path: the
+decision is evaluated against ledger state at request time
+(Experiment~\hyperref[sec:exp_latency]{2}: 6.51\,ms P50), so neither
+firm's application administrators can quietly widen or extend access.
+When the window lapses, expiry is enforced by the chaincode's
+deterministic timestamp comparison --- no cleanup job, no trust in
+either firm's schedulers. If LawFirmA discovers an inadvertently
+produced privileged document, the FRCP~26(b)(5)(B) clawback procedure
+maps to \texttt{RevokeAccess}: the revocation is a ledger transaction
+both parties can see, and subsequent download attempts are denied and
+audited (Scenario~S1, Section~\ref{sec:attack_scenarios}).
+
+\emph{Audit.} When the regulator examines the production --- or when
+the parties dispute whether a document was altered or accessed outside
+its window --- \texttt{GetDocumentHistory} and the anchored audit
+events reconstruct the document's custody without trusting either
+firm's internal databases (Experiments~\hyperref[sec:exp_audit]{4}
+and~\hyperref[sec:exp_gethistory]{7}). Should LawFirmB suffer an
+intrusion during the review window, ABA Formal Opinion~483's
+post-breach duties --- stop the breach, assess what was accessed,
+notify affected clients --- are materially supported by the same
+records: the ledger shows exactly which documents the compromised
+credentials could reach and which were actually released, and the
+fail-closed design (Experiment~\hyperref[sec:exp_failclosed]{9})
+means an attacker who disables the ledger gains denial, not
+access~\cite{aba483}.
+
+Every mechanism the scenario uses --- browser-side encryption,
+per-recipient key wrapping, time-bounded grants, on-path
+\texttt{CheckAccess}, ledger-anchored revocation, and history
+reconstruction --- is implemented and measured in the prototype; the
+scenario costs prose, not code. Table~\ref{tab:legal_mapping}
+generalizes the scenario into a requirement-by-requirement mapping
+from legal obligations to framework mechanisms and the evidence
+behind each.
+
+\begin{table*}[!t]
+\centering
+\scriptsize
+\renewcommand{\arraystretch}{1.25}
+\caption{Mapping from legal requirements to framework mechanisms and
+supporting evidence. US authorities are cited as concrete anchors;
+comparable duties arise in other jurisdictions.}
+\label{tab:legal_mapping}
+\begin{tabularx}{\textwidth}{@{} >{\raggedright\arraybackslash}p{3.6cm}
+  >{\raggedright\arraybackslash}X
+  >{\raggedright\arraybackslash}p{3.4cm} @{}}
+\toprule
+\textbf{Legal requirement} & \textbf{Framework mechanism} &
+\textbf{Evidence / discussion} \\
+\midrule
+Chain of custody and authentication of electronic records
+(FRE~901; FRE~902(13)--(14) self-authentication by
+certification~\cite{fre902}) &
+Plaintext hash $\mathcal{H}_D$ and CID anchored on-chain at
+registration; full custody reconstruction via
+\texttt{GetDocumentHistory} &
+Experiments~\hyperref[sec:exp_audit]{4}
+and~\hyperref[sec:exp_gethistory]{7};
+Section~\ref{sec:crypto} \\
+E-discovery production duties and lifecycle
+(FRCP~26/34; EDRM stages~\cite{edrm2023}) &
+Time-bounded per-recipient grants (\texttt{ExpiresAt}),
+organization- and user-level ACL, exportable audit trail &
+Scenario walk-through (Section~\ref{sec:scenario});
+Experiment~\hyperref[sec:exp_latency]{2} \\
+Clawback of inadvertently produced material
+(FRCP~26(b)(5)(B)) &
+\texttt{RevokeAccess} as a ledger transaction visible to both
+parties; subsequent requests denied and audited &
+Threat-model Scenario~S1
+(Section~\ref{sec:attack_scenarios}) \\
+Client confidentiality in transmission and storage
+(ABA Model Rule~1.6; Formal Opinion~477R~\cite{aba477r}) &
+AES-256-GCM encryption in the browser before transmission;
+ECIES-style per-recipient key wrapping; ciphertext-only off-chain
+storage &
+Section~\ref{sec:crypto};
+Experiment~\hyperref[sec:exp_crypto]{6} \\
+Post-breach duties: stop, assess, notify
+(ABA Formal Opinion~483~\cite{aba483}) &
+Ledger separates \emph{reachable} from \emph{released} documents per
+credential; fail-closed denial under infrastructure attack &
+Experiment~\hyperref[sec:exp_failclosed]{9};
+Section~\ref{sec:attack_scenarios}, S2 \\
+Retention limits and erasure
+(GDPR Art.~5(1)(e), Art.~17~\cite{gdpr2016}; legal-hold interplay) &
+Design decomposition: erasable off-chain ciphertext (unpin +
+garbage-collect) with minimal on-chain metadata (hash, CID,
+timestamps) &
+Section~\ref{sec:gdpr} (incl.\ residual
+pseudonymization caveat) \\
+Regulator and court-supervised audit access &
+Regulator organization as consortium member with its own peer and
+ordering node; independent replica of all anchored events &
+Sections~\ref{sec:workflows}
+and~\ref{sec:consensus} \\
+\bottomrule
+\end{tabularx}
+\end{table*}
 
 \subsection{Operational Workflows}
 \label{sec:workflows}
+
+Each workflow below is a step the scenario of
+Section~\ref{sec:scenario} exercised: registration establishes the
+keys the production relies on, upload is the production step itself,
+grant and download implement the protective-order window, revocation
+implements clawback, and the audit workflow serves the regulator's
+review. The workflows are described as implemented and measured; the
+mapping from each to its legal anchor is Table~\ref{tab:legal_mapping}.
 
 \subsubsection{User Registration}
 Fig.~\ref{fig:user_registration} shows the registration workflow.

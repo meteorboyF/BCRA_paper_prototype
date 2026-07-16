@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.7.12)  16 JUL 2026 16:29
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.7.12)  16 JUL 2026 17:05
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -750,126 +750,130 @@ Overfull \hbox (36.70184pt too wide) in paragraph at lines 345--354
  []
 
 [5]
-<figures/Hierarchy.pdf, id=417, 210.7875pt x 117.3183pt>
+<figures/Hierarchy.pdf, id=421, 210.7875pt x 117.3183pt>
 File: figures/Hierarchy.pdf Graphic file (type pdf)
 <use figures/Hierarchy.pdf>
 Package pdftex.def Info: figures/Hierarchy.pdf  used on input line 378.
 (pdftex.def)             Requested size: 390.0pt x 217.06767pt.
  [6 <./figures/Hierarchy.pdf>] [7] [8] [9] [10] [11] [12] [13] [14] [15]
-<figures/user_registration_flow.pdf, id=601, 952.51855pt x 367.3725pt>
+[16] [17]
+<figures/user_registration_flow.pdf, id=691, 952.51855pt x 367.3725pt>
 File: figures/user_registration_flow.pdf Graphic file (type pdf)
 <use figures/user_registration_flow.pdf>
 Package pdftex.def Info: figures/user_registration_flow.pdf  used on input line
- 817.
+ 972.
 (pdftex.def)             Requested size: 389.99736pt x 150.41628pt.
 
-Overfull \hbox (67.24236pt too wide) in paragraph at lines 825--830
+Overfull \hbox (67.24236pt too wide) in paragraph at lines 980--985
 \T1/cmr/m/n/12 (-20) AES-256-GCM doc-u-ment key $\OML/cmm/m/it/12 k[]$ \T1/cmr/
 m/n/12 (-20) and a 96-bit IV us-ing \T1/cmtt/m/n/12 window.crypto.getRandomValu
 es\T1/cmr/m/n/12 (-20) .
  []
 
-[16 <./figures/user_registration_flow.pdf>]
-<figures/document_upload_flow.pdf, id=642, 2133.9725pt x 1850.36754pt>
+[18]
+<figures/document_upload_flow.pdf, id=704, 2133.9725pt x 1850.36754pt>
 File: figures/document_upload_flow.pdf Graphic file (type pdf)
 <use figures/document_upload_flow.pdf>
-Package pdftex.def Info: figures/document_upload_flow.pdf  used on input line 8
-56.
+Package pdftex.def Info: figures/document_upload_flow.pdf  used on input line 1
+011.
 (pdftex.def)             Requested size: 215.0704pt x 186.48753pt.
- [17 <./figures/document_upload_flow.pdf>]
-<figures/access_control_flow.pdf, id=1677, 1802.735pt x 1033.31505pt>
+ [19 <./figures/user_registration_flow.pdf>]
+<figures/access_control_flow.pdf, id=745, 1802.735pt x 1033.31505pt>
 File: figures/access_control_flow.pdf Graphic file (type pdf)
 <use figures/access_control_flow.pdf>
-Package pdftex.def Info: figures/access_control_flow.pdf  used on input line 88
-4.
+Package pdftex.def Info: figures/access_control_flow.pdf  used on input line 10
+39.
 (pdftex.def)             Requested size: 280.79642pt x 160.95053pt.
-<figures/document_retrieval_flow.pdf, id=1678, 616.22218pt x 324.25137pt>
+<figures/document_retrieval_flow.pdf, id=746, 616.22218pt x 324.25137pt>
 File: figures/document_retrieval_flow.pdf Graphic file (type pdf)
 <use figures/document_retrieval_flow.pdf>
 Package pdftex.def Info: figures/document_retrieval_flow.pdf  used on input lin
-e 893.
+e 1048.
 (pdftex.def)             Requested size: 280.79524pt x 147.7523pt.
-<figures/audit_trail_flow.pdf, id=1681, 884.34387pt x 323.28778pt>
+<figures/audit_trail_flow.pdf, id=749, 884.34387pt x 323.28778pt>
 File: figures/audit_trail_flow.pdf Graphic file (type pdf)
 <use figures/audit_trail_flow.pdf>
-Package pdftex.def Info: figures/audit_trail_flow.pdf  used on input line 916.
+Package pdftex.def Info: figures/audit_trail_flow.pdf  used on input line 1071.
+
 (pdftex.def)             Requested size: 288.60931pt x 105.50632pt.
-<figures/integrity_check_flow.pdf, id=1682, 1385.175pt x 984.67876pt>
+<figures/integrity_check_flow.pdf, id=750, 1385.175pt x 984.67876pt>
 File: figures/integrity_check_flow.pdf Graphic file (type pdf)
 <use figures/integrity_check_flow.pdf>
-Package pdftex.def Info: figures/integrity_check_flow.pdf  used on input line 9
-26.
+Package pdftex.def Info: figures/integrity_check_flow.pdf  used on input line 1
+081.
 (pdftex.def)             Requested size: 390.0pt x 277.2407pt.
- [18 <./figures/access_control_flow.pdf>] [19 <./figures/document_retrieval_flo
-w.pdf> <./figures/audit_trail_flow.pdf>]
-Overfull \hbox (6.10643pt too wide) in paragraph at lines 978--978
+ [20 <./figures/document_upload_flow.pdf>] [21 <./figures/access_control_flow.p
+df> <./figures/document_retrieval_flow.pdf>] [22 <./figures/audit_trail_flow.pd
+f> <./figures/integrity_check_flow.pdf>]
+Overfull \hbox (6.10643pt too wide) in paragraph at lines 1133--1133
 []|$\OML/cmm/m/it/12 sk[];  pk[]$| 
  []
 
 
-Overfull \hbox (1.94984pt too wide) in paragraph at lines 978--978
+Overfull \hbox (1.94984pt too wide) in paragraph at lines 1133--1133
 []|$\OML/cmm/m/it/12 sk[];  pk[]$| 
  []
 
-[20 <./figures/integrity_check_flow.pdf>] [21]
+[23] [24]
 Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
-put line 1036.
+put line 1191.
 
-Underfull \hbox (badness 10000) in paragraph at lines 1067--1070
+Underfull \hbox (badness 10000) in paragraph at lines 1222--1225
 [] []$\OML/cmm/m/it/10.95 ^^\ \OMS/cmsy/m/n/10.95   []\OT1/cmr/m/n/10.95 (+20) 
 (\OMS/cmsy/m/n/10.95 h\OML/cmm/m/it/10.95 M[];  ^^[;  U\OMS/cmsy/m/n/10.95 i\OT
 1/cmr/m/n/10.95 (+20) )$ \T1/cmr/m/n/10.95 (+20) {CID in tx; sig cov-ers
  []
 
-[22] [23]
-Overfull \hbox (17.07124pt too wide) in paragraph at lines 1101--1106
+[25]
+Overfull \hbox (17.07124pt too wide) in paragraph at lines 1256--1261
 \T1/cmr/m/n/12 (-20) ports it as a non-extractable sign-ing key, and calls \T1/
 cmtt/m/n/12 window.crypto.subtle.sign(
  []
 
 
-Overfull \hbox (23.2194pt too wide) in paragraph at lines 1101--1106
+Overfull \hbox (23.2194pt too wide) in paragraph at lines 1256--1261
 \T1/cmtt/m/n/12 {name:'ECDSA',hash:{name:'SHA-256'}})\T1/cmr/m/n/12 (-20) . In 
 the pro-to-type, the []
  []
 
-[24]
-Overfull \hbox (1.15056pt too wide) in paragraph at lines 1152--1158
+[26]
+Overfull \hbox (1.15056pt too wide) in paragraph at lines 1307--1313
 \T1/cmtt/m/n/12 GrantAccess\T1/cmr/m/n/12 (-20) ; it is 51.2% smaller than the 
 256-byte RSA-OAEP 2048 wrapped-
  []
 
-<figures/key_gen_and_storage.pdf, id=2893, 1882.03125pt x 1421.31pt>
+[27]
+<figures/key_gen_and_storage.pdf, id=2992, 1882.03125pt x 1421.31pt>
 File: figures/key_gen_and_storage.pdf Graphic file (type pdf)
 <use figures/key_gen_and_storage.pdf>
-Package pdftex.def Info: figures/key_gen_and_storage.pdf  used on input line 11
-89.
+Package pdftex.def Info: figures/key_gen_and_storage.pdf  used on input line 13
+44.
 (pdftex.def)             Requested size: 390.0pt x 294.5151pt.
-<figures/document_encryption.pdf, id=2894, 2429.075pt x 2469.225pt>
+<figures/document_encryption.pdf, id=2993, 2429.075pt x 2469.225pt>
 File: figures/document_encryption.pdf Graphic file (type pdf)
 <use figures/document_encryption.pdf>
-Package pdftex.def Info: figures/document_encryption.pdf  used on input line 11
-96.
+Package pdftex.def Info: figures/document_encryption.pdf  used on input line 13
+51.
 (pdftex.def)             Requested size: 390.0pt x 396.44046pt.
-<figures/access_grant.pdf, id=2895, 2543.5025pt x 1927.2pt>
+<figures/access_grant.pdf, id=2994, 2543.5025pt x 1927.2pt>
 File: figures/access_grant.pdf Graphic file (type pdf)
 <use figures/access_grant.pdf>
-Package pdftex.def Info: figures/access_grant.pdf  used on input line 1203.
+Package pdftex.def Info: figures/access_grant.pdf  used on input line 1358.
 (pdftex.def)             Requested size: 390.0pt x 295.47818pt.
-<figures/access_and_decryption.pdf, id=2896, 2304.61pt x 3023.84245pt>
+<figures/access_and_decryption.pdf, id=2995, 2304.61pt x 3023.84245pt>
 File: figures/access_and_decryption.pdf Graphic file (type pdf)
 <use figures/access_and_decryption.pdf>
 Package pdftex.def Info: figures/access_and_decryption.pdf  used on input line 
-1210.
+1365.
 (pdftex.def)             Requested size: 370.49881pt x 486.08554pt.
-<figures/key_rotation_and_recovery.pdf, id=2897, 588.27782pt x 427.5975pt>
+<figures/key_rotation_and_recovery.pdf, id=2996, 588.27782pt x 427.5975pt>
 File: figures/key_rotation_and_recovery.pdf Graphic file (type pdf)
 <use figures/key_rotation_and_recovery.pdf>
 Package pdftex.def Info: figures/key_rotation_and_recovery.pdf  used on input l
-ine 1219.
+ine 1374.
 (pdftex.def)             Requested size: 390.0pt x 283.48752pt.
-[25] [26 <./figures/key_gen_and_storage.pdf>]
-(/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstlang1.sty
+ [28 <./figures/key_gen_and_storage.pdf>] [29 <./figures/document_encryption.pd
+f>] (/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2025/11/14 1.11b listings language file
 )
 (/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstlang2.sty
@@ -877,1659 +881,1660 @@ File: lstlang2.sty 2025/11/14 1.11b listings language file
 )
 (/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstlang3.sty
 File: lstlang3.sty 2025/11/14 1.11b listings language file
-) [27 <./figures/document_encryption.pdf>]
+)
 Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on i
-nput line 1256.
+nput line 1411.
+ [30 <./figures/access_grant.pdf>]
 LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <8> not available
-(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 1258.
- [28 <./figures/access_grant.pdf>]
-Overfull \hbox (5.13164pt too wide) in paragraph at lines 1311--1325
+(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 1413.
+
+Overfull \hbox (5.13164pt too wide) in paragraph at lines 1466--1480
 \T1/cmr/m/n/12 (-20) outage-tested. The ser-vice im-me-di-ately logs a \T1/cmtt
 /m/n/12 FABRIC_OUTAGE_ACCESS_DENIED
  []
 
 
-Overfull \hbox (44.24088pt too wide) in paragraph at lines 1311--1325
+Overfull \hbox (44.24088pt too wide) in paragraph at lines 1466--1480
 \T1/cmr/m/n/12 (-20) au-dit event con-tain-ing the fail-ure rea-son and throws 
 a \T1/cmtt/m/n/12 ServiceUnavailableException\T1/cmr/m/n/12 (-20) ,
  []
 
-[29]
-<figures/rbac_acl_pipeline.pdf, id=4757, 2962.06625pt x 1777.91534pt>
+[31]
+<figures/rbac_acl_pipeline.pdf, id=4847, 2962.06625pt x 1777.91534pt>
 File: figures/rbac_acl_pipeline.pdf Graphic file (type pdf)
 <use figures/rbac_acl_pipeline.pdf>
-Package pdftex.def Info: figures/rbac_acl_pipeline.pdf  used on input line 1336
+Package pdftex.def Info: figures/rbac_acl_pipeline.pdf  used on input line 1491
 .
 (pdftex.def)             Requested size: 319.80286pt x 191.93604pt.
 LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <12> not available
-(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 1377.
- [30] [31]
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 1532.
+ [32] [33] [34]
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 []|\T1/cmr/bx/n/8 (+20) Property
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 []|\T1/cmr/bx/n/8 (+20) Property
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 []|\T1/cmr/m/n/8 (+20) Honest-but-
  []
 
 
-Underfull \hbox (badness 6094) in paragraph at lines 1632--1632
+Underfull \hbox (badness 6094) in paragraph at lines 1787--1787
 []|\T1/cmr/m/n/8 (+20) Can ob-serve all
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) trans-ac-tions on
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) joined chan-nels;
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) can read world
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 []|\T1/cmr/m/n/8 (+20) Confidentiality
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) of doc-u-ment
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) con-tent and
  []
 
 
-Underfull \hbox (badness 1005) in paragraph at lines 1632--1632
+Underfull \hbox (badness 1005) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) ci-pher-text in pri-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) only on-chain;
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) still see CIDs,
  []
 
 
-Underfull \hbox (badness 1867) in paragraph at lines 1632--1632
+Underfull \hbox (badness 1867) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) leak-ing fre-quency
  []
 
 
-Underfull \hbox (badness 2460) in paragraph at lines 1632--1632
+Underfull \hbox (badness 2460) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) pat-terns and en-
  []
 
 
-Underfull \hbox (badness 5388) in paragraph at lines 1632--1632
+Underfull \hbox (badness 5388) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) abling candidate-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) document con-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) fir-ma-tion via
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) lo-cal \T1/cmtt/m/n/8 SHA-256\T1/cmr/m/n/8 (+20) .
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) The pro-to-type
  []
 
 
-Underfull \hbox (badness 2042) in paragraph at lines 1632--1632
+Underfull \hbox (badness 2042) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) level mem-ber-ship
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) (\T1/cmtt/m/n/8 doc.OwnerOrg
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmtt/m/n/8 == userOrg\T1/cmr/m/n/8 (+20) ) as
  []
 
 
-Underfull \hbox (badness 4913) in paragraph at lines 1632--1632
+Underfull \hbox (badness 4913) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) first-pass con-trol;
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) per-user intra-
  []
 
 
-Underfull \hbox (badness 2573) in paragraph at lines 1632--1632
+Underfull \hbox (badness 2573) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) and mov-ing $\OMS/cmsy/m/n/8 H[]$
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) to a PDC or
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 [][]\OT1/cmr/m/n/8 (+20) (\OML/cmm/m/it/8 D\OT1/cmr/m/n/8 (+20) )$ \T1/cmr/m/n/
 8 (+20) re-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) main pro-duc-tion
  []
 
 
-Underfull \hbox (badness 6876) in paragraph at lines 1632--1632
+Underfull \hbox (badness 6876) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) Post-greSQL; can
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 []|\T1/cmr/m/n/8 (+20) Integrity of
  []
 
 
-Underfull \hbox (badness 4621) in paragraph at lines 1632--1632
+Underfull \hbox (badness 4621) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) ac-cess con-trol
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) records and
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 []|\T1/cmr/m/n/8 (+20) Under nor-mal
  []
 
 
-Underfull \hbox (badness 3019) in paragraph at lines 1632--1632
+Underfull \hbox (badness 3019) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) op-er-a-tion, ac-cess
  []
 
 
-Underfull \hbox (badness 5288) in paragraph at lines 1632--1632
+Underfull \hbox (badness 5288) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) con-trol is eval-u-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) ity, the sys-tem
  []
 
 
-Underfull \hbox (badness 4531) in paragraph at lines 1632--1632
+Underfull \hbox (badness 4531) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) ing HTTP 503).
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) The \T1/cmtt/m/n/8 audit_log
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) row-level and
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) statement-level
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) trig-gers block
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) ac-ci-den-tal or
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) application-layer
  []
 
 
-Underfull \hbox (badness 6236) in paragraph at lines 1632--1632
+Underfull \hbox (badness 6236) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) mod-i-fi-ca-tion and
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) TRUN-CATE at-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 []|\T1/cmr/m/n/8 (+20) Triggers pro-vide
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) op-er-a-tional in-
  []
 
 
-Underfull \hbox (badness 1910) in paragraph at lines 1632--1632
+Underfull \hbox (badness 1910) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) tegrity only, not
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) cryp-to-graphic
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) pro-tec-tion from
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) a Post-greSQL
  []
 
 
-Underfull \hbox (badness 2401) in paragraph at lines 1632--1632
+Underfull \hbox (badness 2401) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) su-pe-ruser. The
  []
 
 
-Underfull \hbox (badness 2326) in paragraph at lines 1632--1632
+Underfull \hbox (badness 2326) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) ric out-ages deny
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) ac-cess; how-ever,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) can make later
  []
 
 
-Underfull \hbox (badness 4060) in paragraph at lines 1632--1632
+Underfull \hbox (badness 4060) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) while the ledger
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) Null firm/MSP
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) now raises
  []
 
 
-Overfull \hbox (19.64957pt too wide) in paragraph at lines 1632--1632
+Overfull \hbox (19.64957pt too wide) in paragraph at lines 1787--1787
 \T1/cmtt/m/n/8 AccessDeniedException
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) be-fore the Fab-
  []
 
 
-Underfull \hbox (badness 3803) in paragraph at lines 1632--1632
+Underfull \hbox (badness 3803) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) ric gate-way; no
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) de-fault or-ga-ni-za-
  []
 
 
-Underfull \hbox (badness 5954) in paragraph at lines 1632--1632
+Underfull \hbox (badness 5954) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) tion is as-sumed
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 []|\T1/cmr/m/n/8 (+20) Controls the
  []
 
 
-Underfull \hbox (badness 2799) in paragraph at lines 1632--1632
+Underfull \hbox (badness 2799) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) Spring Boot ser-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) vice, API-layer
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) REST gate-way,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) and op-er-a-tional
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) database ac-cess;
  []
 
 
-Underfull \hbox (badness 4084) in paragraph at lines 1632--1632
+Underfull \hbox (badness 4084) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) may at-tempt to
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) by-pass chain-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) code, mis-use
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) server-managed
  []
 
 
-Underfull \hbox (badness 2961) in paragraph at lines 1632--1632
+Underfull \hbox (badness 2961) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) Fab-ric MSP cre-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) den-tials, serve
  []
 
 
-Underfull \hbox (badness 2165) in paragraph at lines 1632--1632
+Underfull \hbox (badness 2165) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) JavaScript to in-
  []
 
 
-Underfull \hbox (badness 1490) in paragraph at lines 1632--1632
+Underfull \hbox (badness 1490) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) op-er-a-tions, cache
  []
 
 
-Underfull \hbox (badness 1917) in paragraph at lines 1632--1632
+Underfull \hbox (badness 1917) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) or for-ward IPFS
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) ci-pher-text af-ter
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) or abuse MSP
  []
 
 
-Underfull \hbox (badness 6032) in paragraph at lines 1632--1632
+Underfull \hbox (badness 6032) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) iden-tity bind-ings
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) be-fore ledger
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 []|\T1/cmr/m/n/8 (+20) Authorization
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) in-tegrity,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) trans-ac-tion
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) at-tri-bu-tion,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) con-fi-den-tial-ity
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) in pro-to-type
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) plaintext-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) against ledger-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) be-fore pro-tected
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) ma-te-rial is re-
  []
 
 
-Underfull \hbox (badness 3884) in paragraph at lines 1632--1632
+Underfull \hbox (badness 3884) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) turned. Fab-ric
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) pro-vides an
  []
 
 
-Underfull \hbox (badness 1681) in paragraph at lines 1632--1632
+Underfull \hbox (badness 1681) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) i-fi-able record for
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) ledger-mediated
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) grants, re-vo-ca-
  []
 
 
-Underfull \hbox (badness 2617) in paragraph at lines 1632--1632
+Underfull \hbox (badness 2617) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) tions, and au-dit
  []
 
 
-Overfull \hbox (46.4879pt too wide) in paragraph at lines 1632--1632
+Overfull \hbox (46.4879pt too wide) in paragraph at lines 1787--1787
 \T1/cmtt/m/n/8 FABRIC_OUTAGE_ACCESS_DENIED\T1/cmr/m/n/8 (-20) ;
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) user-level doc-u-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) ment sig-na-tures
  []
 
 
-Underfull \hbox (badness 2486) in paragraph at lines 1632--1632
+Underfull \hbox (badness 2486) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) bind the sign-ing
  []
 
 
-Underfull \hbox (badness 5771) in paragraph at lines 1632--1632
+Underfull \hbox (badness 5771) in paragraph at lines 1787--1787
 []|\T1/cmr/m/n/8 (+20) A fully com-pro-
  []
 
 
-Underfull \hbox (badness 2591) in paragraph at lines 1632--1632
+Underfull \hbox (badness 2591) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) mised API op-er-
  []
 
 
-Underfull \hbox (badness 4582) in paragraph at lines 1632--1632
+Underfull \hbox (badness 4582) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) a-tor can by-pass
  []
 
 
-Underfull \hbox (badness 7888) in paragraph at lines 1632--1632
+Underfull \hbox (badness 7888) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) ap-pli-ca-tion logic,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) mis-use cus-to-dial
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) MSP cre-den-tials,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) ex-pose plain-text
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) via ma-li-cious
  []
 
 
-Underfull \hbox (badness 5622) in paragraph at lines 1632--1632
+Underfull \hbox (badness 5622) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) fron-tend de-liv-ery
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) be-fore browser
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) off-chain ac-cess
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) paths, or sub-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) sti-tute re-cip-i-ent
  []
 
 
-Underfull \hbox (badness 6708) in paragraph at lines 1632--1632
+Underfull \hbox (badness 6708) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) cre-ation. Fab-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) ric still makes
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) ledger-mediated
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) re-quires browser-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) only en-cryp-tion,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) per-user Fab-ric
  []
 
 
-Underfull \hbox (badness 3049) in paragraph at lines 1632--1632
+Underfull \hbox (badness 3049) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) iden-ti-ties, ledger-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) anchored pub-lic
  []
 
 
-Underfull \hbox (badness 4779) in paragraph at lines 1632--1632
+Underfull \hbox (badness 4779) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) keys, and strict
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 []|\T1/cmr/m/n/8 (+20) Compromised
  []
 
 
-Underfull \hbox (badness 1688) in paragraph at lines 1632--1632
+Underfull \hbox (badness 1688) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) browser / XSS
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) user's browser
  []
 
 
-Underfull \hbox (badness 3884) in paragraph at lines 1632--1632
+Underfull \hbox (badness 3884) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) ses-sion; can ob-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) serve pass-words
  []
 
 
-Underfull \hbox (badness 1259) in paragraph at lines 1632--1632
+Underfull \hbox (badness 1259) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) or de-crypted pri-
  []
 
 
-Underfull \hbox (badness 1859) in paragraph at lines 1632--1632
+Underfull \hbox (badness 1859) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) vate keys dur-ing
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) un-lock/use; can
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) ini-ti-ate ac-tions
  []
 
 
-Underfull \hbox (badness 4036) in paragraph at lines 1632--1632
+Underfull \hbox (badness 4036) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) as the logged-in
  []
 
 
-Underfull \hbox (badness 1152) in paragraph at lines 1632--1632
+Underfull \hbox (badness 1152) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) be-fore en-cryp-tion
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) con-fi-den-tial-
  []
 
 
-Underfull \hbox (badness 2837) in paragraph at lines 1632--1632
+Underfull \hbox (badness 2837) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) ity, doc-u-ment
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) con-fi-den-tial-ity
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) be-fore en-
  []
 
 
-Underfull \hbox (badness 4181) in paragraph at lines 1632--1632
+Underfull \hbox (badness 4181) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) cryp-tion, and
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) user-initiated
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 []|\T1/cmr/m/n/8 (+20) Private keys
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) are stored en-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmtt/m/n/8 localStorage
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) wrap-ping key;
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) in the browser;
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) server-side au-dit
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) logs make sub-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) mit-ted ac-tions
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 []|\T1/cmr/m/n/8 (+20) Encrypted
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmtt/m/n/8 localStorage
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) re-sists pas-sive
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) ac-tive browser
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) tend code can
  []
 
 
-Underfull \hbox (badness 2707) in paragraph at lines 1632--1632
+Underfull \hbox (badness 2707) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) dur-ing use; pro-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) duc-tion re-quires
  []
 
 
-Underfull \hbox (badness 2005) in paragraph at lines 1632--1632
+Underfull \hbox (badness 2005) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) con-trols, We-bAu-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) thn/FIDO2 or
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) and hard-ened
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 []|\T1/cmr/m/n/8 (+20) Compromised
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 []|\T1/cmr/m/n/8 (+20) Document
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) in-tegrity and
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) plain-text stored
  []
 
 
-Underfull \hbox (badness 5741) in paragraph at lines 1632--1632
+Underfull \hbox (badness 5741) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) on-chain at reg-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) is-tra-tion; any
  []
 
 
-Underfull \hbox (badness 7832) in paragraph at lines 1632--1632
+Underfull \hbox (badness 7832) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) tam-pered ci-pher-
  []
 
 
-Underfull \hbox (badness 5345) in paragraph at lines 1632--1632
+Underfull \hbox (badness 5345) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) text pro-duces a
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) hash mis-match
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) au-tho-rized client
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) de-sign uses a
  []
 
 
-Underfull \hbox (badness 6995) in paragraph at lines 1632--1632
+Underfull \hbox (badness 6995) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) pri-vate two-node
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) swarm/cross-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 []|\T1/cmr/m/n/8 (+20) Availability still
  []
 
 
-Underfull \hbox (badness 4967) in paragraph at lines 1632--1632
+Underfull \hbox (badness 4967) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) de-pends on pin-
  []
 
 
-Underfull \hbox (badness 5431) in paragraph at lines 1632--1632
+Underfull \hbox (badness 5431) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) ning pol-icy and
  []
 
 
-Underfull \hbox (badness 1184) in paragraph at lines 1632--1632
+Underfull \hbox (badness 1184) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) node health. If
  []
 
 
-Underfull \hbox (badness 5274) in paragraph at lines 1632--1632
+Underfull \hbox (badness 5274) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) are com-pro-mised
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) or un-avail-able,
  []
 
 
-Underfull \hbox (badness 5787) in paragraph at lines 1632--1632
+Underfull \hbox (badness 5787) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) con-tent may be
  []
 
 
-Underfull \hbox (badness 4819) in paragraph at lines 1632--1632
+Underfull \hbox (badness 4819) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) un-avail-able; pro-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) duc-tion re-quires
  []
 
 
-Underfull \hbox (badness 1242) in paragraph at lines 1632--1632
+Underfull \hbox (badness 1242) in paragraph at lines 1787--1787
 []|\T1/cmr/m/n/8 (+20) A sin-gle com-pro-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) mised or-derer
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) can ob-serve all
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) un-ordered trans-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) ac-tions; can-not
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) uni-lat-er-ally re-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) order or cen-sor
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) sin-gle or-derer
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) while con-sen-sus
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) execute-order-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) validate pipeline
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) ev-ery block re-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 []|\T1/cmr/m/n/8 (+20) Two col-lud-ing
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) or-der-ers (2-of-3)
  []
 
 
-Underfull \hbox (badness 1242) in paragraph at lines 1632--1632
+Underfull \hbox (badness 1242) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) does not pre-vent
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) Byzan-tine or-der-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) is the pro-duc-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) tion path for
  []
 
 
-Underfull \hbox (badness 4595) in paragraph at lines 1632--1632
+Underfull \hbox (badness 4595) in paragraph at lines 1787--1787
 []|\T1/cmr/m/n/8 (+20) On-chain meta-
  []
 
 
-Underfull \hbox (badness 1424) in paragraph at lines 1632--1632
+Underfull \hbox (badness 1424) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) tive meta-data in
  []
 
 
-Underfull \hbox (badness 5726) in paragraph at lines 1632--1632
+Underfull \hbox (badness 5726) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) a pri-vate col-lec-
  []
 
 
-Underfull \hbox (badness 1424) in paragraph at lines 1632--1632
+Underfull \hbox (badness 1424) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) ten to the main
  []
 
 
-Underfull \hbox (badness 1675) in paragraph at lines 1632--1632
+Underfull \hbox (badness 1675) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) quency and CID
  []
 
 
-Underfull \hbox (badness 6995) in paragraph at lines 1632--1632
+Underfull \hbox (badness 6995) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) can in-fer which
  []
 
 
-Underfull \hbox (badness 3769) in paragraph at lines 1632--1632
+Underfull \hbox (badness 3769) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) cessed fre-quently,
  []
 
 
-Underfull \hbox (badness 2547) in paragraph at lines 1632--1632
+Underfull \hbox (badness 2547) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) ing case ac-tiv-ity
  []
 
 
-Underfull \hbox (badness 7722) in paragraph at lines 1632--1632
+Underfull \hbox (badness 7722) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) pat-terns with-out
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 []|\T1/cmr/m/n/8 (+20) Traffic anal-y-sis
  []
 
 
-Underfull \hbox (badness 7722) in paragraph at lines 1632--1632
+Underfull \hbox (badness 7722) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) pat-terns with-out
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) Zero-knowledge
  []
 
 
-Underfull \hbox (badness 6792) in paragraph at lines 1632--1632
+Underfull \hbox (badness 6792) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) proofs, batch-ing,
  []
 
 
-Underfull \hbox (badness 5417) in paragraph at lines 1632--1632
+Underfull \hbox (badness 5417) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) cover traf-fic, or
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) pri-vate ac-cess
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) pro-to-cols are
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) fu-ture work to
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1632
+Underfull \hbox (badness 10000) in paragraph at lines 1787--1787
 \T1/cmr/m/n/8 (+20) re-duce leak-age
  []
 
-[32] [33] [34] [35]
-Overfull \hbox (17.6207pt too wide) in paragraph at lines 1634--1653
+[35] [36] [37]
+Overfull \hbox (17.6207pt too wide) in paragraph at lines 1789--1808
 [][] 
  []
 
 
-Overfull \hbox (6.49997pt too wide) in paragraph at lines 1689--1689
+Overfull \hbox (6.49997pt too wide) in paragraph at lines 1844--1844
 []|\T1/cmr/m/n/6 (-20) Browser/XSS 
  []
 
-[36] [37] [38] [39] [40] [41] [42] [43]
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+[38] [39] [40] [41] [42] [43] [44] [45]
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 []|\T1/cmr/bx/n/10.95 (+20) Proto-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 []|\T1/cmr/bx/n/10.95 (+20) Proto-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 []|\T1/cmr/m/n/10.95 (+20) Browser AES-256-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 []|\T1/cmr/m/n/10.95 (+20) Mechanism im-ple-
  []
 
 
-Underfull \hbox (badness 2158) in paragraph at lines 2093--2093
+Underfull \hbox (badness 2158) in paragraph at lines 2248--2248
 \OMS/cmsy/m/n/10.95 H[]$\T1/cmr/m/n/10.95 (+20) , and $\OML/cmm/m/it/10.95 id[]
 $\T1/cmr/m/n/10.95 (+20) ; Fab-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) ric transaction-level
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) non-repudiation re-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 []|\T1/cmr/m/n/10.95 (+20) ECIES-style P-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 []|\T1/cmr/m/n/10.95 (+20) 125-byte to-ken;
  []
 
 
-Underfull \hbox (badness 7522) in paragraph at lines 2093--2093
+Underfull \hbox (badness 7522) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) browser wraps $\OML/cmm/m/it/10.95 k[]$
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 []|\T1/cmtt/m/n/10.95 CheckAccess \T1/cmr/m/n/10.95 (+20) eval-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) u-ated on ev-ery
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) down-load; ser-vice
  []
 
 
-Underfull \hbox (badness 3919) in paragraph at lines 2093--2093
+Underfull \hbox (badness 3919) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) grants (Branches 1--
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) 2), falls back to
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 \T1/cmtt/m/n/10.95 doc.OwnerOrg ==
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 \T1/cmtt/m/n/10.95 userOrg \T1/cmr/m/n/10.95 (+20) for owner-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) organization ac-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) cess (Branch 3),
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) and eval-u-ates org-
  []
 
 
-Underfull \hbox (badness 7256) in paragraph at lines 2093--2093
+Underfull \hbox (badness 7256) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) prefix grants un-der
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 \T1/cmtt/m/n/10.95 ACL["ORG:"+org]
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) (Branches 4--5), as
  []
 
 
-Underfull \hbox (badness 1297) in paragraph at lines 2093--2093
+Underfull \hbox (badness 1297) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) organization per-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 \T1/cmtt/m/n/10.95 == userOrg \T1/cmr/m/n/10.95 (+20) owner-
  []
 
 
-Underfull \hbox (badness 1297) in paragraph at lines 2093--2093
+Underfull \hbox (badness 1297) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) org fall-back; re-quire
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) ex-plicit per-user
  []
 
 
-Underfull \hbox (badness 4886) in paragraph at lines 2093--2093
+Underfull \hbox (badness 4886) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) grants for all prin-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) ci-pals, in-clud-ing
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) intra-organization
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 []|\T1/cmr/m/n/10.95 (+20) Prototype cur-rently
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) cross-organization
  []
 
 
-Underfull \hbox (badness 2644) in paragraph at lines 2093--2093
+Underfull \hbox (badness 2644) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) ac-cess. Pro-duc-tion
  []
 
 
-Underfull \hbox (badness 4391) in paragraph at lines 2093--2093
+Underfull \hbox (badness 4391) in paragraph at lines 2248--2248
 []|\T1/cmr/m/n/10.95 (+20) On-chain ex-piry en-
  []
 
 
-Underfull \hbox (badness 4084) in paragraph at lines 2093--2093
+Underfull \hbox (badness 4084) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) forced in chain-code;
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) ex-pired grants de-
  []
 
 
-Underfull \hbox (badness 7649) in paragraph at lines 2093--2093
+Underfull \hbox (badness 7649) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) nied by \T1/cmtt/m/n/10.95 ExpiresAt\T1/cmr/m/n/10.95 (
 +20) ;
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) ex-piry write-back
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) to pre-vent MVCC
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 \T1/cmtt/m/n/10.95 CleanExpiredTokens
  []
 
 
-Underfull \hbox (badness 2012) in paragraph at lines 2093--2093
+Underfull \hbox (badness 2012) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) from Raft con-fig-u-ra-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 []|\T1/cmr/m/n/10.95 (+20) 2-node IPFS
  []
 
 
-Underfull \hbox (badness 1009) in paragraph at lines 2093--2093
+Underfull \hbox (badness 1009) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) ning across 2 nodes;
  []
 
 
-Underfull \hbox (badness 1231) in paragraph at lines 2093--2093
+Underfull \hbox (badness 1231) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) pin-ning pol-icy, node
  []
 
 
-Underfull \hbox (badness 1769) in paragraph at lines 2093--2093
+Underfull \hbox (badness 1769) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) health, and net-work
  []
 
 
-Underfull \hbox (badness 3449) in paragraph at lines 2093--2093
+Underfull \hbox (badness 3449) in paragraph at lines 2248--2248
 []|\T1/cmr/m/n/10.95 (+20) Implemented as pri-
  []
 
 
-Underfull \hbox (badness 2521) in paragraph at lines 2093--2093
+Underfull \hbox (badness 2521) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) aged pin-ning rec-om-
  []
 
 
-Underfull \hbox (badness 1147) in paragraph at lines 2093--2093
+Underfull \hbox (badness 1147) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) SLA. Ex-per-i-ment []10[]
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 []|\T1/cmr/m/n/10.95 (+20) Per-user Fab-ric
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 []|\T1/cmr/m/n/10.95 (+20) Hardware-backed
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 []|\T1/cmr/m/n/10.95 (+20) WebAuthn/FIDO2
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 []|\T1/cmr/m/n/10.95 (+20) Browser re-encrypts
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 \OML/cmm/m/it/10.95 k[]$ \T1/cmr/m/n/10.95 (+20) for re-main-ing
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 []|\T1/cmr/m/n/10.95 (+20) Notification im-ple-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) mented; browser
  []
 
 
-Underfull \hbox (badness 1708) in paragraph at lines 2093--2093
+Underfull \hbox (badness 1708) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) owner ac-tion; proxy
  []
 
 
-Underfull \hbox (badness 4353) in paragraph at lines 2093--2093
+Underfull \hbox (badness 4353) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) re-encryption is the
  []
 
 
-Underfull \hbox (badness 2221) in paragraph at lines 2093--2093
+Underfull \hbox (badness 2221) in paragraph at lines 2248--2248
 []|\T1/cmr/m/n/10.95 (+20) TOTP MFA re-
  []
 
 
-Underfull \hbox (badness 2521) in paragraph at lines 2093--2093
+Underfull \hbox (badness 2521) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) gen-er-a-tion at en-roll-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 []|\T1/cmr/m/n/10.95 (+20) TPM/HSM-backed
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) TLS cer-tifi-cates on
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 []|\T1/cmr/m/n/10.95 (+20) Wrapped-key to-kens
  []
 
 
-Underfull \hbox (badness 3803) in paragraph at lines 2093--2093
+Underfull \hbox (badness 3803) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) to re-duce key-token
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 []|\T1/cmr/m/n/10.95 (+20) Prototype stores
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) ECIES-wrapped to-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) kens as en-crypted
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) Fab-ric world-state
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2093--2093
+Underfull \hbox (badness 10000) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) val-ues in-dexed by
  []
 
 
-Underfull \hbox (badness 1742) in paragraph at lines 2093--2093
+Underfull \hbox (badness 1742) in paragraph at lines 2248--2248
 \T1/cmr/m/n/10.95 (+20) doc-u-ment and re-cip-
  []
 
-[44] [45] [46] [47]
-Overfull \hbox (17.6207pt too wide) in paragraph at lines 2095--2106
+[46] [47] [48] [49]
+Overfull \hbox (17.6207pt too wide) in paragraph at lines 2250--2261
 [][] 
  []
 
 
-Overfull \hbox (20.67429pt too wide) in paragraph at lines 2143--2155
+Overfull \hbox (20.67429pt too wide) in paragraph at lines 2298--2310
 []\T1/cmr/m/n/12 (-20) The repos-i-tory con-tains con-fig-u-ra-tion ar-ti-facts
  for a larger six-peer-organization
  []
 
-[48]
-<figures/fabric_topology4.pdf, id=5007, 935.41469pt x 519.86218pt>
+[50]
+<figures/fabric_topology4.pdf, id=5097, 935.41469pt x 519.86218pt>
 File: figures/fabric_topology4.pdf Graphic file (type pdf)
 <use figures/fabric_topology4.pdf>
-Package pdftex.def Info: figures/fabric_topology4.pdf  used on input line 2165.
+Package pdftex.def Info: figures/fabric_topology4.pdf  used on input line 2320.
 
 (pdftex.def)             Requested size: 780.0pt x 433.50034pt.
 
-Overfull \hbox (390.0pt too wide) in paragraph at lines 2165--2171
+Overfull \hbox (390.0pt too wide) in paragraph at lines 2320--2326
  [][] 
  []
 
-[49]
-<figures/grant_access_sequence.pdf, id=5018, 601.28638pt x 327.14218pt>
+[51]
+<figures/grant_access_sequence.pdf, id=5107, 601.28638pt x 327.14218pt>
 File: figures/grant_access_sequence.pdf Graphic file (type pdf)
 <use figures/grant_access_sequence.pdf>
 Package pdftex.def Info: figures/grant_access_sequence.pdf  used on input line 
-2211.
+2366.
 (pdftex.def)             Requested size: 319.80286pt x 173.99352pt.
-<figures/verify_access_sequence.pdf, id=5021, 669.46106pt x 457.71pt>
+<figures/verify_access_sequence.pdf, id=5110, 669.46106pt x 457.71pt>
 File: figures/verify_access_sequence.pdf Graphic file (type pdf)
 <use figures/verify_access_sequence.pdf>
 Package pdftex.def Info: figures/verify_access_sequence.pdf  used on input line
- 2229.
+ 2384.
 (pdftex.def)             Requested size: 343.2019pt x 234.65123pt.
-<figures/activity_diagram.pdf, id=5027, 478.66827pt x 291.00719pt>
+<figures/activity_diagram.pdf, id=5116, 478.66827pt x 291.00719pt>
 File: figures/activity_diagram.pdf Graphic file (type pdf)
 <use figures/activity_diagram.pdf>
-Package pdftex.def Info: figures/activity_diagram.pdf  used on input line 2249.
+Package pdftex.def Info: figures/activity_diagram.pdf  used on input line 2404.
 
 (pdftex.def)             Requested size: 545.99762pt x 331.96921pt.
 
-Overfull \hbox (155.99762pt too wide) in paragraph at lines 2249--2253
+Overfull \hbox (155.99762pt too wide) in paragraph at lines 2404--2408
  [][] 
  []
 
-[50]
-<figures/ui_ledger_explorer.png, id=5039, 1028.34187pt x 578.16pt>
+[52]
+<figures/ui_ledger_explorer.png, id=5128, 1028.34187pt x 578.16pt>
 File: figures/ui_ledger_explorer.png Graphic file (type png)
 <use figures/ui_ledger_explorer.png>
-Package pdftex.def Info: figures/ui_ledger_explorer.png  used on input line 228
-0.
+Package pdftex.def Info: figures/ui_ledger_explorer.png  used on input line 243
+5.
 (pdftex.def)             Requested size: 187.19833pt x 105.24644pt.
-<figures/ui_audit_log.png, id=5041, 1028.34187pt x 578.16pt>
+<figures/ui_audit_log.png, id=5130, 1028.34187pt x 578.16pt>
 File: figures/ui_audit_log.png Graphic file (type png)
 <use figures/ui_audit_log.png>
-Package pdftex.def Info: figures/ui_audit_log.png  used on input line 2283.
+Package pdftex.def Info: figures/ui_audit_log.png  used on input line 2438.
 (pdftex.def)             Requested size: 187.19833pt x 105.24644pt.
 
-Overfull \hbox (27.00488pt too wide) in paragraph at lines 2312--2318
+Overfull \hbox (27.00488pt too wide) in paragraph at lines 2467--2473
 \T1/cmr/m/n/12 (-20) Law-FirmB, Reg-u-la-torOrg) on a shared \T1/cmtt/m/n/12 le
 galchannel\T1/cmr/m/n/12 (-20) , each backed by CouchDB 3.2.
  []
 
 
-Overfull \hbox (67.02524pt too wide) in paragraph at lines 2319--2328
+Overfull \hbox (67.02524pt too wide) in paragraph at lines 2474--2483
 []\T1/cmr/m/n/12 (-20) Unless oth-er-wise stated, \T1/cmtt/m/n/12 BatchTimeout 
 \T1/cmr/m/n/12 (-20) was set to 2s and \T1/cmtt/m/n/12 BatchSize.MaxMessageCoun
 t
  []
 
-[51] [52]
-<figures/fig1_scalability.pdf, id=5085, 543.22902pt x 311.96503pt>
+[53] [54]
+<figures/fig1_scalability.pdf, id=5173, 543.22902pt x 311.96503pt>
 File: figures/fig1_scalability.pdf Graphic file (type pdf)
 <use figures/fig1_scalability.pdf>
-Package pdftex.def Info: figures/fig1_scalability.pdf  used on input line 2423.
+Package pdftex.def Info: figures/fig1_scalability.pdf  used on input line 2578.
 
 (pdftex.def)             Requested size: 304.19952pt x 174.69444pt.
- [53] [54]
-<figures/fig2_latency.pdf, id=5107, 601.045pt x 340.61261pt>
+ [55] [56]
+<figures/fig2_latency.pdf, id=5196, 601.045pt x 340.61261pt>
 File: figures/fig2_latency.pdf Graphic file (type pdf)
 <use figures/fig2_latency.pdf>
-Package pdftex.def Info: figures/fig2_latency.pdf  used on input line 2532.
+Package pdftex.def Info: figures/fig2_latency.pdf  used on input line 2687.
 (pdftex.def)             Requested size: 304.19952pt x 172.39pt.
- [55]
-<figures/fig3_filesize.pdf, id=5115, 543.22902pt x 384.23503pt>
+ [57]
+<figures/fig3_filesize.pdf, id=5203, 543.22902pt x 384.23503pt>
 File: figures/fig3_filesize.pdf Graphic file (type pdf)
 <use figures/fig3_filesize.pdf>
-Package pdftex.def Info: figures/fig3_filesize.pdf  used on input line 2554.
+Package pdftex.def Info: figures/fig3_filesize.pdf  used on input line 2709.
 (pdftex.def)             Requested size: 304.19952pt x 215.16428pt.
-<figures/fig4_audit.pdf, id=5121, 543.22902pt x 250.53552pt>
+<figures/fig4_audit.pdf, id=5209, 543.22902pt x 250.53552pt>
 File: figures/fig4_audit.pdf Graphic file (type pdf)
 <use figures/fig4_audit.pdf>
-Package pdftex.def Info: figures/fig4_audit.pdf  used on input line 2587.
+Package pdftex.def Info: figures/fig4_audit.pdf  used on input line 2742.
 (pdftex.def)             Requested size: 335.40024pt x 154.68434pt.
- [56]
-<figures/fig5_wan.pdf, id=5135, 774.49304pt x 311.96503pt>
+ [58]
+<figures/fig5_wan.pdf, id=5223, 774.49304pt x 311.96503pt>
 File: figures/fig5_wan.pdf Graphic file (type pdf)
 <use figures/fig5_wan.pdf>
-Package pdftex.def Info: figures/fig5_wan.pdf  used on input line 2675.
+Package pdftex.def Info: figures/fig5_wan.pdf  used on input line 2830.
 (pdftex.def)             Requested size: 366.60095pt x 147.66605pt.
- [57] [58]
-<figures/fig6_crypto.pdf, id=5151, 774.49304pt x 326.41902pt>
+ [59] [60]
+<figures/fig6_crypto.pdf, id=5240, 774.49304pt x 326.41902pt>
 File: figures/fig6_crypto.pdf Graphic file (type pdf)
 <use figures/fig6_crypto.pdf>
-Package pdftex.def Info: figures/fig6_crypto.pdf  used on input line 2725.
+Package pdftex.def Info: figures/fig6_crypto.pdf  used on input line 2880.
 (pdftex.def)             Requested size: 350.99762pt x 147.93315pt.
-<figures/fig7_gethistory.pdf, id=5157, 760.03902pt x 311.96503pt>
+<figures/fig7_gethistory.pdf, id=5246, 760.03902pt x 311.96503pt>
 File: figures/fig7_gethistory.pdf Graphic file (type pdf)
 <use figures/fig7_gethistory.pdf>
-Package pdftex.def Info: figures/fig7_gethistory.pdf  used on input line 2780.
+Package pdftex.def Info: figures/fig7_gethistory.pdf  used on input line 2935.
 (pdftex.def)             Requested size: 304.19952pt x 124.85995pt.
- [59]
-<figures/fig8_sensitivity.pdf, id=5165, 543.22902pt x 297.511pt>
+ [61]
+<figures/fig8_sensitivity.pdf, id=5255, 543.22902pt x 297.511pt>
 File: figures/fig8_sensitivity.pdf Graphic file (type pdf)
 <use figures/fig8_sensitivity.pdf>
-Package pdftex.def Info: figures/fig8_sensitivity.pdf  used on input line 2828.
+Package pdftex.def Info: figures/fig8_sensitivity.pdf  used on input line 2983.
 
 (pdftex.def)             Requested size: 390.0pt x 213.59488pt.
- [60]
-Overfull \hbox (4.79622pt too wide) in paragraph at lines 2842--2843
+ [62]
+Overfull \hbox (4.79622pt too wide) in paragraph at lines 2997--2998
 []\T1/cmr/m/n/12 (-20) This re-sult sub-stan-ti-ates the fail-closed be-hav-ior
  for the eval-u-ated document-
  []
 
-<figures/fig9_failclosed_outage.pdf, id=5173, 722.7pt x 346.89601pt>
+<figures/fig9_failclosed_outage.pdf, id=5263, 722.7pt x 346.89601pt>
 File: figures/fig9_failclosed_outage.pdf Graphic file (type pdf)
 <use figures/fig9_failclosed_outage.pdf>
 Package pdftex.def Info: figures/fig9_failclosed_outage.pdf  used on input line
- 2846.
+ 3001.
 (pdftex.def)             Requested size: 331.50238pt x 159.11888pt.
-<figures/fig10_ipfs_cost.pdf, id=5178, 794.97pt x 592.61403pt>
+<figures/fig10_ipfs_cost.pdf, id=5268, 794.97pt x 592.61403pt>
 File: figures/fig10_ipfs_cost.pdf Graphic file (type pdf)
 <use figures/fig10_ipfs_cost.pdf>
-Package pdftex.def Info: figures/fig10_ipfs_cost.pdf  used on input line 2891.
+Package pdftex.def Info: figures/fig10_ipfs_cost.pdf  used on input line 3046.
 (pdftex.def)             Requested size: 382.19833pt x 284.9217pt.
-[61]
-<figures/fig11_caliper.pdf, id=5188, 794.97pt x 332.44202pt>
+[63]
+<figures/fig11_caliper.pdf, id=5277, 794.97pt x 332.44202pt>
 File: figures/fig11_caliper.pdf Graphic file (type pdf)
 <use figures/fig11_caliper.pdf>
-Package pdftex.def Info: figures/fig11_caliper.pdf  used on input line 2931.
+Package pdftex.def Info: figures/fig11_caliper.pdf  used on input line 3086.
 (pdftex.def)             Requested size: 350.99762pt x 146.7822pt.
-<figures/fig12_ledger_growth.pdf, id=5192, 794.97pt x 332.44202pt>
+<figures/fig12_ledger_growth.pdf, id=5281, 794.97pt x 332.44202pt>
 File: figures/fig12_ledger_growth.pdf Graphic file (type pdf)
 <use figures/fig12_ledger_growth.pdf>
-Package pdftex.def Info: figures/fig12_ledger_growth.pdf  used on input line 29
-70.
+Package pdftex.def Info: figures/fig12_ledger_growth.pdf  used on input line 31
+25.
 (pdftex.def)             Requested size: 350.99762pt x 146.7822pt.
- [62]
-<figures/fig13_network_scaling.pdf, id=5202, 794.97pt x 332.44202pt>
+ [64]
+<figures/fig13_network_scaling.pdf, id=5290, 794.97pt x 332.44202pt>
 File: figures/fig13_network_scaling.pdf Graphic file (type pdf)
 <use figures/fig13_network_scaling.pdf>
 Package pdftex.def Info: figures/fig13_network_scaling.pdf  used on input line 
-3011.
+3166.
 (pdftex.def)             Requested size: 350.99762pt x 146.7822pt.
- [63]
-<figures/fig14_baseline.pdf, id=5212, 794.97pt x 332.44202pt>
+ [65]
+<figures/fig14_baseline.pdf, id=5300, 794.97pt x 332.44202pt>
 File: figures/fig14_baseline.pdf Graphic file (type pdf)
 <use figures/fig14_baseline.pdf>
-Package pdftex.def Info: figures/fig14_baseline.pdf  used on input line 3062.
+Package pdftex.def Info: figures/fig14_baseline.pdf  used on input line 3217.
 (pdftex.def)             Requested size: 350.99762pt x 146.7822pt.
 
 Underfull \vbox (badness 1590) has occurred while \output is active []
 
- [64]
-Overfull \hbox (22.75832pt too wide) in paragraph at lines 3182--3193
+ [66]
+Overfull \hbox (22.75832pt too wide) in paragraph at lines 3337--3348
 \T1/cmr/m/n/12 (-20) uses the Fab-ric trans-ac-tion times-tamp (\T1/cmtt/m/n/12
  ctx.GetStub().GetTxTimestamp()\T1/cmr/m/n/12 (-20) )
  []
 
-[65]
-Overfull \hbox (4.18654pt too wide) in paragraph at lines 3209--3216
+[67]
+Overfull \hbox (4.18654pt too wide) in paragraph at lines 3364--3371
 \T1/cmr/m/n/12 (-20) been val-i-dated at pro-duc-tion scale. Mit-i-ga-tions in-
 clude re-duc-ing \T1/cmtt/m/n/12 BatchTimeout
  []
 
 
-Overfull \hbox (18.3314pt too wide) in paragraph at lines 3217--3224
+Overfull \hbox (18.3314pt too wide) in paragraph at lines 3372--3379
 \T1/cmr/m/n/12 (-20) failover, multi-peer fail-ure com-bi-na-tions, or re-cov-e
 ry dur-ing con-cur-rent production-
  []
@@ -2537,47 +2542,47 @@ ry dur-ing con-cur-rent production-
 
 Underfull \vbox (badness 1924) has occurred while \output is active []
 
- [66]
-[67]
-Overfull \hbox (0.83508pt too wide) in paragraph at lines 3292--3306
+ [68]
+[69]
+Overfull \hbox (0.83508pt too wide) in paragraph at lines 3447--3461
 []\T1/cmr/m/n/12 (-20) The Post-greSQL iden-tity database stores each user's pu
 b-lic keys (\T1/cmtt/m/n/12 pk_ecies\T1/cmr/m/n/12 (-20) ,
  []
 
-[68] [69]
-Overfull \hbox (72.48236pt too wide) in paragraph at lines 3350--3359
+[70] [71]
+Overfull \hbox (72.48236pt too wide) in paragraph at lines 3505--3514
 \T1/cmtt/m/n/12 /documents/{id}/download\T1/cmr/m/n/12 (-20) ), ac-cess grant a
 nd re-vo-ca-tion (\T1/cmtt/m/n/12 POST /documents/{id}/grant\T1/cmr/m/n/12 (-20
 ) ,
  []
 
-[70] [71]
-Overfull \hbox (26.30418pt too wide) in paragraph at lines 3423--3437
+[72] [73]
+Overfull \hbox (26.30418pt too wide) in paragraph at lines 3578--3592
 \T1/cmr/m/n/12 (-20) au-dit dash-boards and joint en-dorse-ment poli-cies such 
 as \T1/cmtt/m/n/12 AND('LawFirmAMSP.peer',
  []
 
-[72] [73 <./figures/access_and_decryption.pdf>] [74 <./figures/key_rotation_and
-_recovery.pdf>] [75 <./figures/rbac_acl_pipeline.pdf>] [76 <./figures/fabric_to
-pology4.pdf>] [77 <./figures/grant_access_sequence.pdf> <./figures/verify_acces
-s_sequence.pdf>] [78 <./figures/activity_diagram.pdf> <./figures/ui_ledger_expl
-orer.png> <./figures/ui_audit_log.png>] [79 <./figures/fig1_scalability.pdf> <.
-/figures/fig2_latency.pdf>] [80 <./figures/fig3_filesize.pdf> <./figures/fig4_a
-udit.pdf>] [81 <./figures/fig5_wan.pdf> <./figures/fig6_crypto.pdf>] [82 <./fig
-ures/fig7_gethistory.pdf> <./figures/fig8_sensitivity.pdf>] [83 <./figures/fig9
-_failclosed_outage.pdf>] [84 <./figures/fig10_ipfs_cost.pdf>] [85 <./figures/fi
-g11_caliper.pdf> <./figures/fig12_ledger_growth.pdf>] [86 <./figures/fig13_netw
-ork_scaling.pdf> <./figures/fig14_baseline.pdf>] [87
+[74] [75 <./figures/access_and_decryption.pdf>] [76 <./figures/key_rotation_and
+_recovery.pdf>] [77 <./figures/rbac_acl_pipeline.pdf>] [78 <./figures/fabric_to
+pology4.pdf>] [79 <./figures/grant_access_sequence.pdf> <./figures/verify_acces
+s_sequence.pdf>] [80 <./figures/activity_diagram.pdf> <./figures/ui_ledger_expl
+orer.png> <./figures/ui_audit_log.png>] [81 <./figures/fig1_scalability.pdf> <.
+/figures/fig2_latency.pdf>] [82 <./figures/fig3_filesize.pdf> <./figures/fig4_a
+udit.pdf>] [83 <./figures/fig5_wan.pdf> <./figures/fig6_crypto.pdf>] [84 <./fig
+ures/fig7_gethistory.pdf> <./figures/fig8_sensitivity.pdf>] [85 <./figures/fig9
+_failclosed_outage.pdf>] [86 <./figures/fig10_ipfs_cost.pdf>] [87 <./figures/fi
+g11_caliper.pdf> <./figures/fig12_ledger_growth.pdf>] [88 <./figures/fig13_netw
+ork_scaling.pdf> <./figures/fig14_baseline.pdf>] [89
 
-] [88] [89]
+] [90] [91]
 (/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2025/11/14 1.11b listings language file
-) [90]
-[91] (/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstlang1.sty
+) [92]
+[93] (/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2025/11/14 1.11b listings language file
 )
-[92] [93] (./main.bbl [94] [95] [96] [97] [98] [99] [100] [101] [102] [103]
-[104]) [105] (./main.aux)
+[94] [95] (./main.bbl [96] [97] [98] [99] [100] [101] [102] [103] [104]
+[105] [106] [107]) [108] (./main.aux)
  ***********
 LaTeX2e <2026-06-01>
 L3 programming layer <2026-06-18>
@@ -2588,14 +2593,14 @@ LaTeX Font Warning: Size substitutions with differences
 (Font)              up to 4.5pt have occurred.
 
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 96A0A3EA74BFC936C4E7A0BAB921C63E;17987.
+(rerunfilecheck)             Checksum: C93367F8C2552AB9047A89939A43B662;18330.
  ) 
 Here is how much of TeX's memory you used:
- 19333 strings out of 467168
- 308220 string characters out of 5409468
- 1170665 words of memory out of 5000000
- 47335 multiletter control sequences out of 15000+600000
- 672679 words of font info for 329 fonts, out of 8000000 for 9000
+ 19365 strings out of 467168
+ 308666 string characters out of 5409468
+ 1218023 words of memory out of 5000000
+ 47353 multiletter control sequences out of 15000+600000
+ 672856 words of font info for 331 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  74i,14n,79p,1698b,2329s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb
@@ -2636,10 +2641,10 @@ sftt0800.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sf
 tt1000.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sftt
 1095.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sftt12
 00.pfb>
-Output written on main.pdf (105 pages, 6322805 bytes).
+Output written on main.pdf (108 pages, 6335005 bytes).
 PDF statistics:
- 8425 PDF objects out of 8907 (max. 8388607)
- 4651 compressed objects within 47 object streams
- 554 named destinations out of 1000 (max. 500000)
- 80142 words of extra memory for PDF output out of 89155 (max. 10000000)
+ 8540 PDF objects out of 8907 (max. 8388607)
+ 4726 compressed objects within 48 object streams
+ 564 named destinations out of 1000 (max. 500000)
+ 80150 words of extra memory for PDF output out of 89155 (max. 10000000)
 
