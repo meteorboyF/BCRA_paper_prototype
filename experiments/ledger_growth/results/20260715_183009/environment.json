@@ -2,9 +2,10 @@
   "os": "Linux pop-os 7.0.11-76070011-generic #202606011647~1780583645~24.04~5c4cc15 SMP PREEMPT_DYNAMIC Thu J x86_64 x86_64 x86_64 GNU/Linux",
   "node_version": "v20.20.2",
   "docker_version": "Docker version 29.6.1, build 8900f1d",
-  "git_commit": "bb5efcdcc1c3bb6e4158fee4af55e1b4905f1d44",
+  "git_commit": "0c665d4f7b3a6407ac0a62a892e67df917d95da1",
   "branch": "prototype-fixes",
   "topology": "3 orgs x 1 peer, 3 Raft orderers, CouchDB, majority endorsement",
   "samples_per_function": 100,
-  "preload_concurrency": 200
+  "preload_concurrency": 200,
+  "git_commit_note": "originally recorded bb5efcdcc1c3; branch history was rewritten 2026-07-16 to strip commit-message trailers (tree-identical rewrite, verified empty diff); hash updated to the surviving equivalent"
 }
