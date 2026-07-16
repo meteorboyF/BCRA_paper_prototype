@@ -31,17 +31,15 @@ commit.
   three "15-second" prose claims corrected to the measured 20 s recovery
   lag with the circuit-breaker explanation (first success at t=95 per
   the evidence bundle).
-- [ ] **DEFERRED — fig1–fig8 swap-in**: the published figures are richer
-  compositions than the data-bundle regenerations (fig1 shaded
-  client-saturation region referenced by prose; fig2 audit-query bars;
-  fig5 latency panel; fig7 projection lines discussed in caption; fig8
-  single-panel). Swapping now would break text–figure consistency.
-  Requires composition upgrades to
-  `experiments/legacy_figures/regen_figs.py` on prototype-fixes first,
-  then per-caption CI-method updates (fig1 PG valid region, fig5
-  superseded baselines). Not blocking submission — the published
-  figures remain valid; CIs are reported numerically in
-  `sec:exp_consolidated`.
+- [x] **fig1–fig8 swap-in — RESOLVED**: regen_figs.py upgraded to
+  composition-matched versions (fig1 saturation shading + tuning
+  reference; fig2 five-bar log incl. audit baselines; fig3 derived
+  end-to-end series; fig4 GetHistoryForKey bar; fig5 latency panel;
+  fig6 token-size annotation; fig8 two panels). fig7 switched to the
+  measured-only strip plot per author decision, with the projection
+  moved from plot to prose. All eight swapped, captions rewritten with
+  CI methods and valid-region/superseded-baseline notes, projection
+  prose updated. Compile at baseline.
 - [ ] **Item 5 — AUTHOR-OWNED**: CRediT roles — skeleton untouched as
   agreed; user fills manually with co-author sign-off.
 - [ ] **Item 5 — AUTHOR-OWNED**: data availability — BOTH variants drafted

@@ -2578,10 +2578,14 @@ trade-off, not an architectural barrier.
     \centering
     \includegraphics[width=0.78\textwidth]{fig1_scalability.pdf}
     \caption{Experiment~1 scalability under concurrent load on
-    Linux~\texttt{x86\_64}: Fabric REST-gateway throughput compared with the
-    PostgreSQL-only baseline, the client-side saturation region, and the
-    Experiment~\ref{sec:exp_sensitivity} \texttt{BatchTimeout} tuning
-    reference.}
+    Linux~\texttt{x86\_64} (regenerated from released raw data; mean with
+    95\,\% $t$ confidence intervals, $n{=}5$ per point): Fabric
+    REST-gateway throughput compared with the PostgreSQL-only baseline
+    restricted to its harness-valid region (conc $\leq$ 100); the shaded
+    region marks PostgreSQL-mode client-side load-generator saturation
+    (self-flagged invalid rows, excluded from analysis), and the dotted
+    line is the Experiment~\ref{sec:exp_sensitivity} \texttt{BatchTimeout}
+    tuning reference (193\,TPS at 500\,ms).}
     \label{fig:scalability}
 \end{figure*}
 
@@ -2687,8 +2691,10 @@ grounded, as summarized in Fig.~\ref{fig:latency}.
     \centering
     \includegraphics[width=0.78\textwidth]{fig2_latency.pdf}
 \caption{Experiment~2 function-level latency (P50, log scale; Linux,
-JVM-warmed, 100 samples): \texttt{CheckAccess}, \texttt{RegisterDocument},
-and audit-query trust/latency baselines.}
+JVM-warmed; regenerated with bootstrap 95\,\% confidence intervals):
+\texttt{CheckAccess} in both modes ($n{=}100$ each, overlapping CIs),
+\texttt{RegisterDocument} ($n{=}100$), and the Experiment~4 audit
+trust/latency baselines ($n{=}10$ each).}
     \label{fig:latency}
 \end{figure*}
 
@@ -2709,8 +2715,11 @@ with near-linear Kubo chunk hashing. Total server-side P50 ranged from
     \centering
     \includegraphics[width=0.78\textwidth]{fig3_filesize.pdf}
    \caption{Experiment~3 file-size independence of ledger latency (Linux,
-   direct Kubo API), separating server-side P50, IPFS upload range
-   (10--95\,ms), and constant Fabric commit latency.}
+   direct Kubo API; regenerated with bootstrap 95\,\% CIs, $n{=}10$ per
+   size): IPFS upload P50 (10--95\,ms across 1--50\,MB), the constant
+   Fabric commit latency (2{,}132\,ms band), and the derived end-to-end
+   upload cost (commit $+$ IPFS P50), matching the 2{,}142--2{,}226\,ms
+   range reported in the text.}
     \label{fig:filesize}
 \end{figure*}
 
@@ -2741,9 +2750,11 @@ leaves the on-chain Fabric record intact and independently verifiable, as compar
 \begin{figure*}[!tbp]
     \centering
     \includegraphics[width=0.86\textwidth]{fig4_audit.pdf}
-    \caption{Experiment~4 audit verification efficiency across PostgreSQL
-    queries, manual CSV\,+\,SHA-256 verification, and Fabric
-    \texttt{GetHistoryForKey} ledger-verifiable history.}
+    \caption{Experiment~4 audit verification efficiency (regenerated;
+    P50 with bootstrap 95\,\% CIs, $n{=}10$ each): PostgreSQL indexed
+    queries, manual CSV\,+\,SHA-256 chain verification, and Fabric
+    \texttt{GetHistoryForKey} ledger-verifiable history (depth 107,
+    from Experiment~\hyperref[sec:exp_gethistory]{7}).}
     \label{fig:audit}
 \end{figure*}
 
@@ -2830,9 +2841,11 @@ bridge plus per-orderer-container \texttt{veth} delay (200 clients,
     \centering
     \includegraphics[width=0.94\textwidth]{fig5_wan.pdf}
     \caption{Experiment~5 WAN resilience (\texttt{tc netem},
-    Linux~\texttt{x86\_64}, 200 clients), comparing bridge-only and
-    bridge\,+\,\texttt{veth} delay effects on TPS and
-    \texttt{RegisterDocument} latency.}
+    Linux~\texttt{x86\_64}, 200 clients; regenerated full 8-point sweep,
+    $n{=}5$ per point): (a) throughput (mean, $t$ 95\,\% CI) and
+    (b) request latency (P50, bootstrap 95\,\% CI) for bridge-only vs.\
+    bridge\,+\,\texttt{veth} delay injection. Supersedes the earlier
+    0\,ms-only baselines from the pre-tuning measurement regime.}
     \label{fig:wan}
 \end{figure*}
 % -----------------------------------------------------------------
@@ -2880,8 +2893,11 @@ ledger and network storage per access-grant event.
     \centering
     \includegraphics[width=0.90\textwidth]{fig6_crypto.pdf}
     \caption{Experiment~6 cryptographic primitive benchmark using Node.js
-    WebCrypto fallback (Linux): PBKDF2-SHA256, AES-GCM, SHA-256, ECDSA,
-    ECIES, and RSA-OAEP token-size comparison.}
+    WebCrypto fallback (Linux; regenerated, P50 with bootstrap 95\,\% CIs,
+    $n{=}10$, log scale): PBKDF2-SHA256, ECDH/ECDSA operations, ECIES and
+    RSA-OAEP key wrapping, AES-GCM, and SHA-256, with the wrapped-key
+    token-size comparison (ECIES 125\,B vs.\ RSA-OAEP-2048 256\,B)
+    annotated.}
     \label{fig:crypto}
 \end{figure*}
 
@@ -2916,14 +2932,14 @@ workloads. Only the 107-entry depth was directly measured.
 
 CouchDB evaluates \texttt{GetHistoryForKey} with a full sequential scan and
 no secondary index, so latency is expected to grow approximately linearly
-with history depth. For that reason, the 1,000-entry value in
-Fig.~\ref{fig:gethistory} is a back-of-envelope linear projection from the
-single measured depth, not an independently measured point. Extrapolating
-from 135.5\,ms at 107 entries gives $\approx$1,266\,ms at 1,000 entries.
-That value is suitable for background forensic reports, but it exceeds the
-200\,ms interactive threshold, which is crossed at approximately 158
-entries. Multi-depth validation across deeper histories is left as future
-work.
+with history depth. Fig.~\ref{fig:gethistory} therefore shows only the
+measured depth: all ten trials at 107 entries with the median and its
+bootstrap 95\,\% confidence interval. As a back-of-envelope linear
+extrapolation (stated in text, deliberately not plotted), 135.5\,ms at
+107 entries implies $\approx$1,266\,ms at 1,000 entries --- suitable for
+background forensic reports, but past the 200\,ms interactive threshold,
+which would be crossed at approximately 158 entries. Multi-depth
+validation across deeper histories is left as future work.
 
 For documents with deeper histories, operational queries should use the
 PostgreSQL \texttt{audit\_log} path measured in Experiment~\hyperref[sec:exp_audit]{4} (3.9\,ms P50).
@@ -2934,10 +2950,13 @@ answer to RQ1~\cite{nistir8202,fabricChaincodeStubDoc}.
 \begin{figure*}[!t]
     \centering
     \includegraphics[width=0.78\textwidth]{fig7_gethistory.pdf}
-    \caption{Experiment~7 Fabric \texttt{GetHistoryForKey} latency:
-    107-entry history depth measured directly; deeper data points are linear
-    projections from this single measurement, not independently measured
-    values. Multi-depth validation is future work.}
+    \caption{Experiment~7 Fabric \texttt{GetHistoryForKey} latency at the
+    measured 107-entry history depth (regenerated): all ten individual
+    trials with the median (135.5\,ms) and its bootstrap 95\,\%
+    confidence interval. Only the measured depth is shown; earlier
+    versions displayed linear projections to deeper histories, which are
+    now omitted in favor of measured data. Multi-depth validation is
+    future work.}
     \label{fig:gethistory}
 \end{figure*}
 
@@ -2983,8 +3002,11 @@ optimum shown in Fig.~\ref{fig:sensitivity}.
     \centering
     \includegraphics[width=\columnwidth]{fig8_sensitivity.pdf}
     \caption{Experiment~8 \texttt{BatchTimeout} sensitivity
-    (Linux~\texttt{x86\_64}, 50 clients), showing default 2\,s, 500\,ms,
-    and 250\,ms throughput with zero-error runs.}
+    (Linux~\texttt{x86\_64}, 50 clients; regenerated, $n{=}10$ per
+    setting, zero-error runs): (a) sustained throughput (mean, $t$
+    95\,\% CI) and (b) request latency (P50, bootstrap 95\,\% CI) at
+    2\,s, 500\,ms, and 250\,ms, showing the reproducible 500\,ms
+    optimum.}
     \label{fig:sensitivity}
 \end{figure}
 
