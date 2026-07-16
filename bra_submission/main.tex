@@ -157,12 +157,12 @@ A Hybrid Approach Using Hyperledger Fabric and IPFS}
             country={Bangladesh}}
 
 \begin{abstract}
-Legal document management systems typically centralize trust in privileged administrators, making it difficult for external parties to verify whether access decisions or audit records have been altered. This paper presents a hybrid legal-data management framework that places Hyperledger Fabric on the active document-release path rather than using it only as a passive audit log: every protected download must pass a Fabric chaincode access check before ciphertext or wrapped document keys are released. If Fabric is unavailable, the download path fails closed and returns a denial instead of falling back to a database access-control list. The framework combines browser-side encryption, encrypted off-chain storage in a private IPFS swarm, and on-chain anchoring of document hashes and content identifiers. In experimental evaluation, the REST-gateway workload sustains up to 193 transactions per second, exceeding the estimated baseline for a 1,000-user firm; Fabric-based access checks add no statistically significant delay over a database-only check; and outage simulations confirm that successful downloads drop to zero during Fabric unavailability, with service resuming automatically on reconnection. Prior permissioned-ledger document systems either anchor access decisions off the release path or price on-path authorization only for generic file sharing; none reports measured fail-closed behavior under ledger outage or the end-to-end cost of on-path enforcement against an audit-log-only baseline. The framework thus provides an empirical systems baseline for moving document-release decisions from application-only authorization to ledger-verifiable access-control state.
+Legal document management systems centralize trust in privileged administrators, making it difficult for external parties to verify whether access decisions or audit records have been altered. We present a hybrid legal-data management framework that places Hyperledger Fabric on the active document-release path rather than using it only as a passive audit log: every protected download must pass a chaincode access check before ciphertext or wrapped document keys are released, and if Fabric is unavailable the path fails closed rather than falling back to a database access-control list. The framework combines browser-side encryption, ciphertext-only storage in a private IPFS swarm, and on-chain anchoring of hashes and content identifiers. Across fifteen experiments, the REST-gateway workload sustains up to 193 transactions per second; the ledger access check is statistically indistinguishable from a database-only check (6.51 vs.\ 7.16\,ms median, overlapping 95\,\% confidence intervals) and costs 6.5\,ms end to end over an audit-log-only baseline; outage experiments confirm zero successful downloads during Fabric unavailability with automatic recovery. Prior permissioned-ledger document systems anchor access decisions off the release path or price on-path authorization only for generic file sharing; none reports measured fail-closed behavior under ledger outage or the end-to-end cost of on-path enforcement against the audit-log architecture it replaces.
 \end{abstract}
 
 \begin{keyword}
-Blockchain \sep Hyperledger Fabric \sep Legal document management \sep
-Data integrity \sep Access control \sep Digital forensics
+Blockchain \sep Hyperledger Fabric \sep IPFS \sep
+Legal document management \sep Data integrity \sep Access control
 \end{keyword}
 
 \end{frontmatter}
@@ -358,8 +358,9 @@ the PostgreSQL-only ACL path after warm-up. Experiment~\hyperref[sec:exp_failclo
 enforcement on the document-download path: successful downloads fall to
 exactly zero for the full 45-second Fabric unavailability window
 ($t = 30$--$75$\,s), with HTTP\,503 denials sustained at 25--45 per second.
-Normal operation resumes automatically after an approximately 15-second gRPC
-reconnection lag.
+Normal operation resumes automatically after an approximately 20-second
+recovery lag dominated by the access-path circuit breaker completing its
+30\,s open-state window before half-open probes readmit Fabric calls.
 
 The remainder of this paper is organized as follows.
 Section~\ref{sec:literature_review} reviews related work.
@@ -2992,18 +2993,22 @@ optimum shown in Fig.~\ref{fig:sensitivity}.
 \label{sec:exp_failclosed}
 % -----------------------------------------------------------------
 
-The threat model (Section~\ref{sec:threat_model}) specifies a strict \emph{fail-closed} architecture for protected document release during network partitions: if the Fabric peers become unreachable, the evaluated download path denies access rather than falling back to a database ACL. This experiment validates that behavior empirically. Under a steady 50-client ciphertext-download load, all three Fabric peers were stopped at $t = 30$\,s and restarted at $t = 75$\,s, a 45-second total Fabric peer outage. Fig.~\ref{fig:failclosed} shows the per-second timeline. Successful downloads dropped to exactly zero requests per second for the entire outage window; peers were restarted at $t = 75$\,s, with normal operation resuming automatically after an approximately 15-second gRPC reconnection lag. During the outage, the service sustained 25--45 HTTP~503 fail-closed denials per second, securely blocking all tested download requests (1,340 denial responses and 2,013 \mbox{PostgreSQL} audit rows; the difference reflects additional system-level audit events recorded per denial beyond the HTTP response itself). \texttt{FABRIC\_OUTAGE\_ACCESS\_DENIED} audit rows were written to the operational \mbox{PostgreSQL} log capturing the gRPC failure reason. On peer restart, normal Fabric evaluation resumed cleanly with no manual intervention.
+The threat model (Section~\ref{sec:threat_model}) specifies a strict \emph{fail-closed} architecture for protected document release during network partitions: if the Fabric peers become unreachable, the evaluated download path denies access rather than falling back to a database ACL. This experiment validates that behavior empirically. Under a steady 50-client ciphertext-download load, all three Fabric peers were stopped at $t = 30$\,s and restarted at $t = 75$\,s, a 45-second total Fabric peer outage. Fig.~\ref{fig:failclosed} shows the per-second timeline. Successful downloads dropped to exactly zero requests per second for the entire outage window; peers were restarted at $t = 75$\,s, with the first successful download at $t = 95$\,s --- an approximately 20-second recovery lag whose dominant component is the access-path circuit breaker (resilience4j, 30\,s open-state window with automatic half-open transition) completing its open interval before probe calls readmit Fabric, with gRPC reconnection contributing the remainder. During the outage, the service sustained 25--45 HTTP~503 fail-closed denials per second, securely blocking all tested download requests (1,340 denial responses and 2,013 \mbox{PostgreSQL} audit rows; the difference reflects additional system-level audit events recorded per denial beyond the HTTP response itself). \texttt{FABRIC\_OUTAGE\_ACCESS\_DENIED} audit rows were written to the operational \mbox{PostgreSQL} log capturing the gRPC failure reason. On peer restart, normal Fabric evaluation resumed cleanly with no manual intervention.
 
 This result substantiates the fail-closed behavior for the evaluated document-download path: a peer outage degrades to a secure denial state, prioritizing confidentiality over availability. A malicious DB administrator who deliberately induces an outage cannot force a fallback to the database ACL to bypass chaincode authorization on this path.
 
 \begin{figure*}[!t]
     \centering
     \includegraphics[width=0.85\textwidth]{fig9_failclosed_outage.pdf}
-    \caption{Experiment~9 fail-closed Fabric peer outage: zero successful
-    downloads during the 45\,s outage window; 1{,}340 HTTP~503 denial
-    responses and 2{,}013 \mbox{PostgreSQL} audit rows (the difference
-    reflects additional system-level audit events per denial); normal
-    operation resumes after approximately 15\,s gRPC reconnection lag.}
+    \caption{Experiment~9 fail-closed Fabric peer outage (regenerated
+    from the released raw data): zero successful downloads during the
+    45\,s outage window; 1{,}340 HTTP~503 denial responses and 2{,}013
+    \mbox{PostgreSQL} audit rows (the difference reflects additional
+    system-level audit events per denial). Denials visibly persist
+    $\approx$20\,s past peer restart ($t=75$--$95$\,s): the access-path
+    circuit breaker completes its 30\,s open-state window before
+    half-open probes readmit Fabric calls, after which normal operation
+    resumes without intervention.}
     \label{fig:failclosed}
 \end{figure*}
 
@@ -3679,8 +3684,9 @@ HTTP~503 denials continued at 25--45 per second. Every denied attempt was
 recorded in the operational \mbox{PostgreSQL} audit log, consistent with the
 outage-anchoring limitation noted under RQ1.
 
-Normal operation resumed automatically after an approximately 15-second gRPC
-reconnection lag. The upload, grant, revoke, and audit-query paths enforce the
+Normal operation resumed automatically after an approximately 20-second
+recovery lag (circuit-breaker open-state completion plus gRPC
+reconnection). The upload, grant, revoke, and audit-query paths enforce the
 same policy by design through the same \texttt{FabricGatewayService} pattern,
 but were not independently validated in the experiment campaign and are
 identified as future empirical work.
@@ -3956,11 +3962,28 @@ This work was supported by the Institute for Advanced Research Publication
 Grant of United International University, under Grant IAR 2025 Pub 093.
 
 \section*{Data availability}
-%% TODO: confirm with authors - choose one of the two standard statements:
-%% Option A: Data will be made available on request.
-%% Option B: The evaluation scripts and measurement data are openly
-%%           available at [repository URL / DOI].
-Data will be made available on request.
+%% TODO (author decision pending): TWO DRAFTED VARIANTS BELOW — exactly one
+%% must remain at submission. Variant B2 (archival DOI) is recommended by
+%% the journal's data policy; B1 works if the repository stays public.
+%%
+%% ---- Variant B1 (GitHub as-is) — currently ACTIVE: ----
+The raw measurement data for all fifteen experiments (per-sample CSVs
+with per-run environment records), the load generators, topology
+generators, and analysis and plotting scripts that produce every figure
+and table in this paper, together with the measured-versus-manuscript
+reconciliation log, are openly available in the project repository at
+\url{https://github.com/meteorboyF/Fardeen_Codex_Dhaka_Meetup_Hackathon}
+(directories \texttt{results/} and \texttt{experiments/}, branch
+\texttt{prototype-fixes}).
+%%
+%% ---- Variant B2 (archival DOI) — SWAP IN once a release is deposited: ----
+%% The raw measurement data for all fifteen experiments (per-sample CSVs
+%% with per-run environment records), the load generators, topology
+%% generators, and analysis and plotting scripts that produce every
+%% figure and table in this paper are archived at
+%% \url{https://doi.org/10.5281/zenodo.XXXXXXX} (Zenodo snapshot of the
+%% project repository), with the development history at
+%% \url{https://github.com/meteorboyF/Fardeen_Codex_Dhaka_Meetup_Hackathon}.
 
 \section*{Declaration of generative AI and AI-assisted technologies in the
 manuscript preparation process}

@@ -241,15 +241,18 @@ Z.~Notash, S.~Jamali, R.~Fotohi, An adaptive blockchain-enabled access control
 \bibitem{macaroons2014}
 A.~Birgisson, J.~G. Politz, {\'U}.~Erlingsson, A.~Taly, M.~Vrable,
   M.~Lentczner, Macaroons: Cookies with contextual caveats for decentralized
-  authorization in the cloud, in: Network and Distributed System Security
-  Symposium, 2014.
+  authorization in the cloud, in: 21st Annual Network and Distributed System
+  Security Symposium (NDSS 2014), Internet Society, San Diego, CA, 2014, nDSS
+  proceedings are unpaginated.
+\newblock \href {https://doi.org/10.14722/ndss.2014.23212}
+  {\path{doi:10.14722/ndss.2014.23212}}.
 
 \bibitem{zanzibar2019}
 R.~Pang, R.~Caceres, M.~Burrows, Z.~Chen, P.~Dave, N.~Germer, A.~Golynski,
   K.~Graney, N.~Kang, L.~Kissner, J.~L. Korn, A.~Parmar, C.~D. Richards,
   M.~Wang, Zanzibar: {Google's} consistent, global authorization system, in:
   2019 {USENIX} Annual Technical Conference ({USENIX} {ATC} '19), USENIX
-  Association, Renton, WA, 2019.
+  Association, Renton, WA, 2019, pp. 33--46.
 
 \bibitem{qian2021cpabe}
 X.~Qian, W.~Wu, An efficient ciphertext policy attribute-based encryption
