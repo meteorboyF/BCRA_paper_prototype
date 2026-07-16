@@ -170,3 +170,48 @@ ready pre-proof re-checks. See MANUSCRIPT_TODO.md on bra-submission.
   (assessed unnecessary; analysis in `baseline_auditlog/RESULTS.md`).
 - Bench IPFS config still active (cleared AddrFilters, ipfs3 up) —
   `bash experiments/ipfs_cost/run.sh --teardown` restores when done.
+
+## Final wrap-up (2026-07-16, end of campaign)
+
+**Everything in IMPROVEMENTS.md is now either done or author-owned.**
+
+### Branch/commit inventory
+- `prototype-fixes` @ 118acca (pushed): Exp 1–15 code + verified raw data
+  + evidence runs + consolidated CI table + comparison table + regenerated
+  figure set + AsyncConfig fix + audit-log-only profile + this log.
+- `bra-submission` @ 2661361 (pushed): manuscript with all five writing
+  items landed (108 pages, zero compile errors, 1 documented bibtex
+  warning); `MANUSCRIPT_TODO.md` = remaining-work ledger;
+  `IMPROVEMENTS.md` carries the dated RBAC-IPFS capability correction.
+- Compile toolchain: docker `texlive/texlive:latest` (no local LaTeX);
+  build artifacts (aux/bbl/pdf) are committed on bra-submission.
+
+### Corrections the experiments forced into the manuscript (evidence-backed)
+1. RBAC-IPFS DOES measure on-path authorization (capability table P→Y).
+2. Exp 9 recovery lag is 20 s (first success t=95; circuit-breaker 30 s
+   open state), not the published ~15 s — fixed in 3 places + fig9 caption.
+3. Async-executor defect disclosed in an Exp 14 footnote; Exp 1–9 assessed
+   unaffected (workload never fires a null-txid audit event).
+
+### Open items — ALL author-owned (see MANUSCRIPT_TODO.md)
+1. CRediT roles (skeleton untouched, needs co-author sign-off).
+2. Data availability: pick variant B1 (GitHub, active) or B2 (Zenodo DOI,
+   commented placeholder) — if B2, deposit a release and fill the DOI.
+3. `seoBlockchain2024`: verified correct but uncited — cite or delete.
+4. Optional: fig1–fig8 composition-matched swap (upgrade
+   `experiments/legacy_figures/regen_figs.py` first).
+5. Camera-ready: re-verify pre-proof page cites (RBAC-IPFS, Liu & Zheng,
+   Notash) against versions of record; RBAC-IPFS numbers cited in main.tex
+   also come from the pre-proof.
+6. `lit-papers/` + `lit-papers.zip` are local-only (copyright, gitignored).
+
+### Machine state at wrap-up
+- Running containers: full 3-org Fabric network + legalcc + fabric-cli,
+  postgres, 3 IPFS nodes (bench node ipfs3 + cleared AddrFilters still
+  active — run `bash experiments/ipfs_cost/run.sh --teardown` to restore
+  the app IPFS config and stop ipfs3 when benching is finished).
+- Backend not running. Ledger contains benchmark residue (1M LG-* docs
+  from Exp 12 were destroyed by Exp 13's teardown; current network is the
+  Exp 14-era 3-org deployment) — `make up && make chaincode` in
+  pangochain-fabric for a fresh network if needed.
+- TeX Live docker image (~5 GB) retained for future manuscript compiles.
