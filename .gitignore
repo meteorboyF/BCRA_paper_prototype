@@ -59,3 +59,7 @@ experiments/network_scaling/generated/
 
 # Backend Fabric identity material (synced from fabric-cli by experiment runners)
 pangochain-backend/config/fabric/crypto/
+
+# Literature PDFs for 3.5b verification (copyright — do not commit)
+lit-papers/
+lit-papers.zip

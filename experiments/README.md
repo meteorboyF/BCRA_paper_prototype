@@ -17,10 +17,11 @@ Benchmark and evaluation code for the BRA submission. Manuscript lives on the
 Exp 1–9 raw source data (verified against the published figures) lives in
 repo-root `results/` with `DELTAS.md` as the reconciliation log.
 
-Item 3.5b: skeleton drafted at
-[`comparison/COMPARISON_TABLE.md`](comparison/COMPARISON_TABLE.md) — our
-rows final, every published-system cell is a ⟨VERIFY⟩ placeholder pending
-the source PDFs (do not cite until resolved).
+Item 3.5b: filled at
+[`comparison/COMPARISON_TABLE.md`](comparison/COMPARISON_TABLE.md) — every
+published-system cell page-cited from the source PDFs (in `lit-papers/`,
+gitignored); pending author spot-check, and pre-proof pagination must be
+re-verified against versions of record before camera-ready.
 
 ## Layout
 
