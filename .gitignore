@@ -53,3 +53,6 @@ experiments/ipfs_cost/results/smoke/
 experiments/ledger_growth/node_modules/
 experiments/ledger_growth/crypto/
 experiments/ledger_growth/.state.json
+experiments/network_scaling/node_modules/
+experiments/network_scaling/crypto/
+experiments/network_scaling/generated/

@@ -1,0 +1,10 @@
+label,orgs,peers_per_org,policy,write_conc,write_ok,write_fail,write_tps,write_p50_ms,write_p95_ms,read_n,read_p50_ms,read_p95_ms
+o2p1-single,2,1,single,100,2000,0,43.3,2297,2400,100,5.15,6.98
+o2p1-majority,2,1,majority,100,2000,0,42.9,2322,2420,100,4.69,6.22
+o3p1-single,3,1,single,100,2000,0,42.8,2325,2421,100,3.93,6.11
+o3p1-majority,3,1,majority,100,2000,0,42.1,2363,2468,100,5.44,6.85
+o3p2-majority,3,2,majority,100,2000,0,40.7,2445,2550,100,4.45,6.30
+o5p1-single,5,1,single,100,2000,0,42.3,2358,2446,100,5.12,6.76
+o5p1-majority,5,1,majority,100,2000,0,40.0,2482,2622,100,4.78,6.25
+o7p1-single,7,1,single,100,2000,0,40.9,2432,2542,100,4.63,6.11
+o7p1-majority,7,1,majority,100,2000,0,35.7,2785,2937,100,5.46,7.20
