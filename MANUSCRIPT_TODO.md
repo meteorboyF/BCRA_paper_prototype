@@ -6,21 +6,17 @@ commit.
 
 ## Deferred during item 1 (novelty recut)
 
-- [ ] **"Direct numerical comparison is not possible" paragraph**
-  (evaluation section, near `tab:hardware`): becomes partially false once
-  the Exp 11 Caliper run is integrated — Caliper-vs-Caliper comparison
-  against RBAC-IPFS (356–450 TPS, 10 peers) and Mukta et al. (24–29 TPS)
-  IS possible at instrument level. Rewrite during **item 0** alongside the
-  numbers-level comparison table (source: `experiments/comparison/
-  COMPARISON_TABLE.md` on prototype-fixes). Also extend its citation list
-  with the five new systems either way.
+- [x] **"Direct numerical comparison is not possible" paragraph** —
+  resolved in item 0: rewritten to scope the claim to REST-gateway
+  workloads, extended citations, and forward-referenced Exp 11 +
+  `tab:numbers_comparison`.
 
 ## Carried from earlier phases (fix during the noted item)
 
-- [ ] **Item 0**: "2-node IPFS swarm" limitation wording (contributions +
-  proposed-framework table row) — still true of the app compose, but
-  Exp 10 measured a 3-node bench topology; phrase precisely when adding
-  the new experiments.
+- [x] **Item 0**: "2-node IPFS swarm" wording — lit-table row and
+  framework-vs-prototype row now reference Experiment 10's 3-node
+  bench measurements; contribution-paragraph wording left accurate
+  (app swarm is 2-node).
 - [ ] **Item 5**: abstract grammar bug "Fabric-based access checks add no
   statistically significant delay" — sentence is now grammatical after
   item 1's edit, but the abstract still exceeds BRA's ≤200-word target;

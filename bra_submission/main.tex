@@ -513,7 +513,7 @@ Proposed framework and prototype &
 Ledger-verifiable legal document authorization with encrypted off-chain storage. &
 Fabric + IPFS &
 Y & P & Y &
-Strict access uses Fabric fail-closed; prototype limits include custodial Fabric identities, custodial transaction attribution for user-level signatures, and 2-node IPFS swarm. \\
+Strict access uses Fabric fail-closed; prototype limits include custodial Fabric identities, custodial transaction attribution for user-level signatures, and a 2-node application IPFS swarm (3-node storage-tier behavior measured separately in Experiment~10). \\
 
 \end{xltabular}
 \endgroup
@@ -1913,7 +1913,9 @@ Replicated private pinning across 2 nodes; availability depends on
 pinning policy, node health, and network reachability &
 Y* &
 Implemented as private two-node replication; $\geq$3 nodes or managed
-pinning recommended for production SLA \\
+pinning recommended for production SLA. Experiment~%
+\hyperref[sec:exp_ipfscost]{10} measures 3-node replication cost and
+single-replica-failure behavior on a bench topology \\
 \hline
 Per-user Fabric identity &
 Per-user X.509 certificate issued by Fabric CA; HSM-backed &
@@ -2149,14 +2151,22 @@ as supplementary material.
 \label{sec:performance}
 
 
-Nine experiments evaluate RQ1–RQ3. Measurements were collected on
+Fifteen experiments evaluate RQ1–RQ3. Experiments~1--9 form the core
+campaign; Experiments~10--15 extend it along the axes reviewers of
+permissioned-blockchain systems most often probe: off-chain storage
+cost, standard-instrument comparability, world-state scale, network
+size, an architectural baseline, and consolidated statistics.
+Measurements were collected on
 three platforms: a Windows~11 workstation (Ryzen~7~5700X,
 Java~17~Temurin, Node.js~24), an Apple~M1 MacBook under Rosetta~2
 emulation (macOS, Java~21~Temurin, Node.js~22), and a native
 Linux~x86\_64 server (Intel Core Ultra~5~125H, Ubuntu~22.04,
 8\,GB RAM, NVMe~SSD, Java~21~OpenJDK, Node.js~18). All authoritative
 figures are from Linux; M1 and Windows results are auxiliary
-cross-platform checks where reported.
+cross-platform checks where reported. Experiments~10--15 were collected
+on the same Linux workstation at a later system image and code
+revision (Docker~29, Node.js~20); a per-run machine-readable
+environment record accompanies each released dataset.
 
 The evaluated Fabric network used three peer organizations
 (LawFirmA, LawFirmB, RegulatorOrg) on a shared \texttt{legalchannel},
@@ -2175,13 +2185,20 @@ independent runs after a discarded warm-up round, following standard
 Hyperledger Fabric benchmarking practice~\cite{caliper2021,woznica2022}.
 Table~\ref{tab:hardware} summarizes the configurations.
 
-Direct numerical comparison with prior systems is not possible because,
-to the best of the authors' knowledge, the systems in
-Table~\ref{tab:literature_review} do not report REST-gateway throughput
-under concurrent load with a documented traffic mix~\cite{liu2024blockchain,twoLevelBlockchain,
-onyeashie2025fabricEvidence,verma2021nyaya,hanafi2021ipfschain}. The
-PostgreSQL-only baseline is therefore used as a reproducible upper-bound
-reference~\cite{thakur2024}.
+Direct numerical comparison of the REST-gateway workload with prior
+systems is not possible because, to the best of the authors' knowledge,
+the systems in Table~\ref{tab:literature_review} do not report
+application-gateway throughput under concurrent load with a documented
+traffic mix~\cite{liu2024blockchain,twoLevelBlockchain,
+onyeashie2025fabricEvidence,verma2021nyaya,hanafi2021ipfschain,
+chen2022filewallet,peelam2026decentralized}. The PostgreSQL-only
+baseline is therefore used as a reproducible upper-bound
+reference~\cite{thakur2024}. Instrument-level comparison \emph{is}
+possible where prior systems report Hyperledger Caliper results
+\cite{liu2026rbacipfs,mukta2026zerotrust}: Experiment~%
+\hyperref[sec:exp_caliper]{11} benchmarks the chaincode with Caliper for
+exactly this purpose, and Section~\ref{sec:exp_consolidated} tabulates
+the reported numbers side by side with the usual hardware caveats.
 
 For upload-path experiments, the load generator submits opaque byte payloads
 representing the IV-prepended ciphertext that the server receives in the
@@ -2209,7 +2226,7 @@ RAM     & 16\,GB           & 16\,GB           & 8\,GB            \\
 Java    & 17 Temurin       & 21 Temurin       & 21 OpenJDK         \\
 Fabric  & 2.4.x            & 2.4.x            & 2.4.x              \\
 Orderer & 3-node Raft      & 3-node Raft      & 3-node Raft        \\
-Role    & Auxiliary       & Exps.\,1--4      & Exps.\,1--9        \\
+Role    & Auxiliary       & Exps.\,1--4      & Exps.\,1--15       \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -2693,6 +2710,309 @@ This result substantiates the fail-closed behavior for the evaluated document-do
     operation resumes after approximately 15\,s gRPC reconnection lag.}
     \label{fig:failclosed}
 \end{figure*}
+
+% -----------------------------------------------------------------
+\subsection{Experiment~10: IPFS Storage and Retrieval Cost}
+\label{sec:exp_ipfscost}
+% -----------------------------------------------------------------
+
+Experiments~1--9 exercise the storage tier only on the upload path
+(Experiment~\hyperref[sec:exp_filesize]{3}). This experiment completes
+the storage-tier picture on a three-node private Kubo v0.27 swarm:
+retrieval latency versus file size (1--50\,MB, matching Experiment~3's
+range) under 1--24 concurrent cold fetches, replication cost for a
+second and third pinned replica, storage overhead, and behavior under
+node failure (Fig.~\ref{fig:ipfscost}). Each retrieval targets a
+distinct content identifier so concurrent fetches are independent
+transfers; all latencies are LAN-scale (docker bridge) and compose with
+the synthetic WAN model of Experiment~\hyperref[sec:exp_wan]{5} for
+wide-area estimates.
+
+Retrieval latency is linear in file size, with a $2$--$3.5\times$
+premium when the serving node must fetch blocks over the swarm rather
+than reading locally (50\,MB: 254\,ms local vs.\ 875\,ms remote P50 at
+concurrency~1, rising to 7.0\,s at 24 concurrent cold transfers with
+zero failures across 576 requests). Replicas are independent: pinning a
+third copy costs approximately the same transfer time as the second, so
+$k$-node replication scales linearly in total transfer cost. The UnixFS
+DAG imposes a constant 0.024\,\% storage overhead at every measured
+size (256\,KiB chunking), plus a 46-byte content identifier per
+document. Most importantly for availability governance: with a document
+pinned on two of three nodes, stopping one replica produced no
+measurable retrieval penalty (P50 206\,ms vs.\ 204\,ms baseline, 10/10
+served), stopping all replicas produced clean timeouts with zero bytes
+served, and service resumed without manual repair after restart --- the
+storage-tier counterpart of Experiment~\hyperref[sec:exp_failclosed]{9}'s
+fail-closed result on the ledger tier.
+
+\begin{figure*}[!t]
+    \centering
+    \includegraphics[width=0.98\textwidth]{fig10_ipfs_cost.pdf}
+    \caption{Experiment~10 IPFS storage/retrieval cost: (a) retrieval
+    latency vs.\ file size and concurrency (local vs.\ cross-node);
+    (b) replication cost per added replica; (c) constant 0.024\,\%
+    UnixFS DAG overhead; (d) retrieval under node failure with a
+    document pinned on 2 of 3 nodes.}
+    \label{fig:ipfscost}
+\end{figure*}
+
+% -----------------------------------------------------------------
+\subsection{Experiment~11: Standard-Instrument Benchmark (Hyperledger Caliper)}
+\label{sec:exp_caliper}
+% -----------------------------------------------------------------
+
+The custom REST-gateway generator measures the application path users
+actually traverse, but most published permissioned-blockchain numbers
+are produced by Hyperledger Caliper~\cite{caliper2021}. To anchor
+comparability, this experiment benchmarks the deployed chaincode
+directly with Caliper~0.6 through the Fabric peer-gateway API (the same
+client path as the Spring gateway), sweeping fixed loads of 50--600
+in-flight transactions for the two release-path functions
+(Fig.~\ref{fig:caliper}).
+
+\texttt{CheckAccess} (evaluate, read path) reaches 875\,TPS at
+load~600 with a flat 20\,ms average latency and zero failures ---
+confirming that the ledger-side access decision is not the release-path
+bottleneck. \texttt{RegisterDocument} (submit, write path) climbs to
+172\,TPS, approaching the $\approx$193\,TPS ordering ceiling of
+Experiment~\hyperref[sec:exp_sensitivity]{8}, with write latency pinned
+at 1.7--2.0\,s by the 2\,s \texttt{BatchTimeout} at every load --- an
+independent, standard-instrument corroboration of the custom
+generator's saturation analysis. At loads $\geq$500 the peer gateway's
+default admission control (\texttt{peer.limits.concurrency.gatewayService}=500)
+rejects excess in-flight submissions cleanly (3.7\,\% at load~500,
+27\,\% at load~600); the limit is a documented, tunable Fabric default
+that was deliberately left at the value used throughout
+Experiments~1--9.
+
+\begin{figure*}[!t]
+    \centering
+    \includegraphics[width=0.9\textwidth]{fig11_caliper.pdf}
+    \caption{Experiment~11 Hyperledger Caliper benchmark of the deployed
+    chaincode via the peer-gateway API: (a) throughput and (b) latency
+    vs.\ offered fixed load for \texttt{CheckAccess} (evaluate) and
+    \texttt{RegisterDocument} (submit). Caliper reports average/min/max
+    latency, the convention used by comparable published systems.}
+    \label{fig:caliper}
+\end{figure*}
+
+% -----------------------------------------------------------------
+\subsection{Experiment~12: Document-Volume and Ledger-Growth Scaling}
+\label{sec:exp_ledgergrowth}
+% -----------------------------------------------------------------
+
+Experiment~\hyperref[sec:exp_gethistory]{7} measured history depth on a
+single key; this experiment measures the orthogonal axis: how the
+release-path queries and storage footprint behave as the \emph{number
+of documents} grows. Starting from a fresh ledger, 1{,}000{,}000
+documents were registered through the peer gateway (200 closed-loop
+submitters, 70--76\,TPS sustained, zero failed transactions over the
+3.6\,h campaign), with \texttt{CheckAccess} and
+\texttt{GetDocumentHistory} latency sampled ($n{=}100$ each, random
+keys) and per-peer disk usage recorded at the $10^3$, $10^4$, $10^5$,
+and $10^6$ checkpoints (Fig.~\ref{fig:ledgergrowth}).
+
+Both queries are effectively flat across three orders of magnitude of
+world-state growth: \texttt{CheckAccess} P50 rises from 7.96\,ms at
+$10^3$ documents to 8.60\,ms at $10^6$ (+8\,\% for a $1000\times$ state
+increase), consistent with Experiment~\hyperref[sec:exp_latency]{2}'s
+6.51\,ms measured on a near-empty ledger, and
+\texttt{GetDocumentHistory} rises from 5.68 to 7.12\,ms. Storage grows
+linearly at $\approx$5{,}618 bytes of block store plus 1{,}389 bytes of
+CouchDB state per document per peer ($\approx$7\,KB/document; the
+$10^6$ measurement lands within 0.1\,\% of the linear extrapolation
+from $10^5$), i.e., one million documents occupy roughly 7\,GB per peer
+--- commodity-hardware territory for a realistic legal archive.
+
+\begin{figure*}[!t]
+    \centering
+    \includegraphics[width=0.9\textwidth]{fig12_ledger_growth.pdf}
+    \caption{Experiment~12 ledger-growth scaling from $10^3$ to $10^6$
+    registered documents: (a) release-path query latency vs.\
+    world-state size (P50, caps P95); (b) linear per-peer storage
+    growth ($\approx$7\,KB/document across block store and CouchDB).}
+    \label{fig:ledgergrowth}
+\end{figure*}
+
+% -----------------------------------------------------------------
+\subsection{Experiment~13: Scaling with Network Size and Endorsement Policy}
+\label{sec:exp_netscale}
+% -----------------------------------------------------------------
+
+Experiments~1--12 share the reference three-organization topology. This
+experiment regenerates complete networks at 2, 3, 5, and 7 organizations
+(one peer each, plus a 3-organization/two-peer point), each with
+per-peer CouchDB, a 3-node Raft ordering service, and identical batch
+parameters, and benchmarks every point under both a single-organization
+endorsement policy and the channel-default majority policy
+(Fig.~\ref{fig:netscale}; 2{,}000 writes and $n{=}100$ reads per point,
+zero failed transactions at all nine points).
+
+Write throughput is ordering-dominated, not size-dominated: under
+single-organization endorsement it declines only 5.5\,\% from 2 to 7
+organizations (43.3 to 40.9\,TPS) with write latency pinned near the
+2\,s batch window throughout. The majority-endorsement premium grows
+gently with consortium size --- $-0.9$\,\% at 2 organizations,
+$-5.4$\,\% at 5, and $-12.7$\,\% at 7 (35.7\,TPS) --- reflecting
+parallel endorsement collection that tracks the slowest endorser rather
+than the sum. Doubling peers per organization costs 3.3\,\%. Read-path
+\texttt{CheckAccess} latency is size-independent (3.9--5.5\,ms P50 at
+every topology and policy), extending Experiment~%
+\hyperref[sec:exp_ledgergrowth]{12}'s flatness result from the volume
+axis to the topology axis. One measurement artifact is documented in
+the released data: the first 7-organization/majority run produced an
+implausible read-latency inflation attributable to transient host
+contention and was re-run in isolation; both runs are preserved, and
+the verified rerun is reported here.
+
+\begin{figure*}[!t]
+    \centering
+    \includegraphics[width=0.9\textwidth]{fig13_network_scaling.pdf}
+    \caption{Experiment~13 network-size scaling across 2--7
+    organizations and endorsement policies: (a) write throughput;
+    (b) write and read latency (log scale). Single-host deployment;
+    inter-point ratios, not absolute TPS, are the meaningful result.}
+    \label{fig:netscale}
+\end{figure*}
+
+% -----------------------------------------------------------------
+\subsection{Experiment~14: Price of On-Path Enforcement vs.\ a Passive-Audit-Log Baseline}
+\label{sec:exp_baseline}
+% -----------------------------------------------------------------
+
+The architectural claim of this paper is that the ledger belongs
+\emph{on} the document-release path rather than beside it as a passive
+audit log. This experiment prices that claim end to end. A
+default-off Spring profile (\texttt{audit-log-only}) implements the
+opposing architecture in the same codebase: the PostgreSQL ACL decides,
+and the decision is recorded through the existing asynchronous audit
+pipeline, which anchors a \texttt{LogAuditEvent} transaction to Fabric
+off the request path. The identical ciphertext-download workload
+(closed loop, 10--200 concurrent clients, 2{,}000 requests per level)
+was run against both modes; 16{,}000 requests completed with zero
+failures (Fig.~\ref{fig:baseline}).
+
+On-path enforcement costs $+6.5$ to $+9.1$\,ms P50 per release at
+10--100 concurrent clients (e.g., 21.6 vs.\ 15.1\,ms at concurrency~10)
+and at most 10\,\% throughput at saturation; at 200 clients the
+on-path P95 is actually \emph{below} the baseline's. The end-to-end
+premium independently corroborates Experiment~%
+\hyperref[sec:exp_latency]{2}'s function-level 6.51\,ms figure on a
+different build five weeks later. The baseline's hidden cost is also
+now quantified: its fire-and-forget anchors drained at only 3--8
+transactions per second against 700+ generated per second at gateway
+saturation, so during the benchmark window just 144 of $\approx$24{,}000
+audit anchors reached the ledger and the backlog was lost at process
+restart. A passive-audit-log deployment therefore needs batched,
+durable anchoring infrastructure merely to keep its audit promise,
+while the on-path design's enforcement guarantee never depends on that
+pipeline.\footnote{Preparing this baseline exposed a resource-management
+defect in the prototype: Spring's \texttt{@Async} audit anchoring had
+silently fallen back to an unbounded thread-per-task executor, capping
+the gateway at $\approx$14 requests/s under sustained download load.
+The defect was fixed (bounded executor) before both modes were
+measured. Experiments~1--9 are unaffected: their workload never
+triggers the pathological path (\texttt{GET /wrapped-key} writes no
+audit event, and upload audits carry a transaction ID that skips
+ledger anchoring), which the released analysis documents in detail.}
+
+\begin{figure*}[!t]
+    \centering
+    \includegraphics[width=0.9\textwidth]{fig14_baseline.pdf}
+    \caption{Experiment~14 on-path enforcement vs.\ the
+    audit-log-only baseline on the identical download workload:
+    (a) gateway throughput; (b) request latency (P50, caps P95).
+    The architectural premium of on-path enforcement is
+    single-digit milliseconds.}
+    \label{fig:baseline}
+\end{figure*}
+
+% -----------------------------------------------------------------
+\subsection{Consolidated Evidence and Positioning Against Reported Numbers}
+\label{sec:exp_consolidated}
+% -----------------------------------------------------------------
+
+To counter point estimates masking variance, the released dataset
+consolidates 37 headline metrics across all fifteen experiments with
+95\,\% confidence intervals: bootstrap percentile intervals
+(10{,}000 resamples) for medians computed from per-sample data, and
+Student-$t$ intervals for means of trial-level throughput.
+Two intervals carry the paper's central claims. First, the
+function-level ACL comparison of Experiment~\hyperref[sec:exp_latency]{2}
+yields \emph{overlapping} intervals --- Fabric \texttt{CheckAccess}
+6.51\,ms [6.33, 7.22] vs.\ PostgreSQL 7.16\,ms [6.60, 7.81]
+($n{=}100$ each) --- so the ``no statistically significant added
+delay'' claim is now interval-supported rather than asserted. Second,
+Experiment~\hyperref[sec:exp_baseline]{14}'s end-to-end premium is
+significant but small: 21.62\,ms [21.39, 21.84] vs.\ 15.09\,ms
+[14.84, 15.36] at concurrency~10 ($n{=}2{,}000$ each). Across four
+independent setups (Experiments 2, 12, 13, and 14), the ledger access
+decision consistently lands at 4--9\,ms P50.
+
+Table~\ref{tab:numbers_comparison} positions the measured numbers
+against the figures reported by the closest published systems. The
+numbers are deliberately \emph{not} hardware-normalized: each row
+reports the system's own published values on its own testbed, so
+order-of-magnitude positioning and measurement coverage --- not a
+throughput race --- are the comparison targets. Where prior systems
+used Caliper, the instrument-matched row is Experiment~%
+\hyperref[sec:exp_caliper]{11}.
+
+\begin{table*}[!t]
+\centering
+\scriptsize
+\renewcommand{\arraystretch}{1.25}
+\caption{Reported performance of the closest published systems versus
+this work. Values are each paper's own published figures on its own
+testbed (no hardware normalization); statistic conventions differ as
+noted. Pre-proof values for~\cite{liu2026rbacipfs,notash2026adaptive}
+are subject to change in the versions of record.}
+\label{tab:numbers_comparison}
+\begin{tabularx}{\textwidth}{@{} >{\raggedright\arraybackslash}p{2.4cm}
+  >{\raggedright\arraybackslash}p{2.4cm}
+  >{\raggedright\arraybackslash}X
+  >{\raggedright\arraybackslash}X
+  >{\raggedright\arraybackslash}p{2.1cm} @{}}
+\toprule
+\textbf{System} & \textbf{Platform / instrument} &
+\textbf{Read path} & \textbf{Write path} & \textbf{Testbed} \\
+\midrule
+RBAC-IPFS~\cite{liu2026rbacipfs} &
+Fabric 2.4.9 + IPFS, 10 peers; Caliper &
+queryCid 159.8\,ms client mean (50\,ms emulated WAN); on-path retrieval
+authorization 146--156\,ms e2e &
+$\approx$356--378\,TPS saturated; $\approx$450\,TPS mixed workload &
+Xeon Gold, 128 GB RAM \\
+Mukta et al.~\cite{mukta2026zerotrust} &
+Fabric, 4 peers; Caliper &
+verifyDC peak 29.4\,TPS @75 users &
+createDC 25.0\,TPS, delegateDC 24.2\,TPS peaks &
+4-core, 8\,GB \\
+Liu and Zheng~\cite{liu2024blockchain} &
+FISCO BCOS + IPFS; java-sdk bench &
+--- (send/confirm times tabulated) &
+peak 247\,TPS &
+2-core, 4\,GB \\
+Peelam et al.~\cite{peelam2026decentralized} &
+Private Ethereum (PoS) + IPFS + fog; custom simulation &
+--- &
+transaction delays avg 24.5\,s ($\pm$3.6--52.7\,s at 95\,\%) &
+Core i5 (8 GB) and i9 (32 GB) hosts \\
+\midrule
+This work (gateway path) &
+Fabric 2.4 + IPFS, 3 orgs; custom REST loadgen &
+\texttt{CheckAccess} 6.51\,ms P50 [6.33, 7.22], $n{=}100$ &
+66--69\,TPS @2\,s batch; 193.0\,TPS [182.8, 203.2] @500\,ms batch &
+Core Ultra 5, 8\,GB \\
+This work (chaincode direct) &
+same network; \textbf{Caliper 0.6} &
+\texttt{CheckAccess} 874.9\,TPS @load 600, 20\,ms avg &
+\texttt{RegisterDocument} 172.0\,TPS @load 600, $\approx$2\,s avg &
+same \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
 % =========================================================================
 % SECTION VII --- LIMITATIONS AND FUTURE WORK
 % =========================================================================

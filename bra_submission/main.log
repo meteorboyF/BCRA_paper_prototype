@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.7.12)  16 JUL 2026 15:44
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.7.12)  16 JUL 2026 16:10
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -750,58 +750,58 @@ Overfull \hbox (36.70184pt too wide) in paragraph at lines 345--354
  []
 
 [5]
-<figures/Hierarchy.pdf, id=372, 210.7875pt x 117.3183pt>
+<figures/Hierarchy.pdf, id=396, 210.7875pt x 117.3183pt>
 File: figures/Hierarchy.pdf Graphic file (type pdf)
 <use figures/Hierarchy.pdf>
 Package pdftex.def Info: figures/Hierarchy.pdf  used on input line 378.
 (pdftex.def)             Requested size: 390.0pt x 217.06767pt.
- [6 <./figures/Hierarchy.pdf>] [7] [8] [9] [10] [11] [12] [13] [14]
-<figures/user_registration_flow.pdf, id=550, 952.51855pt x 367.3725pt>
+ [6 <./figures/Hierarchy.pdf>] [7] [8] [9] [10] [11] [12] [13] [14] [15]
+<figures/user_registration_flow.pdf, id=581, 952.51855pt x 367.3725pt>
 File: figures/user_registration_flow.pdf Graphic file (type pdf)
 <use figures/user_registration_flow.pdf>
 Package pdftex.def Info: figures/user_registration_flow.pdf  used on input line
  817.
 (pdftex.def)             Requested size: 389.99736pt x 150.41628pt.
- [15]
+
 Overfull \hbox (67.24236pt too wide) in paragraph at lines 825--830
 \T1/cmr/m/n/12 (-20) AES-256-GCM doc-u-ment key $\OML/cmm/m/it/12 k[]$ \T1/cmr/
 m/n/12 (-20) and a 96-bit IV us-ing \T1/cmtt/m/n/12 window.crypto.getRandomValu
 es\T1/cmr/m/n/12 (-20) .
  []
 
-<figures/document_upload_flow.pdf, id=565, 2133.9725pt x 1850.36754pt>
+[16 <./figures/user_registration_flow.pdf>]
+<figures/document_upload_flow.pdf, id=622, 2133.9725pt x 1850.36754pt>
 File: figures/document_upload_flow.pdf Graphic file (type pdf)
 <use figures/document_upload_flow.pdf>
 Package pdftex.def Info: figures/document_upload_flow.pdf  used on input line 8
 56.
 (pdftex.def)             Requested size: 215.0704pt x 186.48753pt.
-[16 <./figures/user_registration_flow.pdf>]
-<figures/access_control_flow.pdf, id=603, 1802.735pt x 1033.31505pt>
+ [17 <./figures/document_upload_flow.pdf>]
+<figures/access_control_flow.pdf, id=1657, 1802.735pt x 1033.31505pt>
 File: figures/access_control_flow.pdf Graphic file (type pdf)
 <use figures/access_control_flow.pdf>
 Package pdftex.def Info: figures/access_control_flow.pdf  used on input line 88
 4.
 (pdftex.def)             Requested size: 280.79642pt x 160.95053pt.
-<figures/document_retrieval_flow.pdf, id=604, 616.22218pt x 324.25137pt>
+<figures/document_retrieval_flow.pdf, id=1658, 616.22218pt x 324.25137pt>
 File: figures/document_retrieval_flow.pdf Graphic file (type pdf)
 <use figures/document_retrieval_flow.pdf>
 Package pdftex.def Info: figures/document_retrieval_flow.pdf  used on input lin
 e 893.
 (pdftex.def)             Requested size: 280.79524pt x 147.7523pt.
- [17 <./figures/document_upload_flow.pdf>] [18 <./figures/access_control_flow.p
-df> <./figures/document_retrieval_flow.pdf>]
-<figures/audit_trail_flow.pdf, id=2241, 884.34387pt x 323.28778pt>
+<figures/audit_trail_flow.pdf, id=1661, 884.34387pt x 323.28778pt>
 File: figures/audit_trail_flow.pdf Graphic file (type pdf)
 <use figures/audit_trail_flow.pdf>
 Package pdftex.def Info: figures/audit_trail_flow.pdf  used on input line 916.
 (pdftex.def)             Requested size: 288.60931pt x 105.50632pt.
-<figures/integrity_check_flow.pdf, id=2242, 1385.175pt x 984.67876pt>
+<figures/integrity_check_flow.pdf, id=1662, 1385.175pt x 984.67876pt>
 File: figures/integrity_check_flow.pdf Graphic file (type pdf)
 <use figures/integrity_check_flow.pdf>
 Package pdftex.def Info: figures/integrity_check_flow.pdf  used on input line 9
 26.
 (pdftex.def)             Requested size: 390.0pt x 277.2407pt.
-
+ [18 <./figures/access_control_flow.pdf>] [19 <./figures/document_retrieval_flo
+w.pdf> <./figures/audit_trail_flow.pdf>]
 Overfull \hbox (6.10643pt too wide) in paragraph at lines 978--978
 []|$\OML/cmm/m/it/12 sk[];  pk[]$| 
  []
@@ -811,8 +811,7 @@ Overfull \hbox (1.94984pt too wide) in paragraph at lines 978--978
 []|$\OML/cmm/m/it/12 sk[];  pk[]$| 
  []
 
-[19 <./figures/audit_trail_flow.pdf>] [20 <./figures/integrity_check_flow.pdf>]
-[21]
+[20 <./figures/integrity_check_flow.pdf>] [21]
 Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
 put line 1036.
 
@@ -840,30 +839,30 @@ Overfull \hbox (1.15056pt too wide) in paragraph at lines 1152--1158
 256-byte RSA-OAEP 2048 wrapped-
  []
 
-<figures/key_gen_and_storage.pdf, id=2848, 1882.03125pt x 1421.31pt>
+<figures/key_gen_and_storage.pdf, id=2872, 1882.03125pt x 1421.31pt>
 File: figures/key_gen_and_storage.pdf Graphic file (type pdf)
 <use figures/key_gen_and_storage.pdf>
 Package pdftex.def Info: figures/key_gen_and_storage.pdf  used on input line 11
 89.
 (pdftex.def)             Requested size: 390.0pt x 294.5151pt.
-<figures/document_encryption.pdf, id=2849, 2429.075pt x 2469.225pt>
+<figures/document_encryption.pdf, id=2873, 2429.075pt x 2469.225pt>
 File: figures/document_encryption.pdf Graphic file (type pdf)
 <use figures/document_encryption.pdf>
 Package pdftex.def Info: figures/document_encryption.pdf  used on input line 11
 96.
 (pdftex.def)             Requested size: 390.0pt x 396.44046pt.
-<figures/access_grant.pdf, id=2850, 2543.5025pt x 1927.2pt>
+<figures/access_grant.pdf, id=2874, 2543.5025pt x 1927.2pt>
 File: figures/access_grant.pdf Graphic file (type pdf)
 <use figures/access_grant.pdf>
 Package pdftex.def Info: figures/access_grant.pdf  used on input line 1203.
 (pdftex.def)             Requested size: 390.0pt x 295.47818pt.
-<figures/access_and_decryption.pdf, id=2851, 2304.61pt x 3023.84245pt>
+<figures/access_and_decryption.pdf, id=2875, 2304.61pt x 3023.84245pt>
 File: figures/access_and_decryption.pdf Graphic file (type pdf)
 <use figures/access_and_decryption.pdf>
 Package pdftex.def Info: figures/access_and_decryption.pdf  used on input line 
 1210.
 (pdftex.def)             Requested size: 370.49881pt x 486.08554pt.
-<figures/key_rotation_and_recovery.pdf, id=2852, 588.27782pt x 427.5975pt>
+<figures/key_rotation_and_recovery.pdf, id=2876, 588.27782pt x 427.5975pt>
 File: figures/key_rotation_and_recovery.pdf Graphic file (type pdf)
 <use figures/key_rotation_and_recovery.pdf>
 Package pdftex.def Info: figures/key_rotation_and_recovery.pdf  used on input l
@@ -896,7 +895,7 @@ a \T1/cmtt/m/n/12 ServiceUnavailableException\T1/cmr/m/n/12 (-20) ,
  []
 
 [29]
-<figures/rbac_acl_pipeline.pdf, id=4713, 2962.06625pt x 1777.91534pt>
+<figures/rbac_acl_pipeline.pdf, id=4737, 2962.06625pt x 1777.91534pt>
 File: figures/rbac_acl_pipeline.pdf Graphic file (type pdf)
 <use figures/rbac_acl_pipeline.pdf>
 Package pdftex.def Info: figures/rbac_acl_pipeline.pdf  used on input line 1336
@@ -2006,536 +2005,579 @@ Overfull \hbox (6.49997pt too wide) in paragraph at lines 1674--1674
  []
 
 [36] [37] [38] [39] [40]
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 []|\T1/cmr/bx/n/10.95 (+20) Proto-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 []|\T1/cmr/bx/n/10.95 (+20) Proto-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 []|\T1/cmr/m/n/10.95 (+20) Browser AES-256-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 []|\T1/cmr/m/n/10.95 (+20) Mechanism im-ple-
  []
 
 
-Underfull \hbox (badness 2158) in paragraph at lines 1950--1950
+Underfull \hbox (badness 2158) in paragraph at lines 1952--1952
 \OMS/cmsy/m/n/10.95 H[]$\T1/cmr/m/n/10.95 (+20) , and $\OML/cmm/m/it/10.95 id[]
 $\T1/cmr/m/n/10.95 (+20) ; Fab-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) ric transaction-level
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) non-repudiation re-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 []|\T1/cmr/m/n/10.95 (+20) ECIES-style P-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 []|\T1/cmr/m/n/10.95 (+20) 125-byte to-ken;
  []
 
 
-Underfull \hbox (badness 7522) in paragraph at lines 1950--1950
+Underfull \hbox (badness 7522) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) browser wraps $\OML/cmm/m/it/10.95 k[]$
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 []|\T1/cmtt/m/n/10.95 CheckAccess \T1/cmr/m/n/10.95 (+20) eval-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) u-ated on ev-ery
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) down-load; ser-vice
  []
 
 
-Underfull \hbox (badness 3919) in paragraph at lines 1950--1950
+Underfull \hbox (badness 3919) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) grants (Branches 1--
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) 2), falls back to
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 \T1/cmtt/m/n/10.95 doc.OwnerOrg ==
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 \T1/cmtt/m/n/10.95 userOrg \T1/cmr/m/n/10.95 (+20) for owner-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) organization ac-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) cess (Branch 3),
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) and eval-u-ates org-
  []
 
 
-Underfull \hbox (badness 7256) in paragraph at lines 1950--1950
+Underfull \hbox (badness 7256) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) prefix grants un-der
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 \T1/cmtt/m/n/10.95 ACL["ORG:"+org]
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) (Branches 4--5), as
  []
 
 
-Underfull \hbox (badness 1297) in paragraph at lines 1950--1950
+Underfull \hbox (badness 1297) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) organization per-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 \T1/cmtt/m/n/10.95 == userOrg \T1/cmr/m/n/10.95 (+20) owner-
  []
 
 
-Underfull \hbox (badness 1297) in paragraph at lines 1950--1950
+Underfull \hbox (badness 1297) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) org fall-back; re-quire
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) ex-plicit per-user
  []
 
 
-Underfull \hbox (badness 4886) in paragraph at lines 1950--1950
+Underfull \hbox (badness 4886) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) grants for all prin-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) ci-pals, in-clud-ing
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) intra-organization
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 []|\T1/cmr/m/n/10.95 (+20) Prototype cur-rently
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) cross-organization
  []
 
 
-Underfull \hbox (badness 2644) in paragraph at lines 1950--1950
+Underfull \hbox (badness 2644) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) ac-cess. Pro-duc-tion
  []
 
 
-Underfull \hbox (badness 4391) in paragraph at lines 1950--1950
+Underfull \hbox (badness 4391) in paragraph at lines 1952--1952
 []|\T1/cmr/m/n/10.95 (+20) On-chain ex-piry en-
  []
 
 
-Underfull \hbox (badness 4084) in paragraph at lines 1950--1950
+Underfull \hbox (badness 4084) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) forced in chain-code;
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) ex-pired grants de-
  []
 
 
-Underfull \hbox (badness 7649) in paragraph at lines 1950--1950
+Underfull \hbox (badness 7649) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) nied by \T1/cmtt/m/n/10.95 ExpiresAt\T1/cmr/m/n/10.95 (
 +20) ;
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) ex-piry write-back
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) to pre-vent MVCC
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 \T1/cmtt/m/n/10.95 CleanExpiredTokens
  []
 
 
-Underfull \hbox (badness 2012) in paragraph at lines 1950--1950
+Underfull \hbox (badness 2012) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) from Raft con-fig-u-ra-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 []|\T1/cmr/m/n/10.95 (+20) 2-node IPFS
  []
 
 
-Underfull \hbox (badness 1009) in paragraph at lines 1950--1950
+Underfull \hbox (badness 1009) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) ning across 2 nodes;
  []
 
 
-Underfull \hbox (badness 1231) in paragraph at lines 1950--1950
+Underfull \hbox (badness 1231) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) pin-ning pol-icy, node
  []
 
 
-Underfull \hbox (badness 1769) in paragraph at lines 1950--1950
+Underfull \hbox (badness 1769) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) health, and net-work
  []
 
 
-Underfull \hbox (badness 3449) in paragraph at lines 1950--1950
+Underfull \hbox (badness 3449) in paragraph at lines 1952--1952
 []|\T1/cmr/m/n/10.95 (+20) Implemented as pri-
  []
 
 
-Underfull \hbox (badness 2521) in paragraph at lines 1950--1950
+Underfull \hbox (badness 2521) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) aged pin-ning rec-om-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 1147) in paragraph at lines 1952--1952
+\T1/cmr/m/n/10.95 (+20) SLA. Ex-per-i-ment []10[]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 []|\T1/cmr/m/n/10.95 (+20) Per-user Fab-ric
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 []|\T1/cmr/m/n/10.95 (+20) Hardware-backed
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 []|\T1/cmr/m/n/10.95 (+20) WebAuthn/FIDO2
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 []|\T1/cmr/m/n/10.95 (+20) Browser re-encrypts
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 \OML/cmm/m/it/10.95 k[]$ \T1/cmr/m/n/10.95 (+20) for re-main-ing
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 []|\T1/cmr/m/n/10.95 (+20) Notification im-ple-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) mented; browser
  []
 
 
-Underfull \hbox (badness 1708) in paragraph at lines 1950--1950
+Underfull \hbox (badness 1708) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) owner ac-tion; proxy
  []
 
 
-Underfull \hbox (badness 4353) in paragraph at lines 1950--1950
+Underfull \hbox (badness 4353) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) re-encryption is the
  []
 
 
-Underfull \hbox (badness 2221) in paragraph at lines 1950--1950
+Underfull \hbox (badness 2221) in paragraph at lines 1952--1952
 []|\T1/cmr/m/n/10.95 (+20) TOTP MFA re-
  []
 
 
-Underfull \hbox (badness 2521) in paragraph at lines 1950--1950
+Underfull \hbox (badness 2521) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) gen-er-a-tion at en-roll-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 []|\T1/cmr/m/n/10.95 (+20) TPM/HSM-backed
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) TLS cer-tifi-cates on
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 []|\T1/cmr/m/n/10.95 (+20) Wrapped-key to-kens
  []
 
 
-Underfull \hbox (badness 3803) in paragraph at lines 1950--1950
+Underfull \hbox (badness 3803) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) to re-duce key-token
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 []|\T1/cmr/m/n/10.95 (+20) Prototype stores
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) ECIES-wrapped to-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) kens as en-crypted
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) Fab-ric world-state
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1950
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) val-ues in-dexed by
  []
 
 
-Underfull \hbox (badness 1742) in paragraph at lines 1950--1950
+Underfull \hbox (badness 1742) in paragraph at lines 1952--1952
 \T1/cmr/m/n/10.95 (+20) doc-u-ment and re-cip-
  []
 
 [41] [42] [43] [44]
-Overfull \hbox (17.6207pt too wide) in paragraph at lines 1952--1963
+Overfull \hbox (17.6207pt too wide) in paragraph at lines 1954--1965
 [][] 
  []
 
 
-Overfull \hbox (20.67429pt too wide) in paragraph at lines 2000--2012
+Overfull \hbox (20.67429pt too wide) in paragraph at lines 2002--2014
 []\T1/cmr/m/n/12 (-20) The repos-i-tory con-tains con-fig-u-ra-tion ar-ti-facts
  for a larger six-peer-organization
  []
 
 [45]
-<figures/fabric_topology4.pdf, id=4920, 935.41469pt x 519.86218pt>
+<figures/fabric_topology4.pdf, id=4948, 935.41469pt x 519.86218pt>
 File: figures/fabric_topology4.pdf Graphic file (type pdf)
 <use figures/fabric_topology4.pdf>
-Package pdftex.def Info: figures/fabric_topology4.pdf  used on input line 2022.
+Package pdftex.def Info: figures/fabric_topology4.pdf  used on input line 2024.
 
 (pdftex.def)             Requested size: 780.0pt x 433.50034pt.
 
-Overfull \hbox (390.0pt too wide) in paragraph at lines 2022--2028
+Overfull \hbox (390.0pt too wide) in paragraph at lines 2024--2030
  [][] 
  []
 
 [46]
-<figures/grant_access_sequence.pdf, id=4931, 601.28638pt x 327.14218pt>
+<figures/grant_access_sequence.pdf, id=4958, 601.28638pt x 327.14218pt>
 File: figures/grant_access_sequence.pdf Graphic file (type pdf)
 <use figures/grant_access_sequence.pdf>
 Package pdftex.def Info: figures/grant_access_sequence.pdf  used on input line 
-2068.
+2070.
 (pdftex.def)             Requested size: 319.80286pt x 173.99352pt.
-<figures/verify_access_sequence.pdf, id=4934, 669.46106pt x 457.71pt>
+<figures/verify_access_sequence.pdf, id=4961, 669.46106pt x 457.71pt>
 File: figures/verify_access_sequence.pdf Graphic file (type pdf)
 <use figures/verify_access_sequence.pdf>
 Package pdftex.def Info: figures/verify_access_sequence.pdf  used on input line
- 2086.
+ 2088.
 (pdftex.def)             Requested size: 343.2019pt x 234.65123pt.
-<figures/activity_diagram.pdf, id=4940, 478.66827pt x 291.00719pt>
+<figures/activity_diagram.pdf, id=4967, 478.66827pt x 291.00719pt>
 File: figures/activity_diagram.pdf Graphic file (type pdf)
 <use figures/activity_diagram.pdf>
-Package pdftex.def Info: figures/activity_diagram.pdf  used on input line 2106.
+Package pdftex.def Info: figures/activity_diagram.pdf  used on input line 2108.
 
 (pdftex.def)             Requested size: 545.99762pt x 331.96921pt.
 
-Overfull \hbox (155.99762pt too wide) in paragraph at lines 2106--2110
+Overfull \hbox (155.99762pt too wide) in paragraph at lines 2108--2112
  [][] 
  []
 
 [47]
-<figures/ui_ledger_explorer.png, id=4952, 1028.34187pt x 578.16pt>
+<figures/ui_ledger_explorer.png, id=4979, 1028.34187pt x 578.16pt>
 File: figures/ui_ledger_explorer.png Graphic file (type png)
 <use figures/ui_ledger_explorer.png>
 Package pdftex.def Info: figures/ui_ledger_explorer.png  used on input line 213
-7.
+9.
 (pdftex.def)             Requested size: 187.19833pt x 105.24644pt.
-<figures/ui_audit_log.png, id=4954, 1028.34187pt x 578.16pt>
+<figures/ui_audit_log.png, id=4981, 1028.34187pt x 578.16pt>
 File: figures/ui_audit_log.png Graphic file (type png)
 <use figures/ui_audit_log.png>
-Package pdftex.def Info: figures/ui_audit_log.png  used on input line 2140.
+Package pdftex.def Info: figures/ui_audit_log.png  used on input line 2142.
 (pdftex.def)             Requested size: 187.19833pt x 105.24644pt.
 
-Overfull \hbox (27.00488pt too wide) in paragraph at lines 2161--2167
+Overfull \hbox (27.00488pt too wide) in paragraph at lines 2171--2177
 \T1/cmr/m/n/12 (-20) Law-FirmB, Reg-u-la-torOrg) on a shared \T1/cmtt/m/n/12 le
 galchannel\T1/cmr/m/n/12 (-20) , each backed by CouchDB 3.2.
  []
 
 
-Overfull \hbox (67.02524pt too wide) in paragraph at lines 2168--2177
+Overfull \hbox (67.02524pt too wide) in paragraph at lines 2178--2187
 []\T1/cmr/m/n/12 (-20) Unless oth-er-wise stated, \T1/cmtt/m/n/12 BatchTimeout 
 \T1/cmr/m/n/12 (-20) was set to 2s and \T1/cmtt/m/n/12 BatchSize.MaxMessageCoun
 t
  []
 
 [48] [49]
-<figures/fig1_scalability.pdf, id=4993, 543.22902pt x 311.96503pt>
+<figures/fig1_scalability.pdf, id=5025, 543.22902pt x 311.96503pt>
 File: figures/fig1_scalability.pdf Graphic file (type pdf)
 <use figures/fig1_scalability.pdf>
-Package pdftex.def Info: figures/fig1_scalability.pdf  used on input line 2265.
+Package pdftex.def Info: figures/fig1_scalability.pdf  used on input line 2282.
 
 (pdftex.def)             Requested size: 304.19952pt x 174.69444pt.
  [50] [51]
-<figures/fig2_latency.pdf, id=5014, 601.045pt x 340.61261pt>
+<figures/fig2_latency.pdf, id=5047, 601.045pt x 340.61261pt>
 File: figures/fig2_latency.pdf Graphic file (type pdf)
 <use figures/fig2_latency.pdf>
-Package pdftex.def Info: figures/fig2_latency.pdf  used on input line 2374.
+Package pdftex.def Info: figures/fig2_latency.pdf  used on input line 2391.
 (pdftex.def)             Requested size: 304.19952pt x 172.39pt.
-<figures/fig3_filesize.pdf, id=5016, 543.22902pt x 384.23503pt>
+ [52]
+<figures/fig3_filesize.pdf, id=5054, 543.22902pt x 384.23503pt>
 File: figures/fig3_filesize.pdf Graphic file (type pdf)
 <use figures/fig3_filesize.pdf>
-Package pdftex.def Info: figures/fig3_filesize.pdf  used on input line 2396.
+Package pdftex.def Info: figures/fig3_filesize.pdf  used on input line 2413.
 (pdftex.def)             Requested size: 304.19952pt x 215.16428pt.
- [52]
-<figures/fig4_audit.pdf, id=5028, 543.22902pt x 250.53552pt>
+<figures/fig4_audit.pdf, id=5060, 543.22902pt x 250.53552pt>
 File: figures/fig4_audit.pdf Graphic file (type pdf)
 <use figures/fig4_audit.pdf>
-Package pdftex.def Info: figures/fig4_audit.pdf  used on input line 2429.
+Package pdftex.def Info: figures/fig4_audit.pdf  used on input line 2446.
 (pdftex.def)             Requested size: 335.40024pt x 154.68434pt.
  [53]
-<figures/fig5_wan.pdf, id=5041, 774.49304pt x 311.96503pt>
+<figures/fig5_wan.pdf, id=5075, 774.49304pt x 311.96503pt>
 File: figures/fig5_wan.pdf Graphic file (type pdf)
 <use figures/fig5_wan.pdf>
-Package pdftex.def Info: figures/fig5_wan.pdf  used on input line 2517.
+Package pdftex.def Info: figures/fig5_wan.pdf  used on input line 2534.
 (pdftex.def)             Requested size: 366.60095pt x 147.66605pt.
- [54]
-<figures/fig6_crypto.pdf, id=5052, 774.49304pt x 326.41902pt>
+ [54] [55]
+<figures/fig6_crypto.pdf, id=5092, 774.49304pt x 326.41902pt>
 File: figures/fig6_crypto.pdf Graphic file (type pdf)
 <use figures/fig6_crypto.pdf>
-Package pdftex.def Info: figures/fig6_crypto.pdf  used on input line 2567.
+Package pdftex.def Info: figures/fig6_crypto.pdf  used on input line 2584.
 (pdftex.def)             Requested size: 350.99762pt x 147.93315pt.
- [55]
-<figures/fig7_gethistory.pdf, id=5065, 760.03902pt x 311.96503pt>
+<figures/fig7_gethistory.pdf, id=5098, 760.03902pt x 311.96503pt>
 File: figures/fig7_gethistory.pdf Graphic file (type pdf)
 <use figures/fig7_gethistory.pdf>
-Package pdftex.def Info: figures/fig7_gethistory.pdf  used on input line 2622.
+Package pdftex.def Info: figures/fig7_gethistory.pdf  used on input line 2639.
 (pdftex.def)             Requested size: 304.19952pt x 124.85995pt.
  [56]
-<figures/fig8_sensitivity.pdf, id=5073, 543.22902pt x 297.511pt>
+<figures/fig8_sensitivity.pdf, id=5106, 543.22902pt x 297.511pt>
 File: figures/fig8_sensitivity.pdf Graphic file (type pdf)
 <use figures/fig8_sensitivity.pdf>
-Package pdftex.def Info: figures/fig8_sensitivity.pdf  used on input line 2670.
+Package pdftex.def Info: figures/fig8_sensitivity.pdf  used on input line 2687.
 
 (pdftex.def)             Requested size: 390.0pt x 213.59488pt.
-
-Overfull \hbox (4.79622pt too wide) in paragraph at lines 2684--2685
+ [57]
+Overfull \hbox (4.79622pt too wide) in paragraph at lines 2701--2702
 []\T1/cmr/m/n/12 (-20) This re-sult sub-stan-ti-ates the fail-closed be-hav-ior
  for the eval-u-ated document-
  []
 
-<figures/fig9_failclosed_outage.pdf, id=5076, 722.7pt x 346.89601pt>
+<figures/fig9_failclosed_outage.pdf, id=5114, 722.7pt x 346.89601pt>
 File: figures/fig9_failclosed_outage.pdf Graphic file (type pdf)
 <use figures/fig9_failclosed_outage.pdf>
 Package pdftex.def Info: figures/fig9_failclosed_outage.pdf  used on input line
- 2688.
+ 2705.
 (pdftex.def)             Requested size: 331.50238pt x 159.11888pt.
-[57]
-Overfull \hbox (22.75832pt too wide) in paragraph at lines 2721--2732
+<figures/fig10_ipfs_cost.pdf, id=5119, 794.97pt x 592.61403pt>
+File: figures/fig10_ipfs_cost.pdf Graphic file (type pdf)
+<use figures/fig10_ipfs_cost.pdf>
+Package pdftex.def Info: figures/fig10_ipfs_cost.pdf  used on input line 2750.
+(pdftex.def)             Requested size: 382.19833pt x 284.9217pt.
+[58]
+<figures/fig11_caliper.pdf, id=5128, 794.97pt x 332.44202pt>
+File: figures/fig11_caliper.pdf Graphic file (type pdf)
+<use figures/fig11_caliper.pdf>
+Package pdftex.def Info: figures/fig11_caliper.pdf  used on input line 2790.
+(pdftex.def)             Requested size: 350.99762pt x 146.7822pt.
+<figures/fig12_ledger_growth.pdf, id=5132, 794.97pt x 332.44202pt>
+File: figures/fig12_ledger_growth.pdf Graphic file (type pdf)
+<use figures/fig12_ledger_growth.pdf>
+Package pdftex.def Info: figures/fig12_ledger_growth.pdf  used on input line 28
+29.
+(pdftex.def)             Requested size: 350.99762pt x 146.7822pt.
+ [59]
+<figures/fig13_network_scaling.pdf, id=5141, 794.97pt x 332.44202pt>
+File: figures/fig13_network_scaling.pdf Graphic file (type pdf)
+<use figures/fig13_network_scaling.pdf>
+Package pdftex.def Info: figures/fig13_network_scaling.pdf  used on input line 
+2870.
+(pdftex.def)             Requested size: 350.99762pt x 146.7822pt.
+ [60]
+<figures/fig14_baseline.pdf, id=5151, 794.97pt x 332.44202pt>
+File: figures/fig14_baseline.pdf Graphic file (type pdf)
+<use figures/fig14_baseline.pdf>
+Package pdftex.def Info: figures/fig14_baseline.pdf  used on input line 2921.
+(pdftex.def)             Requested size: 350.99762pt x 146.7822pt.
+
+Underfull \vbox (badness 1590) has occurred while \output is active []
+
+ [61]
+Overfull \hbox (22.75832pt too wide) in paragraph at lines 3041--3052
 \T1/cmr/m/n/12 (-20) uses the Fab-ric trans-ac-tion times-tamp (\T1/cmtt/m/n/12
  ctx.GetStub().GetTxTimestamp()\T1/cmr/m/n/12 (-20) )
  []
 
-[58]
-Overfull \hbox (4.18654pt too wide) in paragraph at lines 2748--2755
+[62]
+Overfull \hbox (4.18654pt too wide) in paragraph at lines 3068--3075
 \T1/cmr/m/n/12 (-20) been val-i-dated at pro-duc-tion scale. Mit-i-ga-tions in-
 clude re-duc-ing \T1/cmtt/m/n/12 BatchTimeout
  []
 
 
-Overfull \hbox (18.3314pt too wide) in paragraph at lines 2756--2763
+Overfull \hbox (18.3314pt too wide) in paragraph at lines 3076--3083
 \T1/cmr/m/n/12 (-20) failover, multi-peer fail-ure com-bi-na-tions, or re-cov-e
 ry dur-ing con-cur-rent production-
  []
 
-[59]
-Overfull \hbox (0.83508pt too wide) in paragraph at lines 2831--2832
+
+Underfull \vbox (badness 1924) has occurred while \output is active []
+
+ [63]
+[64]
+Overfull \hbox (0.83508pt too wide) in paragraph at lines 3151--3152
 []\T1/cmr/m/n/12 (-20) The Post-greSQL iden-tity database stores each user's pu
 b-lic keys (\T1/cmtt/m/n/12 pk_ecies\T1/cmr/m/n/12 (-20) ,
  []
 
-[60] [61] [62]
-Overfull \hbox (72.48236pt too wide) in paragraph at lines 2876--2885
+[65] [66]
+Overfull \hbox (72.48236pt too wide) in paragraph at lines 3196--3205
 \T1/cmtt/m/n/12 /documents/{id}/download\T1/cmr/m/n/12 (-20) ), ac-cess grant a
 nd re-vo-ca-tion (\T1/cmtt/m/n/12 POST /documents/{id}/grant\T1/cmr/m/n/12 (-20
 ) ,
  []
 
-[63]
-Overfull \hbox (26.30418pt too wide) in paragraph at lines 2949--2963
+[67] [68]
+Overfull \hbox (26.30418pt too wide) in paragraph at lines 3269--3283
 \T1/cmr/m/n/12 (-20) au-dit dash-boards and joint en-dorse-ment poli-cies such 
 as \T1/cmtt/m/n/12 AND('LawFirmAMSP.peer',
  []
 
-[64] [65 <./figures/access_and_decryption.pdf>] [66 <./figures/key_rotation_and
-_recovery.pdf>] [67 <./figures/rbac_acl_pipeline.pdf>] [68 <./figures/fabric_to
-pology4.pdf>] [69 <./figures/grant_access_sequence.pdf> <./figures/verify_acces
-s_sequence.pdf>] [70 <./figures/activity_diagram.pdf> <./figures/ui_ledger_expl
-orer.png> <./figures/ui_audit_log.png>] [71 <./figures/fig1_scalability.pdf> <.
-/figures/fig2_latency.pdf>] [72 <./figures/fig3_filesize.pdf> <./figures/fig4_a
-udit.pdf>] [73 <./figures/fig5_wan.pdf> <./figures/fig6_crypto.pdf>] [74 <./fig
-ures/fig7_gethistory.pdf> <./figures/fig8_sensitivity.pdf>] [75 <./figures/fig9
-_failclosed_outage.pdf>] [76
+[69] [70 <./figures/access_and_decryption.pdf>] [71 <./figures/key_rotation_and
+_recovery.pdf>] [72 <./figures/rbac_acl_pipeline.pdf>] [73 <./figures/fabric_to
+pology4.pdf>] [74 <./figures/grant_access_sequence.pdf> <./figures/verify_acces
+s_sequence.pdf>] [75 <./figures/activity_diagram.pdf> <./figures/ui_ledger_expl
+orer.png> <./figures/ui_audit_log.png>] [76 <./figures/fig1_scalability.pdf> <.
+/figures/fig2_latency.pdf>] [77 <./figures/fig3_filesize.pdf> <./figures/fig4_a
+udit.pdf>] [78 <./figures/fig5_wan.pdf> <./figures/fig6_crypto.pdf>] [79 <./fig
+ures/fig7_gethistory.pdf> <./figures/fig8_sensitivity.pdf>] [80 <./figures/fig9
+_failclosed_outage.pdf>] [81 <./figures/fig10_ipfs_cost.pdf>] [82 <./figures/fi
+g11_caliper.pdf> <./figures/fig12_ledger_growth.pdf>] [83 <./figures/fig13_netw
+ork_scaling.pdf> <./figures/fig14_baseline.pdf>] [84
 
-] [77] [78]
+] [85] [86]
 (/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2025/11/14 1.11b listings language file
-) [79]
-[80] (/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstlang1.sty
+) [87]
+[88] (/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2025/11/14 1.11b listings language file
 )
-[81] [82] (./main.bbl [83] [84] [85] [86] [87] [88] [89] [90] [91] [92]
-[93]) [94] (./main.aux)
+[89] [90] (./main.bbl [91] [92] [93] [94] [95] [96] [97] [98] [99] [100]
+[101]) [102] (./main.aux)
  ***********
 LaTeX2e <2026-06-01>
 L3 programming layer <2026-06-18>
@@ -2546,14 +2588,14 @@ LaTeX Font Warning: Size substitutions with differences
 (Font)              up to 4.5pt have occurred.
 
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 42C6F541FA1B24390CFF09F42885D494;14671.
+(rerunfilecheck)             Checksum: 52497AA113B992AD97A08DE3B3769D4C;16993.
  ) 
 Here is how much of TeX's memory you used:
- 19183 strings out of 467168
- 305172 string characters out of 5409468
- 1167508 words of memory out of 5000000
- 47258 multiletter control sequences out of 15000+600000
- 670890 words of font info for 309 fonts, out of 8000000 for 9000
+ 19297 strings out of 467168
+ 307655 string characters out of 5409468
+ 1170141 words of memory out of 5000000
+ 47323 multiletter control sequences out of 15000+600000
+ 671977 words of font info for 323 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  74i,14n,79p,1698b,2329s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb
@@ -2564,38 +2606,40 @@ r/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/
 local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/lo
 cal/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/loca
 l/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/
-texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/tex
-live/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texl
-ive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/texliv
-e/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/
-2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/20
-26/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/202
-6/texmf-dist/fonts/type1/public/cm-super/sfbx0600.pfb></usr/local/texlive/2026/
-texmf-dist/fonts/type1/public/cm-super/sfbx0800.pfb></usr/local/texlive/2026/te
-xmf-dist/fonts/type1/public/cm-super/sfbx1000.pfb></usr/local/texlive/2026/texm
-f-dist/fonts/type1/public/cm-super/sfbx1095.pfb></usr/local/texlive/2026/texmf-
-dist/fonts/type1/public/cm-super/sfbx1200.pfb></usr/local/texlive/2026/texmf-di
-st/fonts/type1/public/cm-super/sfcc1200.pfb></usr/local/texlive/2026/texmf-dist
-/fonts/type1/public/cm-super/sfit0800.pfb></usr/local/texlive/2026/texmf-dist/f
-onts/type1/public/cm-super/sfrm0600.pfb></usr/local/texlive/2026/texmf-dist/fon
-ts/type1/public/cm-super/sfrm0800.pfb></usr/local/texlive/2026/texmf-dist/fonts
-/type1/public/cm-super/sfrm1000.pfb></usr/local/texlive/2026/texmf-dist/fonts/t
-ype1/public/cm-super/sfrm1095.pfb></usr/local/texlive/2026/texmf-dist/fonts/typ
-e1/public/cm-super/sfrm1200.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1
-/public/cm-super/sfrm1728.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/p
-ublic/cm-super/sfti0700.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/pub
-lic/cm-super/sfti0800.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/publi
-c/cm-super/sfti1000.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/
-cm-super/sfti1095.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm
--super/sfti1200.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-s
-uper/sftt0800.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-sup
-er/sftt1000.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super
-/sftt1095.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/s
-ftt1200.pfb>
-Output written on main.pdf (94 pages, 6175147 bytes).
+texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/tex
+live/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texliv
+e/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive
+/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/texlive/2
+026/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/202
+6/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/2026/
+texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2026/t
+exmf-dist/fonts/type1/public/cm-super/sfbx0600.pfb></usr/local/texlive/2026/tex
+mf-dist/fonts/type1/public/cm-super/sfbx0800.pfb></usr/local/texlive/2026/texmf
+-dist/fonts/type1/public/cm-super/sfbx1000.pfb></usr/local/texlive/2026/texmf-d
+ist/fonts/type1/public/cm-super/sfbx1095.pfb></usr/local/texlive/2026/texmf-dis
+t/fonts/type1/public/cm-super/sfbx1200.pfb></usr/local/texlive/2026/texmf-dist/
+fonts/type1/public/cm-super/sfcc1200.pfb></usr/local/texlive/2026/texmf-dist/fo
+nts/type1/public/cm-super/sfit0800.pfb></usr/local/texlive/2026/texmf-dist/font
+s/type1/public/cm-super/sfrm0600.pfb></usr/local/texlive/2026/texmf-dist/fonts/
+type1/public/cm-super/sfrm0700.pfb></usr/local/texlive/2026/texmf-dist/fonts/ty
+pe1/public/cm-super/sfrm0800.pfb></usr/local/texlive/2026/texmf-dist/fonts/type
+1/public/cm-super/sfrm1000.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/
+public/cm-super/sfrm1095.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/pu
+blic/cm-super/sfrm1200.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/publ
+ic/cm-super/sfrm1728.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public
+/cm-super/sfti0700.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/c
+m-super/sfti0800.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-
+super/sfti1000.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-su
+per/sfti1095.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-supe
+r/sfti1200.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/
+sftt0800.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sf
+tt1000.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sftt
+1095.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sftt12
+00.pfb>
+Output written on main.pdf (102 pages, 6313547 bytes).
 PDF statistics:
- 7913 PDF objects out of 8907 (max. 8388607)
- 4463 compressed objects within 45 object streams
- 521 named destinations out of 1000 (max. 500000)
- 80029 words of extra memory for PDF output out of 89155 (max. 10000000)
+ 8361 PDF objects out of 8907 (max. 8388607)
+ 4591 compressed objects within 46 object streams
+ 542 named destinations out of 1000 (max. 500000)
+ 80102 words of extra memory for PDF output out of 89155 (max. 10000000)
 
