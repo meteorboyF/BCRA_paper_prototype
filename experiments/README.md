@@ -13,6 +13,7 @@ Benchmark and evaluation code for the BRA submission. Manuscript lives on the
 | 13 — Network-size scaling (2–7 orgs × policy) | 3.2 | [`network_scaling/RESULTS.md`](network_scaling/RESULTS.md) | `network_scaling/results/20260715_225854/` (+ `o7verify/`) | `fig13_network_scaling.png/.pdf` |
 | 14 — Passive-audit-log baseline (+ async-executor bug fix) | 3.5a | [`baseline_auditlog/RESULTS.md`](baseline_auditlog/RESULTS.md) | `baseline_auditlog/results/20260716_122821/` | `fig14_baseline.png/.pdf` |
 | 15 — Consolidated evidence table + 95% CIs | 3.6 | [`consolidated/RESULTS.md`](consolidated/RESULTS.md) | `consolidated/results/20260716_131526/` | `fig15_ci_headline.png/.pdf` |
+| Legacy figure regeneration (fig1–fig9 + CIs) | 3.6 | [`legacy_figures/RESULTS.md`](legacy_figures/RESULTS.md) | `legacy_figures/results/20260716_145930/` | `fig1`–`fig9` `.png/.pdf` |
 
 Exp 1–9 raw source data (verified against the published figures) lives in
 repo-root `results/` with `DELTAS.md` as the reconciliation log.

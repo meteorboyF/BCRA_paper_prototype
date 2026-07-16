@@ -113,6 +113,16 @@ Index of everything: `experiments/README.md`.
 - TODO at top of COMPARISON_TABLE.md: re-verify pre-proof page cites
   (RBAC-IPFS, Liu & Zheng, Notash) against versions of record.
 
+### Legacy figure regeneration (completing item 3.6)
+- fig1–fig9 regenerated from committed raw CSVs in the unified house
+  style with 95% CIs (`experiments/legacy_figures/`, run 20260716_145930).
+- Deltas vs published versions documented in its RESULTS.md: fig1 PG
+  series truncated to the valid region; fig5 uses the full superseded-
+  baseline RTT sweep; fig6 flags the Node WebCrypto runtime in-figure;
+  fig9 re-render makes the circuit-breaker recovery lag visible.
+- Swapping into `bra_submission/figures/` + caption updates = manuscript
+  work, deliberately not done here.
+
 ## Repo/process decisions
 - One RESULTS.md per experiment beside the code; timestamped evidence
   runs under `<exp>/results/`; smoke runs gitignored, never evidence.
