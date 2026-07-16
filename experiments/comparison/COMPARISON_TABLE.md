@@ -1,5 +1,11 @@
 # Item 3.5b — Numbers-Level Comparison vs Closest Published Systems
 
+> **TODO (before camera-ready): re-verify page citations against the
+> versions of record for the three journal pre-proofs — RBAC-IPFS
+> (Liu/Lu/Guan/Ren, BRA in press), Liu & Zheng 2024 (BRA pre-proof), and
+> Notash et al. (BRA in press). Pre-proof pagination and numbers may
+> shift in the final published PDFs.**
+
 Status: **FILLED from the source PDFs (lit-papers/, 2026-07-16); pending
 author spot-check.** Every published-system cell carries a page citation
 into its PDF. Our rows are sourced from the consolidated evidence table
