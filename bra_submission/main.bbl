@@ -135,6 +135,20 @@ R.~B. Miller, \href{https://doi.org/10.1145/1476589.1476628}{Response time in
   2023}, Tech. rep., ILTA (2023).
 \newline\urlprefix\url{https://www.iltanet.org/research/surveys}
 
+\bibitem{liu2026rbacipfs}
+N.~Liu, S.~Lu, F.~Guan, W.~Ren, A blockchain-based traceable access control
+  scheme for {IPFS}, Blockchain: Research and ApplicationsIn press, journal
+  pre-proof (2026).
+\newblock \href {https://doi.org/10.1016/j.bcra.2026.100503}
+  {\path{doi:10.1016/j.bcra.2026.100503}}.
+
+\bibitem{mukta2026zerotrust}
+R.~Mukta, S.~Pal, K.~Chowdhury, M.~Hitchens, H.-y. Paik, S.~S. Kanhere, Zero
+  trust-driven access control delegation using blockchain, Blockchain: Research
+  and Applications 7~(1) (2026) 100319.
+\newblock \href {https://doi.org/10.1016/j.bcra.2025.100319}
+  {\path{doi:10.1016/j.bcra.2025.100319}}.
+
 \bibitem{jaoude2019blockchain}
 J.~Abou~Jaoude, R.~G. Saade, Blockchain applications--usage in different
   domains, IEEE Access 7 (2019) 45360--45381.
@@ -202,6 +216,27 @@ J.~Guo, K.~Zhao, Z.~Liang, K.~Min, Efficient and secure emr storage and sharing
   scheme based on hyperledger fabric and ipfs, Applied Sciences 14 (2024) 5005.
 \newblock \href {https://doi.org/10.3390/app14125005}
   {\path{doi:10.3390/app14125005}}.
+
+\bibitem{chen2022filewallet}
+J.~Chen, C.~Zhang, Y.~Yan, Y.~Liu, {FileWallet}: A file management system based
+  on {IPFS} and {Hyperledger Fabric}, Computer Modeling in Engineering \&
+  Sciences 130~(2) (2022) 949--966.
+\newblock \href {https://doi.org/10.32604/cmes.2022.017516}
+  {\path{doi:10.32604/cmes.2022.017516}}.
+
+\bibitem{peelam2026decentralized}
+M.~S. Peelam, V.~Chamola, A.~K. Sharma, B.~K. Chaurasia, Decentralized trust:
+  {NFT} and blockchain-enabled evidence system using fog computing, Blockchain:
+  Research and Applications 7~(1) (2026) 100321.
+\newblock \href {https://doi.org/10.1016/j.bcra.2025.100321}
+  {\path{doi:10.1016/j.bcra.2025.100321}}.
+
+\bibitem{notash2026adaptive}
+Z.~Notash, S.~Jamali, R.~Fotohi, An adaptive blockchain-enabled access control
+  framework for secure and privacy-preserving e-health data sharing,
+  Blockchain: Research and ApplicationsIn press, journal pre-proof (2026).
+\newblock \href {https://doi.org/10.1016/j.bcra.2026.100492}
+  {\path{doi:10.1016/j.bcra.2026.100492}}.
 
 \bibitem{macaroons2014}
 A.~Birgisson, J.~G. Politz, {\'U}.~Erlingsson, A.~Taly, M.~Vrable,

@@ -157,7 +157,7 @@ A Hybrid Approach Using Hyperledger Fabric and IPFS}
             country={Bangladesh}}
 
 \begin{abstract}
-Legal document management systems typically centralize trust in privileged administrators, making it difficult for external parties to verify whether access decisions or audit records have been altered. This paper presents a hybrid legal-data management framework that places Hyperledger Fabric on the active document-release path rather than using it only as a passive audit log: every protected download must pass a Fabric chaincode access check before ciphertext or wrapped document keys are released. If Fabric is unavailable, the download path fails closed and returns a denial instead of falling back to a database access-control list. The framework combines browser-side encryption, encrypted off-chain storage in a private IPFS swarm, and on-chain anchoring of document hashes and content identifiers. In experimental evaluation, the REST-gateway workload sustains up to 193 transactions per second, exceeding the estimated baseline for a 1,000-user firm; Fabric-based access checks add no statistically significant delay over a database-only check; and outage simulations confirm that successful downloads drop to zero during Fabric unavailability, with service resuming automatically on reconnection. The framework thus provides an empirical systems baseline for moving document-release decisions from application-only authorization to ledger-verifiable access-control state.
+Legal document management systems typically centralize trust in privileged administrators, making it difficult for external parties to verify whether access decisions or audit records have been altered. This paper presents a hybrid legal-data management framework that places Hyperledger Fabric on the active document-release path rather than using it only as a passive audit log: every protected download must pass a Fabric chaincode access check before ciphertext or wrapped document keys are released. If Fabric is unavailable, the download path fails closed and returns a denial instead of falling back to a database access-control list. The framework combines browser-side encryption, encrypted off-chain storage in a private IPFS swarm, and on-chain anchoring of document hashes and content identifiers. In experimental evaluation, the REST-gateway workload sustains up to 193 transactions per second, exceeding the estimated baseline for a 1,000-user firm; Fabric-based access checks add no statistically significant delay over a database-only check; and outage simulations confirm that successful downloads drop to zero during Fabric unavailability, with service resuming automatically on reconnection. Prior permissioned-ledger document systems either anchor access decisions off the release path or price on-path authorization only for generic file sharing; none reports measured fail-closed behavior under ledger outage or the end-to-end cost of on-path enforcement against an audit-log-only baseline. The framework thus provides an empirical systems baseline for moving document-release decisions from application-only authorization to ledger-verifiable access-control state.
 \end{abstract}
 
 \begin{keyword}
@@ -316,7 +316,13 @@ authorization boundary from application-only trust to ledger-verifiable
 access-control state on the normal release path. The framework does not
 propose a new access-control primitive, a Byzantine-fault-tolerant ordering
 protocol, or a production-ready legal deployment. Fail-closed behavior is
-empirically confirmed for the download path.
+empirically confirmed for the download path. Against the closest current
+systems, the delta is measurement scope: RBAC-IPFS~\cite{liu2026rbacipfs}
+prices on-path authorization for generic IPFS file sharing and zero-trust
+delegation~\cite{mukta2026zerotrust} verifies capabilities on-ledger, but
+no prior Fabric-and-IPFS document system reports measured fail-closed
+behavior under ledger outage or quantifies the end-to-end premium of
+on-path enforcement over the audit-log-only architecture it replaces.
 
 Second, a proof-of-concept prototype is implemented and evaluated for a
 three-organization legal consortium using Hyperledger Fabric, a
@@ -402,10 +408,11 @@ auditor must still trust the system that made the decision.
 c c c
 >{\raggedright\arraybackslash}X
 @{}}
-\caption{Comparison with representative blockchain-based legal and evidence-management systems. 
-ACL = access-control decision evaluated on the normal document-release path; 
-Sig = user-level signature binding actor to document content; 
-Rev = ledger-verifiable revocation or expiry. 
+\caption{Comparison with representative blockchain-based legal,
+evidence-management, and access-controlled storage systems.
+ACL = access-control decision evaluated on the normal document-release path;
+Sig = user-level signature binding actor to document content;
+Rev = ledger-verifiable revocation or expiry.
 Y = supported; N = not supported; P = partial.}
 \label{tab:literature_review}\\
 \toprule
@@ -465,6 +472,36 @@ Secure record storage and event auditing combining IPFS and Fabric. &
 Fabric + IPFS &
 N & N & N &
 Uses Fabric mainly for audit recording; per-request access enforcement and per-recipient key wrapping are not evaluated. \\
+
+Liu et al.~\cite{liu2026rbacipfs} &
+Role-based access control for IPFS with root-CID smart-contract authorization on the retrieval path. &
+Fabric + IPFS &
+Y & N & Y &
+Prices on-path authorization for generic file sharing (146--156\,ms end-to-end under 50\,ms emulated WAN), but does not evaluate ledger-outage behavior, an enforcement-cost baseline, per-recipient key wrapping, or a legal workflow. \\
+
+Chen et al.~\cite{chen2022filewallet} &
+Peer-to-peer personal and organizational file management on Fabric and IPFS. &
+Fabric + IPFS &
+P & N & N &
+Chaincode privilege checks are validated functionally but never timed; no fail-closed design, expiry, or per-recipient key distribution. \\
+
+Mukta et al.~\cite{mukta2026zerotrust} &
+Zero-trust capability delegation with verifiable credentials on Fabric. &
+Fabric + SSI &
+P & P & Y &
+Delegation verification is benchmarked as a chaincode operation (peak 29.4\,TPS), but there is no storage tier: authorization is never enforced on a document-release path. \\
+
+Peelam et al.~\cite{peelam2026decentralized} &
+NFT-based evidence registration with fog computing and IPFS. &
+Ethereum + IPFS &
+N & P & N &
+Evidence minting and transfer delays are seconds-scale; document access is not evaluated by ledger-visible policy before release. \\
+
+Notash et al.~\cite{notash2026adaptive} &
+Adaptive access-control framework for e-health data sharing with broadcast encryption. &
+Fabric + IPFS &
+P & N & P &
+Access policies are enforced and formally analyzed, but enforcement latency on the release path is not isolated (reported metrics are workflow-scale averages). \\
 
 Capability and ABAC systems~\cite{macaroons2014,zanzibar2019,qian2021cpabe} &
 Fine-grained delegation or attribute-based authorization. &
@@ -571,23 +608,61 @@ organize evidence across active and static chains, and Onyeashie
 et al.~\cite{onyeashie2025fabricEvidence} use Fabric and IPFS to separate law-enforcement, forensic, and judicial workflows. Hanafi et al.~\cite{hanafi2021ipfschain} and Guo et al. \cite{guo2024efficient} also combine IPFS and Fabric for secure record storage and event auditing, demonstrating the architecture's viability for highly confidential, role-based document sharing. These systems move closer to the legal-consortium model considered in this paper, but their
 primary contribution remains evidence management and audit recording. To the best of the authors' knowledge, none of the prior legal and evidence-management systems in Table~\ref{tab:literature_review} report evaluating an access-control decision against chaincode on the critical path of every document download or measuring the latency cost of doing so in a REST-gateway legal-document workflow, leaving an open baseline against which future permissioned-blockchain document-access systems can calibrate their access-control overhead.
 
+\subsubsection{Access-Control-Centric Fabric and IPFS Systems}
+
+A fourth line of work makes the access decision itself the primary
+contribution. FileWallet~\cite{chen2022filewallet} manages personal and
+organizational files on Fabric and IPFS with chaincode privilege checks,
+but validates them functionally rather than measuring their cost, and
+provides neither expiry nor per-recipient key distribution. Mukta et
+al.~\cite{mukta2026zerotrust} verify zero-trust capability delegations
+on Fabric and benchmark the delegation chaincode with Hyperledger
+Caliper, but the architecture has no storage tier: no document release
+is ever gated by the verified capability. Notash et
+al.~\cite{notash2026adaptive} enforce adaptive policies for e-health
+sharing over Fabric and IPFS and analyze them formally, reporting
+workflow-scale averages rather than isolating the enforcement decision
+on the release path. Closest to this work, the recent RBAC-IPFS scheme
+of Liu et al.~\cite{liu2026rbacipfs} performs a single root-CID
+smart-contract authorization on the IPFS retrieval path and, notably,
+\emph{does} measure it: contract execution in 1--2\,ms and 146--156\,ms
+end-to-end retrieval under an emulated 50\,ms wide-area network. That
+system targets generic file sharing; what remains unmeasured in it, and
+in all of the systems above, is the behavior of the enforcement point
+when the ledger is unavailable, the end-to-end premium of on-path
+enforcement relative to the audit-log-only architecture it replaces,
+and the domain mechanisms a legal consortium requires (time-bounded
+grants, per-recipient key wrapping, user-level signature binding, and a
+regulator role).
+
 \subsection{Identified Research Gaps}
 \label{sec:gaps}
 
 The reviewed literature reveals four gaps that motivate the proposed
-framework. First, many blockchain-based evidence systems provide
+framework. First, most blockchain-based evidence systems provide
 tamper-evident storage or timestamping but leave authorization to the
-application layer. This means a compromised or overly privileged
+application layer: Liu and Zheng~\cite{liu2024blockchain}, Hanafi et
+al.~\cite{hanafi2021ipfschain}, and Guo et al.~\cite{guo2024efficient}
+anchor or audit access events without evaluating the decision against
+ledger state before release, so a compromised or overly privileged
 application server may still authorize access using state that is not
-independently verifiable at the time of access. Second, access-control
-models are often coarse-grained or static. Legal collaboration
+independently verifiable at the time of access. RBAC-IPFS
+\cite{liu2026rbacipfs} closes part of this gap for generic file sharing
+by pricing an on-path authorization, but reports neither
+ledger-outage behavior nor the cost of on-path enforcement relative to
+an audit-log-only baseline. Second, access-control models are often
+coarse-grained or static: capability delegation is verified on-ledger
+without gating any storage tier~\cite{mukta2026zerotrust}, and
+file-management ACLs lack expiry and revocation
+semantics~\cite{chen2022filewallet}, whereas legal collaboration
 requires operation-specific capabilities, expiry, revocation, and
 auditable sharing across institutions. Third, user-level
 non-repudiation is often incomplete: a ledger transaction may show
 that an organization submitted an event, but not that a specific user
-signed the document content or action being recorded. Fourth,
-off-chain storage availability is frequently assumed rather than
-governed; IPFS content must be pinned and replicated deliberately.
+signed the document content or action being
+recorded~\cite{peelam2026decentralized}. Fourth, off-chain storage
+availability is frequently assumed rather than governed; IPFS content
+must be pinned and replicated deliberately.
 
 The proposed framework addresses these gaps by moving the enforcement boundary onto the normal document-release path.
 The contribution is not a new access-control primitive, not a
@@ -3026,9 +3101,14 @@ design and current implementation, bounding the measured prototype relative
 to the framework design. To the best of the authors' knowledge, none of the
 prior Fabric\,+\,IPFS legal-document systems in Table~\ref{tab:literature_review}
 report the latency cost of placing \texttt{CheckAccess} on the critical
-download path. The negligible read overhead measured here (6.51\,ms
-vs.\ 7.16\,ms P50, a 0.65\,ms difference, $n{=}100$) confirms that this
-architectural choice imposes negligible interactive overhead. It also establishes a reproducible baseline
+download path; the closest measurement is the 146--156\,ms end-to-end
+retrieval authorization that RBAC-IPFS reports for generic file sharing
+under an emulated 50\,ms wide-area network~\cite{liu2026rbacipfs}, which
+is complementary to, but not directly comparable with, the LAN-scale
+function-level isolation reported here. The negligible read overhead
+measured here (6.51\,ms vs.\ 7.16\,ms P50, a 0.65\,ms difference,
+$n{=}100$) confirms that this architectural choice imposes negligible
+interactive overhead. It also establishes a reproducible baseline
 against which future on-path enforcement designs can be evaluated.
 
 Future work will focus on per-user Fabric CA enrollment, HSM/WebAuthn-backed
