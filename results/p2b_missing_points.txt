@@ -1,0 +1,31 @@
+P2-B Missing Points — Handoff Document
+========================================
+Both RTT=50ms and RTT=100ms (veth_corrected) were captured in the full
+P2-B run on 2026-05-25 and are already present in the CSV files.
+No re-measurement was required.
+
+RTT 50ms  veth_corrected: mean TPS=20.88, P50 commit=2339ms
+RTT 100ms veth_corrected: mean TPS=17.64, P50 commit=2554ms
+
+Detail:
+  RTT=50ms  veth_corrected TPS trials (n=5): 18.9, 21.9, 22.1, 19.7, 21.8
+    mean=20.88  p50_tps=21.80  p50_lat=2339ms  p95_lat=2394ms
+
+  RTT=100ms veth_corrected TPS trials (n=5): 19.3, 15.5, 17.1, 17.1, 19.2
+    mean=17.64  p50_tps=17.10  p50_lat=2554ms  p95_lat=2578ms
+
+Full veth_corrected dataset across all RTT levels:
+  RTT=0ms:   mean TPS=24.38, P50 commit=2137ms, P95=2166ms
+  RTT=50ms:  mean TPS=20.88, P50 commit=2339ms, P95=2394ms
+  RTT=100ms: mean TPS=17.64, P50 commit=2554ms, P95=2578ms
+  RTT=150ms: mean TPS=17.14, P50 commit=2744ms, P95=2756ms
+
+Files appended/verified:
+  results/p2b_wan_tps_raw.csv    — 25 rows (header + 20 veth_corrected + 4 bridge_original)
+  results/p2b_wan_latency_raw.csv — 85 rows (header + 80 veth_corrected + 4 bridge_original)
+  results/p2b_summary.txt        — all 8 conditions present (4 RTTs × 2 methods)
+
+Network state at completion:
+  - All 10 Fabric containers running (3 orderers, 3 peers, 3 CouchDB, 1 CLI)
+  - No tc netem rules active on any interface
+  - BatchTimeout=2s (confirmed in configtx.yaml)

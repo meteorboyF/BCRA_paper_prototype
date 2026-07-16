@@ -1,0 +1,23 @@
+{
+  "fallback_rows_delta": 1090,
+  "before_outage": {
+    "ok": 469,
+    "h5": 0,
+    "h403": 0,
+    "err": 0
+  },
+  "during_outage": {
+    "ok": 649,
+    "h5": 0,
+    "h403": 0,
+    "err": 0
+  },
+  "after_recovery": {
+    "ok": 1417,
+    "h5": 0,
+    "h403": 0,
+    "err": 0
+  },
+  "peers_stopped_at_s": 30,
+  "peers_started_at_s": 75
+}

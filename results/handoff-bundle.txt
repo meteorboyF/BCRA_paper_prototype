@@ -1,0 +1,3480 @@
+# ============================================================================
+# Pangochain experiment campaign — handoff bundle
+# Generated 2026-06-01T17:01:54+06:00 on Angkon-Lappy
+# Each section below is one file; the '# FILE:' line names it. ~/Pangochain_AOOP is repo root.
+# ============================================================================
+
+
+# ════════════════════════════════════════════════════════════════════════
+# FILE: results/EXPERIMENT_PROGRESS.md
+#   (105 lines, 14151 bytes)
+# ════════════════════════════════════════════════════════════════════════
+# Experiment Progress / Crash-Resume Checkpoint
+
+_Last updated: 2026-06-01 (resume after host crash mid-session). This file is the single
+source of truth for resuming the V → R → S measurement campaign. Update it after every
+completed experiment so another crash never costs more than one in-flight measurement._
+
+## Locked plan (unchanged across sessions)
+- Sequence: **V → R → S**, in order.
+- **PARAMETER LOCK (canonical):** `BatchTimeout=2s`, `MaxMessageCount=500` ("BatchSize"=500).
+  - Manuscript says "BatchSize=50" → WRONG. Logged in `DELTAS.md` as `BatchSize 50→500`. Do NOT edit LaTeX.
+  - V1 **Phase B** deliberately sweeps `BatchTimeout` 500ms→250ms as a *sensitivity* sub-experiment,
+    then RESTORES 2s. 2s remains the canonical value for V2–V5 / R / S.
+- Topology: **3-org** (FirmA, FirmB, Regulator), 3 orderers (Raft).
+- Throughput (V1): 5 runs/point + 1 discarded warm-up.
+- CheckAccess/RegisterDocument latency (V2): 20 warm-up discarded + 100 measured; record cold-JIT P50 AND warmed P50 separately.
+- Every experiment → `results/<exp>.csv` (ALL raw per-trial rows) + `<exp>.summary.json` (mean,P50,min,max,stdev).
+  Tag every row with `platform` (linux_x86_64 authoritative) and `method`.
+- Write path: gateway preferred; fall back to `peer chaincode invoke --waitForEvent` only if gateway fails after TLS fix, tagging `method=cli_proxy` vs `gateway` per row.
+- Do NOT fabricate values; record failures in DELTAS and CONTINUE. Do NOT edit LaTeX.
+
+## Live infrastructure state (as found on resume)
+- **All Fabric containers DOWN** — orderer1/2/3, peer0.{firma,firmb,regulator}, all 3 CAs, all 3 CouchDB,
+  legalcc, fabric-cli, pangochain-postgres → all `Exited (255)` ~45 min before resume.
+- **IPFS UP & healthy**: `pangochain-ipfs`, `pangochain-ipfs2` (Kubo v0.27.0).
+- `pangochain-fabric/configtx.yaml`: **uncommitted edit `BatchTimeout: 2s → 500ms`** (git status `M`).
+  This is the unfinished V1-Phase-B state; the run was supposed to restore 2s at the end but crashed first.
+- TLS/admin certs in `pangochain-backend/config/fabric/crypto/` were refreshed 03:28 (git `M`);
+  prior originals saved under `_stale-backup-20260601-032801/`.
+
+## Per-experiment status
+
+| Exp | Script | Output files | Status |
+|-----|--------|--------------|--------|
+| **V1 Phase A** (throughput sweep @ 2s, fixedcount_x10, gateway) | `run-exp1-fabric-sweep.sh` | `exp1_throughput.csv` rows 2–42 | ✅ **DONE & valid** — conc {50,100,150,200,300,400,500,600}, warm-up(trial0)@50 + 5 trials/pt, all `bt=2000`, `method=gateway` |
+| **V1 cross-check** (duration60s tool @ 2s, conc=50) | `run-exp1-batchtimeout.sh` (configurable tool) | `exp1_throughput.csv` rows 43–47 | ✅ tool cross-check @ 2s captured (5 rows). Sanity only. |
+| **V1 Phase B** (BatchTimeout sensitivity 500ms→250ms, conc=50, both tools) | `run-exp1-batchtimeout.sh` (patched: added anchor-peer updates to `join_deploy`) | `exp1_throughput.csv` rows bt=500/bt=250 | ✅ **DONE & valid** — 5 dur60 + 5 fixedcount per timeout, all err=0. fixedcount mean TPS: ~63@2s → ~200@500ms → ~300@250ms. Network restored to 2s. |
+| **V2** CheckAccess/RegisterDocument latency | `measure-v2-latency.py` | `exp2_latency.{csv,summary.json}` | ✅ **DONE** (fabric/gateway) — checkaccess cold/warmed p50=7.5/6.5ms; registerdoc p50≈2084ms (=BatchTimeout). 120 samples/op, 0 bad, all 200 |
+| **V3** file-size (direct Kubo HTTP) | `measure-v3-filesize.py` | `exp3_filesize.{csv,summary.json}` | ✅ **DONE** — fabric commit const 2131ms (peer_cli, n=5); IPFS add p50 1MB=10ms→50MB=95ms (10/size). |
+| **V4** audit verification | `measure-v4-audit.sh` | `exp4_audit.{csv,summary.json}` | ✅ **DONE** — pg_query p50=3.85ms vs csv_sha256_chain p50=86.3ms (1000 events, 10 trials). audit_log had 108k rows. |
+| **V5** GetHistoryForKey (107 entries, 10 raw) | `measure-v5-history.sh` | `exp7_history.{csv,summary.json}` | ✅ **DONE** — depth=107, p50=135.5ms mean=134 stdev=6.41. Raw: [127,128,137,138,137,134,123,134,145,137]. |
+| **R** WAN 0ms reconcile (bridge vs bridge_veth) | `run-R-wan-reconcile.sh` | `exp5_wan.csv` | ✅ **DONE** — back-to-back 0ms baselines, 5 reps each, err=0. bridge mean=66.64 TPS, bridge_veth mean=72.14 TPS. |
+| **S1** Fabric v3 SmartBFT 4-node | (none) | n/a | ⛔ **BLOCKED & recorded** in DELTAS — needs 4th-orderer crypto, pinned v3 tools image (only `:latest`), v3 osnadmin bring-up (system channel removed), BFT configtx. Separate from-scratch v3 network; risks campaign net. BFT projection left as-is. |
+| **S2** fail-open | `run-S2-failopen.sh` + `s2-ciphertext-load.js` | `exp_failopen.{csv,audit.json,summary.json}` | ✅ **DONE** — during 45s peer outage: 649 ok, 0 err/5xx/403, 1090 ACL_FABRIC_FALLBACK rows (fail-OPEN). Recovery: Fabric CheckAccess authoritative again, delta=0 new fallbacks. audit.json re-extracted (20 samples; orig COPY FORMAT json was invalid for SELECTs). |
+| **S3** 6-org | (none) | n/a | ⛔ **BLOCKED & recorded** in DELTAS — 3-org-only artifacts (crypto-config/configtx/compose); 6-org needs destructive full crypto regen (wipes validated 3-org net) + chaincode/backend MSP changes. "3-org upper bound" text left as-is. |
+
+## Data validity decisions
+- **KEEP** `exp1_throughput.csv` rows 2–47 (Phase A sweep @2s + duration60s@2s cross-check) — collected on a fully-built 3-org network via the gateway. Valid.
+- **REGENERATE** `exp1_throughput.summary.json`: it was written 04:21, but the CSV grew to 07:00 (now includes warm-up trial0 + duration60s rows). Stale → must rebuild from the full CSV after the campaign settles (and must EXCLUDE the trial=0 warm-up row and label the duration60s rows separately).
+- **REDO** V1 Phase B from scratch (no valid 500ms/250ms rows exist).
+- Everything V2–S3: nothing to keep; start clean.
+
+## Resume recipe (do these in order)
+1. **Restore canonical config:** set `configtx.yaml` BatchTimeout back to `2s` (or run Phase B which restores it).
+2. **Bring the network up at 2s** (regen genesis/channel artifacts → start orderers/peers/CAs/CouchDB → create channel → join 3 peers → deploy legalcc → smoke test). Bring up Postgres. IPFS already up.
+3. **Fix backend→peer gateway TLS**, start backend, assert in logs that commits go through the gateway (not silent CLI fallback). Tag rows `method=gateway` (or `cli_proxy` if forced to fall back).
+4. Re-run **V1 Phase B** (`run-exp1-batchtimeout.sh`) — it rebuilds 500ms, measures, rebuilds 250ms, measures, restores 2s.
+5. Run **V2 → V3 → V4 → V5** at 2s. Checkpoint this file after each.
+6. **R**: both 0ms WAN baselines (bridge + bridge_veth) back-to-back in one session.
+7. **S2** fail-open; attempt **S1** (v3 SmartBFT) and **S3** (6-org) — on any blocker, record exact blocker in DELTAS and CONTINUE.
+8. Regenerate every `*.summary.json`; finalize `DELTAS.md`.
+
+## Decision (locked this session)
+- **"Restore 2s, redo Phase B"** chosen. Ordering: bring up 2s network → fix gateway → **V2→V3→V4→V5 on stable 2s** → **V1 Phase B** (`run-exp1-batchtimeout.sh`, sweeps 500/250 then restores 2s) → **R** → **S2/S1/S3**. Stable-2s latency experiments captured BEFORE any further rebuilds, so a Phase-B rebuild crash can't cost V2–V5.
+
+## Crash forensics (important)
+- **HOST REBOOTED 2026-06-01 09:15** (not just docker). Consequence: `/tmp` wiped → `/tmp/launch-backend.sh` was lost. **Reconstructed** it (cd pangochain-backend; `java -jar target/pangochain-backend-2.0.0.jar --spring.jpa.hibernate.ddl-auto=validate`, backgrounded, log `/tmp/pangochain-backend.log`). Phase B `restart_backend()` depends on it.
+- Survived reboot: `crypto-config/` (so ledger-only rebuild keeps backend certs valid), backend jar (`target/pangochain-backend-2.0.0.jar`, built 03:28), node v18, docker 29 / compose v5.
+- Rebuild method = ledger-only (NOT `start-network.sh`): `docker compose -f pangochain-fabric/docker-compose.fabric.yml down -v` → `docker rm -f legalcc` → regen **channel-artifacts only** (`configtxgen`, keeps crypto-config) → `up -d` → wait 30s → create+join channel (3 peers) → `deploy-chaincode.sh`. This preserves crypto so the backend TLS certs stay valid.
+- Backend deps to start first: **pangochain-postgres** (was Exited) and **IPFS** (already up). Backend env defaults: DB localhost:5432, peer localhost:7051 (FirmAMSP, host-override peer0.firma.pangochain.com), IPFS 5001/5002, certs `pangochain-backend/config/fabric/crypto/{admin-cert,admin-key,tls-ca-cert}.pem`.
+
+## CAMPAIGN COMPLETE (2026-06-01 ~11:10)
+All measurable experiments done; S1/S3 blockers recorded. Every experiment has `<exp>.csv` (raw rows) + `<exp>.summary.json`:
+- `exp1_throughput` (V1 Phase A sweep @2s + Phase B 500/250ms sensitivity) — 66 data rows
+- `exp2_latency` (V2 checkaccess + registerdoc, 120 each, cold+warmed) — 240 rows
+- `exp3_filesize` (V3, 6 sizes ×10 + fabric const) — 65 rows
+- `exp4_audit` (V4, pg_query ×10 + sha256_chain ×10) — 20 rows
+- `exp7_history` (V5, depth 107, 10 trials) — 10 rows
+- `exp5_wan` (R, bridge+bridge_veth ×5 @0ms) — 10 rows
+- `exp_failopen` (S2, 150 per-second + audit.json + summary) — 150 rows
+Network left healthy at **BatchTimeout=2s**, backend gateway up, IPFS dual-pin persistent. `DELTAS.md` finalized.
+
+## TOP-UP PHASE 2 (2026-06-01 ~11:40) — close 3 data gaps + clean sensitivity
+Network stays 3-org @2s (NO crypto regen). Conventions unchanged. Append-only except where noted.
+Canonical throughput tool = **duration60s** (`pangochain-loadtest-configurable.js`, 80/20 read/write).
+
+| Task | What | Output | Status |
+|------|------|--------|--------|
+| **W** Full WAN RTT sweep | bridge+bridge_veth × RTT {0,50,100,150} × 5 reps, conc=200, duration60s. OVERWRITE exp5_wan.csv (8 points). | `exp5_wan.csv` (+ summary) | ✅ **DONE** — bridge 68→61 TPS, bridge_veth 69→38 TPS across 0→150ms. 40 rows. err: bridge ~3-5/pt, bridge_veth grows to 976@150ms (client 10s timeout). |
+| **PG** PostgreSQL-only throughput | backend `fabric.enabled=false`; duration60s; conc {50..600}×5+warmup. APPEND mode=postgres to exp1_throughput.csv | `exp1_throughput.csv` | ✅ **DONE** — PG peak ≈279 TPS (conc=100); ratio ≈4.1× Fabric @conc=50. conc≥150 = client closed-loop socket-storm collapse (TPS=0, ~480k err; backend stayed UP) → harness-invalid, kept+flagged. Backend restored to fabric mode. |
+| **DB** DB-only CheckAccess latency | `measure-v2-latency.py MODE=db_only OPS=checkaccess`, 20 warm+100 meas, cold+warmed. APPEND db_only block | `exp2_latency.{csv,summary.json}` | ✅ **DONE** — db_only cold/warmed p50=8.00/7.16ms; vs fabric 7.50/6.51ms → overhead ≈ −0.5ms (<1ms, within noise). RQ2 confirmed. |
+| **SENS** Clean BatchTimeout sensitivity | conc=50, {2s,500ms,250ms}, duration60s, 10 reps each, capture client CPU; rebuild per timeout, restore 2s | `exp_batchtimeout_sens.{csv,summary.json}` | ✅ **DONE** — 2s=67.7, 500ms=193.0, 250ms=179.8 TPS; client CPU 2/11/14% (NOT saturated → not a client ceiling); err=0. Non-monotonic 250<500 reproduced; 500ms = sustained sweet spot. Network restored to 2s. |
+
+Order: **W** (fabric+netem) → **PG+DB** (backend db-only, then restore fabric) → **SENS** (rebuilds, restore 2s). End: regenerate affected summaries, finalize DELTAS old→new, leave net @2s.
+Resume note: if crash mid-W, just re-run `run-W-wan-sweep.sh` (it overwrites). PG appends — if interrupted, dedupe mode=postgres rows before re-run.
+
+**TOP-UP PHASE 2 COMPLETE (2026-06-01 ~13:55).** W/PG/DB/SENS all done; affected summaries regenerated; DELTAS finalized old→new. Network verified left at **BatchTimeout=2s**, backend **fabric mode** (gateway write path proven: on-chain `fabricTxId` returned), IPFS dual-pin + Postgres up. Key results: WAN sweep (bridge 68→61, bridge_veth 69→38 TPS over 0–150ms); PG peak ≈279 TPS (~4.1× Fabric, harness saturates >conc100); DB CheckAccess overhead ≈ −0.5ms (<1ms, RQ2 ✓); SENS 500ms=193 / 250ms=180 / 2s=68 TPS with client CPU ≤14% (load gen NOT the ceiling; 500ms = sweet spot). New scripts: `run-W-wan-sweep.sh`, `run-PG-throughput.sh`, `run-SENS-batchtimeout.sh`, `/tmp/launch-backend-dbonly.sh`.
+
+## Checkpoint log
+- 2026-06-01 ~10:05: Resume inventory complete. Confirmed Phase A valid, Phase B incomplete, V2–S3 not started. Found host rebooted 09:15 (/tmp wiped); reconstructed launch-backend.sh; verified crypto-config + jar survived. Set configtx back to BatchTimeout=2s. About to start postgres + ledger-only rebuild at 2s. Nothing measured yet.
+- 2026-06-01 ~10:10: **Network REBUILT at 2s.** Postgres started (accepting connections); IPFS up. Fabric: down -v, regen channel-artifacts @2s, up -d (all 10 containers), created legal-channel, joined 3 peers, deployed legalcc (smoke test RegisterCase = status 200 PASS). Verified backend certs vs live crypto: tls-ca-cert MATCH, admin-cert MATCH (no cert re-sync needed). Starting backend now; next = assert gateway commit, then V2.
+- 2026-06-01 ~10:24: **Write path VERIFIED on gateway + IPFS fixed.** Two environment regressions found and fixed (both post-reboot):
+  1. **Anchor peers were missing** (my manual channel setup skipped the anchor updates) → gateway service discovery couldn't find cross-org endorsers → `FAILED_PRECONDITION: no peer combination satisfies endorsement policy`. Fixed by running the 3 anchor-peer updates. **If you rebuild the channel manually, ALWAYS run the anchor updates** (start-network.sh step 5 does them; my ad-hoc create+join did not).
+  2. **IPFS dual-pin hung** — see DELTAS "Environment fixes". Cleared `Swarm.AddrFilters` (was blocking docker subnet 172.16/12) + set persistent `Peering.Peers` on both Kubo nodes. Secondary pin 10s-timeout → 13ms.
+  - End-to-end proof: `/api/documents/upload` → HTTP 200 in 2.105s (=1 BatchTimeout) with on-chain `fabricTxId=9edbfb11...`; `GetDocumentHistory` returns the same txId. `method=gateway`, no fallback.
+  - **Infra now fully ready for measurement:** Fabric @2s (3-org + anchors + legalcc), backend up (gateway write path live), IPFS dual-pin healthy, Postgres up. Next: run V2 (`measure-v2-latency.py`).
+
+
+# ════════════════════════════════════════════════════════════════════════
+# FILE: results/DELTAS.md
+#   (62 lines, 8677 bytes)
+# ════════════════════════════════════════════════════════════════════════
+# DELTAS — numbers/claims in the manuscript that differ from measured reality
+
+_Running log. Do NOT edit the LaTeX; record every divergence here for a later editing pass.
+Finalized at the end of the V → R → S campaign._
+
+## Parameter corrections
+- **BatchSize 50 → 500.** Manuscript text says "BatchSize=50". The live ordering service uses
+  `MaxMessageCount=500` (configtx.yaml `BatchSize.MaxMessageCount: 500`). Correct value is **500**.
+- **BatchTimeout = 2s (canonical).** All V2–V5 / R / S measurements use BatchTimeout=2s.
+  V1 Phase B additionally reports a sensitivity sweep at 500ms and 250ms (not the canonical value).
+
+## Measured-vs-manuscript number deltas
+_(to be filled in as each experiment completes)_
+
+| Section | Manuscript value | Measured value | Notes |
+|---------|------------------|----------------|-------|
+| §VI.B   | BatchSize=50     | MaxMessageCount=500 | parameter correction (above) |
+| Exp5 WAN **full RTT sweep** (Task W, supersedes 0ms-only) | old baselines 21.9 / 24.4 TPS (old ~22 TPS regime) | **bridge:** 0→68.24, 50→64.94, 100→62.28, 150→60.76 TPS; **bridge_veth:** 0→69.48, 50→50.94, 100→47.04, 150→38.32 TPS | duration60s tool, conc=200, 5 reps/point. The prior 21.9/24.4 baselines were from the old ~22 TPS regime and are **superseded** by the current ~66–69 TPS regime. At 0ms the two configs match (~68 vs ~69.5); they diverge with RTT — `bridge` (delay on the docker bridge only) degrades gently, `bridge_veth` (delay also on each orderer veth → compounded inter-orderer Raft latency) collapses. **err:** bridge 3–5/point (p95<10s); bridge_veth grows with RTT (13→76→64→976 at 0/50/100/150ms) as p95 approaches the load tool's 10s client timeout — TPS reflects successful-commit throughput. Raw in `exp5_wan.csv` (full 8-point). |
+| Exp1 BatchTimeout sensitivity (conc=50, fixedcount) | — | 2s≈62 TPS, 500ms≈214 TPS, 250ms≈301 TPS | V1 Phase B, 5 reps/timeout, err=0. (dur60 tool: 66/174/153 TPS resp.) Clean 10-rep re-run in Task SENS. |
+| Exp1 **PostgreSQL-only throughput** (Task PG, replaces stale 481.4 TPS / 18×) | PG peak 481.4 TPS, ~18× Fabric (old ~22-TPS regime, different write path) | **PG peak ≈ 279 TPS (conc=100, 0 err); ratio ≈ 4.0–4.1× Fabric** | duration60s tool, mode=postgres (fabric.enabled=false). Matched-tool @conc=50: PG 272.1 / Fabric 66.3 = **4.1×**; peak/peak 279/~70 ≈ 4.0×. Lower than the old 481 because this PG write path still does IPFS add + dual-pin on 20% of requests (IPFS-bound). **Caveat:** the duration60s *closed-loop client* saturates its socket pool at conc≥150 in the fast db-only regime (no 2s batch to throttle it) → TPS collapses to 0 with ~480k spin-errors/trial; backend stayed UP and kept committing, so this is a load-generator limit, not a PG-server limit. conc≥150 rows kept in CSV but are harness-invalid (err column self-flags them); peak/ratio taken from the stable conc≤100 region. In *fabric* mode the same tool ran fine at conc=200 (Task W) because the 2s commit throttles the client. |
+| Exp2 RegisterDocument latency @2s | — | cold/warmed p50 ≈ 2084 ms (=BatchTimeout) | gateway write path |
+| Exp2 CheckAccess latency (fabric) | — | cold p50=7.50ms / warmed p50=6.51ms | Fabric CheckAccess read |
+| Exp2 CheckAccess latency (db_only, Task DB) | — | cold p50=8.00ms / warmed p50=7.16ms | PostgreSQL-ACL path, Fabric bypassed (fabric.enabled=false), 20 warm+100 meas, 0 bad |
+| RQ2 Fabric CheckAccess **overhead** vs DB | "<1 ms overhead" (claim) | **≈ −0.5 ms (cold), −0.65 ms (warmed)** → \|overhead\| < 1 ms, within noise | Confirms RQ2. CheckAccess is a Fabric *evaluate* (query, no ordering/commit), so it adds negligible time over the PG-ACL lookup; both dominated by ~7ms HTTP/app round-trip. |
+| Exp3 fabric commit constant | — | 2131.7 ms (peer_cli, n=5) | IPFS add p50 1MB=10ms→50MB=95ms |
+| Exp4 audit verification | — | PG query p50=3.85ms vs CSV+SHA256 chain p50=86.3ms (1000 events) | |
+| Exp7 GetHistoryForKey (depth 107) | — | p50=135.5ms (10 trials, raw recorded) | |
+| **SENS** clean BatchTimeout sensitivity (conc=50, duration60s, 10 reps) | (tool disagreement: Phase B fixedcount said 250ms>500ms; duration60s said 250ms<500ms) | **2s=67.7, 500ms=193.0, 250ms=179.8 TPS** (mean); client CPU 2.0 / 11.2 / 14.1%; err=0 | `exp_batchtimeout_sens.{csv,summary.json}`. **Resolved:** non-monotonicity (250ms < 500ms) is **reproducible**, and **NOT a load-generator artifact** — client CPU is only ~14% (nowhere near saturation). 500ms is the sustained-throughput sweet spot; pushing to 250ms cuts ~2× as many small blocks → higher per-block commit/validation overhead + noisier latency (250ms block ranged 137–206 TPS, p50 62–227ms) → slightly lower net throughput. The fixedcount tool ranked 250ms higher because it times fixed-batch completion (latency-favoring), not sustained throughput; the canonical sustained **duration60s** tool is the representative throughput metric. |
+
+## Methodology notes for the manuscript
+- §VI.B `commitStatusOptions` / CLI-proxy caveat: **RESOLVED — write path confirmed on the Fabric
+  gateway.** A backend `/api/documents/upload` (RegisterDocument) returned a real on-chain
+  `fabricTxId=9edbfb11...` in HTTP 200 at 2.105 s (= one BatchTimeout=2s), and `GetDocumentHistory`
+  on the ledger returned the same txId. No CLI proxy, no DB fallback. The §VI.B caveat about the
+  write path using the CLI proxy can be updated to say commits go through the gateway
+  (`method=gateway` on all V1/V2 write rows).
+
+## Environment fixes applied this session (reproducibility, not manuscript numbers)
+- **IPFS dual-pin was hanging** post-reboot: `IpfsService.pinOnSecondary` does a blocking `pin/add`
+  (no timeout) on node 2, which must fetch the CID from node 1 via bitswap. The two Kubo nodes
+  could not dial each other because the default `Swarm.AddrFilters` blocks `172.16.0.0/12` (the
+  docker subnet). Fix: cleared `Swarm.AddrFilters` on both nodes and set persistent `Peering.Peers`
+  (by container DNS name) so they auto-reconnect across restarts. Secondary `cat` went from
+  >10 s timeout → 13 ms. This restores the pre-reboot steady state; it does not change any
+  measured system property.
+
+## Blockers recorded (campaign continues regardless)
+
+### S1 — Fabric v3.0 SmartBFT, 4-node ordering — BLOCKED (manuscript BFT projection left as-is)
+Attempted on an isolated config copy (live v2.4 network untouched). Concrete blockers:
+1. **No ≥4-orderer crypto.** SmartBFT tolerates f=1 only with 3f+1=4 nodes; `crypto-config/` has just orderer1/2/3. A 4th orderer's MSP+TLS must be generated.
+2. **Pinned v3 tools image missing.** `hyperledger/fabric-orderer:3.0.0` pulls fine, but `fabric-tools:3.0.0 / 3.0 / 3.1.0` are **not found** on Docker Hub (only `:latest`, which is unpinnable for a reproducible paper). `configtxgen` for a BFT genesis needs the matching pinned tools image.
+3. **v3 removed the system channel.** The repo bootstraps via a `LegalOrdererGenesis` *system-channel* genesis + `peer channel create` (start-network.sh, configtx.yaml). Fabric v3 BFT requires the channel-participation API (`osnadmin channel join`, per-channel genesis) — a different bring-up the repo does not contain.
+4. configtx is `OrdererType: etcdraft`; BFT needs `OrdererType: BFT` + `SmartBFTOptions` + 4 consenter mappings + the v3 channel capability.
+**Net:** S1 = a separate v3 SmartBFT network from scratch (new crypto, configtx, osnadmin bring-up scripts, v3 peer/tools images, separate ports). It cannot reuse the validated v2.4 tooling and would risk the campaign network. Not attempted to completion; BFT numbers in the manuscript remain a projection.
+
+### S3 — 6-org topology — BLOCKED (manuscript "3-org upper bound" text left as-is)
+Concrete blockers:
+1. **Topology artifacts are 3-org only.** `crypto-config.yaml`, `configtx.yaml`, and `docker-compose.fabric.yml` define exactly FirmA/FirmB/Regulator. A 6-org run needs 3 more orgs authored across all three files (+3 peers, +3 CAs, +3 CouchDB, port map).
+2. **Full crypto regen is destructive.** Adding orgs regenerates `crypto-config/`, which invalidates the backend admin/TLS certs and **wipes the validated 3-org network** currently holding all V/R/S2 results.
+3. **Chaincode + backend are 3-org-aware.** legalcc endorsement = MAJORITY of the 3 defined orgs; the backend is pinned to `FirmAMSP`. 6-org would need endorsement-policy + MSP-config changes.
+**Net:** a non-destructive bounded attempt is not possible — it requires rebuilding the network at 6 orgs, destroying the validated 3-org state. The "3-org upper bound" claim remains as-is.
+
+
+# ════════════════════════════════════════════════════════════════════════
+# FILE: pangochain-fabric/configtx.yaml
+#   (192 lines, 5244 bytes)
+# ════════════════════════════════════════════════════════════════════════
+---
+Organizations:
+  - &OrdererOrg
+    Name: OrdererOrg
+    ID: OrdererMSP
+    MSPDir: crypto-config/ordererOrganizations/pangochain.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('OrdererMSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('OrdererMSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('OrdererMSP.admin')"
+
+  - &FirmA
+    Name: FirmAMSP
+    ID: FirmAMSP
+    MSPDir: crypto-config/peerOrganizations/firma.pangochain.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('FirmAMSP.admin', 'FirmAMSP.peer', 'FirmAMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('FirmAMSP.admin', 'FirmAMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('FirmAMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('FirmAMSP.peer')"
+    AnchorPeers:
+      - Host: peer0.firma.pangochain.com
+        Port: 7051
+
+  - &FirmB
+    Name: FirmBMSP
+    ID: FirmBMSP
+    MSPDir: crypto-config/peerOrganizations/firmb.pangochain.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('FirmBMSP.admin', 'FirmBMSP.peer', 'FirmBMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('FirmBMSP.admin', 'FirmBMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('FirmBMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('FirmBMSP.peer')"
+    AnchorPeers:
+      - Host: peer0.firmb.pangochain.com
+        Port: 8051
+
+  - &RegulatorOrg
+    Name: RegulatorMSP
+    ID: RegulatorMSP
+    MSPDir: crypto-config/peerOrganizations/regulator.pangochain.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('RegulatorMSP.admin', 'RegulatorMSP.peer', 'RegulatorMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('RegulatorMSP.admin', 'RegulatorMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('RegulatorMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('RegulatorMSP.peer')"
+    AnchorPeers:
+      - Host: peer0.regulator.pangochain.com
+        Port: 9051
+
+Capabilities:
+  Channel: &ChannelCapabilities
+    V2_0: true
+  Orderer: &OrdererCapabilities
+    V2_0: true
+  Application: &ApplicationCapabilities
+    V2_0: true
+
+Application: &ApplicationDefaults
+  Organizations:
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+    LifecycleEndorsement:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Endorsement"
+    Endorsement:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Endorsement"
+  Capabilities:
+    <<: *ApplicationCapabilities
+
+Orderer: &OrdererDefaults
+  OrdererType: etcdraft
+  Addresses:
+    - orderer1.pangochain.com:7050
+    - orderer2.pangochain.com:8050
+    - orderer3.pangochain.com:9050
+  BatchTimeout: 2s
+  BatchSize:
+    MaxMessageCount: 500
+    AbsoluteMaxBytes: 99 MB
+    PreferredMaxBytes: 2 MB
+  EtcdRaft:
+    Consenters:
+      - Host: orderer1.pangochain.com
+        Port: 7050
+        ClientTLSCert: crypto-config/ordererOrganizations/pangochain.com/orderers/orderer1.pangochain.com/tls/server.crt
+        ServerTLSCert: crypto-config/ordererOrganizations/pangochain.com/orderers/orderer1.pangochain.com/tls/server.crt
+      - Host: orderer2.pangochain.com
+        Port: 8050
+        ClientTLSCert: crypto-config/ordererOrganizations/pangochain.com/orderers/orderer2.pangochain.com/tls/server.crt
+        ServerTLSCert: crypto-config/ordererOrganizations/pangochain.com/orderers/orderer2.pangochain.com/tls/server.crt
+      - Host: orderer3.pangochain.com
+        Port: 9050
+        ClientTLSCert: crypto-config/ordererOrganizations/pangochain.com/orderers/orderer3.pangochain.com/tls/server.crt
+        ServerTLSCert: crypto-config/ordererOrganizations/pangochain.com/orderers/orderer3.pangochain.com/tls/server.crt
+  Organizations:
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+    BlockValidation:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+  Capabilities:
+    <<: *OrdererCapabilities
+
+Channel: &ChannelDefaults
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+  Capabilities:
+    <<: *ChannelCapabilities
+
+Profiles:
+  # Genesis block profile — used to bootstrap the orderer system channel
+  LegalOrdererGenesis:
+    <<: *ChannelDefaults
+    Orderer:
+      <<: *OrdererDefaults
+      Organizations:
+        - *OrdererOrg
+    Consortiums:
+      LegalConsortium:
+        Organizations:
+          - *FirmA
+          - *FirmB
+          - *RegulatorOrg
+
+  # Application channel profile
+  LegalChannel:
+    Consortium: LegalConsortium
+    <<: *ChannelDefaults
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - *FirmA
+        - *FirmB
+        - *RegulatorOrg
+      Capabilities:
+        <<: *ApplicationCapabilities
+
+
+# ════════════════════════════════════════════════════════════════════════
+# FILE: experiments/run-exp1-batchtimeout.sh
+#   (109 lines, 8250 bytes)
+# ════════════════════════════════════════════════════════════════════════
+#!/usr/bin/env bash
+# V1 Phase B — BatchTimeout sensitivity at peak client level (conc=50).
+# Rebuilds the Fabric network at BatchTimeout=500ms then 250ms (MaxMessageCount stays 500),
+# measuring conc=50 x5 with BOTH tools: configurable (fixed-duration 60s) and exp1-round
+# (fixed-count). Restores BatchTimeout=2s at the end. Appends to results/exp1_throughput.csv.
+set -uo pipefail
+REPO=/home/angkon/Pangochain_AOOP
+FAB=$REPO/pangochain-fabric
+CSV=$REPO/results/exp1_throughput.csv
+CONFIGTX=$FAB/configtx.yaml
+ORDERER_TLS=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/pangochain.com/orderers/orderer1.pangochain.com/tls/ca.crt
+CB=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto
+CONF=$REPO/experiments/caliper/pangochain-loadtest-configurable.js
+ROUND=$REPO/experiments/exp1-round.js
+cd "$REPO"
+log(){ echo "[B $(date +%H:%M:%S)] $*"; }
+
+regen_artifacts(){
+  rm -f "$FAB/channel-artifacts/genesis.block" "$FAB/channel-artifacts/legal-channel.block" \
+        "$FAB/channel-artifacts/legal-channel.tx" "$FAB/channel-artifacts/"*anchors.tx
+  docker run --rm -v "$FAB:/workspace" -w /workspace hyperledger/fabric-tools:2.4 bash -c "
+    export FABRIC_CFG_PATH=/workspace; mkdir -p /workspace/channel-artifacts
+    configtxgen -profile LegalOrdererGenesis -channelID system-channel -outputBlock /workspace/channel-artifacts/genesis.block
+    configtxgen -profile LegalChannel -outputCreateChannelTx /workspace/channel-artifacts/legal-channel.tx -channelID legal-channel
+    configtxgen -profile LegalChannel -outputAnchorPeersUpdate /workspace/channel-artifacts/FirmAMSPanchors.tx -channelID legal-channel -asOrg FirmAMSP
+    configtxgen -profile LegalChannel -outputAnchorPeersUpdate /workspace/channel-artifacts/FirmBMSPanchors.tx -channelID legal-channel -asOrg FirmBMSP
+    configtxgen -profile LegalChannel -outputAnchorPeersUpdate /workspace/channel-artifacts/RegulatorMSPanchors.tx -channelID legal-channel -asOrg RegulatorMSP" 2>&1 | tail -3
+}
+join_deploy(){
+  docker exec fabric-cli peer channel create -o orderer1.pangochain.com:7050 -c legal-channel \
+    -f "${CB}/../channel-artifacts/legal-channel.tx" --tls --cafile "$ORDERER_TLS" \
+    --outputBlock "${CB}/../channel-artifacts/legal-channel.block" 2>&1 | tail -1 || return 1
+  docker exec fabric-cli peer channel join -b "${CB}/../channel-artifacts/legal-channel.block" 2>&1 | tail -1
+  docker exec -e CORE_PEER_ADDRESS=peer0.firmb.pangochain.com:8051 -e CORE_PEER_LOCALMSPID=FirmBMSP \
+    -e "CORE_PEER_TLS_ROOTCERT_FILE=${CB}/peerOrganizations/firmb.pangochain.com/peers/peer0.firmb.pangochain.com/tls/ca.crt" \
+    -e "CORE_PEER_MSPCONFIGPATH=${CB}/peerOrganizations/firmb.pangochain.com/users/Admin@firmb.pangochain.com/msp" \
+    fabric-cli peer channel join -b "${CB}/../channel-artifacts/legal-channel.block" 2>&1 | tail -1
+  docker exec -e CORE_PEER_ADDRESS=peer0.regulator.pangochain.com:9051 -e CORE_PEER_LOCALMSPID=RegulatorMSP \
+    -e "CORE_PEER_TLS_ROOTCERT_FILE=${CB}/peerOrganizations/regulator.pangochain.com/peers/peer0.regulator.pangochain.com/tls/ca.crt" \
+    -e "CORE_PEER_MSPCONFIGPATH=${CB}/peerOrganizations/regulator.pangochain.com/users/Admin@regulator.pangochain.com/msp" \
+    fabric-cli peer channel join -b "${CB}/../channel-artifacts/legal-channel.block" 2>&1 | tail -1
+  # Anchor-peer updates — REQUIRED for cross-org gateway service discovery (endorsement policy).
+  # Without these, the backend gateway write path fails with FAILED_PRECONDITION (no peer combination).
+  docker exec fabric-cli peer channel update -o orderer1.pangochain.com:7050 -c legal-channel \
+    -f "${CB}/../channel-artifacts/FirmAMSPanchors.tx" --tls --cafile "$ORDERER_TLS" 2>&1 | tail -1
+  docker exec -e CORE_PEER_ADDRESS=peer0.firmb.pangochain.com:8051 -e CORE_PEER_LOCALMSPID=FirmBMSP \
+    -e "CORE_PEER_TLS_ROOTCERT_FILE=${CB}/peerOrganizations/firmb.pangochain.com/peers/peer0.firmb.pangochain.com/tls/ca.crt" \
+    -e "CORE_PEER_MSPCONFIGPATH=${CB}/peerOrganizations/firmb.pangochain.com/users/Admin@firmb.pangochain.com/msp" \
+    fabric-cli peer channel update -o orderer1.pangochain.com:7050 -c legal-channel \
+    -f "${CB}/../channel-artifacts/FirmBMSPanchors.tx" --tls --cafile "$ORDERER_TLS" 2>&1 | tail -1
+  docker exec -e CORE_PEER_ADDRESS=peer0.regulator.pangochain.com:9051 -e CORE_PEER_LOCALMSPID=RegulatorMSP \
+    -e "CORE_PEER_TLS_ROOTCERT_FILE=${CB}/peerOrganizations/regulator.pangochain.com/peers/peer0.regulator.pangochain.com/tls/ca.crt" \
+    -e "CORE_PEER_MSPCONFIGPATH=${CB}/peerOrganizations/regulator.pangochain.com/users/Admin@regulator.pangochain.com/msp" \
+    fabric-cli peer channel update -o orderer1.pangochain.com:7050 -c legal-channel \
+    -f "${CB}/../channel-artifacts/RegulatorMSPanchors.tx" --tls --cafile "$ORDERER_TLS" 2>&1 | tail -1
+  bash "$FAB/scripts/deploy-chaincode.sh" 2>&1 | tail -4 || return 1
+}
+rebuild(){  # rebuild <timeout-str e.g 500ms>
+  local ts=$1
+  log "rebuild network @ BatchTimeout=$ts"
+  sed -i "s/BatchTimeout: [0-9a-z.]*/BatchTimeout: ${ts}/" "$CONFIGTX"; grep BatchTimeout "$CONFIGTX"
+  (cd "$FAB" && docker compose -f docker-compose.fabric.yml down -v --remove-orphans 2>&1 | tail -1 || true)
+  docker rm -f legalcc 2>/dev/null || true
+  regen_artifacts
+  (cd "$FAB" && docker compose -f docker-compose.fabric.yml up -d 2>&1 | tail -1)
+  log "waiting 30s for peers..."; sleep 30
+  join_deploy || { log "join/deploy FAILED for $ts"; return 1; }
+  log "chaincode deployed @ $ts"
+}
+restart_backend(){
+  local pid; pid=$(pgrep -f "java -jar target/pangochain-backend-2.0.0.jar" | head -1); [ -n "$pid" ] && kill "$pid"; sleep 5
+  bash /tmp/launch-backend.sh
+  for i in $(seq 1 40); do curl -sf http://localhost:8080/actuator/health 2>/dev/null|grep -q UP && { log "backend healthy"; return 0; }; sleep 3; done
+  log "backend did NOT become healthy"; return 1
+}
+setup_data(){ local OUT; OUT=$(python3 experiments/setup-bench-data.py 2>/tmp/b_setup.err) || { cat /tmp/b_setup.err; return 1; }; eval "$OUT"; export PANGOCHAIN_JWT_TOKEN PANGOCHAIN_TEST_CASE_ID PANGOCHAIN_TEST_DOC_ID; [ -n "${PANGOCHAIN_JWT_TOKEN:-}" ]; }
+
+measure(){  # measure <bt_ms>
+  local bt=$1 L t
+  log "warmup (configurable conc=10 30s)"; PANGOCHAIN_CONCURRENCY=10 PANGOCHAIN_DURATION_SEC=30 node "$CONF" >/dev/null 2>&1
+  for t in 1 2 3 4 5; do
+    L=$(PANGOCHAIN_CONCURRENCY=50 PANGOCHAIN_DURATION_SEC=60 node "$CONF" 2>&1)
+    TPS=$(grep -oP 'TPS=\K[0-9.]+'<<<"$L"); P50=$(grep -oP 'P50=\K[0-9]+'<<<"$L"); P95=$(grep -oP 'P95=\K[0-9]+'<<<"$L"); ERR=$(grep -oP 'errors=\K[0-9]+'<<<"$L")
+    echo "exp1,fabric,$bt,duration60s,50,$t,${TPS:-0},${P50:-NA},${P95:-NA},${ERR:-NA},NA,60,NA,NA,gateway,linux_x86_64" >> "$CSV"
+    log "  dur60 trial $t: $L"; sleep 8
+  done
+  for t in 1 2 3 4 5; do
+    L=$(PANGOCHAIN_CONCURRENCY=50 node "$ROUND" 2>&1)
+    TPS=$(grep -oP 'TPS=\K[0-9.]+'<<<"$L"); P50=$(grep -oP 'P50=\K[0-9]+'<<<"$L"); P95=$(grep -oP 'P95=\K[0-9]+'<<<"$L"); ERR=$(grep -oP 'errors=\K[0-9]+'<<<"$L"); SU=$(grep -oP 'success=\K[0-9]+'<<<"$L"); EL=$(grep -oP 'elapsed=\K[0-9.]+'<<<"$L")
+    echo "exp1,fabric,$bt,fixedcount_x10,50,$t,${TPS:-0},${P50:-NA},${P95:-NA},${ERR:-NA},${SU:-NA},${EL:-NA},NA,NA,gateway,linux_x86_64" >> "$CSV"
+    log "  fixedcount trial $t: $L"; sleep 8
+  done
+}
+
+for spec in 500ms:500 250ms:250; do
+  TS=${spec%%:*}; BT=${spec##*:}
+  log "================= BatchTimeout=$TS ================="
+  rebuild "$TS" || { log "SKIP $TS (rebuild failed)"; continue; }
+  restart_backend || { log "SKIP $TS (backend)"; continue; }
+  setup_data || { log "SKIP $TS (data)"; continue; }
+  # verify a gateway commit
+  curl -s -o /dev/null -w "" -X POST http://localhost:8080/api/documents/upload -H "Authorization: Bearer $PANGOCHAIN_JWT_TOKEN" -H 'Content-Type: application/json' \
+    -d "{\"caseId\":\"$PANGOCHAIN_TEST_CASE_ID\",\"fileName\":\"v.bin\",\"ivBase64\":\"AAAAAAAAAAAAAAAA\",\"ciphertextBase64\":\"AAAA\",\"documentHashSha256\":\"$(printf '0%.0s' {1..64})\",\"wrappedKeyTokenForOwner\":\"$(printf 'A%.0s' {1..125})\"}"
+  measure "$BT"
+done
+
+log "================= restore BatchTimeout=2s ================="
+rebuild "2s" && restart_backend && { setup_data && log "restored, gateway up"; } || log "WARN restore incomplete"
+log "=== Phase B complete ==="
+
+
+# ════════════════════════════════════════════════════════════════════════
+# FILE: experiments/run-W-wan-sweep.sh
+#   (74 lines, 3593 bytes)
+# ════════════════════════════════════════════════════════════════════════
+#!/usr/bin/env bash
+# TASK W — Full WAN RTT sweep with the CANONICAL duration60s tool (pangochain-loadtest-configurable.js).
+# Both netem configs (bridge, bridge_veth) at RTT {0,50,100,150} ms, 200 clients, 5 reps each,
+# ONE session back-to-back. OVERWRITES results/exp5_wan.csv with the full 8-point sweep.
+set -uo pipefail
+REPO=/home/angkon/Pangochain_AOOP
+CSV=$REPO/results/exp5_wan.csv
+TOOL=$REPO/experiments/caliper/pangochain-loadtest-configurable.js
+CONC=${CONC:-200}; DUR=${DUR:-60}; REPS=${REPS:-5}
+read -r -a RTTS <<< "${RTTS:-0 50 100 150}"
+read -r -a CONFIGS <<< "${CONFIGS:-bridge bridge_veth}"
+cd "$REPO"; mkdir -p results
+log(){ echo "[W $(date +%H:%M:%S)] $*"; }
+
+BRID=$(docker network inspect fabric_test -f '{{.Id}}' 2>/dev/null | cut -c1-12)
+BRIDGE="br-${BRID}"
+ip link show "$BRIDGE" >/dev/null 2>&1 || { log "FATAL: bridge $BRIDGE not found"; exit 1; }
+log "fabric bridge = $BRIDGE  tool=duration60s conc=$CONC dur=${DUR}s reps=$REPS"
+
+orderer_veths(){
+  local c iflink f n
+  for c in orderer1.pangochain.com orderer2.pangochain.com orderer3.pangochain.com; do
+    iflink=$(docker exec "$c" cat /sys/class/net/eth0/iflink 2>/dev/null | tr -d '\r')
+    for f in /sys/class/net/*/ifindex; do n=$(cat "$f"); [ "$n" = "$iflink" ] && basename "$(dirname "$f")"; done
+  done
+}
+VETHS=($(orderer_veths)); log "orderer veths: ${VETHS[*]}"
+
+clear_netem(){
+  sudo -n tc qdisc del dev "$BRIDGE" root 2>/dev/null || true
+  for v in "${VETHS[@]}"; do sudo -n tc qdisc del dev "$v" root 2>/dev/null || true; done
+}
+apply_netem(){  # apply_netem <config> <rtt_ms>
+  local cfg=$1 rtt=$2
+  clear_netem
+  sudo -n tc qdisc add dev "$BRIDGE" root netem delay "${rtt}ms"
+  if [ "$cfg" = "bridge_veth" ]; then
+    for v in "${VETHS[@]}"; do sudo -n tc qdisc add dev "$v" root netem delay "${rtt}ms"; done
+  fi
+  sleep 2
+}
+refresh_jwt(){ local OUT; OUT=$(python3 experiments/setup-bench-data.py 2>/tmp/w_setup.err) || { cat /tmp/w_setup.err; return 1; }; eval "$OUT"; export PANGOCHAIN_JWT_TOKEN PANGOCHAIN_TEST_CASE_ID PANGOCHAIN_TEST_DOC_ID; [ -n "${PANGOCHAIN_JWT_TOKEN:-}" ]; }
+
+trap clear_netem EXIT
+# OVERWRITE with the full sweep
+echo "rtt_ms,config,tool,trial,tps,p50_ms,p95_ms,errors,method,platform" > "$CSV"
+
+log "=== TASK W: configs=(${CONFIGS[*]}) rtts=(${RTTS[*]}) reps=$REPS ==="
+for cfg in "${CONFIGS[@]}"; do
+  for rtt in "${RTTS[@]}"; do
+    log "--- config=$cfg rtt=${rtt}ms ---"
+    apply_netem "$cfg" "$rtt"
+    SHOW=$(sudo -n tc qdisc show dev "$BRIDGE" | tr -d '\n'); log "  bridge qdisc: $SHOW"
+    refresh_jwt || { log "JWT failed"; continue; }
+    for r in $(seq 1 "$REPS"); do
+      OUT=$(PANGOCHAIN_CONCURRENCY=$CONC PANGOCHAIN_DURATION_SEC=$DUR node "$TOOL" 2>&1) || true
+      TPS=$(grep -oP 'TPS=\K[0-9.]+' <<<"$OUT"|head -1); P50=$(grep -oP 'P50=\K[0-9]+' <<<"$OUT"|head -1)
+      P95=$(grep -oP 'P95=\K[0-9]+' <<<"$OUT"|head -1); ERR=$(grep -oP 'errors=\K[0-9]+' <<<"$OUT"|head -1)
+      echo "${rtt},${cfg},duration60s,${r},${TPS:-0},${P50:-NA},${P95:-NA},${ERR:-NA},gateway,linux_x86_64" >> "$CSV"
+      log "  run $r: TPS=${TPS:-NA} P50=${P50:-NA} P95=${P95:-NA} err=${ERR:-NA}"
+    done
+  done
+done
+clear_netem
+log "=== TASK W done -> $CSV ==="
+python3 - "$CSV" <<'PY'
+import csv,sys,statistics
+rows=list(csv.DictReader(open(sys.argv[1])))
+by={}
+for r in rows: by.setdefault((r['config'],r['rtt_ms']),[]).append(float(r['tps']))
+for k in sorted(by): print(f"  {k[0]} rtt={k[1]}ms: mean_tps={statistics.mean(by[k]):.2f} n={len(by[k])}")
+err=sum(int(r['errors']) for r in rows if r['errors'] not in ('NA',''))
+print(f"  TOTAL errors across sweep: {err}")
+PY
+
+
+# ════════════════════════════════════════════════════════════════════════
+# FILE: experiments/run-PG-throughput.sh
+#   (34 lines, 2215 bytes)
+# ════════════════════════════════════════════════════════════════════════
+#!/usr/bin/env bash
+# TASK PG — PostgreSQL-only throughput baseline with the CANONICAL duration60s tool.
+# Backend MUST already be running in db-only mode (fabric.enabled=false) — caller relaunches it.
+# Concurrency sweep {50,100,150,200,300,400,500,600}, 5 reps + 1 discarded warm-up.
+# Appends mode=postgres rows to results/exp1_throughput.csv.
+set -uo pipefail
+REPO=/home/angkon/Pangochain_AOOP
+CSV=$REPO/results/exp1_throughput.csv
+TOOL=$REPO/experiments/caliper/pangochain-loadtest-configurable.js
+DUR=${DUR:-60}; TRIALS=${TRIALS:-5}
+read -r -a CONCS <<< "${CONCS:-50 100 150 200 300 400 500 600}"
+cd "$REPO"; mkdir -p results
+log(){ echo "[PG $(date +%H:%M:%S)] $*"; }
+[ -f "$CSV" ] || echo "experiment,mode,batch_timeout_ms,tool,concurrency,trial,tps,p50_ms,p95_ms,errors,success,elapsed_s,cpu_pct,ram_mb,method,platform" > "$CSV"
+refresh_jwt(){ local OUT; OUT=$(python3 experiments/setup-bench-data.py 2>/tmp/pg_setup.err) || { cat /tmp/pg_setup.err; return 1; }; eval "$OUT"; export PANGOCHAIN_JWT_TOKEN PANGOCHAIN_TEST_CASE_ID PANGOCHAIN_TEST_DOC_ID; [ -n "${PANGOCHAIN_JWT_TOKEN:-}" ]; }
+emit(){ # emit <conc> <trial> <line>
+  local conc=$1 trial=$2 line=$3 tps p50 p95 err el
+  tps=$(grep -oP 'TPS=\K[0-9.]+' <<<"$line"); p50=$(grep -oP 'P50=\K[0-9]+' <<<"$line")
+  p95=$(grep -oP 'P95=\K[0-9]+' <<<"$line"); err=$(grep -oP 'errors=\K[0-9]+' <<<"$line"); el=$(grep -oP 'elapsed=\K[0-9.]+' <<<"$line")
+  echo "exp1,postgres,NA,duration60s,$conc,$trial,${tps:-0},${p50:-NA},${p95:-NA},${err:-NA},NA,${el:-$DUR},NA,NA,db_only,linux_x86_64" >> "$CSV"
+}
+
+log "=== PG-only throughput  tool=duration60s dur=${DUR}s concs=${CONCS[*]} ==="
+refresh_jwt || { log "JWT failed"; exit 1; }
+log "JWT ok CASE=$PANGOCHAIN_TEST_CASE_ID DOC=$PANGOCHAIN_TEST_DOC_ID"
+log "warm-up conc=50 (trial=0, discarded)"
+WLINE=$(PANGOCHAIN_CONCURRENCY=50 PANGOCHAIN_DURATION_SEC=$DUR node "$TOOL" 2>&1); log "  $WLINE"; emit 50 0 "$WLINE"; sleep 5
+for c in "${CONCS[@]}"; do
+  log "--- concurrency=$c ---"
+  for t in $(seq 1 "$TRIALS"); do
+    LINE=$(PANGOCHAIN_CONCURRENCY=$c PANGOCHAIN_DURATION_SEC=$DUR node "$TOOL" 2>&1); log "  trial $t: $LINE"; emit "$c" "$t" "$LINE"; sleep 5
+  done
+done
+log "=== TASK PG done -> $CSV ==="
+
+
+# ════════════════════════════════════════════════════════════════════════
+# FILE: experiments/run-SENS-batchtimeout.sh
+#   (127 lines, 8826 bytes)
+# ════════════════════════════════════════════════════════════════════════
+#!/usr/bin/env bash
+# TASK SENS — Clean BatchTimeout sensitivity with the CANONICAL duration60s tool.
+# conc=50, timeouts {2s,500ms,250ms}, 10 reps each. Rebuilds the ledger for each timeout
+# (keeps crypto, includes anchor updates), RESTORES 2s at the end. Captures client-side
+# (load generator) %CPU each rep to test whether the load generator — not the orderer — is
+# the ceiling when 250ms is non-monotonic vs 500ms.
+# Raw -> results/exp_batchtimeout_sens.csv ; summary -> results/exp_batchtimeout_sens.summary.json
+set -uo pipefail
+REPO=/home/angkon/Pangochain_AOOP
+FAB=$REPO/pangochain-fabric
+CSV=$REPO/results/exp_batchtimeout_sens.csv
+SJ=$REPO/results/exp_batchtimeout_sens.summary.json
+CONFIGTX=$FAB/configtx.yaml
+ORDERER_TLS=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/pangochain.com/orderers/orderer1.pangochain.com/tls/ca.crt
+CB=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto
+TOOL=$REPO/experiments/caliper/pangochain-loadtest-configurable.js
+CONC=${CONC:-50}; DUR=${DUR:-60}; REPS=${REPS:-10}
+cd "$REPO"
+log(){ echo "[SENS $(date +%H:%M:%S)] $*"; }
+
+regen_artifacts(){
+  rm -f "$FAB/channel-artifacts/genesis.block" "$FAB/channel-artifacts/legal-channel.block" \
+        "$FAB/channel-artifacts/legal-channel.tx" "$FAB/channel-artifacts/"*anchors.tx
+  docker run --rm -v "$FAB:/workspace" -w /workspace hyperledger/fabric-tools:2.4 bash -c "
+    export FABRIC_CFG_PATH=/workspace; mkdir -p /workspace/channel-artifacts
+    configtxgen -profile LegalOrdererGenesis -channelID system-channel -outputBlock /workspace/channel-artifacts/genesis.block
+    configtxgen -profile LegalChannel -outputCreateChannelTx /workspace/channel-artifacts/legal-channel.tx -channelID legal-channel
+    configtxgen -profile LegalChannel -outputAnchorPeersUpdate /workspace/channel-artifacts/FirmAMSPanchors.tx -channelID legal-channel -asOrg FirmAMSP
+    configtxgen -profile LegalChannel -outputAnchorPeersUpdate /workspace/channel-artifacts/FirmBMSPanchors.tx -channelID legal-channel -asOrg FirmBMSP
+    configtxgen -profile LegalChannel -outputAnchorPeersUpdate /workspace/channel-artifacts/RegulatorMSPanchors.tx -channelID legal-channel -asOrg RegulatorMSP" 2>&1 | tail -1
+}
+join_deploy(){
+  docker exec fabric-cli peer channel create -o orderer1.pangochain.com:7050 -c legal-channel \
+    -f "${CB}/../channel-artifacts/legal-channel.tx" --tls --cafile "$ORDERER_TLS" \
+    --outputBlock "${CB}/../channel-artifacts/legal-channel.block" 2>&1 | tail -1 || return 1
+  docker exec fabric-cli peer channel join -b "${CB}/../channel-artifacts/legal-channel.block" 2>&1 | tail -1
+  docker exec -e CORE_PEER_ADDRESS=peer0.firmb.pangochain.com:8051 -e CORE_PEER_LOCALMSPID=FirmBMSP \
+    -e "CORE_PEER_TLS_ROOTCERT_FILE=${CB}/peerOrganizations/firmb.pangochain.com/peers/peer0.firmb.pangochain.com/tls/ca.crt" \
+    -e "CORE_PEER_MSPCONFIGPATH=${CB}/peerOrganizations/firmb.pangochain.com/users/Admin@firmb.pangochain.com/msp" \
+    fabric-cli peer channel join -b "${CB}/../channel-artifacts/legal-channel.block" 2>&1 | tail -1
+  docker exec -e CORE_PEER_ADDRESS=peer0.regulator.pangochain.com:9051 -e CORE_PEER_LOCALMSPID=RegulatorMSP \
+    -e "CORE_PEER_TLS_ROOTCERT_FILE=${CB}/peerOrganizations/regulator.pangochain.com/peers/peer0.regulator.pangochain.com/tls/ca.crt" \
+    -e "CORE_PEER_MSPCONFIGPATH=${CB}/peerOrganizations/regulator.pangochain.com/users/Admin@regulator.pangochain.com/msp" \
+    fabric-cli peer channel join -b "${CB}/../channel-artifacts/legal-channel.block" 2>&1 | tail -1
+  # anchor-peer updates — REQUIRED for gateway cross-org endorsement discovery
+  docker exec fabric-cli peer channel update -o orderer1.pangochain.com:7050 -c legal-channel \
+    -f "${CB}/../channel-artifacts/FirmAMSPanchors.tx" --tls --cafile "$ORDERER_TLS" 2>&1 | tail -1
+  docker exec -e CORE_PEER_ADDRESS=peer0.firmb.pangochain.com:8051 -e CORE_PEER_LOCALMSPID=FirmBMSP \
+    -e "CORE_PEER_TLS_ROOTCERT_FILE=${CB}/peerOrganizations/firmb.pangochain.com/peers/peer0.firmb.pangochain.com/tls/ca.crt" \
+    -e "CORE_PEER_MSPCONFIGPATH=${CB}/peerOrganizations/firmb.pangochain.com/users/Admin@firmb.pangochain.com/msp" \
+    fabric-cli peer channel update -o orderer1.pangochain.com:7050 -c legal-channel \
+    -f "${CB}/../channel-artifacts/FirmBMSPanchors.tx" --tls --cafile "$ORDERER_TLS" 2>&1 | tail -1
+  docker exec -e CORE_PEER_ADDRESS=peer0.regulator.pangochain.com:9051 -e CORE_PEER_LOCALMSPID=RegulatorMSP \
+    -e "CORE_PEER_TLS_ROOTCERT_FILE=${CB}/peerOrganizations/regulator.pangochain.com/peers/peer0.regulator.pangochain.com/tls/ca.crt" \
+    -e "CORE_PEER_MSPCONFIGPATH=${CB}/peerOrganizations/regulator.pangochain.com/users/Admin@regulator.pangochain.com/msp" \
+    fabric-cli peer channel update -o orderer1.pangochain.com:7050 -c legal-channel \
+    -f "${CB}/../channel-artifacts/RegulatorMSPanchors.tx" --tls --cafile "$ORDERER_TLS" 2>&1 | tail -1
+  bash "$FAB/scripts/deploy-chaincode.sh" 2>&1 | tail -2 || return 1
+}
+rebuild(){  # rebuild <timeout-str e.g 500ms>
+  local ts=$1
+  log "rebuild network @ BatchTimeout=$ts"
+  sed -i "s/BatchTimeout: [0-9a-z.]*/BatchTimeout: ${ts}/" "$CONFIGTX"; grep BatchTimeout "$CONFIGTX"
+  (cd "$FAB" && docker compose -f docker-compose.fabric.yml down -v --remove-orphans 2>&1 | tail -1 || true)
+  docker rm -f legalcc 2>/dev/null || true
+  regen_artifacts
+  (cd "$FAB" && docker compose -f docker-compose.fabric.yml up -d 2>&1 | tail -1)
+  log "waiting 30s for peers..."; sleep 30
+  join_deploy || { log "join/deploy FAILED for $ts"; return 1; }
+  log "chaincode deployed @ $ts"
+}
+restart_backend(){
+  bash /tmp/launch-backend.sh
+  for i in $(seq 1 50); do curl -sf http://localhost:8080/actuator/health 2>/dev/null|grep -q UP && { log "backend healthy"; return 0; }; sleep 3; done
+  log "backend did NOT become healthy"; return 1
+}
+setup_data(){ local OUT; OUT=$(python3 experiments/setup-bench-data.py 2>/tmp/sens_setup.err) || { cat /tmp/sens_setup.err; return 1; }; eval "$OUT"; export PANGOCHAIN_JWT_TOKEN PANGOCHAIN_TEST_CASE_ID PANGOCHAIN_TEST_DOC_ID; [ -n "${PANGOCHAIN_JWT_TOKEN:-}" ]; }
+
+measure(){  # measure <bt_ms>
+  local bt=$1 t L TPS P50 P95 ERR CPU TF
+  log "warmup conc=$CONC 30s (discarded)"; PANGOCHAIN_CONCURRENCY=$CONC PANGOCHAIN_DURATION_SEC=30 node "$TOOL" >/dev/null 2>&1
+  for t in $(seq 1 "$REPS"); do
+    TF=$(mktemp)
+    # /usr/bin/time -v captures the load-generator (node) %CPU for this run
+    L=$(PANGOCHAIN_CONCURRENCY=$CONC PANGOCHAIN_DURATION_SEC=$DUR /usr/bin/time -v node "$TOOL" 2>"$TF")
+    TPS=$(grep -oP 'TPS=\K[0-9.]+'<<<"$L"); P50=$(grep -oP 'P50=\K[0-9]+'<<<"$L"); P95=$(grep -oP 'P95=\K[0-9]+'<<<"$L"); ERR=$(grep -oP 'errors=\K[0-9]+'<<<"$L")
+    CPU=$(grep -oP 'Percent of CPU this job got:\s*\K[0-9]+' "$TF"); rm -f "$TF"
+    echo "exp_sens,fabric,$bt,duration60s,$CONC,$t,${TPS:-0},${P50:-NA},${P95:-NA},${ERR:-NA},${CPU:-NA},gateway,linux_x86_64" >> "$CSV"
+    log "  bt=${bt}ms trial $t: $L client_cpu=${CPU:-NA}%"; sleep 5
+  done
+}
+
+echo "experiment,mode,batch_timeout_ms,tool,concurrency,trial,tps,p50_ms,p95_ms,errors,client_cpu_pct,method,platform" > "$CSV"
+for spec in 2s:2000 500ms:500 250ms:250; do
+  TS=${spec%%:*}; BT=${spec##*:}
+  log "================= BatchTimeout=$TS ================="
+  rebuild "$TS" || { log "SKIP $TS (rebuild failed)"; continue; }
+  restart_backend || { log "SKIP $TS (backend)"; continue; }
+  setup_data || { log "SKIP $TS (data)"; continue; }
+  measure "$BT"
+done
+
+log "================= restore BatchTimeout=2s ================="
+rebuild "2s" && restart_backend && { setup_data && log "restored, gateway up"; } || log "WARN restore incomplete"
+
+python3 - "$CSV" "$SJ" <<'PY'
+import csv,sys,json,statistics
+rows=list(csv.DictReader(open(sys.argv[1])))
+by={}
+for r in rows: by.setdefault(r['batch_timeout_ms'],[]).append(r)
+def st(v):
+    v=[x for x in v if x is not None]
+    return dict(n=len(v),mean=round(statistics.mean(v),2),p50=round(statistics.median(v),2),
+                min=round(min(v),2),max=round(max(v),2),stdev=round(statistics.stdev(v),2) if len(v)>1 else 0.0)
+out={}
+for bt,rs in by.items():
+    tps=[float(r['tps']) for r in rs]
+    cpu=[float(r['client_cpu_pct']) for r in rs if r['client_cpu_pct'] not in ('NA','')]
+    out[bt]={"tool":"duration60s","conc":int(rs[0]['concurrency']),"reps":len(rs),
+             "tps":st(tps),"client_cpu_pct":st(cpu) if cpu else None,
+             "raw_tps":tps,"errors_total":sum(int(r['errors']) for r in rs if r['errors'] not in ('NA',''))}
+json.dump(out,open(sys.argv[2],"w"),indent=2)
+for bt in sorted(out,key=lambda x:int(x)):
+    o=out[bt]; cpu=o['client_cpu_pct']['mean'] if o['client_cpu_pct'] else 'NA'
+    print(f"  bt={bt}ms: tps mean={o['tps']['mean']} p50={o['tps']['p50']} client_cpu_mean={cpu}% err={o['errors_total']}")
+PY
+log "=== TASK SENS done -> $CSV ==="
+
+
+# ════════════════════════════════════════════════════════════════════════
+# FILE: /tmp/launch-backend.sh
+#   (16 lines, 666 bytes)
+# ════════════════════════════════════════════════════════════════════════
+#!/usr/bin/env bash
+# Reconstructed after host reboot (2026-06-01 09:15 wiped /tmp). Launches the Spring Boot
+# backend in fabric-enabled mode from pangochain-backend/ (so relative crypto paths resolve).
+# Backgrounds and returns immediately; caller polls /actuator/health.
+set -u
+REPO=/home/angkon/Pangochain_AOOP
+BACKEND_DIR="$REPO/pangochain-backend"
+JAR="$BACKEND_DIR/target/pangochain-backend-2.0.0.jar"
+LOG="/tmp/pangochain-backend.log"
+pkill -f "pangochain-backend.*\.jar" 2>/dev/null || true
+sleep 2
+(cd "$BACKEND_DIR" && nohup java -jar "$JAR" \
+   --spring.jpa.hibernate.ddl-auto=validate \
+   > "$LOG" 2>&1 &)
+sleep 1
+echo "backend launching (log: $LOG)"
+
+
+# ════════════════════════════════════════════════════════════════════════
+# FILE: /tmp/launch-backend-dbonly.sh
+#   (16 lines, 648 bytes)
+# ════════════════════════════════════════════════════════════════════════
+#!/usr/bin/env bash
+# Launch backend in PostgreSQL-only mode (fabric.enabled=false) for TASK PG + TASK DB.
+# Writes go to Postgres only (no Fabric commit); CheckAccess uses the PostgreSQL ACL path.
+set -u
+REPO=/home/angkon/Pangochain_AOOP
+BACKEND_DIR="$REPO/pangochain-backend"
+JAR="$BACKEND_DIR/target/pangochain-backend-2.0.0.jar"
+LOG="/tmp/pangochain-backend.log"
+pkill -f "pangochain-backend.*\.jar" 2>/dev/null || true
+sleep 2
+(cd "$BACKEND_DIR" && nohup java -jar "$JAR" \
+   --spring.jpa.hibernate.ddl-auto=validate \
+   --fabric.enabled=false \
+   > "$LOG" 2>&1 &)
+sleep 1
+echo "backend launching DB-ONLY (fabric.enabled=false, log: $LOG)"
+
+
+# ════════════════════════════════════════════════════════════════════════
+# FILE: results/exp1_throughput.csv
+#   (108 lines, 9645 bytes)
+# ════════════════════════════════════════════════════════════════════════
+experiment,mode,batch_timeout_ms,tool,concurrency,trial,tps,p50_ms,p95_ms,errors,success,elapsed_s,cpu_pct,ram_mb,method,platform
+exp1,fabric,2000,fixedcount_x10,50,0,58.0,34,2156,0,500,8.6,18.3,883,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,50,1,77.0,19,2147,0,500,6.5,18.9,904,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,50,2,58.2,24,2145,0,500,8.6,19.3,912,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,50,3,58.3,20,2160,0,500,8.6,19.7,915,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,50,4,58.8,19,2129,0,500,8.5,20.0,911,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,50,5,58.4,17,2144,0,500,8.6,20.2,791,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,100,1,58.5,2100,4232,0,1000,17.1,20.9,724,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,100,2,66.9,2096,4225,0,1000,15.0,21.4,706,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,100,3,58.7,2098,4220,0,1000,17.0,21.6,681,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,100,4,66.9,60,4225,0,1000,15.0,21.9,653,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,100,5,66.3,2092,4233,0,1000,15.1,22.0,565,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,150,1,70.2,2122,4250,0,1500,21.4,22.5,586,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,150,2,70.4,2122,4242,0,1500,21.3,22.7,593,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,150,3,70.2,2127,4259,0,1500,21.4,22.9,598,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,150,4,70.2,2126,4250,0,1500,21.4,22.9,605,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,150,5,64.0,2129,4249,0,1500,23.4,22.8,602,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,200,1,71.7,2150,4306,0,2000,27.9,22.9,559,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,200,2,62.5,2157,6376,0,2000,32.0,22.8,558,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,200,3,66.8,2149,6362,0,2000,29.9,22.6,545,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,200,4,66.9,2149,6373,0,2000,29.9,22.4,546,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,200,5,66.7,2151,6367,0,2000,30.0,22.3,540,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,300,1,63.7,4273,8530,0,3000,47.1,22.4,542,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,300,2,66.7,4272,6480,0,3000,45.0,22.4,540,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,300,3,70.4,4237,6436,0,3000,42.6,22.4,542,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,300,4,67.2,4238,6414,0,3000,44.7,22.3,543,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,300,5,63.9,4257,8456,0,3000,46.9,22.2,544,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,400,1,67.1,6355,8526,0,4000,59.6,22.1,544,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,400,2,69.4,6332,8530,0,4000,57.6,22.0,545,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,400,3,69.4,6341,8541,0,4000,57.7,21.9,544,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,400,4,72.0,4299,8524,0,4000,55.5,21.8,543,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,400,5,72.0,4298,8529,0,4000,55.5,21.7,535,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,500,1,70.9,6413,10645,1,4999,70.6,21.6,526,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,500,2,67.1,6402,10643,1,4999,74.5,21.5,605,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,500,3,67.2,6387,10619,1,4999,74.4,21.5,611,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,500,4,69.1,6390,10617,0,5000,72.4,21.4,611,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,500,5,68.9,6418,10654,0,5000,72.6,21.4,612,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,600,1,70.2,8519,12757,3,5997,85.4,21.3,613,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,600,2,68.5,8530,12762,2,5998,87.6,21.2,615,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,600,3,68.4,8536,12754,8,5992,87.7,21.2,619,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,600,4,67.0,8502,12726,7,5993,89.4,21.1,616,gateway,linux_x86_64
+exp1,fabric,2000,fixedcount_x10,600,5,67.0,8514,12738,2,5998,89.5,21.0,617,gateway,linux_x86_64
+exp1,fabric,2000,duration60s,50,1,65.5,13,2161,0,NA,60,NA,NA,gateway,linux_x86_64
+exp1,fabric,2000,duration60s,50,2,67.8,10,2135,0,NA,60,NA,NA,gateway,linux_x86_64
+exp1,fabric,2000,duration60s,50,3,63.1,10,2137,0,NA,60,NA,NA,gateway,linux_x86_64
+exp1,fabric,2000,duration60s,50,4,66.7,9,2140,0,NA,60,NA,NA,gateway,linux_x86_64
+exp1,fabric,2000,duration60s,50,5,68.4,10,2137,0,NA,60,NA,NA,gateway,linux_x86_64
+exp1,fabric,500,duration60s,50,1,178.5,62,1001,0,NA,60,NA,NA,gateway,linux_x86_64
+exp1,fabric,500,duration60s,50,2,166.5,56,1045,0,NA,60,NA,NA,gateway,linux_x86_64
+exp1,fabric,500,duration60s,50,3,167.1,39,1051,0,NA,60,NA,NA,gateway,linux_x86_64
+exp1,fabric,500,duration60s,50,4,183.7,34,1022,0,NA,60,NA,NA,gateway,linux_x86_64
+exp1,fabric,500,duration60s,50,5,175.9,42,1034,0,NA,60,NA,NA,gateway,linux_x86_64
+exp1,fabric,500,fixedcount_x10,50,1,262.7,11,628,0,500,1.9,NA,NA,gateway,linux_x86_64
+exp1,fabric,500,fixedcount_x10,50,2,200.9,10,663,0,500,2.5,NA,NA,gateway,linux_x86_64
+exp1,fabric,500,fixedcount_x10,50,3,201.9,10,635,0,500,2.5,NA,NA,gateway,linux_x86_64
+exp1,fabric,500,fixedcount_x10,50,4,200.6,10,647,0,500,2.5,NA,NA,gateway,linux_x86_64
+exp1,fabric,500,fixedcount_x10,50,5,201.4,10,623,0,500,2.5,NA,NA,gateway,linux_x86_64
+exp1,fabric,250,duration60s,50,1,128.5,214,1366,0,NA,60,NA,NA,gateway,linux_x86_64
+exp1,fabric,250,duration60s,50,2,152.4,155,1283,0,NA,60,NA,NA,gateway,linux_x86_64
+exp1,fabric,250,duration60s,50,3,157.1,179,1224,0,NA,60,NA,NA,gateway,linux_x86_64
+exp1,fabric,250,duration60s,50,4,164.5,189,1170,0,NA,60,NA,NA,gateway,linux_x86_64
+exp1,fabric,250,duration60s,50,5,161.3,180,1284,0,NA,60,NA,NA,gateway,linux_x86_64
+exp1,fabric,250,fixedcount_x10,50,1,253.3,16,599,0,500,2.0,NA,NA,gateway,linux_x86_64
+exp1,fabric,250,fixedcount_x10,50,2,350.9,12,515,0,500,1.4,NA,NA,gateway,linux_x86_64
+exp1,fabric,250,fixedcount_x10,50,3,298.3,12,507,0,500,1.7,NA,NA,gateway,linux_x86_64
+exp1,fabric,250,fixedcount_x10,50,4,252.4,19,730,0,500,2.0,NA,NA,gateway,linux_x86_64
+exp1,fabric,250,fixedcount_x10,50,5,348.7,10,516,0,500,1.4,NA,NA,gateway,linux_x86_64
+exp1,postgres,NA,duration60s,50,0,231.3,98,776,0,NA,60.8,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,50,1,257.2,85,733,0,NA,60.5,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,50,2,281.9,79,614,0,NA,60.5,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,50,3,264.2,85,689,0,NA,60.3,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,50,4,287.9,77,620,0,NA,60.5,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,50,5,269.5,83,677,0,NA,60.4,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,100,1,294.7,257,822,0,NA,60.7,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,100,2,267.8,286,911,0,NA,60.4,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,100,3,287.6,263,815,0,NA,60.8,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,100,4,293.5,262,823,0,NA,60.4,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,100,5,252.9,300,900,0,NA,60.7,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,150,1,273.2,479,1116,0,NA,60.4,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,150,2,284.3,452,1050,0,NA,60.8,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,150,3,212.6,485,1134,67329,NA,60.0,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,150,4,0.0,NA,NA,479396,NA,60.0,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,150,5,0.0,NA,NA,450451,NA,60.0,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,200,1,0.0,NA,NA,472375,NA,60.0,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,200,2,0.0,NA,NA,463037,NA,60.0,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,200,3,0.0,NA,NA,467639,NA,60.0,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,200,4,0.0,NA,NA,478850,NA,60.0,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,200,5,0.0,NA,NA,474160,NA,60.0,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,300,1,0.0,NA,NA,463663,NA,60.0,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,300,2,0.0,NA,NA,478573,NA,60.0,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,300,3,0.0,NA,NA,468796,NA,60.0,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,300,4,0.0,NA,NA,467293,NA,60.0,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,300,5,0.0,NA,NA,447920,NA,60.0,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,400,1,0.0,NA,NA,448007,NA,60.0,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,400,2,0.0,NA,NA,449407,NA,60.0,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,400,3,0.0,NA,NA,451619,NA,60.0,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,400,4,0.0,NA,NA,459010,NA,60.0,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,400,5,0.0,NA,NA,461004,NA,60.0,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,500,1,0.0,NA,NA,431035,NA,60.0,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,500,2,0.0,NA,NA,456082,NA,60.0,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,500,3,0.0,NA,NA,453618,NA,60.0,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,500,4,0.0,NA,NA,441271,NA,60.0,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,500,5,0.0,NA,NA,439630,NA,60.0,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,600,1,0.0,NA,NA,405083,NA,60.0,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,600,2,0.0,NA,NA,445624,NA,60.0,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,600,3,0.0,NA,NA,451011,NA,60.0,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,600,4,0.0,NA,NA,447821,NA,60.0,NA,NA,db_only,linux_x86_64
+exp1,postgres,NA,duration60s,600,5,0.0,NA,NA,432931,NA,60.0,NA,NA,db_only,linux_x86_64
+
+
+# ════════════════════════════════════════════════════════════════════════
+# FILE: results/exp1_throughput.summary.json
+#   (876 lines, 14559 bytes)
+# ════════════════════════════════════════════════════════════════════════
+[
+  {
+    "mode": "fabric",
+    "batch_timeout_ms": "2000",
+    "tool": "duration60s",
+    "concurrency": "50",
+    "tps": {
+      "n": 5,
+      "mean": 66.3,
+      "p50": 66.7,
+      "min": 63.1,
+      "max": 68.4,
+      "stdev": 2.104
+    },
+    "p50_ms": {
+      "n": 5,
+      "mean": 10.4,
+      "p50": 10.0,
+      "min": 9.0,
+      "max": 13.0,
+      "stdev": 1.517
+    },
+    "p95_ms": {
+      "n": 5,
+      "mean": 2142.0,
+      "p50": 2137.0,
+      "min": 2135.0,
+      "max": 2161.0,
+      "stdev": 10.77
+    },
+    "errors": {
+      "n": 5,
+      "mean": 0.0,
+      "p50": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "stdev": 0.0
+    },
+    "raw_tps": [
+      65.5,
+      67.8,
+      63.1,
+      66.7,
+      68.4
+    ]
+  },
+  {
+    "mode": "fabric",
+    "batch_timeout_ms": "2000",
+    "tool": "fixedcount_x10",
+    "concurrency": "100",
+    "tps": {
+      "n": 5,
+      "mean": 63.46,
+      "p50": 66.3,
+      "min": 58.5,
+      "max": 66.9,
+      "stdev": 4.444
+    },
+    "p50_ms": {
+      "n": 5,
+      "mean": 1689.2,
+      "p50": 2096.0,
+      "min": 60.0,
+      "max": 2100.0,
+      "stdev": 910.755
+    },
+    "p95_ms": {
+      "n": 5,
+      "mean": 4227.0,
+      "p50": 4225.0,
+      "min": 4220.0,
+      "max": 4233.0,
+      "stdev": 5.431
+    },
+    "errors": {
+      "n": 5,
+      "mean": 0.0,
+      "p50": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "stdev": 0.0
+    },
+    "raw_tps": [
+      58.5,
+      66.9,
+      58.7,
+      66.9,
+      66.3
+    ]
+  },
+  {
+    "mode": "fabric",
+    "batch_timeout_ms": "2000",
+    "tool": "fixedcount_x10",
+    "concurrency": "150",
+    "tps": {
+      "n": 5,
+      "mean": 69.0,
+      "p50": 70.2,
+      "min": 64.0,
+      "max": 70.4,
+      "stdev": 2.796
+    },
+    "p50_ms": {
+      "n": 5,
+      "mean": 2125.2,
+      "p50": 2126.0,
+      "min": 2122.0,
+      "max": 2129.0,
+      "stdev": 3.114
+    },
+    "p95_ms": {
+      "n": 5,
+      "mean": 4250.0,
+      "p50": 4250.0,
+      "min": 4242.0,
+      "max": 4259.0,
+      "stdev": 6.042
+    },
+    "errors": {
+      "n": 5,
+      "mean": 0.0,
+      "p50": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "stdev": 0.0
+    },
+    "raw_tps": [
+      70.2,
+      70.4,
+      70.2,
+      70.2,
+      64.0
+    ]
+  },
+  {
+    "mode": "fabric",
+    "batch_timeout_ms": "2000",
+    "tool": "fixedcount_x10",
+    "concurrency": "200",
+    "tps": {
+      "n": 5,
+      "mean": 66.92,
+      "p50": 66.8,
+      "min": 62.5,
+      "max": 71.7,
+      "stdev": 3.258
+    },
+    "p50_ms": {
+      "n": 5,
+      "mean": 2151.2,
+      "p50": 2150.0,
+      "min": 2149.0,
+      "max": 2157.0,
+      "stdev": 3.347
+    },
+    "p95_ms": {
+      "n": 5,
+      "mean": 5956.8,
+      "p50": 6367.0,
+      "min": 4306.0,
+      "max": 6376.0,
+      "stdev": 922.841
+    },
+    "errors": {
+      "n": 5,
+      "mean": 0.0,
+      "p50": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "stdev": 0.0
+    },
+    "raw_tps": [
+      71.7,
+      62.5,
+      66.8,
+      66.9,
+      66.7
+    ]
+  },
+  {
+    "mode": "fabric",
+    "batch_timeout_ms": "2000",
+    "tool": "fixedcount_x10",
+    "concurrency": "300",
+    "tps": {
+      "n": 5,
+      "mean": 66.38,
+      "p50": 66.7,
+      "min": 63.7,
+      "max": 70.4,
+      "stdev": 2.751
+    },
+    "p50_ms": {
+      "n": 5,
+      "mean": 4255.4,
+      "p50": 4257.0,
+      "min": 4237.0,
+      "max": 4273.0,
+      "stdev": 17.53
+    },
+    "p95_ms": {
+      "n": 5,
+      "mean": 7263.2,
+      "p50": 6480.0,
+      "min": 6414.0,
+      "max": 8530.0,
+      "stdev": 1123.205
+    },
+    "errors": {
+      "n": 5,
+      "mean": 0.0,
+      "p50": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "stdev": 0.0
+    },
+    "raw_tps": [
+      63.7,
+      66.7,
+      70.4,
+      67.2,
+      63.9
+    ]
+  },
+  {
+    "mode": "fabric",
+    "batch_timeout_ms": "2000",
+    "tool": "fixedcount_x10",
+    "concurrency": "400",
+    "tps": {
+      "n": 5,
+      "mean": 69.98,
+      "p50": 69.4,
+      "min": 67.1,
+      "max": 72.0,
+      "stdev": 2.069
+    },
+    "p50_ms": {
+      "n": 5,
+      "mean": 5525.0,
+      "p50": 6332.0,
+      "min": 4298.0,
+      "max": 6355.0,
+      "stdev": 1119.666
+    },
+    "p95_ms": {
+      "n": 5,
+      "mean": 8530.0,
+      "p50": 8529.0,
+      "min": 8524.0,
+      "max": 8541.0,
+      "stdev": 6.595
+    },
+    "errors": {
+      "n": 5,
+      "mean": 0.0,
+      "p50": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "stdev": 0.0
+    },
+    "raw_tps": [
+      67.1,
+      69.4,
+      69.4,
+      72.0,
+      72.0
+    ]
+  },
+  {
+    "mode": "fabric",
+    "batch_timeout_ms": "2000",
+    "tool": "fixedcount_x10",
+    "concurrency": "50",
+    "tps": {
+      "n": 5,
+      "mean": 62.14,
+      "p50": 58.4,
+      "min": 58.2,
+      "max": 77.0,
+      "stdev": 8.31
+    },
+    "p50_ms": {
+      "n": 5,
+      "mean": 19.8,
+      "p50": 19.0,
+      "min": 17.0,
+      "max": 24.0,
+      "stdev": 2.588
+    },
+    "p95_ms": {
+      "n": 5,
+      "mean": 2145.0,
+      "p50": 2145.0,
+      "min": 2129.0,
+      "max": 2160.0,
+      "stdev": 11.023
+    },
+    "errors": {
+      "n": 5,
+      "mean": 0.0,
+      "p50": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "stdev": 0.0
+    },
+    "raw_tps": [
+      77.0,
+      58.2,
+      58.3,
+      58.8,
+      58.4
+    ]
+  },
+  {
+    "mode": "fabric",
+    "batch_timeout_ms": "2000",
+    "tool": "fixedcount_x10",
+    "concurrency": "500",
+    "tps": {
+      "n": 5,
+      "mean": 68.64,
+      "p50": 68.9,
+      "min": 67.1,
+      "max": 70.9,
+      "stdev": 1.568
+    },
+    "p50_ms": {
+      "n": 5,
+      "mean": 6402.0,
+      "p50": 6402.0,
+      "min": 6387.0,
+      "max": 6418.0,
+      "stdev": 13.657
+    },
+    "p95_ms": {
+      "n": 5,
+      "mean": 10635.6,
+      "p50": 10643.0,
+      "min": 10617.0,
+      "max": 10654.0,
+      "stdev": 16.607
+    },
+    "errors": {
+      "n": 5,
+      "mean": 0.6,
+      "p50": 1.0,
+      "min": 0.0,
+      "max": 1.0,
+      "stdev": 0.548
+    },
+    "raw_tps": [
+      70.9,
+      67.1,
+      67.2,
+      69.1,
+      68.9
+    ]
+  },
+  {
+    "mode": "fabric",
+    "batch_timeout_ms": "2000",
+    "tool": "fixedcount_x10",
+    "concurrency": "600",
+    "tps": {
+      "n": 5,
+      "mean": 68.22,
+      "p50": 68.4,
+      "min": 67.0,
+      "max": 70.2,
+      "stdev": 1.324
+    },
+    "p50_ms": {
+      "n": 5,
+      "mean": 8520.2,
+      "p50": 8519.0,
+      "min": 8502.0,
+      "max": 8536.0,
+      "stdev": 13.387
+    },
+    "p95_ms": {
+      "n": 5,
+      "mean": 12747.4,
+      "p50": 12754.0,
+      "min": 12726.0,
+      "max": 12762.0,
+      "stdev": 14.96
+    },
+    "errors": {
+      "n": 5,
+      "mean": 4.4,
+      "p50": 3.0,
+      "min": 2.0,
+      "max": 8.0,
+      "stdev": 2.881
+    },
+    "raw_tps": [
+      70.2,
+      68.5,
+      68.4,
+      67.0,
+      67.0
+    ]
+  },
+  {
+    "mode": "fabric",
+    "batch_timeout_ms": "250",
+    "tool": "duration60s",
+    "concurrency": "50",
+    "tps": {
+      "n": 5,
+      "mean": 152.76,
+      "p50": 157.1,
+      "min": 128.5,
+      "max": 164.5,
+      "stdev": 14.303
+    },
+    "p50_ms": {
+      "n": 5,
+      "mean": 183.4,
+      "p50": 180.0,
+      "min": 155.0,
+      "max": 214.0,
+      "stdev": 21.244
+    },
+    "p95_ms": {
+      "n": 5,
+      "mean": 1265.4,
+      "p50": 1283.0,
+      "min": 1170.0,
+      "max": 1366.0,
+      "stdev": 73.47
+    },
+    "errors": {
+      "n": 5,
+      "mean": 0.0,
+      "p50": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "stdev": 0.0
+    },
+    "raw_tps": [
+      128.5,
+      152.4,
+      157.1,
+      164.5,
+      161.3
+    ]
+  },
+  {
+    "mode": "fabric",
+    "batch_timeout_ms": "250",
+    "tool": "fixedcount_x10",
+    "concurrency": "50",
+    "tps": {
+      "n": 5,
+      "mean": 300.72,
+      "p50": 298.3,
+      "min": 252.4,
+      "max": 350.9,
+      "stdev": 48.501
+    },
+    "p50_ms": {
+      "n": 5,
+      "mean": 13.8,
+      "p50": 12.0,
+      "min": 10.0,
+      "max": 19.0,
+      "stdev": 3.633
+    },
+    "p95_ms": {
+      "n": 5,
+      "mean": 573.4,
+      "p50": 516.0,
+      "min": 507.0,
+      "max": 730.0,
+      "stdev": 95.254
+    },
+    "errors": {
+      "n": 5,
+      "mean": 0.0,
+      "p50": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "stdev": 0.0
+    },
+    "raw_tps": [
+      253.3,
+      350.9,
+      298.3,
+      252.4,
+      348.7
+    ]
+  },
+  {
+    "mode": "fabric",
+    "batch_timeout_ms": "500",
+    "tool": "duration60s",
+    "concurrency": "50",
+    "tps": {
+      "n": 5,
+      "mean": 174.34,
+      "p50": 175.9,
+      "min": 166.5,
+      "max": 183.7,
+      "stdev": 7.437
+    },
+    "p50_ms": {
+      "n": 5,
+      "mean": 46.6,
+      "p50": 42.0,
+      "min": 34.0,
+      "max": 62.0,
+      "stdev": 11.866
+    },
+    "p95_ms": {
+      "n": 5,
+      "mean": 1030.6,
+      "p50": 1034.0,
+      "min": 1001.0,
+      "max": 1051.0,
+      "stdev": 19.907
+    },
+    "errors": {
+      "n": 5,
+      "mean": 0.0,
+      "p50": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "stdev": 0.0
+    },
+    "raw_tps": [
+      178.5,
+      166.5,
+      167.1,
+      183.7,
+      175.9
+    ]
+  },
+  {
+    "mode": "fabric",
+    "batch_timeout_ms": "500",
+    "tool": "fixedcount_x10",
+    "concurrency": "50",
+    "tps": {
+      "n": 5,
+      "mean": 213.5,
+      "p50": 201.4,
+      "min": 200.6,
+      "max": 262.7,
+      "stdev": 27.508
+    },
+    "p50_ms": {
+      "n": 5,
+      "mean": 10.2,
+      "p50": 10.0,
+      "min": 10.0,
+      "max": 11.0,
+      "stdev": 0.447
+    },
+    "p95_ms": {
+      "n": 5,
+      "mean": 639.2,
+      "p50": 635.0,
+      "min": 623.0,
+      "max": 663.0,
+      "stdev": 16.069
+    },
+    "errors": {
+      "n": 5,
+      "mean": 0.0,
+      "p50": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "stdev": 0.0
+    },
+    "raw_tps": [
+      262.7,
+      200.9,
+      201.9,
+      200.6,
+      201.4
+    ]
+  },
+  {
+    "mode": "postgres",
+    "batch_timeout_ms": "NA",
+    "tool": "duration60s",
+    "concurrency": "100",
+    "tps": {
+      "n": 5,
+      "mean": 279.3,
+      "p50": 287.6,
+      "min": 252.9,
+      "max": 294.7,
+      "stdev": 18.282
+    },
+    "p50_ms": {
+      "n": 5,
+      "mean": 273.6,
+      "p50": 263.0,
+      "min": 257.0,
+      "max": 300.0,
+      "stdev": 18.528
+    },
+    "p95_ms": {
+      "n": 5,
+      "mean": 854.2,
+      "p50": 823.0,
+      "min": 815.0,
+      "max": 911.0,
+      "stdev": 47.092
+    },
+    "errors": {
+      "n": 5,
+      "mean": 0.0,
+      "p50": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "stdev": 0.0
+    },
+    "raw_tps": [
+      294.7,
+      267.8,
+      287.6,
+      293.5,
+      252.9
+    ]
+  },
+  {
+    "mode": "postgres",
+    "batch_timeout_ms": "NA",
+    "tool": "duration60s",
+    "concurrency": "150",
+    "tps": {
+      "n": 5,
+      "mean": 154.02,
+      "p50": 212.6,
+      "min": 0.0,
+      "max": 284.3,
+      "stdev": 143.224
+    },
+    "p50_ms": {
+      "n": 3,
+      "mean": 472.0,
+      "p50": 479.0,
+      "min": 452.0,
+      "max": 485.0,
+      "stdev": 17.578
+    },
+    "p95_ms": {
+      "n": 3,
+      "mean": 1100.0,
+      "p50": 1116.0,
+      "min": 1050.0,
+      "max": 1134.0,
+      "stdev": 44.227
+    },
+    "errors": {
+      "n": 5,
+      "mean": 199435.2,
+      "p50": 67329.0,
+      "min": 0.0,
+      "max": 479396.0,
+      "stdev": 244124.88
+    },
+    "raw_tps": [
+      273.2,
+      284.3,
+      212.6,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "mode": "postgres",
+    "batch_timeout_ms": "NA",
+    "tool": "duration60s",
+    "concurrency": "200",
+    "tps": {
+      "n": 5,
+      "mean": 0.0,
+      "p50": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "stdev": 0.0
+    },
+    "p50_ms": null,
+    "p95_ms": null,
+    "errors": {
+      "n": 5,
+      "mean": 471212.2,
+      "p50": 472375.0,
+      "min": 463037.0,
+      "max": 478850.0,
+      "stdev": 6082.337
+    },
+    "raw_tps": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "mode": "postgres",
+    "batch_timeout_ms": "NA",
+    "tool": "duration60s",
+    "concurrency": "300",
+    "tps": {
+      "n": 5,
+      "mean": 0.0,
+      "p50": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "stdev": 0.0
+    },
+    "p50_ms": null,
+    "p95_ms": null,
+    "errors": {
+      "n": 5,
+      "mean": 465249.0,
+      "p50": 467293.0,
+      "min": 447920.0,
+      "max": 478573.0,
+      "stdev": 11147.845
+    },
+    "raw_tps": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "mode": "postgres",
+    "batch_timeout_ms": "NA",
+    "tool": "duration60s",
+    "concurrency": "400",
+    "tps": {
+      "n": 5,
+      "mean": 0.0,
+      "p50": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "stdev": 0.0
+    },
+    "p50_ms": null,
+    "p95_ms": null,
+    "errors": {
+      "n": 5,
+      "mean": 453809.4,
+      "p50": 451619.0,
+      "min": 448007.0,
+      "max": 461004.0,
+      "stdev": 5844.984
+    },
+    "raw_tps": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "mode": "postgres",
+    "batch_timeout_ms": "NA",
+    "tool": "duration60s",
+    "concurrency": "50",
+    "tps": {
+      "n": 5,
+      "mean": 272.14,
+      "p50": 269.5,
+      "min": 257.2,
+      "max": 287.9,
+      "stdev": 12.618
+    },
+    "p50_ms": {
+      "n": 5,
+      "mean": 81.8,
+      "p50": 83.0,
+      "min": 77.0,
+      "max": 85.0,
+      "stdev": 3.633
+    },
+    "p95_ms": {
+      "n": 5,
+      "mean": 666.6,
+      "p50": 677.0,
+      "min": 614.0,
+      "max": 733.0,
+      "stdev": 49.893
+    },
+    "errors": {
+      "n": 5,
+      "mean": 0.0,
+      "p50": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "stdev": 0.0
+    },
+    "raw_tps": [
+      257.2,
+      281.9,
+      264.2,
+      287.9,
+      269.5
+    ]
+  },
+  {
+    "mode": "postgres",
+    "batch_timeout_ms": "NA",
+    "tool": "duration60s",
+    "concurrency": "500",
+    "tps": {
+      "n": 5,
+      "mean": 0.0,
+      "p50": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "stdev": 0.0
+    },
+    "p50_ms": null,
+    "p95_ms": null,
+    "errors": {
+      "n": 5,
+      "mean": 444327.2,
+      "p50": 441271.0,
+      "min": 431035.0,
+      "max": 456082.0,
+      "stdev": 10399.29
+    },
+    "raw_tps": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "mode": "postgres",
+    "batch_timeout_ms": "NA",
+    "tool": "duration60s",
+    "concurrency": "600",
+    "tps": {
+      "n": 5,
+      "mean": 0.0,
+      "p50": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "stdev": 0.0
+    },
+    "p50_ms": null,
+    "p95_ms": null,
+    "errors": {
+      "n": 5,
+      "mean": 436494.0,
+      "p50": 445624.0,
+      "min": 405083.0,
+      "max": 451011.0,
+      "stdev": 18853.03
+    },
+    "raw_tps": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  }
+]
+
+# ════════════════════════════════════════════════════════════════════════
+# FILE: results/exp2_latency.csv
+#   (361 lines, 21830 bytes)
+# ════════════════════════════════════════════════════════════════════════
+experiment,operation,mode,method,sample_idx,latency_ms,http,platform
+exp2,checkaccess,fabric,gateway,1,22.912,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,2,15.046,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,3,9.434,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,4,8.665,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,5,12.75,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,6,8.887,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,7,10.989,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,8,11.125,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,9,8.065,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,10,6.606,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,11,10.202,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,12,12.74,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,13,12.438,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,14,7.194,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,15,10.445,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,16,10.808,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,17,8.566,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,18,7.679,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,19,6.155,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,20,7.221,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,21,10.177,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,22,9.133,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,23,8.445,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,24,5.949,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,25,8.535,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,26,9.494,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,27,6.87,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,28,6.254,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,29,9.252,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,30,10.852,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,31,8.105,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,32,8.858,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,33,8.375,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,34,7.404,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,35,7.26,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,36,9.388,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,37,6.771,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,38,6.595,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,39,5.847,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,40,5.618,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,41,5.51,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,42,7.6,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,43,6.378,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,44,6.66,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,45,9.869,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,46,13.969,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,47,10.868,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,48,7.181,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,49,9.091,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,50,10.023,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,51,6.344,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,52,5.666,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,53,9.176,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,54,8.512,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,55,10.937,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,56,6.338,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,57,6.109,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,58,19.305,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,59,15.46,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,60,11.728,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,61,7.157,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,62,5.864,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,63,5.119,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,64,7.862,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,65,7.213,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,66,5.251,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,67,5.842,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,68,7.364,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,69,6.333,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,70,9.399,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,71,5.339,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,72,8.015,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,73,7.982,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,74,5.704,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,75,6.526,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,76,6.019,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,77,6.791,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,78,6.382,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,79,8.532,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,80,5.04,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,81,5.576,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,82,5.143,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,83,4.888,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,84,5.718,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,85,10.088,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,86,8.311,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,87,8.324,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,88,8.514,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,89,6.089,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,90,5.298,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,91,6.255,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,92,5.249,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,93,4.614,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,94,8.496,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,95,5.679,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,96,5.34,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,97,5.072,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,98,8.014,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,99,5.973,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,100,5.88,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,101,6.366,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,102,4.744,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,103,4.63,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,104,6.316,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,105,9.579,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,106,6.445,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,107,6.493,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,108,7.559,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,109,6.446,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,110,8.11,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,111,5.041,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,112,6.76,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,113,5.454,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,114,4.938,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,115,5.939,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,116,4.898,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,117,4.957,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,118,6.357,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,119,4.719,200,linux_x86_64
+exp2,checkaccess,fabric,gateway,120,5.376,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,1,2104.95,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,2,2089.759,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,3,2096.289,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,4,2096.956,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,5,2091.795,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,6,2092.969,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,7,2084.326,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,8,2086.757,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,9,2092.725,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,10,2093.879,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,11,2085.075,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,12,2080.802,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,13,2084.497,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,14,2081.677,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,15,2081.727,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,16,2077.416,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,17,2092.326,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,18,2075.701,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,19,2080.124,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,20,2078.172,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,21,2085.472,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,22,2085.614,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,23,2089.114,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,24,2084.232,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,25,2091.023,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,26,2084.622,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,27,2089.472,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,28,2083.936,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,29,2089.308,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,30,2086.574,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,31,2076.944,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,32,2082.196,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,33,2085.529,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,34,2083.357,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,35,2080.862,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,36,2085.269,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,37,2083.094,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,38,2080.888,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,39,2079.219,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,40,2079.195,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,41,2097.971,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,42,2082.04,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,43,2085.262,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,44,2082.798,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,45,2083.925,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,46,2088.197,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,47,2088.309,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,48,2083.877,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,49,2084.778,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,50,2079.335,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,51,2082.959,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,52,2082.398,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,53,2082.801,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,54,2079.715,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,55,2085.656,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,56,2089.086,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,57,2083.196,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,58,2089.233,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,59,2078.321,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,60,2076.673,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,61,2085.175,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,62,2080.656,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,63,2083.031,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,64,2090.189,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,65,2085.309,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,66,2079.141,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,67,2087.15,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,68,2085.666,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,69,2086.496,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,70,2086.08,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,71,2081.347,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,72,2089.635,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,73,2083.248,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,74,2084.002,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,75,2084.423,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,76,2079.486,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,77,2080.47,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,78,2083.577,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,79,2077.922,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,80,2077.619,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,81,2079.704,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,82,2081.721,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,83,2078.914,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,84,2077.936,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,85,2087.883,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,86,2085.315,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,87,2083.092,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,88,2084.721,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,89,2080.532,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,90,2084.707,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,91,2083.3,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,92,2090.227,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,93,2083.453,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,94,2081.383,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,95,2083.83,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,96,2085.95,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,97,2083.427,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,98,2088.833,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,99,2086.098,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,100,2085.92,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,101,2084.933,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,102,2084.597,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,103,2090.192,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,104,2082.936,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,105,2079.473,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,106,2082.761,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,107,2085.006,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,108,2079.59,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,109,2079.581,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,110,2084.313,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,111,2082.517,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,112,2080.212,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,113,2081.075,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,114,2084.446,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,115,2091.946,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,116,2080.514,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,117,2087.558,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,118,2089.636,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,119,2088.59,200,linux_x86_64
+exp2,registerdoc,fabric,gateway,120,2084.011,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,1,13.885,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,2,14.075,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,3,11.48,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,4,11.924,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,5,10.802,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,6,8.258,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,7,10.017,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,8,9.265,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,9,9.372,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,10,9.556,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,11,9.27,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,12,9.119,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,13,8.799,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,14,8.564,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,15,7.365,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,16,8.938,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,17,7.492,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,18,6.076,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,19,7.013,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,20,8.519,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,21,9.093,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,22,10.037,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,23,10.045,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,24,8.317,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,25,9.409,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,26,8.374,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,27,11.629,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,28,6.603,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,29,6.793,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,30,11.265,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,31,11.202,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,32,9.606,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,33,8.516,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,34,13.218,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,35,13.144,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,36,11.635,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,37,9.948,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,38,10.313,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,39,9.869,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,40,10.596,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,41,10.111,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,42,8.587,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,43,10.895,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,44,7.074,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,45,8.708,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,46,7.439,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,47,8.997,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,48,6.151,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,49,6.689,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,50,6.921,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,51,9.067,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,52,7.825,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,53,9.891,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,54,8.794,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,55,6.842,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,56,5.826,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,57,9.727,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,58,7.103,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,59,9.18,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,60,6.226,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,61,7.221,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,62,6.542,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,63,6.08,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,64,8.739,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,65,6.389,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,66,5.558,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,67,5.922,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,68,5.256,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,69,7.948,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,70,14.584,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,71,6.34,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,72,8.048,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,73,5.789,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,74,5.201,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,75,7.026,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,76,6.338,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,77,6.128,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,78,4.878,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,79,4.897,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,80,7.685,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,81,9.575,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,82,5.767,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,83,8.475,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,84,6.444,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,85,5.75,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,86,6.282,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,87,5.081,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,88,4.851,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,89,5.066,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,90,5.913,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,91,6.841,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,92,7.616,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,93,5.178,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,94,8.132,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,95,5.636,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,96,7.807,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,97,4.728,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,98,7.948,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,99,6.247,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,100,5.189,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,101,4.77,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,102,5.118,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,103,6.094,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,104,4.911,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,105,7.811,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,106,5.789,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,107,5.253,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,108,7.451,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,109,7.248,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,110,7.509,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,111,7.31,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,112,7.481,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,113,6.629,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,114,5.272,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,115,5.768,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,116,5.924,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,117,5.839,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,118,8.173,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,119,7.852,200,linux_x86_64
+exp2,checkaccess,db_only,db_only,120,5.828,200,linux_x86_64
+
+
+# ════════════════════════════════════════════════════════════════════════
+# FILE: results/exp2_latency.summary.json
+#   (62 lines, 1130 bytes)
+# ════════════════════════════════════════════════════════════════════════
+{
+  "fabric": {
+    "checkaccess": {
+      "cold": {
+        "n": 100,
+        "mean": 8.161,
+        "p50": 7.502,
+        "min": 4.614,
+        "max": 22.912,
+        "stdev": 2.969
+      },
+      "warmed": {
+        "n": 100,
+        "mean": 7.293,
+        "p50": 6.509,
+        "min": 4.614,
+        "max": 19.305,
+        "stdev": 2.351
+      },
+      "bad": 0
+    },
+    "registerdoc": {
+      "cold": {
+        "n": 100,
+        "mean": 2084.679,
+        "p50": 2084.117,
+        "min": 2075.701,
+        "max": 2104.95,
+        "stdev": 4.99
+      },
+      "warmed": {
+        "n": 100,
+        "mean": 2084.039,
+        "p50": 2083.931,
+        "min": 2076.673,
+        "max": 2097.971,
+        "stdev": 3.779
+      },
+      "bad": 0
+    }
+  },
+  "db_only": {
+    "checkaccess": {
+      "cold": {
+        "n": 100,
+        "mean": 8.166,
+        "p50": 7.998,
+        "min": 4.728,
+        "max": 14.584,
+        "stdev": 2.256
+      },
+      "warmed": {
+        "n": 100,
+        "mean": 7.548,
+        "p50": 7.162,
+        "min": 4.728,
+        "max": 14.584,
+        "stdev": 2.092
+      },
+      "bad": 0
+    }
+  }
+}
+
+# ════════════════════════════════════════════════════════════════════════
+# FILE: results/exp3_filesize.csv
+#   (66 lines, 5476 bytes)
+# ════════════════════════════════════════════════════════════════════════
+experiment,kind,size_mb,sample,value_ms,cid,platform
+exp3,fabric_commit,,1,2135.43,,linux_x86_64
+exp3,fabric_commit,,2,2131.733,,linux_x86_64
+exp3,fabric_commit,,3,2129.74,,linux_x86_64
+exp3,fabric_commit,,4,2136.899,,linux_x86_64
+exp3,fabric_commit,,5,2128.634,,linux_x86_64
+exp3,ipfs_add,1,1,26.913,QmcEkzxqhAr54Jm8Z57vidykLgoW14pUVbMjJJmu7pcuAe,linux_x86_64
+exp3,ipfs_add,1,2,9.18,QmcEkzxqhAr54Jm8Z57vidykLgoW14pUVbMjJJmu7pcuAe,linux_x86_64
+exp3,ipfs_add,1,3,14.021,QmcEkzxqhAr54Jm8Z57vidykLgoW14pUVbMjJJmu7pcuAe,linux_x86_64
+exp3,ipfs_add,1,4,10.019,QmcEkzxqhAr54Jm8Z57vidykLgoW14pUVbMjJJmu7pcuAe,linux_x86_64
+exp3,ipfs_add,1,5,9.952,QmcEkzxqhAr54Jm8Z57vidykLgoW14pUVbMjJJmu7pcuAe,linux_x86_64
+exp3,ipfs_add,1,6,11.046,QmcEkzxqhAr54Jm8Z57vidykLgoW14pUVbMjJJmu7pcuAe,linux_x86_64
+exp3,ipfs_add,1,7,12.301,QmcEkzxqhAr54Jm8Z57vidykLgoW14pUVbMjJJmu7pcuAe,linux_x86_64
+exp3,ipfs_add,1,8,8.48,QmcEkzxqhAr54Jm8Z57vidykLgoW14pUVbMjJJmu7pcuAe,linux_x86_64
+exp3,ipfs_add,1,9,10.057,QmcEkzxqhAr54Jm8Z57vidykLgoW14pUVbMjJJmu7pcuAe,linux_x86_64
+exp3,ipfs_add,1,10,10.225,QmcEkzxqhAr54Jm8Z57vidykLgoW14pUVbMjJJmu7pcuAe,linux_x86_64
+exp3,ipfs_add,5,1,32.821,QmZsUoMJNXhvqtafpMSCxKntQgjD81X7meJ5poFngCYC8A,linux_x86_64
+exp3,ipfs_add,5,2,21.239,QmZsUoMJNXhvqtafpMSCxKntQgjD81X7meJ5poFngCYC8A,linux_x86_64
+exp3,ipfs_add,5,3,17.12,QmZsUoMJNXhvqtafpMSCxKntQgjD81X7meJ5poFngCYC8A,linux_x86_64
+exp3,ipfs_add,5,4,18.891,QmZsUoMJNXhvqtafpMSCxKntQgjD81X7meJ5poFngCYC8A,linux_x86_64
+exp3,ipfs_add,5,5,19.277,QmZsUoMJNXhvqtafpMSCxKntQgjD81X7meJ5poFngCYC8A,linux_x86_64
+exp3,ipfs_add,5,6,14.895,QmZsUoMJNXhvqtafpMSCxKntQgjD81X7meJ5poFngCYC8A,linux_x86_64
+exp3,ipfs_add,5,7,16.273,QmZsUoMJNXhvqtafpMSCxKntQgjD81X7meJ5poFngCYC8A,linux_x86_64
+exp3,ipfs_add,5,8,15.28,QmZsUoMJNXhvqtafpMSCxKntQgjD81X7meJ5poFngCYC8A,linux_x86_64
+exp3,ipfs_add,5,9,14.678,QmZsUoMJNXhvqtafpMSCxKntQgjD81X7meJ5poFngCYC8A,linux_x86_64
+exp3,ipfs_add,5,10,17.4,QmZsUoMJNXhvqtafpMSCxKntQgjD81X7meJ5poFngCYC8A,linux_x86_64
+exp3,ipfs_add,10,1,41.134,QmYiLYy8WndAQQSJyz6PbdyYXpbdFv7andKKunv4sayGrh,linux_x86_64
+exp3,ipfs_add,10,2,33.219,QmYiLYy8WndAQQSJyz6PbdyYXpbdFv7andKKunv4sayGrh,linux_x86_64
+exp3,ipfs_add,10,3,35.3,QmYiLYy8WndAQQSJyz6PbdyYXpbdFv7andKKunv4sayGrh,linux_x86_64
+exp3,ipfs_add,10,4,26.676,QmYiLYy8WndAQQSJyz6PbdyYXpbdFv7andKKunv4sayGrh,linux_x86_64
+exp3,ipfs_add,10,5,30.459,QmYiLYy8WndAQQSJyz6PbdyYXpbdFv7andKKunv4sayGrh,linux_x86_64
+exp3,ipfs_add,10,6,24.395,QmYiLYy8WndAQQSJyz6PbdyYXpbdFv7andKKunv4sayGrh,linux_x86_64
+exp3,ipfs_add,10,7,29.407,QmYiLYy8WndAQQSJyz6PbdyYXpbdFv7andKKunv4sayGrh,linux_x86_64
+exp3,ipfs_add,10,8,28.474,QmYiLYy8WndAQQSJyz6PbdyYXpbdFv7andKKunv4sayGrh,linux_x86_64
+exp3,ipfs_add,10,9,30.315,QmYiLYy8WndAQQSJyz6PbdyYXpbdFv7andKKunv4sayGrh,linux_x86_64
+exp3,ipfs_add,10,10,29.217,QmYiLYy8WndAQQSJyz6PbdyYXpbdFv7andKKunv4sayGrh,linux_x86_64
+exp3,ipfs_add,20,1,74.726,QmWYRjtm6b7wPeddBWf7qJ9SdhLUEBcE1JgZS9BSq5zNpg,linux_x86_64
+exp3,ipfs_add,20,2,44.854,QmWYRjtm6b7wPeddBWf7qJ9SdhLUEBcE1JgZS9BSq5zNpg,linux_x86_64
+exp3,ipfs_add,20,3,37.235,QmWYRjtm6b7wPeddBWf7qJ9SdhLUEBcE1JgZS9BSq5zNpg,linux_x86_64
+exp3,ipfs_add,20,4,41.416,QmWYRjtm6b7wPeddBWf7qJ9SdhLUEBcE1JgZS9BSq5zNpg,linux_x86_64
+exp3,ipfs_add,20,5,43.76,QmWYRjtm6b7wPeddBWf7qJ9SdhLUEBcE1JgZS9BSq5zNpg,linux_x86_64
+exp3,ipfs_add,20,6,38.992,QmWYRjtm6b7wPeddBWf7qJ9SdhLUEBcE1JgZS9BSq5zNpg,linux_x86_64
+exp3,ipfs_add,20,7,41.364,QmWYRjtm6b7wPeddBWf7qJ9SdhLUEBcE1JgZS9BSq5zNpg,linux_x86_64
+exp3,ipfs_add,20,8,41.838,QmWYRjtm6b7wPeddBWf7qJ9SdhLUEBcE1JgZS9BSq5zNpg,linux_x86_64
+exp3,ipfs_add,20,9,42.569,QmWYRjtm6b7wPeddBWf7qJ9SdhLUEBcE1JgZS9BSq5zNpg,linux_x86_64
+exp3,ipfs_add,20,10,49.453,QmWYRjtm6b7wPeddBWf7qJ9SdhLUEBcE1JgZS9BSq5zNpg,linux_x86_64
+exp3,ipfs_add,30,1,93.85,QmXf5TC4f5LzfwQKpYBpHKH96HQfJDS8EftW42dr918ks8,linux_x86_64
+exp3,ipfs_add,30,2,62.81,QmXf5TC4f5LzfwQKpYBpHKH96HQfJDS8EftW42dr918ks8,linux_x86_64
+exp3,ipfs_add,30,3,59.901,QmXf5TC4f5LzfwQKpYBpHKH96HQfJDS8EftW42dr918ks8,linux_x86_64
+exp3,ipfs_add,30,4,70.586,QmXf5TC4f5LzfwQKpYBpHKH96HQfJDS8EftW42dr918ks8,linux_x86_64
+exp3,ipfs_add,30,5,69.807,QmXf5TC4f5LzfwQKpYBpHKH96HQfJDS8EftW42dr918ks8,linux_x86_64
+exp3,ipfs_add,30,6,67.935,QmXf5TC4f5LzfwQKpYBpHKH96HQfJDS8EftW42dr918ks8,linux_x86_64
+exp3,ipfs_add,30,7,72.318,QmXf5TC4f5LzfwQKpYBpHKH96HQfJDS8EftW42dr918ks8,linux_x86_64
+exp3,ipfs_add,30,8,55.646,QmXf5TC4f5LzfwQKpYBpHKH96HQfJDS8EftW42dr918ks8,linux_x86_64
+exp3,ipfs_add,30,9,54.561,QmXf5TC4f5LzfwQKpYBpHKH96HQfJDS8EftW42dr918ks8,linux_x86_64
+exp3,ipfs_add,30,10,68.062,QmXf5TC4f5LzfwQKpYBpHKH96HQfJDS8EftW42dr918ks8,linux_x86_64
+exp3,ipfs_add,50,1,146.761,QmQ2eLcWLtDcGZxAQsbfKd9LzfrRGrnVT98FjvJfhNMcTz,linux_x86_64
+exp3,ipfs_add,50,2,99.962,QmQ2eLcWLtDcGZxAQsbfKd9LzfrRGrnVT98FjvJfhNMcTz,linux_x86_64
+exp3,ipfs_add,50,3,93.628,QmQ2eLcWLtDcGZxAQsbfKd9LzfrRGrnVT98FjvJfhNMcTz,linux_x86_64
+exp3,ipfs_add,50,4,88.971,QmQ2eLcWLtDcGZxAQsbfKd9LzfrRGrnVT98FjvJfhNMcTz,linux_x86_64
+exp3,ipfs_add,50,5,102.31,QmQ2eLcWLtDcGZxAQsbfKd9LzfrRGrnVT98FjvJfhNMcTz,linux_x86_64
+exp3,ipfs_add,50,6,93.979,QmQ2eLcWLtDcGZxAQsbfKd9LzfrRGrnVT98FjvJfhNMcTz,linux_x86_64
+exp3,ipfs_add,50,7,95.423,QmQ2eLcWLtDcGZxAQsbfKd9LzfrRGrnVT98FjvJfhNMcTz,linux_x86_64
+exp3,ipfs_add,50,8,102.119,QmQ2eLcWLtDcGZxAQsbfKd9LzfrRGrnVT98FjvJfhNMcTz,linux_x86_64
+exp3,ipfs_add,50,9,83.613,QmQ2eLcWLtDcGZxAQsbfKd9LzfrRGrnVT98FjvJfhNMcTz,linux_x86_64
+exp3,ipfs_add,50,10,88.105,QmQ2eLcWLtDcGZxAQsbfKd9LzfrRGrnVT98FjvJfhNMcTz,linux_x86_64
+
+
+# ════════════════════════════════════════════════════════════════════════
+# FILE: results/exp3_filesize.summary.json
+#   (143 lines, 2663 bytes)
+# ════════════════════════════════════════════════════════════════════════
+{
+  "fabric_commit_method": "peer_cli_invoke",
+  "fabric_commit_raw": [
+    2135.43,
+    2131.73,
+    2129.74,
+    2136.9,
+    2128.63
+  ],
+  "per_size": [
+    {
+      "size_mb": 1,
+      "ipfs_p50_ms": 10.14,
+      "ipfs_mean_ms": 12.22,
+      "ipfs_min_ms": 8.48,
+      "ipfs_max_ms": 26.91,
+      "ipfs_stdev_ms": 5.4,
+      "fabric_commit_ms": 2131.73,
+      "total_p50_ms": 2141.87,
+      "ipfs_raw": [
+        26.91,
+        9.18,
+        14.02,
+        10.02,
+        9.95,
+        11.05,
+        12.3,
+        8.48,
+        10.06,
+        10.22
+      ]
+    },
+    {
+      "size_mb": 5,
+      "ipfs_p50_ms": 17.26,
+      "ipfs_mean_ms": 18.79,
+      "ipfs_min_ms": 14.68,
+      "ipfs_max_ms": 32.82,
+      "ipfs_stdev_ms": 5.36,
+      "fabric_commit_ms": 2131.73,
+      "total_p50_ms": 2148.99,
+      "ipfs_raw": [
+        32.82,
+        21.24,
+        17.12,
+        18.89,
+        19.28,
+        14.9,
+        16.27,
+        15.28,
+        14.68,
+        17.4
+      ]
+    },
+    {
+      "size_mb": 10,
+      "ipfs_p50_ms": 29.86,
+      "ipfs_mean_ms": 30.86,
+      "ipfs_min_ms": 24.4,
+      "ipfs_max_ms": 41.13,
+      "ipfs_stdev_ms": 4.73,
+      "fabric_commit_ms": 2131.73,
+      "total_p50_ms": 2161.59,
+      "ipfs_raw": [
+        41.13,
+        33.22,
+        35.3,
+        26.68,
+        30.46,
+        24.4,
+        29.41,
+        28.47,
+        30.32,
+        29.22
+      ]
+    },
+    {
+      "size_mb": 20,
+      "ipfs_p50_ms": 42.2,
+      "ipfs_mean_ms": 45.62,
+      "ipfs_min_ms": 37.24,
+      "ipfs_max_ms": 74.73,
+      "ipfs_stdev_ms": 10.75,
+      "fabric_commit_ms": 2131.73,
+      "total_p50_ms": 2173.94,
+      "ipfs_raw": [
+        74.73,
+        44.85,
+        37.24,
+        41.42,
+        43.76,
+        38.99,
+        41.36,
+        41.84,
+        42.57,
+        49.45
+      ]
+    },
+    {
+      "size_mb": 30,
+      "ipfs_p50_ms": 68.0,
+      "ipfs_mean_ms": 67.55,
+      "ipfs_min_ms": 54.56,
+      "ipfs_max_ms": 93.85,
+      "ipfs_stdev_ms": 11.16,
+      "fabric_commit_ms": 2131.73,
+      "total_p50_ms": 2199.73,
+      "ipfs_raw": [
+        93.85,
+        62.81,
+        59.9,
+        70.59,
+        69.81,
+        67.93,
+        72.32,
+        55.65,
+        54.56,
+        68.06
+      ]
+    },
+    {
+      "size_mb": 50,
+      "ipfs_p50_ms": 94.7,
+      "ipfs_mean_ms": 99.49,
+      "ipfs_min_ms": 83.61,
+      "ipfs_max_ms": 146.76,
+      "ipfs_stdev_ms": 17.71,
+      "fabric_commit_ms": 2131.73,
+      "total_p50_ms": 2226.43,
+      "ipfs_raw": [
+        146.76,
+        99.96,
+        93.63,
+        88.97,
+        102.31,
+        93.98,
+        95.42,
+        102.12,
+        83.61,
+        88.1
+      ]
+    }
+  ]
+}
+
+# ════════════════════════════════════════════════════════════════════════
+# FILE: results/exp4_audit.csv
+#   (21 lines, 1023 bytes)
+# ════════════════════════════════════════════════════════════════════════
+experiment,method,trial,ms,rows,platform
+exp4,pg_query_1000,1,3.598,1000,linux_x86_64
+exp4,pg_query_1000,2,2.569,1000,linux_x86_64
+exp4,pg_query_1000,3,2.526,1000,linux_x86_64
+exp4,pg_query_1000,4,2.225,1000,linux_x86_64
+exp4,pg_query_1000,5,4.346,1000,linux_x86_64
+exp4,pg_query_1000,6,2.222,1000,linux_x86_64
+exp4,pg_query_1000,7,4.213,1000,linux_x86_64
+exp4,pg_query_1000,8,4.112,1000,linux_x86_64
+exp4,pg_query_1000,9,4.463,1000,linux_x86_64
+exp4,pg_query_1000,10,4.232,1000,linux_x86_64
+exp4,csv_sha256_chain_1000,1,94.55,1000,linux_x86_64
+exp4,csv_sha256_chain_1000,2,79.32,1000,linux_x86_64
+exp4,csv_sha256_chain_1000,3,84.07,1000,linux_x86_64
+exp4,csv_sha256_chain_1000,4,75.51,1000,linux_x86_64
+exp4,csv_sha256_chain_1000,5,81.6,1000,linux_x86_64
+exp4,csv_sha256_chain_1000,6,83.61,1000,linux_x86_64
+exp4,csv_sha256_chain_1000,7,102.45,1000,linux_x86_64
+exp4,csv_sha256_chain_1000,8,89.65,1000,linux_x86_64
+exp4,csv_sha256_chain_1000,9,88.55,1000,linux_x86_64
+exp4,csv_sha256_chain_1000,10,95.14,1000,linux_x86_64
+
+
+# ════════════════════════════════════════════════════════════════════════
+# FILE: results/exp4_audit.summary.json
+#   (41 lines, 565 bytes)
+# ════════════════════════════════════════════════════════════════════════
+{
+  "pg_query_1000": {
+    "n": 10,
+    "mean": 3.45,
+    "p50": 3.85,
+    "min": 2.22,
+    "max": 4.46,
+    "stdev": 0.95,
+    "raw": [
+      3.598,
+      2.569,
+      2.526,
+      2.225,
+      4.346,
+      2.222,
+      4.213,
+      4.112,
+      4.463,
+      4.232
+    ]
+  },
+  "csv_sha256_chain_1000": {
+    "n": 10,
+    "mean": 87.44,
+    "p50": 86.31,
+    "min": 75.51,
+    "max": 102.45,
+    "stdev": 8.23,
+    "raw": [
+      94.55,
+      79.32,
+      84.07,
+      75.51,
+      81.6,
+      83.61,
+      102.45,
+      89.65,
+      88.55,
+      95.14
+    ]
+  }
+}
+
+# ════════════════════════════════════════════════════════════════════════
+# FILE: results/exp5_wan.csv
+#   (41 lines, 2673 bytes)
+# ════════════════════════════════════════════════════════════════════════
+rtt_ms,config,tool,trial,tps,p50_ms,p95_ms,errors,method,platform
+0,bridge,duration60s,1,66.9,2150,6357,0,gateway,linux_x86_64
+0,bridge,duration60s,2,70.6,2138,6345,1,gateway,linux_x86_64
+0,bridge,duration60s,3,67.6,2136,6336,3,gateway,linux_x86_64
+0,bridge,duration60s,4,66.4,2141,6343,1,gateway,linux_x86_64
+0,bridge,duration60s,5,69.7,2137,6346,0,gateway,linux_x86_64
+50,bridge,duration60s,1,62.7,2247,6662,2,gateway,linux_x86_64
+50,bridge,duration60s,2,66.8,2243,6670,1,gateway,linux_x86_64
+50,bridge,duration60s,3,63.2,2242,6642,0,gateway,linux_x86_64
+50,bridge,duration60s,4,66.2,2232,6640,1,gateway,linux_x86_64
+50,bridge,duration60s,5,65.8,2235,6637,1,gateway,linux_x86_64
+100,bridge,duration60s,1,61.1,2357,6997,1,gateway,linux_x86_64
+100,bridge,duration60s,2,62.2,2353,6990,0,gateway,linux_x86_64
+100,bridge,duration60s,3,61.3,2357,6992,2,gateway,linux_x86_64
+100,bridge,duration60s,4,64.6,2358,6996,0,gateway,linux_x86_64
+100,bridge,duration60s,5,62.2,2362,7023,1,gateway,linux_x86_64
+150,bridge,duration60s,1,61.6,2464,7302,1,gateway,linux_x86_64
+150,bridge,duration60s,2,60.6,2457,7291,0,gateway,linux_x86_64
+150,bridge,duration60s,3,62.0,2451,7277,1,gateway,linux_x86_64
+150,bridge,duration60s,4,64.0,2450,7275,0,gateway,linux_x86_64
+150,bridge,duration60s,5,55.6,2461,7309,1,gateway,linux_x86_64
+0,bridge_veth,duration60s,1,71.6,2137,6346,3,gateway,linux_x86_64
+0,bridge_veth,duration60s,2,67.8,2140,6358,3,gateway,linux_x86_64
+0,bridge_veth,duration60s,3,71.2,2140,6352,2,gateway,linux_x86_64
+0,bridge_veth,duration60s,4,68.1,2142,6359,3,gateway,linux_x86_64
+0,bridge_veth,duration60s,5,68.7,2146,6369,2,gateway,linux_x86_64
+50,bridge_veth,duration60s,1,50.7,2915,8634,17,gateway,linux_x86_64
+50,bridge_veth,duration60s,2,50.1,2920,8631,25,gateway,linux_x86_64
+50,bridge_veth,duration60s,3,51.6,2912,8612,8,gateway,linux_x86_64
+50,bridge_veth,duration60s,4,52.3,2921,8626,12,gateway,linux_x86_64
+50,bridge_veth,duration60s,5,50.0,2928,8642,14,gateway,linux_x86_64
+100,bridge_veth,duration60s,1,45.7,3114,9156,21,gateway,linux_x86_64
+100,bridge_veth,duration60s,2,46.0,3153,9186,13,gateway,linux_x86_64
+100,bridge_veth,duration60s,3,47.4,3132,6255,7,gateway,linux_x86_64
+100,bridge_veth,duration60s,4,49.6,3139,9122,9,gateway,linux_x86_64
+100,bridge_veth,duration60s,5,46.5,3124,9191,14,gateway,linux_x86_64
+150,bridge_veth,duration60s,1,40.5,3577,7225,143,gateway,linux_x86_64
+150,bridge_veth,duration60s,2,38.7,3564,7148,187,gateway,linux_x86_64
+150,bridge_veth,duration60s,3,38.0,3543,7192,199,gateway,linux_x86_64
+150,bridge_veth,duration60s,4,39.1,3639,7266,193,gateway,linux_x86_64
+150,bridge_veth,duration60s,5,35.3,3618,7249,254,gateway,linux_x86_64
+
+
+# ════════════════════════════════════════════════════════════════════════
+# FILE: results/exp5_wan.summary.json
+#   (345 lines, 5522 bytes)
+# ════════════════════════════════════════════════════════════════════════
+[
+  {
+    "config": "bridge",
+    "rtt_ms": "0",
+    "tps": {
+      "n": 5,
+      "mean": 68.24,
+      "p50": 67.6,
+      "min": 66.4,
+      "max": 70.6,
+      "stdev": 1.823
+    },
+    "p50_ms": {
+      "n": 5,
+      "mean": 2140.4,
+      "p50": 2138.0,
+      "min": 2136.0,
+      "max": 2150.0,
+      "stdev": 5.683
+    },
+    "p95_ms": {
+      "n": 5,
+      "mean": 6345.4,
+      "p50": 6345.0,
+      "min": 6336.0,
+      "max": 6357.0,
+      "stdev": 7.57
+    },
+    "errors": {
+      "n": 5,
+      "mean": 1.0,
+      "p50": 1.0,
+      "min": 0.0,
+      "max": 3.0,
+      "stdev": 1.225
+    },
+    "raw_tps": [
+      66.9,
+      70.6,
+      67.6,
+      66.4,
+      69.7
+    ]
+  },
+  {
+    "config": "bridge",
+    "rtt_ms": "100",
+    "tps": {
+      "n": 5,
+      "mean": 62.28,
+      "p50": 62.2,
+      "min": 61.1,
+      "max": 64.6,
+      "stdev": 1.392
+    },
+    "p50_ms": {
+      "n": 5,
+      "mean": 2357.4,
+      "p50": 2357.0,
+      "min": 2353.0,
+      "max": 2362.0,
+      "stdev": 3.209
+    },
+    "p95_ms": {
+      "n": 5,
+      "mean": 6999.6,
+      "p50": 6996.0,
+      "min": 6990.0,
+      "max": 7023.0,
+      "stdev": 13.39
+    },
+    "errors": {
+      "n": 5,
+      "mean": 0.8,
+      "p50": 1.0,
+      "min": 0.0,
+      "max": 2.0,
+      "stdev": 0.837
+    },
+    "raw_tps": [
+      61.1,
+      62.2,
+      61.3,
+      64.6,
+      62.2
+    ]
+  },
+  {
+    "config": "bridge",
+    "rtt_ms": "150",
+    "tps": {
+      "n": 5,
+      "mean": 60.76,
+      "p50": 61.6,
+      "min": 55.6,
+      "max": 64.0,
+      "stdev": 3.138
+    },
+    "p50_ms": {
+      "n": 5,
+      "mean": 2456.6,
+      "p50": 2457.0,
+      "min": 2450.0,
+      "max": 2464.0,
+      "stdev": 6.107
+    },
+    "p95_ms": {
+      "n": 5,
+      "mean": 7290.8,
+      "p50": 7291.0,
+      "min": 7275.0,
+      "max": 7309.0,
+      "stdev": 14.973
+    },
+    "errors": {
+      "n": 5,
+      "mean": 0.6,
+      "p50": 1.0,
+      "min": 0.0,
+      "max": 1.0,
+      "stdev": 0.548
+    },
+    "raw_tps": [
+      61.6,
+      60.6,
+      62.0,
+      64.0,
+      55.6
+    ]
+  },
+  {
+    "config": "bridge",
+    "rtt_ms": "50",
+    "tps": {
+      "n": 5,
+      "mean": 64.94,
+      "p50": 65.8,
+      "min": 62.7,
+      "max": 66.8,
+      "stdev": 1.86
+    },
+    "p50_ms": {
+      "n": 5,
+      "mean": 2239.8,
+      "p50": 2242.0,
+      "min": 2232.0,
+      "max": 2247.0,
+      "stdev": 6.14
+    },
+    "p95_ms": {
+      "n": 5,
+      "mean": 6650.2,
+      "p50": 6642.0,
+      "min": 6637.0,
+      "max": 6670.0,
+      "stdev": 14.805
+    },
+    "errors": {
+      "n": 5,
+      "mean": 1.0,
+      "p50": 1.0,
+      "min": 0.0,
+      "max": 2.0,
+      "stdev": 0.707
+    },
+    "raw_tps": [
+      62.7,
+      66.8,
+      63.2,
+      66.2,
+      65.8
+    ]
+  },
+  {
+    "config": "bridge_veth",
+    "rtt_ms": "0",
+    "tps": {
+      "n": 5,
+      "mean": 69.48,
+      "p50": 68.7,
+      "min": 67.8,
+      "max": 71.6,
+      "stdev": 1.788
+    },
+    "p50_ms": {
+      "n": 5,
+      "mean": 2141.0,
+      "p50": 2140.0,
+      "min": 2137.0,
+      "max": 2146.0,
+      "stdev": 3.317
+    },
+    "p95_ms": {
+      "n": 5,
+      "mean": 6356.8,
+      "p50": 6358.0,
+      "min": 6346.0,
+      "max": 6369.0,
+      "stdev": 8.585
+    },
+    "errors": {
+      "n": 5,
+      "mean": 2.6,
+      "p50": 3.0,
+      "min": 2.0,
+      "max": 3.0,
+      "stdev": 0.548
+    },
+    "raw_tps": [
+      71.6,
+      67.8,
+      71.2,
+      68.1,
+      68.7
+    ]
+  },
+  {
+    "config": "bridge_veth",
+    "rtt_ms": "100",
+    "tps": {
+      "n": 5,
+      "mean": 47.04,
+      "p50": 46.5,
+      "min": 45.7,
+      "max": 49.6,
+      "stdev": 1.569
+    },
+    "p50_ms": {
+      "n": 5,
+      "mean": 3132.4,
+      "p50": 3132.0,
+      "min": 3114.0,
+      "max": 3153.0,
+      "stdev": 14.809
+    },
+    "p95_ms": {
+      "n": 5,
+      "mean": 8582.0,
+      "p50": 9156.0,
+      "min": 6255.0,
+      "max": 9191.0,
+      "stdev": 1301.125
+    },
+    "errors": {
+      "n": 5,
+      "mean": 12.8,
+      "p50": 13.0,
+      "min": 7.0,
+      "max": 21.0,
+      "stdev": 5.404
+    },
+    "raw_tps": [
+      45.7,
+      46.0,
+      47.4,
+      49.6,
+      46.5
+    ]
+  },
+  {
+    "config": "bridge_veth",
+    "rtt_ms": "150",
+    "tps": {
+      "n": 5,
+      "mean": 38.32,
+      "p50": 38.7,
+      "min": 35.3,
+      "max": 40.5,
+      "stdev": 1.919
+    },
+    "p50_ms": {
+      "n": 5,
+      "mean": 3588.2,
+      "p50": 3577.0,
+      "min": 3543.0,
+      "max": 3639.0,
+      "stdev": 39.442
+    },
+    "p95_ms": {
+      "n": 5,
+      "mean": 7216.0,
+      "p50": 7225.0,
+      "min": 7148.0,
+      "max": 7266.0,
+      "stdev": 47.09
+    },
+    "errors": {
+      "n": 5,
+      "mean": 195.2,
+      "p50": 193.0,
+      "min": 143.0,
+      "max": 254.0,
+      "stdev": 39.588
+    },
+    "raw_tps": [
+      40.5,
+      38.7,
+      38.0,
+      39.1,
+      35.3
+    ]
+  },
+  {
+    "config": "bridge_veth",
+    "rtt_ms": "50",
+    "tps": {
+      "n": 5,
+      "mean": 50.94,
+      "p50": 50.7,
+      "min": 50.0,
+      "max": 52.3,
+      "stdev": 0.991
+    },
+    "p50_ms": {
+      "n": 5,
+      "mean": 2919.2,
+      "p50": 2920.0,
+      "min": 2912.0,
+      "max": 2928.0,
+      "stdev": 6.14
+    },
+    "p95_ms": {
+      "n": 5,
+      "mean": 8629.0,
+      "p50": 8631.0,
+      "min": 8612.0,
+      "max": 8642.0,
+      "stdev": 11.136
+    },
+    "errors": {
+      "n": 5,
+      "mean": 15.2,
+      "p50": 14.0,
+      "min": 8.0,
+      "max": 25.0,
+      "stdev": 6.38
+    },
+    "raw_tps": [
+      50.7,
+      50.1,
+      51.6,
+      52.3,
+      50.0
+    ]
+  }
+]
+
+# ════════════════════════════════════════════════════════════════════════
+# FILE: results/exp7_history.csv
+#   (11 lines, 756 bytes)
+# ════════════════════════════════════════════════════════════════════════
+experiment,doc_id,history_depth,trial,latency_ms,method,platform
+exp7,HIST-BENCH-DOC-1780288319,107,1,127,peer_cli_query,linux_x86_64
+exp7,HIST-BENCH-DOC-1780288319,107,2,128,peer_cli_query,linux_x86_64
+exp7,HIST-BENCH-DOC-1780288319,107,3,137,peer_cli_query,linux_x86_64
+exp7,HIST-BENCH-DOC-1780288319,107,4,138,peer_cli_query,linux_x86_64
+exp7,HIST-BENCH-DOC-1780288319,107,5,137,peer_cli_query,linux_x86_64
+exp7,HIST-BENCH-DOC-1780288319,107,6,134,peer_cli_query,linux_x86_64
+exp7,HIST-BENCH-DOC-1780288319,107,7,123,peer_cli_query,linux_x86_64
+exp7,HIST-BENCH-DOC-1780288319,107,8,134,peer_cli_query,linux_x86_64
+exp7,HIST-BENCH-DOC-1780288319,107,9,145,peer_cli_query,linux_x86_64
+exp7,HIST-BENCH-DOC-1780288319,107,10,137,peer_cli_query,linux_x86_64
+
+
+# ════════════════════════════════════════════════════════════════════════
+# FILE: results/exp7_history.summary.json
+#   (20 lines, 220 bytes)
+# ════════════════════════════════════════════════════════════════════════
+{
+  "history_depth": "107",
+  "n": 10,
+  "raw": [
+    127,
+    128,
+    137,
+    138,
+    137,
+    134,
+    123,
+    134,
+    145,
+    137
+  ],
+  "mean": 134,
+  "p50": 135.5,
+  "min": 123,
+  "max": 145,
+  "stdev": 6.41
+}
+
+# ════════════════════════════════════════════════════════════════════════
+# FILE: results/exp_failopen.csv
+#   (151 lines, 6382 bytes)
+# ════════════════════════════════════════════════════════════════════════
+experiment,t_sec,ok,http5xx,http403,err,inflight,event,platform
+exp_failopen,1,72,0,0,0,50,,linux_x86_64
+exp_failopen,2,7,0,0,0,50,,linux_x86_64
+exp_failopen,3,0,0,0,0,50,,linux_x86_64
+exp_failopen,4,0,0,0,0,50,,linux_x86_64
+exp_failopen,5,50,0,0,0,50,,linux_x86_64
+exp_failopen,6,0,0,0,0,50,,linux_x86_64
+exp_failopen,7,6,0,0,0,50,,linux_x86_64
+exp_failopen,8,0,0,0,0,50,,linux_x86_64
+exp_failopen,9,52,0,0,0,50,,linux_x86_64
+exp_failopen,10,0,0,0,0,50,,linux_x86_64
+exp_failopen,11,16,0,0,0,50,,linux_x86_64
+exp_failopen,12,0,0,0,0,50,,linux_x86_64
+exp_failopen,13,43,0,0,0,50,,linux_x86_64
+exp_failopen,14,0,0,0,0,50,,linux_x86_64
+exp_failopen,15,22,0,0,0,50,,linux_x86_64
+exp_failopen,16,0,0,0,0,50,,linux_x86_64
+exp_failopen,17,20,0,0,0,50,,linux_x86_64
+exp_failopen,18,0,0,0,0,50,,linux_x86_64
+exp_failopen,19,53,0,0,0,50,,linux_x86_64
+exp_failopen,20,0,0,0,0,50,,linux_x86_64
+exp_failopen,21,10,0,0,0,50,,linux_x86_64
+exp_failopen,22,0,0,0,0,50,,linux_x86_64
+exp_failopen,23,50,0,0,0,50,,linux_x86_64
+exp_failopen,24,0,0,0,0,50,,linux_x86_64
+exp_failopen,25,4,0,0,0,50,,linux_x86_64
+exp_failopen,26,0,0,0,0,50,,linux_x86_64
+exp_failopen,27,51,0,0,0,50,,linux_x86_64
+exp_failopen,28,0,0,0,0,50,,linux_x86_64
+exp_failopen,29,13,0,0,0,50,,linux_x86_64
+exp_failopen,30,0,0,0,0,50,PEERS_STOPPED,linux_x86_64
+exp_failopen,31,0,0,0,0,50,,linux_x86_64
+exp_failopen,32,23,0,0,0,50,,linux_x86_64
+exp_failopen,33,12,0,0,0,50,,linux_x86_64
+exp_failopen,34,10,0,0,0,50,,linux_x86_64
+exp_failopen,35,21,0,0,0,50,,linux_x86_64
+exp_failopen,36,17,0,0,0,50,,linux_x86_64
+exp_failopen,37,11,0,0,0,50,,linux_x86_64
+exp_failopen,38,14,0,0,0,50,,linux_x86_64
+exp_failopen,39,25,0,0,0,50,,linux_x86_64
+exp_failopen,40,8,0,0,0,50,,linux_x86_64
+exp_failopen,41,12,0,0,0,50,,linux_x86_64
+exp_failopen,42,16,0,0,0,50,,linux_x86_64
+exp_failopen,43,18,0,0,0,50,,linux_x86_64
+exp_failopen,44,9,0,0,0,50,,linux_x86_64
+exp_failopen,45,29,0,0,0,50,,linux_x86_64
+exp_failopen,46,10,0,0,0,50,,linux_x86_64
+exp_failopen,47,3,0,0,0,50,,linux_x86_64
+exp_failopen,48,18,0,0,0,50,,linux_x86_64
+exp_failopen,49,21,0,0,0,50,,linux_x86_64
+exp_failopen,50,10,0,0,0,50,,linux_x86_64
+exp_failopen,51,20,0,0,0,50,,linux_x86_64
+exp_failopen,52,10,0,0,0,50,,linux_x86_64
+exp_failopen,53,16,0,0,0,50,,linux_x86_64
+exp_failopen,54,18,0,0,0,50,,linux_x86_64
+exp_failopen,55,12,0,0,0,50,,linux_x86_64
+exp_failopen,56,15,0,0,0,50,,linux_x86_64
+exp_failopen,57,19,0,0,0,50,,linux_x86_64
+exp_failopen,58,14,0,0,0,50,,linux_x86_64
+exp_failopen,59,11,0,0,0,50,,linux_x86_64
+exp_failopen,60,20,0,0,0,50,,linux_x86_64
+exp_failopen,61,10,0,0,0,50,,linux_x86_64
+exp_failopen,62,24,0,0,0,50,,linux_x86_64
+exp_failopen,63,8,0,0,0,50,,linux_x86_64
+exp_failopen,64,11,0,0,0,50,,linux_x86_64
+exp_failopen,65,24,0,0,0,50,,linux_x86_64
+exp_failopen,66,14,0,0,0,50,,linux_x86_64
+exp_failopen,67,7,0,0,0,50,,linux_x86_64
+exp_failopen,68,28,0,0,0,50,,linux_x86_64
+exp_failopen,69,11,0,0,0,50,,linux_x86_64
+exp_failopen,70,9,0,0,0,50,,linux_x86_64
+exp_failopen,71,19,0,0,0,50,,linux_x86_64
+exp_failopen,72,14,0,0,0,50,,linux_x86_64
+exp_failopen,73,16,0,0,0,50,,linux_x86_64
+exp_failopen,74,12,0,0,0,50,,linux_x86_64
+exp_failopen,75,16,0,0,0,50,PEERS_STARTED,linux_x86_64
+exp_failopen,76,14,0,0,0,50,,linux_x86_64
+exp_failopen,77,22,0,0,0,50,,linux_x86_64
+exp_failopen,78,10,0,0,0,50,,linux_x86_64
+exp_failopen,79,18,0,0,0,50,,linux_x86_64
+exp_failopen,80,10,0,0,0,50,,linux_x86_64
+exp_failopen,81,17,0,0,0,50,,linux_x86_64
+exp_failopen,82,18,0,0,0,50,,linux_x86_64
+exp_failopen,83,18,0,0,0,50,,linux_x86_64
+exp_failopen,84,13,0,0,0,50,,linux_x86_64
+exp_failopen,85,11,0,0,0,50,,linux_x86_64
+exp_failopen,86,15,0,0,0,50,,linux_x86_64
+exp_failopen,87,8,0,0,0,50,,linux_x86_64
+exp_failopen,88,36,0,0,0,50,,linux_x86_64
+exp_failopen,89,11,0,0,0,50,,linux_x86_64
+exp_failopen,90,1,0,0,0,50,,linux_x86_64
+exp_failopen,91,25,0,0,0,50,,linux_x86_64
+exp_failopen,92,11,0,0,0,50,,linux_x86_64
+exp_failopen,93,15,0,0,0,50,,linux_x86_64
+exp_failopen,94,13,0,0,0,50,,linux_x86_64
+exp_failopen,95,20,0,0,0,50,,linux_x86_64
+exp_failopen,96,9,0,0,0,50,,linux_x86_64
+exp_failopen,97,19,0,0,0,50,,linux_x86_64
+exp_failopen,98,10,0,0,0,50,,linux_x86_64
+exp_failopen,99,19,0,0,0,50,,linux_x86_64
+exp_failopen,100,15,0,0,0,50,,linux_x86_64
+exp_failopen,101,22,0,0,0,50,,linux_x86_64
+exp_failopen,102,7,0,0,0,50,,linux_x86_64
+exp_failopen,103,16,0,0,0,50,,linux_x86_64
+exp_failopen,104,30,0,0,0,50,,linux_x86_64
+exp_failopen,105,11,0,0,0,50,,linux_x86_64
+exp_failopen,106,38,0,0,0,50,,linux_x86_64
+exp_failopen,107,12,0,0,0,50,,linux_x86_64
+exp_failopen,108,55,0,0,0,50,,linux_x86_64
+exp_failopen,109,4,0,0,0,50,,linux_x86_64
+exp_failopen,110,52,0,0,0,50,,linux_x86_64
+exp_failopen,111,0,0,0,0,50,,linux_x86_64
+exp_failopen,112,53,0,0,0,50,,linux_x86_64
+exp_failopen,113,13,0,0,0,50,,linux_x86_64
+exp_failopen,114,54,0,0,0,50,,linux_x86_64
+exp_failopen,115,7,0,0,0,50,,linux_x86_64
+exp_failopen,116,47,0,0,0,50,,linux_x86_64
+exp_failopen,117,14,0,0,0,50,,linux_x86_64
+exp_failopen,118,43,0,0,0,50,,linux_x86_64
+exp_failopen,119,20,0,0,0,50,,linux_x86_64
+exp_failopen,120,52,0,0,0,50,,linux_x86_64
+exp_failopen,121,3,0,0,0,50,,linux_x86_64
+exp_failopen,122,52,0,0,0,50,,linux_x86_64
+exp_failopen,123,12,0,0,0,50,,linux_x86_64
+exp_failopen,124,49,0,0,0,50,,linux_x86_64
+exp_failopen,125,0,0,0,0,50,,linux_x86_64
+exp_failopen,126,7,0,0,0,50,,linux_x86_64
+exp_failopen,127,0,0,0,0,50,,linux_x86_64
+exp_failopen,128,52,0,0,0,50,,linux_x86_64
+exp_failopen,129,0,0,0,0,50,,linux_x86_64
+exp_failopen,130,11,0,0,0,50,,linux_x86_64
+exp_failopen,131,0,0,0,0,50,,linux_x86_64
+exp_failopen,132,46,0,0,0,50,,linux_x86_64
+exp_failopen,133,0,0,0,0,50,,linux_x86_64
+exp_failopen,134,20,0,0,0,50,,linux_x86_64
+exp_failopen,135,0,0,0,0,50,,linux_x86_64
+exp_failopen,136,4,0,0,0,50,,linux_x86_64
+exp_failopen,137,46,0,0,0,50,,linux_x86_64
+exp_failopen,138,0,0,0,0,50,,linux_x86_64
+exp_failopen,139,9,0,0,0,50,,linux_x86_64
+exp_failopen,140,0,0,0,0,50,,linux_x86_64
+exp_failopen,141,46,0,0,0,50,,linux_x86_64
+exp_failopen,142,0,0,0,0,50,,linux_x86_64
+exp_failopen,143,12,0,0,0,50,,linux_x86_64
+exp_failopen,144,0,0,0,0,50,,linux_x86_64
+exp_failopen,145,50,0,0,0,50,,linux_x86_64
+exp_failopen,146,0,0,0,0,50,,linux_x86_64
+exp_failopen,147,5,0,0,0,50,,linux_x86_64
+exp_failopen,148,0,0,0,0,50,,linux_x86_64
+exp_failopen,149,49,0,0,0,50,,linux_x86_64
+exp_failopen,150,0,0,0,0,50,,linux_x86_64
+
+
+# ════════════════════════════════════════════════════════════════════════
+# FILE: results/exp_failopen.audit.json
+#   (181 lines, 7838 bytes)
+# ════════════════════════════════════════════════════════════════════════
+[
+  {
+    "id": 136966,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:43.89418+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136957,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:42.893186+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136941,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:42.885738+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136940,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:42.885513+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136939,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:42.885441+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136938,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:42.885209+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136937,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:42.8852+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136933,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:42.42912+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136930,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:42.426716+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136927,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:41.885225+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136926,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:41.884953+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136921,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:41.881757+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136920,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:41.881744+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136918,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:41.881456+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136917,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:41.881346+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136915,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:41.881219+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136914,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:41.880747+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136912,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:41.880503+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136913,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:41.880484+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136909,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:41.879755+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  }
+]
+
+# ════════════════════════════════════════════════════════════════════════
+# FILE: results/exp_failopen.summary.json
+#   (22 lines, 337 bytes)
+# ════════════════════════════════════════════════════════════════════════
+{
+  "fallback_rows_delta": 1090,
+  "before_outage": {
+    "ok": 469,
+    "h5": 0,
+    "h403": 0,
+    "err": 0
+  },
+  "during_outage": {
+    "ok": 649,
+    "h5": 0,
+    "h403": 0,
+    "err": 0
+  },
+  "after_recovery": {
+    "ok": 1417,
+    "h5": 0,
+    "h403": 0,
+    "err": 0
+  },
+  "peers_stopped_at_s": 30,
+  "peers_started_at_s": 75
+}
+
+# ════════════════════════════════════════════════════════════════════════
+# FILE: results/exp_batchtimeout_sens.csv
+#   (31 lines, 2413 bytes)
+# ════════════════════════════════════════════════════════════════════════
+experiment,mode,batch_timeout_ms,tool,concurrency,trial,tps,p50_ms,p95_ms,errors,client_cpu_pct,method,platform
+exp_sens,fabric,2000,duration60s,50,1,70.4,16,2131,0,2,gateway,linux_x86_64
+exp_sens,fabric,2000,duration60s,50,2,67.1,12,2207,0,2,gateway,linux_x86_64
+exp_sens,fabric,2000,duration60s,50,3,69.9,10,2145,0,2,gateway,linux_x86_64
+exp_sens,fabric,2000,duration60s,50,4,64.8,10,2148,0,2,gateway,linux_x86_64
+exp_sens,fabric,2000,duration60s,50,5,68.9,11,2148,0,2,gateway,linux_x86_64
+exp_sens,fabric,2000,duration60s,50,6,66.6,10,2151,0,2,gateway,linux_x86_64
+exp_sens,fabric,2000,duration60s,50,7,65.0,10,2135,0,2,gateway,linux_x86_64
+exp_sens,fabric,2000,duration60s,50,8,67.6,9,2120,0,2,gateway,linux_x86_64
+exp_sens,fabric,2000,duration60s,50,9,68.9,10,2118,0,2,gateway,linux_x86_64
+exp_sens,fabric,2000,duration60s,50,10,67.6,10,2119,0,2,gateway,linux_x86_64
+exp_sens,fabric,500,duration60s,50,1,174.2,49,1009,0,15,gateway,linux_x86_64
+exp_sens,fabric,500,duration60s,50,2,185.5,35,1026,0,12,gateway,linux_x86_64
+exp_sens,fabric,500,duration60s,50,3,216.8,25,959,0,10,gateway,linux_x86_64
+exp_sens,fabric,500,duration60s,50,4,196.0,32,991,0,11,gateway,linux_x86_64
+exp_sens,fabric,500,duration60s,50,5,175.7,32,1030,0,10,gateway,linux_x86_64
+exp_sens,fabric,500,duration60s,50,6,205.8,25,987,0,10,gateway,linux_x86_64
+exp_sens,fabric,500,duration60s,50,7,207.8,31,979,0,12,gateway,linux_x86_64
+exp_sens,fabric,500,duration60s,50,8,179.9,30,1023,0,10,gateway,linux_x86_64
+exp_sens,fabric,500,duration60s,50,9,195.0,24,1024,0,9,gateway,linux_x86_64
+exp_sens,fabric,500,duration60s,50,10,193.3,34,996,0,13,gateway,linux_x86_64
+exp_sens,fabric,250,duration60s,50,1,136.7,227,1316,0,15,gateway,linux_x86_64
+exp_sens,fabric,250,duration60s,50,2,178.6,97,1071,0,15,gateway,linux_x86_64
+exp_sens,fabric,250,duration60s,50,3,182.1,165,1048,0,14,gateway,linux_x86_64
+exp_sens,fabric,250,duration60s,50,4,179.4,199,1044,0,12,gateway,linux_x86_64
+exp_sens,fabric,250,duration60s,50,5,185.9,123,1042,0,15,gateway,linux_x86_64
+exp_sens,fabric,250,duration60s,50,6,192.4,62,1038,0,13,gateway,linux_x86_64
+exp_sens,fabric,250,duration60s,50,7,178.4,177,1053,0,12,gateway,linux_x86_64
+exp_sens,fabric,250,duration60s,50,8,203.2,67,1004,0,15,gateway,linux_x86_64
+exp_sens,fabric,250,duration60s,50,9,205.5,65,961,0,16,gateway,linux_x86_64
+exp_sens,fabric,250,duration60s,50,10,155.7,211,1280,0,14,gateway,linux_x86_64
+
+
+# ════════════════════════════════════════════════════════════════════════
+# FILE: results/exp_batchtimeout_sens.summary.json
+#   (103 lines, 1576 bytes)
+# ════════════════════════════════════════════════════════════════════════
+{
+  "2000": {
+    "tool": "duration60s",
+    "conc": 50,
+    "reps": 10,
+    "tps": {
+      "n": 10,
+      "mean": 67.68,
+      "p50": 67.6,
+      "min": 64.8,
+      "max": 70.4,
+      "stdev": 1.89
+    },
+    "client_cpu_pct": {
+      "n": 10,
+      "mean": 2.0,
+      "p50": 2.0,
+      "min": 2.0,
+      "max": 2.0,
+      "stdev": 0.0
+    },
+    "raw_tps": [
+      70.4,
+      67.1,
+      69.9,
+      64.8,
+      68.9,
+      66.6,
+      65.0,
+      67.6,
+      68.9,
+      67.6
+    ],
+    "errors_total": 0
+  },
+  "500": {
+    "tool": "duration60s",
+    "conc": 50,
+    "reps": 10,
+    "tps": {
+      "n": 10,
+      "mean": 193.0,
+      "p50": 194.15,
+      "min": 174.2,
+      "max": 216.8,
+      "stdev": 14.31
+    },
+    "client_cpu_pct": {
+      "n": 10,
+      "mean": 11.2,
+      "p50": 10.5,
+      "min": 9.0,
+      "max": 15.0,
+      "stdev": 1.81
+    },
+    "raw_tps": [
+      174.2,
+      185.5,
+      216.8,
+      196.0,
+      175.7,
+      205.8,
+      207.8,
+      179.9,
+      195.0,
+      193.3
+    ],
+    "errors_total": 0
+  },
+  "250": {
+    "tool": "duration60s",
+    "conc": 50,
+    "reps": 10,
+    "tps": {
+      "n": 10,
+      "mean": 179.79,
+      "p50": 180.75,
+      "min": 136.7,
+      "max": 205.5,
+      "stdev": 20.69
+    },
+    "client_cpu_pct": {
+      "n": 10,
+      "mean": 14.1,
+      "p50": 14.5,
+      "min": 12.0,
+      "max": 16.0,
+      "stdev": 1.37
+    },
+    "raw_tps": [
+      136.7,
+      178.6,
+      182.1,
+      179.4,
+      185.9,
+      192.4,
+      178.4,
+      203.2,
+      205.5,
+      155.7
+    ],
+    "errors_total": 0
+  }
+}

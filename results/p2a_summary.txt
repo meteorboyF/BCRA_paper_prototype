@@ -1,0 +1,20 @@
+P2-A BatchTimeout TPS Summary (clean data)
+==================================================
+
+BatchTimeout=250ms  Concurrency=50  n=5
+  mean=150.92  min=147.10  max=153.20  stddev=2.50
+
+BatchTimeout=250ms  Concurrency=100  n=5
+  mean=150.22  min=146.80  max=152.90  stddev=2.65
+
+BatchTimeout=250ms  Concurrency=200  n=2
+  mean=151.15  min=148.00  max=154.30  stddev=4.45
+
+BatchTimeout=500ms  Concurrency=50  n=5
+  mean=86.88  min=83.70  max=88.70  stddev=1.97
+
+BatchTimeout=500ms  Concurrency=100  n=5
+  mean=86.40  min=84.00  max=90.40  stddev=2.56
+
+BatchTimeout=500ms  Concurrency=200  n=2
+  mean=86.35  min=85.80  max=86.90  stddev=0.78

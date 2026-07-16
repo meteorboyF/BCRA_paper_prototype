@@ -1,0 +1,11 @@
+experiment,doc_id,history_depth,trial,latency_ms,method,platform
+exp7,HIST-BENCH-DOC-1780288319,107,1,127,peer_cli_query,linux_x86_64
+exp7,HIST-BENCH-DOC-1780288319,107,2,128,peer_cli_query,linux_x86_64
+exp7,HIST-BENCH-DOC-1780288319,107,3,137,peer_cli_query,linux_x86_64
+exp7,HIST-BENCH-DOC-1780288319,107,4,138,peer_cli_query,linux_x86_64
+exp7,HIST-BENCH-DOC-1780288319,107,5,137,peer_cli_query,linux_x86_64
+exp7,HIST-BENCH-DOC-1780288319,107,6,134,peer_cli_query,linux_x86_64
+exp7,HIST-BENCH-DOC-1780288319,107,7,123,peer_cli_query,linux_x86_64
+exp7,HIST-BENCH-DOC-1780288319,107,8,134,peer_cli_query,linux_x86_64
+exp7,HIST-BENCH-DOC-1780288319,107,9,145,peer_cli_query,linux_x86_64
+exp7,HIST-BENCH-DOC-1780288319,107,10,137,peer_cli_query,linux_x86_64

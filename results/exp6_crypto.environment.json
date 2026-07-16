@@ -1,0 +1,52 @@
+{
+  "experiment": "exp6_crypto",
+  "timestamp": "2026-06-05T04:57:12.654Z",
+  "runtime": "node-webcrypto",
+  "browser_webcrypto_used": false,
+  "node_webcrypto_used": true,
+  "command_used": "node experiments/run-exp6-crypto-benchmark.mjs",
+  "platform": "Linux 6.8.0-111-generic x64",
+  "os": {
+    "type": "Linux",
+    "release": "6.8.0-111-generic",
+    "arch": "x64",
+    "cpus": [
+      "Intel(R) Core(TM) Ultra 5 125H",
+      "Intel(R) Core(TM) Ultra 5 125H",
+      "Intel(R) Core(TM) Ultra 5 125H",
+      "Intel(R) Core(TM) Ultra 5 125H",
+      "Intel(R) Core(TM) Ultra 5 125H",
+      "Intel(R) Core(TM) Ultra 5 125H",
+      "Intel(R) Core(TM) Ultra 5 125H",
+      "Intel(R) Core(TM) Ultra 5 125H",
+      "Intel(R) Core(TM) Ultra 5 125H",
+      "Intel(R) Core(TM) Ultra 5 125H",
+      "Intel(R) Core(TM) Ultra 5 125H",
+      "Intel(R) Core(TM) Ultra 5 125H",
+      "Intel(R) Core(TM) Ultra 5 125H",
+      "Intel(R) Core(TM) Ultra 5 125H",
+      "Intel(R) Core(TM) Ultra 5 125H",
+      "Intel(R) Core(TM) Ultra 5 125H",
+      "Intel(R) Core(TM) Ultra 5 125H",
+      "Intel(R) Core(TM) Ultra 5 125H"
+    ],
+    "totalmem_bytes": 7655931904
+  },
+  "node_version": "v18.20.8",
+  "user_agent": "Node.js v18.20.8 (linux; x64) crypto.webcrypto.subtle",
+  "browser_name": "n/a",
+  "browser_version": "n/a",
+  "browser_tooling_detection": [
+    {
+      "package": "playwright",
+      "available": false,
+      "error": "ERR_MODULE_NOT_FOUND"
+    },
+    {
+      "package": "puppeteer",
+      "available": false,
+      "error": "ERR_MODULE_NOT_FOUND"
+    }
+  ],
+  "notes": "Playwright/Puppeteer not installed; used Node.js crypto.webcrypto.subtle fallback."
+}

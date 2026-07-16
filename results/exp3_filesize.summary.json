@@ -1,0 +1,144 @@
+{
+  "fabric_commit_method": "peer_cli_invoke",
+  "fabric_commit_raw": [
+    2135.43,
+    2131.73,
+    2129.74,
+    2136.9,
+    2128.63
+  ],
+  "per_size": [
+    {
+      "size_mb": 1,
+      "ipfs_p50_ms": 10.14,
+      "ipfs_mean_ms": 12.22,
+      "ipfs_min_ms": 8.48,
+      "ipfs_max_ms": 26.91,
+      "ipfs_stdev_ms": 5.4,
+      "fabric_commit_ms": 2131.73,
+      "total_p50_ms": 2141.87,
+      "ipfs_raw": [
+        26.91,
+        9.18,
+        14.02,
+        10.02,
+        9.95,
+        11.05,
+        12.3,
+        8.48,
+        10.06,
+        10.22
+      ]
+    },
+    {
+      "size_mb": 5,
+      "ipfs_p50_ms": 17.26,
+      "ipfs_mean_ms": 18.79,
+      "ipfs_min_ms": 14.68,
+      "ipfs_max_ms": 32.82,
+      "ipfs_stdev_ms": 5.36,
+      "fabric_commit_ms": 2131.73,
+      "total_p50_ms": 2148.99,
+      "ipfs_raw": [
+        32.82,
+        21.24,
+        17.12,
+        18.89,
+        19.28,
+        14.9,
+        16.27,
+        15.28,
+        14.68,
+        17.4
+      ]
+    },
+    {
+      "size_mb": 10,
+      "ipfs_p50_ms": 29.86,
+      "ipfs_mean_ms": 30.86,
+      "ipfs_min_ms": 24.4,
+      "ipfs_max_ms": 41.13,
+      "ipfs_stdev_ms": 4.73,
+      "fabric_commit_ms": 2131.73,
+      "total_p50_ms": 2161.59,
+      "ipfs_raw": [
+        41.13,
+        33.22,
+        35.3,
+        26.68,
+        30.46,
+        24.4,
+        29.41,
+        28.47,
+        30.32,
+        29.22
+      ]
+    },
+    {
+      "size_mb": 20,
+      "ipfs_p50_ms": 42.2,
+      "ipfs_mean_ms": 45.62,
+      "ipfs_min_ms": 37.24,
+      "ipfs_max_ms": 74.73,
+      "ipfs_stdev_ms": 10.75,
+      "fabric_commit_ms": 2131.73,
+      "total_p50_ms": 2173.94,
+      "ipfs_raw": [
+        74.73,
+        44.85,
+        37.24,
+        41.42,
+        43.76,
+        38.99,
+        41.36,
+        41.84,
+        42.57,
+        49.45
+      ]
+    },
+    {
+      "size_mb": 30,
+      "ipfs_p50_ms": 68.0,
+      "ipfs_mean_ms": 67.55,
+      "ipfs_min_ms": 54.56,
+      "ipfs_max_ms": 93.85,
+      "ipfs_stdev_ms": 11.16,
+      "fabric_commit_ms": 2131.73,
+      "total_p50_ms": 2199.73,
+      "ipfs_raw": [
+        93.85,
+        62.81,
+        59.9,
+        70.59,
+        69.81,
+        67.93,
+        72.32,
+        55.65,
+        54.56,
+        68.06
+      ]
+    },
+    {
+      "size_mb": 50,
+      "ipfs_p50_ms": 94.7,
+      "ipfs_mean_ms": 99.49,
+      "ipfs_min_ms": 83.61,
+      "ipfs_max_ms": 146.76,
+      "ipfs_stdev_ms": 17.71,
+      "fabric_commit_ms": 2131.73,
+      "total_p50_ms": 2226.43,
+      "ipfs_raw": [
+        146.76,
+        99.96,
+        93.63,
+        88.97,
+        102.31,
+        93.98,
+        95.42,
+        102.12,
+        83.61,
+        88.1
+      ]
+    }
+  ]
+}

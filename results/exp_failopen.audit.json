@@ -1,0 +1,182 @@
+[
+  {
+    "id": 136966,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:43.89418+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136957,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:42.893186+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136941,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:42.885738+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136940,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:42.885513+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136939,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:42.885441+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136938,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:42.885209+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136937,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:42.8852+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136933,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:42.42912+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136930,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:42.426716+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136927,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:41.885225+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136926,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:41.884953+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136921,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:41.881757+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136920,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:41.881744+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136918,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:41.881456+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136917,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:41.881346+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136915,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:41.881219+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136914,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:41.880747+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136912,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:41.880503+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136913,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:41.880484+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  },
+  {
+    "id": 136909,
+    "event_type": "ACL_FABRIC_FALLBACK",
+    "actor_id": "b0f9972a-1336-4aef-b3c3-2a57a22a549c",
+    "resource_type": "DOCUMENT",
+    "resource_id": "7eba24ec-305f-4237-bc13-dd47cf62c9a0",
+    "timestamp": "2026-06-01T05:03:41.879755+00:00",
+    "metadata_json": "{\"reason\":\"Blockchain query failed: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception\"}"
+  }
+]

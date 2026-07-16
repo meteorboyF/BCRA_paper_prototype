@@ -1,0 +1,26 @@
+P2-B WAN Summary
+============================================================
+
+RTT=0ms method=veth_corrected
+  mean_tps=24.38  p50_tps=25.50  p50_lat=2137ms  p95_lat=2166ms
+
+RTT=0ms method=bridge_original
+  mean_tps=21.90  p50_tps=21.90  p50_lat=2080ms  p95_lat=2080ms
+
+RTT=50ms method=veth_corrected
+  mean_tps=20.88  p50_tps=21.80  p50_lat=2339ms  p95_lat=2394ms
+
+RTT=50ms method=bridge_original
+  mean_tps=22.30  p50_tps=22.30  p50_lat=2185ms  p95_lat=2185ms
+
+RTT=100ms method=veth_corrected
+  mean_tps=17.64  p50_tps=17.10  p50_lat=2554ms  p95_lat=2578ms
+
+RTT=100ms method=bridge_original
+  mean_tps=21.10  p50_tps=21.10  p50_lat=2288ms  p95_lat=2288ms
+
+RTT=150ms method=veth_corrected
+  mean_tps=17.14  p50_tps=18.10  p50_lat=2744ms  p95_lat=2756ms
+
+RTT=150ms method=bridge_original
+  mean_tps=20.40  p50_tps=20.40  p50_lat=2556ms  p95_lat=2556ms
