@@ -123,6 +123,34 @@ Index of everything: `experiments/README.md`.
 - Swapping into `bra_submission/figures/` + caption updates = manuscript
   work, deliberately not done here.
 
+### Manuscript campaign (bra-submission branch, 2026-07-16)
+All IMPROVEMENTS.md writing items executed in order 1 -> 0 -> 4 -> 2 -> 5
+with per-item sign-off checkpoints, docker TeX Live compile verification
+(zero errors, overfull-vs-baseline discipline), and MANUSCRIPT_TODO.md as
+the deferral ledger:
+- **Item 1** (dfc7e79): novelty recut — 5 page-verified lit-table rows,
+  new access-control-centric related-work subsection conceding RBAC-IPFS's
+  measured on-path auth, gaps rewritten naming systems, delta sentences.
+- **Item 0** (ddb4066): Exp 10-15 integrated — six evaluation subsections,
+  numbers-positioning table, executor-defect footnote, fifteen-experiment
+  intro, fig10-fig14 added.
+- **Item 4** (ee0aaae): threat model restructured four-part — assumptions
+  A1-A6, properties P1-P4 with experiment anchors, scenarios S1-S4
+  (key-substitution promoted), explicit out-of-scope.
+- **Item 2** (3738c87): legal grounding — cross-firm e-discovery scenario
+  (FRCP clawback = RevokeAccess mapping), 7-row legal requirement ->
+  mechanism -> evidence table, 5 verified web refs (FRE 902, ABA 477R/483,
+  EDRM 2.0, EU 2023/1543) with last-accessed dates.
+- **Item 5** (2661361): abstract ~201 words ending on delta sentence,
+  keywords swap, fig9 swapped + THREE '15-second' claims corrected to the
+  measured 20 s (circuit-breaker open-state, config-verified), zanzibar
+  pages fixed, macaroons DOI'd (NDSS unpaginated — documented),
+  seoBlockchain2024 verified-but-uncited flagged, data-availability B1/B2
+  variants drafted. fig1-fig8 swap deferred (composition mismatch).
+Remaining: author-owned decisions only (CRediT, data-availability choice,
+seo cite-or-delete, optional fig1-8 composition-matched swap) + camera-
+ready pre-proof re-checks. See MANUSCRIPT_TODO.md on bra-submission.
+
 ## Repo/process decisions
 - One RESULTS.md per experiment beside the code; timestamped evidence
   runs under `<exp>/results/`; smoke runs gitignored, never evidence.
