@@ -1,5 +1,15 @@
 # Manuscript Handoff — BRA Resubmission (as of 2026-07-17)
 
+> **2026-07-17 (later): fifth pass applied on branch `hardening-pass`** —
+> layout repair (float pile-up: experiment figures were landing 20–43 pages
+> from their references; topology figure was 2× page width), em-dash removal
+> (31 prose sites), three raw-data-verified number corrections (66–70 TPS,
+> denial rate ≈30/s, Exp 7 σ 6.4), Experiment-15 retitle, data-availability
+> leak warning + Variant B3. See `CHANGELOG_review.md`, `RISKS.md`,
+> `ACCEPTANCE_NOTES.md`. Build: 100 pp, 0 errors, 22 cosmetic overfulls,
+> 1 documented bibtex warning. Compiled with local MiKTeX (+cm-super), not
+> docker texlive; layout equivalent.
+
 One-page map of every editing pass applied to `bra_submission/main.tex`
 this week, for co-author review. Detail files are all at this repo root
 on `bra-submission` unless noted. The full chronological campaign log

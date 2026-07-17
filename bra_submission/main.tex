@@ -37,7 +37,7 @@
 \usepackage{xcolor}
 \usepackage{needspace}
 \usepackage{float}
-\usepackage{placeins}
+\usepackage[section]{placeins}
 \usepackage{hyperref}
 
 \graphicspath{{figures/}}
@@ -200,6 +200,16 @@ hierarchy can be represented in software, but whether its enforcement
 decisions and audit records can be verified by parties other than the
 administrator who recorded them.
 
+% Fig 1 - role hierarchy: single-column is appropriate (simple org-chart)
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=\linewidth]{Hierarchy.pdf}
+\caption{Role hierarchy enforced by the proposed framework, from
+managing partners with full case visibility to paralegals
+restricted to assigned documents only.}
+\label{fig:rbac_hierarchy}
+\end{figure}
+
 \subsection{Existing Challenges and Problem Definition}
 \label{sec:challenges}
 
@@ -331,6 +341,7 @@ workload rather than an isolated peer/orderer microbenchmark, so the
 reported throughput reflects the application path exercised by legal
 document registration and retrieval.
 
+
 Third, cryptographic mechanisms are integrated for document
 confidentiality, key distribution, integrity anchoring, and user-level
 signing. The framework uses AES-256-GCM for document encryption,
@@ -346,7 +357,7 @@ throughput, latency, file-size effects, audit-query cost, synthetic WAN
 latency, \texttt{BatchTimeout} sensitivity, cryptographic operation cost,
 ledger-history depth, and outage behavior. At the canonical
 \texttt{BatchTimeout=2s} and \texttt{MaxMessageCount=500}, the REST-gateway
-workload sustains approximately 68--70\,TPS, about 4.1 to 4.2$\times$ above the estimated
+workload sustains approximately 66--70\,TPS, about 4.0 to 4.2$\times$ above the estimated
 16.7\,TPS legal workload. Reducing \texttt{BatchTimeout} to 500\,ms produced
 the highest measured throughput, 193.0\,TPS, for the evaluated
 three-organization deployment.
@@ -356,7 +367,8 @@ the PostgreSQL-only ACL path after warm-up. Experiment~\hyperref[sec:exp_failclo
 (Fig.~\ref{fig:failclosed}) demonstrates strict fail-closed security
 enforcement on the document-download path: successful downloads fall to
 exactly zero for the full 45-second Fabric unavailability window
-($t = 30$--$75$\,s), with HTTP\,503 denials sustained at 25--45 per second.
+($t = 30$--$75$\,s), with HTTP\,503 denials averaging approximately
+30 per second (peaking at 44).
 Normal operation resumes automatically after an approximately 20-second
 recovery lag dominated by the access-path circuit breaker completing its
 30\,s open-state window before half-open probes readmit Fabric calls.
@@ -372,21 +384,6 @@ regulatory considerations. Section~\ref{sec:discussion} discusses the
 research-question findings and interprets the experimental results.
 Section~\ref{sec:conclusion} concludes the paper.
 
-% Fig 1 - role hierarchy: single-column is appropriate (simple org-chart)
-\begin{figure}[H]
-\centering
-\includegraphics[width=\linewidth]{Hierarchy.pdf}
-\caption{Role hierarchy enforced by the proposed framework, from
-managing partners with full case visibility to paralegals
-restricted to assigned documents only.}
-\label{fig:rbac_hierarchy}
-\end{figure}
-\FloatBarrier
-
-
-% =========================================================================
-% SECTION II - LITERATURE REVIEW
-% =========================================================================
 % =========================================================================
 % SECTION II - LITERATURE REVIEW
 % =========================================================================
@@ -666,8 +663,8 @@ must be pinned and replicated deliberately.
 
 The proposed framework addresses these gaps by moving the enforcement
 boundary onto the normal document-release path; the scope of that
-contribution --- a measured relocation of the authorization boundary
-rather than a new access-control primitive or ordering protocol --- is
+contribution, a measured relocation of the authorization boundary
+rather than a new access-control primitive or ordering protocol, is
 delimited in Section~\ref{sec:contributions}. The prototype still has limitations, including custodial Fabric
 identity handling and \texttt{localStorage}-based key storage, and
 those limitations are disclosed in
@@ -796,7 +793,7 @@ threat model are in Section~\ref{sec:governance_security}.
 
 The following scenario motivates every workflow in this section using
 only mechanisms the prototype implements. It follows a document
-production between opposing law firms --- the setting in which the
+production between opposing law firms: the setting in which the
 trust problem this paper addresses is sharpest, because the parties
 are professionally adverse yet legally obliged to exchange and
 safeguard each other's materials.
@@ -811,7 +808,7 @@ jurisdictions, and cross-border variants increasingly involve
 electronic-evidence production regimes such as Regulation~(EU)
 2023/1543~\cite{euEvidence2023}. A regulator (or court-appointed
 special master) may later audit how the production was handled. The
-EDRM model describes this lifecycle --- identification through
+EDRM model describes this lifecycle: identification through
 preservation, collection, review, and production~\cite{edrm2023}; the
 framework's role begins where reviewed documents leave the producing
 firm's custody.
@@ -820,9 +817,9 @@ firm's custody.
 through the upload workflow
 (Section~\ref{sec:workflows}): the browser encrypts the
 plaintext under a fresh AES-256-GCM key before it leaves the machine
---- the lawyer's confidentiality duty under ABA Model Rule~1.6 and its
+(the lawyer's confidentiality duty under ABA Model Rule~1.6 and its
 ``reasonable efforts'' gloss in Formal Opinion~477R attaches to
-exactly this transmission step~\cite{aba477r} --- the ciphertext is
+exactly this transmission step~\cite{aba477r}), the ciphertext is
 stored in the private IPFS swarm, and \texttt{RegisterDocument}
 anchors the plaintext hash and content identifier on the consortium
 ledger. The anchored hash is what later authenticates the production:
@@ -840,32 +837,32 @@ decision is evaluated against ledger state at request time
 (Experiment~\hyperref[sec:exp_latency]{2}: 6.51\,ms P50), so neither
 firm's application administrators can quietly widen or extend access.
 When the window lapses, expiry is enforced by the chaincode's
-deterministic timestamp comparison --- no cleanup job, no trust in
+deterministic timestamp comparison: no cleanup job, no trust in
 either firm's schedulers. If LawFirmA discovers an inadvertently
 produced privileged document, the FRCP~26(b)(5)(B) clawback procedure
 maps to \texttt{RevokeAccess}: the revocation is a ledger transaction
 both parties can see, and subsequent download attempts are denied and
 audited (Scenario~S1, Section~\ref{sec:attack_scenarios}).
 
-\emph{Audit.} When the regulator examines the production --- or when
+\emph{Audit.} When the regulator examines the production, or when
 the parties dispute whether a document was altered or accessed outside
-its window --- \texttt{GetDocumentHistory} and the anchored audit
+its window, \texttt{GetDocumentHistory} and the anchored audit
 events reconstruct the document's custody without trusting either
 firm's internal databases (Experiments~\hyperref[sec:exp_audit]{4}
 and~\hyperref[sec:exp_gethistory]{7}). Should LawFirmB suffer an
 intrusion during the review window, ABA Formal Opinion~483's
-post-breach duties --- stop the breach, assess what was accessed,
-notify affected clients --- are materially supported by the same
+post-breach duties (stop the breach, assess what was accessed,
+notify affected clients) are materially supported by the same
 records: the ledger shows exactly which documents the compromised
 credentials could reach and which were actually released, and the
 fail-closed design (Experiment~\hyperref[sec:exp_failclosed]{9})
 means an attacker who disables the ledger gains denial, not
 access~\cite{aba483}.
 
-Every mechanism the scenario uses --- browser-side encryption,
+Every mechanism the scenario uses (browser-side encryption,
 per-recipient key wrapping, time-bounded grants, on-path
 \texttt{CheckAccess}, ledger-anchored revocation, and history
-reconstruction --- is implemented and measured in the prototype; the
+reconstruction) is implemented and measured in the prototype; the
 scenario costs prose, not code. Table~\ref{tab:legal_mapping}
 generalizes the scenario into a requirement-by-requirement mapping
 from legal obligations to framework mechanisms and the evidence
@@ -1327,8 +1324,8 @@ served the existing ciphertext under the original $k_{enc}$ during this
 window. This limitation is disclosed in Table~\ref{tab:framework_vs_prototype}
 and motivates the proxy re-encryption production path.
 
-The two residual key-custody limitations --- server-managed MSP
-wallets and \texttt{localStorage}-held signing keys --- are cataloged
+The two residual key-custody limitations (server-managed MSP
+wallets and \texttt{localStorage}-held signing keys) are cataloged
 with their production paths in
 Table~\ref{tab:framework_vs_prototype}~\cite{fabricCADoc,fips1403,nist800634,w3cWebAuthnL3}.
 
@@ -1353,9 +1350,9 @@ Table~\ref{tab:framework_vs_prototype}~\cite{fabricCADoc,fips1403,nist800634,w3c
     \label{fig:access_grant_key_distribution}
 \end{figure}
 
-\begin{figure}[!t]
+\begin{figure}[!tp]
     \centering
-    \includegraphics[width=0.95\columnwidth]{access_and_decryption.pdf}
+    \includegraphics[width=0.95\columnwidth,height=0.55\textheight,keepaspectratio]{access_and_decryption.pdf}
     \caption{Phase~4: Recipient unwraps $k_{enc}$ with $sk_{ecies}$,
     extracts IV from first 12~bytes of stored ciphertext, and decrypts
     locally. Server delivers only ciphertext and wrapped key token.}
@@ -1617,8 +1614,8 @@ only availability does.
 \item[A5 (Identity-table integrity).] The PostgreSQL identity table
 binding users to public keys (\texttt{pk\_ecies}, \texttt{pk\_sign})
 has not been maliciously modified. This is deliberately the weakest
-assumption in the prototype --- its violation is walked through as
-Scenario~S3 --- and is discharged in the production design by
+assumption in the prototype (its violation is walked through as
+Scenario~S3) and is discharged in the production design by
 ledger-anchoring key registrations.
 \item[A6 (Client endpoint).] The user's browser is uncompromised
 while keys are unlocked and plaintext is present. Endpoint
@@ -1834,7 +1831,7 @@ on A4.
 \item[P4 (Attributable ledger actions).] Under A1--A3, every grant,
 revocation, and anchored audit event is attributable to the
 submitting organization via MSP signatures, and document commitments
-are additionally bound to user-level ECDSA keys --- subject to the
+are additionally bound to user-level ECDSA keys, subject to the
 custodial-identity caveat of the prototype, and to A5 for the
 binding between users and their published keys.
 \end{description}
@@ -1864,7 +1861,7 @@ Table~\ref{tab:threat_model}) deliberately disrupts Fabric
 connectivity, expecting the application to fall back to the
 PostgreSQL ACL that the insider can edit. The design refuses the
 trade: under P2 the path fails closed.
-\emph{Traces to:} Experiment~\hyperref[sec:exp_failclosed]{9} ---
+\emph{Traces to:} Experiment~\hyperref[sec:exp_failclosed]{9}:
 1{,}340 HTTP~503 denials, zero protected bytes released during the
 induced outage, denial events audited; the analogous storage-tier
 attack (disabling IPFS replicas) degrades availability but never
@@ -2232,7 +2229,7 @@ six-peer-organization topology: five representing law firms
 The measured prototype deployment used a shared \texttt{OrdererOrg} CA
 to issue the three orderer identities for the evaluated
 three-organization configuration (LawFirmA, LawFirmB, and RegulatorOrg;
-three orderers, three peers) --- a repository-level simplification. The
+three orderers, three peers), a repository-level simplification. The
 production governance model (Section~\ref{sec:consensus}) instead
 requires member-controlled orderer-identity administration or
 multi-party control of any shared ordering CA, which otherwise remains
@@ -2254,7 +2251,7 @@ configuration.
 
 \begin{figure*}[!t]
     \centering
-    \includegraphics[width=2\columnwidth]{fabric_topology4.pdf}
+    \includegraphics[width=\textwidth]{fabric_topology4.pdf}
     \caption{Six-peer-organization Fabric reference topology with a
 consortium-governed three-node EtcdRaft ordering service. The orderer nodes
 are operated by the regulator, LawFirmA, and LawFirmB under member-controlled
@@ -2309,7 +2306,12 @@ as supplementary material.
 \subfloat[Audit log]{%
     \includegraphics[width=0.48\linewidth]{ui_audit_log.png}%
     \label{fig:ui_audit_log}}
-\caption{Audit and transparency views of the prototype interface.}
+\caption{Audit and transparency views of the prototype interface:
+(a) the ledger explorer groups committed entries by block and shows
+transaction identifiers, channel, timestamp, transaction type, and
+document references; (b) the operational audit-log view lists
+application events with timestamps and expandable metadata. The
+remaining interface screens are provided as supplementary material.}
 \label{fig:ui_audit_views}
 \end{figure*}
 % =========================================================================
@@ -2416,15 +2418,17 @@ requests and reads as \texttt{GET /wrapped-key}, with a 10\,s per-request
 timeout and five repetitions per concurrency level.
 
 The framework REST gateway with Fabric sustained approximately
-68--70\,TPS across the measured 50--600 client range, with zero
-transaction errors up to 400 clients. This is about 4.1 to
-$4.2\times$ above the 16.7\,TPS baseline of RQ3 --- an illustrative
+66--70\,TPS in the 60-second duration runs at the canonical setting;
+the fixed-count cross-check sweep spans 62--70\,TPS per point across
+the measured 50--600 client range, with zero
+transaction errors up to 400 clients. The sustained rate is about 4.0 to
+$4.2\times$ above the 16.7\,TPS baseline of RQ3, an illustrative
 capacity-planning assumption for a 1,000-user firm performing one
 document action per minute per user~\cite{aba2023,ilta2023}. Throughput
 is invariant with respect to concurrency: as load rises, per-request
 latency grows while committed throughput holds flat, the signature
 of a system gated by the fixed 2\,s Raft batch window rather than by
-compute or concurrency. CPU utilization stayed below 23\,\% throughout confirming the bottleneck is the Raft orderer
+compute or concurrency. CPU utilization stayed below 23\,\% throughout, confirming that the bottleneck is the Raft orderer
 \texttt{BatchTimeout=2s}, not compute. The PostgreSQL-only baseline
 peaked near 279\,TPS in the stable region. Beyond that point,
 the closed-loop load generator saturates, so the shaded region in
@@ -2511,11 +2515,11 @@ PostgreSQL inserts would omit the Fabric SDK endorsement round-trip and
 orderer batch costs that are structurally part of every document
 registration. The absolute \texttt{RegisterDocument} latency
 (2{,}084\,ms P50) is therefore evaluated directly against the 5\,s SLO\@.
-Experiment~\hyperref[sec:exp_scalability]{1} corroborates this interpretation: under the 68-70\,TPS Fabric
+Experiment~\hyperref[sec:exp_scalability]{1} corroborates this interpretation: under the 66--70\,TPS Fabric
 load, PostgreSQL operated at approximately 25\% of its independently
 observed write-capacity reference ($\approx$279\,TPS), and CPU utilization
 remained below 23\%. Cross-platform results also support BatchTimeout
-dominance: the Apple~M1 session measured 2{,}147\,ms, within 3\,\% of the
+dominance: the Apple~M1 session measured 2{,}147\,ms, within about 3\,\% of the
 Linux figure, as expected when the orderer timeout accounts for
 $\approx$96\,\% of total write latency.
 
@@ -2792,7 +2796,7 @@ renewals across multiple firms. Ten trials were executed with
 request, to CouchDB history scan, to response.
 
 \texttt{GetHistoryForKey} completed in 135.5\,ms P50 (mean 134.0\,ms,
-range 123--145\,ms, $\sigma = 6.1$\,ms). The coefficient of variation is
+range 123--145\,ms, $\sigma = 6.4$\,ms). The coefficient of variation is
 $<$5\,\%, indicating stable performance with no observed index-scan
 anomalies. Because the audit-history measurement was obtained through a peer
 chaincode query CLI path, whereas the main latency and throughput experiments
@@ -2806,7 +2810,7 @@ with history depth. Fig.~\ref{fig:gethistory} therefore shows only the
 measured depth: all ten trials at 107 entries with the median and its
 bootstrap 95\,\% confidence interval. As a back-of-envelope linear
 extrapolation (stated in text, not plotted), 135.5\,ms at
-107 entries implies $\approx$1,266\,ms at 1,000 entries --- suitable for
+107 entries implies $\approx$1,266\,ms at 1,000 entries: suitable for
 background forensic reports, but past the 200\,ms interactive threshold,
 which would be crossed at approximately 158 entries. Multi-depth
 validation across deeper histories is left as future work.
@@ -2846,7 +2850,7 @@ setting using the closed-loop load generator. The load generator's own
 CPU utilization was recorded each run to detect client-side
 saturation.
 
-Sustained throughput was 68--70\,TPS at 2\,s, rose to
+Sustained throughput was 67.7\,TPS at 2\,s (95\,\% CI [66.3, 69.0]), rose to
 193.0\,TPS at 500\,ms, and then fell to 180\,TPS at
 250\,ms. The 500\,ms setting is therefore the sustained-throughput sweet
 spot, providing an 11.6$\times$ margin over the 16.7\,TPS synthetic
@@ -2886,9 +2890,9 @@ optimum shown in Fig.~\ref{fig:sensitivity}.
 
 The threat model (Section~\ref{sec:threat_model}) specifies a strict \emph{fail-closed} architecture for protected document release during network partitions: if the Fabric peers become unreachable, the evaluated download path denies access rather than falling back to a database ACL. This experiment validates that behavior empirically. Under a steady 50-client ciphertext-download load, all three Fabric peers were stopped at $t = 30$\,s and restarted at $t = 75$\,s, a 45-second total Fabric peer outage. Fig.~\ref{fig:failclosed} shows the per-second timeline.
 
-Successful downloads dropped to exactly zero requests per second for the entire outage window; peers were restarted at $t = 75$\,s, with the first successful download at $t = 95$\,s --- an approximately 20-second recovery lag whose dominant component is the access-path circuit breaker (resilience4j, 30\,s open-state window with automatic half-open transition) completing its open interval before probe calls readmit Fabric, with gRPC reconnection contributing the remainder.
+Successful downloads dropped to exactly zero requests per second for the entire outage window; peers were restarted at $t = 75$\,s, with the first successful download at $t = 95$\,s, an approximately 20-second recovery lag whose dominant component is the access-path circuit breaker (resilience4j, 30\,s open-state window with automatic half-open transition) completing its open interval before probe calls readmit Fabric, with gRPC reconnection contributing the remainder.
 
-During the outage, the service sustained 25--45 HTTP~503 fail-closed denials per second, securely blocking all tested download requests (1,340 denial responses and 2,013 \mbox{PostgreSQL} audit rows; the difference reflects additional system-level audit events recorded per denial beyond the HTTP response itself). \texttt{FABRIC\_OUTAGE\_ACCESS\_DENIED} audit rows were written to the operational \mbox{PostgreSQL} log capturing the gRPC failure reason. On peer restart, normal Fabric evaluation resumed cleanly with no manual intervention.
+During the outage, the service issued HTTP~503 fail-closed denials at approximately 30 per second on average (peaking at 44), securely blocking all tested download requests (1,340 denial responses and 2,013 \mbox{PostgreSQL} audit rows; the difference reflects additional system-level audit events recorded per denial beyond the HTTP response itself). \texttt{FABRIC\_OUTAGE\_ACCESS\_DENIED} audit rows were written to the operational \mbox{PostgreSQL} log capturing the gRPC failure reason. On peer restart, normal Fabric evaluation resumed cleanly with no manual intervention.
 
 This result substantiates the fail-closed behavior for the evaluated document-download path: a peer outage degrades to a secure denial state, prioritizing confidentiality over availability. A malicious DB administrator who deliberately induces an outage cannot force a fallback to the database ACL to bypass chaincode authorization on this path.
 
@@ -2937,7 +2941,7 @@ document. Most importantly for availability governance: with a document
 pinned on two of three nodes, stopping one replica produced no
 measurable retrieval penalty (P50 206\,ms vs.\ 204\,ms baseline, 10/10
 served), stopping all replicas produced clean timeouts with zero bytes
-served, and service resumed without manual repair after restart --- the
+served, and service resumed without manual repair after restart: the
 storage-tier counterpart of Experiment~\hyperref[sec:exp_failclosed]{9}'s
 fail-closed result on the ledger tier.
 
@@ -2967,18 +2971,18 @@ in-flight transactions for the two release-path functions
 (Fig.~\ref{fig:caliper}).
 
 \texttt{CheckAccess} (evaluate, read path) reaches 875\,TPS at
-load~600 with a flat 20\,ms average latency and zero failures ---
+load~600 with a flat 20\,ms average latency and zero failures,
 confirming that the ledger-side access decision is not the release-path
 bottleneck. The 20\,ms Caliper average and Experiment~%
 \hyperref[sec:exp_latency]{2}'s 6.51\,ms P50 measure different regimes
---- 600 concurrent in-flight transactions on the direct peer-gateway
-path versus a single sequential client through the REST gateway --- and
+(600 concurrent in-flight transactions on the direct peer-gateway
+path versus a single sequential client through the REST gateway) and
 are complementary rather than conflicting.
 \texttt{RegisterDocument} (submit, write path) climbs to
 172\,TPS, approaching the $\approx$193\,TPS ordering ceiling of
 Experiment~\hyperref[sec:exp_sensitivity]{8}, with write latency pinned
-at 1.7--2.0\,s by the 2\,s \texttt{BatchTimeout} at every load --- an
-independent, standard-instrument corroboration of the custom
+at 1.7--2.0\,s by the 2\,s \texttt{BatchTimeout} at every load, an
+independent standard-instrument corroboration of the custom
 generator's saturation analysis. At loads $\geq$500 the peer gateway's
 default admission control (\texttt{peer.limits.concurrency.gatewayService}=500)
 rejects excess in-flight submissions cleanly (3.7\,\% at load~500,
@@ -3022,8 +3026,8 @@ increase), consistent with Experiment~\hyperref[sec:exp_latency]{2}'s
 linearly at $\approx$5{,}618 bytes of block store plus 1{,}389 bytes of
 CouchDB state per document per peer ($\approx$7\,KB/document; the
 $10^6$ measurement lands within 0.1\,\% of the linear extrapolation
-from $10^5$), i.e., one million documents occupy roughly 7\,GB per peer
---- commodity-hardware territory for a realistic legal archive.
+from $10^5$), i.e., one million documents occupy roughly 7\,GB per peer,
+commodity-hardware territory for a realistic legal archive.
 
 \begin{figure*}[!t]
     \centering
@@ -3053,8 +3057,8 @@ Write throughput is ordering-dominated, not size-dominated: under
 single-organization endorsement it declines only 5.5\,\% from 2 to 7
 organizations (43.3 to 40.9\,TPS) with write latency pinned near the
 2\,s batch window throughout. The majority-endorsement premium grows
-gently with consortium size --- $-0.9$\,\% at 2 organizations,
-$-5.4$\,\% at 5, and $-12.7$\,\% at 7 (35.7\,TPS) --- reflecting
+gently with consortium size ($-0.9$\,\% at 2 organizations,
+$-5.4$\,\% at 5, and $-12.7$\,\% at 7, i.e., 35.7\,TPS), reflecting
 parallel endorsement collection that tracks the slowest endorser rather
 than the sum. Doubling peers per organization costs 3.3\,\%. Read-path
 \texttt{CheckAccess} latency is size-independent (3.9--5.5\,ms P50 at
@@ -3129,7 +3133,7 @@ ledger anchoring), which the released analysis documents in detail.}
 \end{figure*}
 
 % -----------------------------------------------------------------
-\subsection{Consolidated Evidence and Positioning Against Reported Numbers}
+\subsection{Experiment~15: Consolidated Evidence and Positioning Against Reported Numbers}
 \label{sec:exp_consolidated}
 % -----------------------------------------------------------------
 
@@ -3149,9 +3153,9 @@ Fig.~\ref{fig:crypto}); the prose uses the run-summary convention
 consistently throughout.}
 Two intervals carry the paper's central claims. First, the
 function-level ACL comparison of Experiment~\hyperref[sec:exp_latency]{2}
-yields \emph{overlapping} intervals --- Fabric \texttt{CheckAccess}
-6.51\,ms [6.33, 7.22] vs.\ PostgreSQL 7.16\,ms [6.60, 7.81]
-($n{=}100$ each) --- so the ``no statistically significant added
+yields \emph{overlapping} intervals (Fabric \texttt{CheckAccess}
+6.51\,ms [6.33, 7.22] vs.\ PostgreSQL 7.16\,ms [6.60, 7.81],
+$n{=}100$ each), so the ``no statistically significant added
 delay'' claim is interval-supported rather than merely asserted. Second,
 Experiment~\hyperref[sec:exp_baseline]{14}'s end-to-end premium is
 significant but small: 21.62\,ms [21.39, 21.84] vs.\ 15.09\,ms
@@ -3163,8 +3167,8 @@ Table~\ref{tab:numbers_comparison} positions the measured numbers
 against the figures reported by the closest published systems. The
 numbers are \emph{not} hardware-normalized: each row
 reports the system's own published values on its own testbed, so
-order-of-magnitude positioning and measurement coverage --- not a
-throughput race --- are the comparison targets. Where prior systems
+order-of-magnitude positioning and measurement coverage, not a
+throughput race, are the comparison targets. Where prior systems
 used Caliper, the instrument-matched row is Experiment~%
 \hyperref[sec:exp_caliper]{11}.
 
@@ -3200,19 +3204,19 @@ createDC 25.0\,TPS, delegateDC 24.2\,TPS peaks &
 4-core, 8\,GB \\
 Liu and Zheng~\cite{liu2024blockchain} &
 FISCO BCOS + IPFS; java-sdk bench &
---- (send/confirm times tabulated) &
+not reported (send/confirm times tabulated) &
 peak 247\,TPS &
 2-core, 4\,GB \\
 Peelam et al.~\cite{peelam2026decentralized} &
 Private Ethereum (PoS) + IPFS + fog; custom simulation &
---- &
+not reported &
 transaction delays avg 24.5\,s ($\pm$3.6--52.7\,s at 95\,\%) &
 Core i5 (8 GB) and i9 (32 GB) hosts \\
 \midrule
 This work (gateway path) &
 Fabric 2.4 + IPFS, 3 orgs; custom REST loadgen &
 \texttt{CheckAccess} 6.51\,ms P50 [6.33, 7.22], $n{=}100$ &
-66--69\,TPS @2\,s batch; 193.0\,TPS [182.8, 203.2] @500\,ms batch &
+66--70\,TPS @2\,s batch; 193.0\,TPS [182.8, 203.2] @500\,ms batch &
 Core Ultra 5, 8\,GB \\
 This work (chaincode direct) &
 same network; \textbf{Caliper 0.6} &
@@ -3569,8 +3573,8 @@ input, as measured in Experiment~\hyperref[sec:exp_crypto]{6}.
 
 \textbf{RQ3} asked whether the framework sustains throughput sufficient for
 realistic legal workload peaks. The measured REST-gateway Fabric deployment
-sustains approximately 68--70\,TPS across 50--600 concurrent clients, about
-4.2$\times$ above the estimated 16.7\,TPS workload for a 1,000-user
+sustains approximately 66--70\,TPS under concurrent load up to 600 clients, about
+4$\times$ above the estimated 16.7\,TPS workload for a 1,000-user
 organization issuing one document action per minute per user. Reducing
 \texttt{BatchTimeout} to 500\,ms produced the highest measured throughput,
 193.0\,TPS, under the evaluated three-organization deployment, an
@@ -3579,7 +3583,7 @@ organization issuing one document action per minute per user. Reducing
 Experiment~\hyperref[sec:exp_failclosed]{9} confirms strict fail-closed
 enforcement on the document-download path. Successful downloads fell to
 exactly zero for the full 45-second Fabric unavailability window, while
-HTTP~503 denials continued at 25--45 per second. Every denied attempt was
+HTTP~503 denials continued at approximately 30 per second on average. Every denied attempt was
 recorded in the operational \mbox{PostgreSQL} audit log, consistent with the
 outage-anchoring limitation noted under RQ1.
 
@@ -3858,11 +3862,17 @@ This work was supported by the Institute for Advanced Research Publication
 Grant of United International University, under Grant IAR 2025 Pub 093.
 
 \section*{Data availability}
-%% TODO (author decision pending): TWO DRAFTED VARIANTS BELOW — exactly one
+%% TODO (author decision pending): THREE DRAFTED VARIANTS BELOW -- exactly one
 %% must remain at submission. Variant B2 (archival DOI) is recommended by
 %% the journal's data policy; B1 works if the repository stays public.
 %%
-%% ---- Variant B1 (GitHub as-is) — currently ACTIVE: ----
+%% WARNING (system-name leak): the linked repository's directories are named
+%% "pangochain-*" and its docs use the system name "PangoChain" throughout.
+%% Linking it as-is leaks a name the manuscript deliberately never uses.
+%% Before submission either (a) mirror/rename the repo (and its pangochain-*
+%% paths) under a neutral name, then keep B1/B2, or (b) activate Variant B3.
+%%
+%% ---- Variant B1 (GitHub as-is) -- currently ACTIVE: ----
 The raw measurement data for all fifteen experiments (per-sample CSVs
 with per-run environment records), the load generators, topology
 generators, and analysis and plotting scripts that produce every figure
@@ -3872,7 +3882,7 @@ reconciliation log, are openly available in the project repository at
 (directories \texttt{results/} and \texttt{experiments/}, branch
 \texttt{prototype-fixes}).
 %%
-%% ---- Variant B2 (archival DOI) — SWAP IN once a release is deposited: ----
+%% ---- Variant B2 (archival DOI) -- SWAP IN once a release is deposited: ----
 %% The raw measurement data for all fifteen experiments (per-sample CSVs
 %% with per-run environment records), the load generators, topology
 %% generators, and analysis and plotting scripts that produce every
@@ -3880,6 +3890,11 @@ reconciliation log, are openly available in the project repository at
 %% \url{https://doi.org/10.5281/zenodo.XXXXXXX} (Zenodo snapshot of the
 %% project repository), with the development history at
 %% \url{https://github.com/meteorboyF/Fardeen_Codex_Dhaka_Meetup_Hackathon}.
+%%
+%% ---- Variant B3 (no public link; avoids the name leak entirely): ----
+%% The raw measurement data, load generators, and analysis scripts that
+%% produce every figure and table in this paper are available from the
+%% corresponding author on reasonable request.
 
 \section*{Declaration of generative AI and AI-assisted technologies in the
 manuscript preparation process}
