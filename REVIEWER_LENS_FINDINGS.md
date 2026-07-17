@@ -10,6 +10,8 @@ V1–V3 (commit 0caac55); then C1, R1, R2, R3 (H1–H3 are their hedging
 faces), N2 (fork/join rehomed to prototype scope), N4, H5, the two
 preemptive sentences from section H (#4 generator co-location, #5
 gateway-vs-Caliper reconciliation), and batches A–F = N1, N6, W7 |
+[N1 subsequently REVERTED by author decision 2026-07-17 — role-hierarchy
+figure restored] |
 W6, C3, R6 | W2, W3 | W1, W8, D1, R4, R5, H4, H6 | D2, D3, R7 |
 C2, R8, W4, W5, H7 — plus the tech-stack custodial sentence (R2's
 last site). Full before/after record: `REVIEWER_LENS_CHANGES.md`.

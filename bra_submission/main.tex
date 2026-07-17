@@ -194,7 +194,8 @@ systems centralize trust in a privileged database or application
 administrator. That administrator, or an attacker who compromises their
 credentials, may be able to read restricted documents, alter access-control
 tables, modify audit logs, or erase evidence of having done so~\cite{nistir8202}.
-A system may still encode a detailed role hierarchy. The central question is not whether such a
+A system may still encode a detailed role hierarchy, as illustrated in
+Fig.~\ref{fig:rbac_hierarchy}. The central question is not whether such a
 hierarchy can be represented in software, but whether its enforcement
 decisions and audit records can be verified by parties other than the
 administrator who recorded them.
@@ -370,6 +371,17 @@ experiments. Section~\ref{sec:limitations} discusses limitations and
 regulatory considerations. Section~\ref{sec:discussion} discusses the
 research-question findings and interprets the experimental results.
 Section~\ref{sec:conclusion} concludes the paper.
+
+% Fig 1 - role hierarchy: single-column is appropriate (simple org-chart)
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{Hierarchy.pdf}
+\caption{Role hierarchy enforced by the proposed framework, from
+managing partners with full case visibility to paralegals
+restricted to assigned documents only.}
+\label{fig:rbac_hierarchy}
+\end{figure}
+\FloatBarrier
 
 
 % =========================================================================

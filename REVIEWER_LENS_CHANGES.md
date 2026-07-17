@@ -24,7 +24,8 @@ Net effect of wave 2: 108 → 103 pages, overfull 26 → 23,
 
 - **N1**: Fig. "Hierarchy.pdf" role-hierarchy org chart + its intro
   reference clause ("as illustrated in Fig.~X") — referenced once,
-  generic content.
+  generic content. **REVERTED by author decision 2026-07-17**: figure
+  and reference clause restored verbatim; page count unaffected (103).
 - **N2**: subsection "Demonstration of Core System Workflows" (3
   sequence/activity figures + prose, ~57 lines; all flows already
   diagrammed in Section 3). Rehomed its one non-duplicated fact into
