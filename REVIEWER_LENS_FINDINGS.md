@@ -5,9 +5,20 @@ at 759ee40 (post F1–F10 coherence audit, post R1–R8 draft-history
 sweep). Reads the paper as a first-time peer reviewer: does it earn
 each claim and page? Line numbers refer to main.tex at 759ee40.
 
-**Status: V1, V2, V3 approved and applied 2026-07-17. All other IDs
-awaiting author selection.** Review-then-fix gate: author selects IDs;
-judgment-call rewrites get before/after diffs before commit.
+**Status: RESOLVED 2026-07-17.** Applied across two waves (author-ruled):
+V1–V3 (commit 0caac55); then C1, R1, R2, R3 (H1–H3 are their hedging
+faces), N2 (fork/join rehomed to prototype scope), N4, H5, the two
+preemptive sentences from section H (#4 generator co-location, #5
+gateway-vs-Caliper reconciliation), and batches A–F = N1, N6, W7 |
+W6, C3, R6 | W2, W3 | W1, W8, D1, R4, R5, H4, H6 | D2, D3, R7 |
+C2, R8, W4, W5, H7 — plus the tech-stack custodial sentence (R2's
+last site). Full before/after record: `REVIEWER_LENS_CHANGES.md`.
+
+**Remaining open (never ruled, low stakes):** N3 (compress UI
+showcase), N5 (merge key-lifecycle figures 1–4), and synthesis #6's
+optional "cross-organization" qualifier in the abstract.
+Line numbers in the tables below refer to 759ee40 (pre-fix).
+Overfull baseline after this pass: 23 (was 26); pages: 103 (was 108).
 
 ## A. Factual / mechanical catches
 

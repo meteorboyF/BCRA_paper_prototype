@@ -183,9 +183,8 @@ Recent sector evidence motivates this security concern. A 2024 NetDocuments
 report found that more than half of identified data breaches at UK legal firms
 were caused by insiders~\cite{ico2024trends}. The American Bar
 Association's 2023 Legal Technology Survey also found that 29\% of respondents
-answered yes to a security-breach question~\cite{aba2023}. These figures do
-not prove that audit logs were altered. They do, however, motivate the
-structural concern addressed here: NIST IR~8202~\cite{nistir8202} identifies
+answered yes to a security-breach question~\cite{aba2023}. These figures
+motivate the structural concern addressed here: NIST IR~8202~\cite{nistir8202} identifies
 administrator control as a risk in permissioned systems, while NIST SP~800-92
 \cite{nist800092} and NIST SP~800-53 AU-9 \cite{nist80053} emphasize protecting
 audit logs against unauthorized modification.
@@ -195,8 +194,7 @@ systems centralize trust in a privileged database or application
 administrator. That administrator, or an attacker who compromises their
 credentials, may be able to read restricted documents, alter access-control
 tables, modify audit logs, or erase evidence of having done so~\cite{nistir8202}.
-A system may still encode a detailed role hierarchy, as illustrated in
-Fig.~\ref{fig:rbac_hierarchy}. The central question is not whether such a
+A system may still encode a detailed role hierarchy. The central question is not whether such a
 hierarchy can be represented in software, but whether its enforcement
 decisions and audit records can be verified by parties other than the
 administrator who recorded them.
@@ -247,9 +245,9 @@ request is evaluated (cross-organization access; see
 Section~\ref{sec:limitations} for intra-organization scope). When Fabric is
 unavailable, the evaluated document-download path returns HTTP~503 and does
 not fall back to a database ACL. Other Fabric-gateway paths follow the same
-fail-closed pattern by design but were not independently outage-tested. This
-prevents new document releases through the evaluated path during the tested
-Fabric outage.
+fail-closed pattern by design but were not independently outage-tested.
+During Fabric unavailability, no new documents are released through
+this path.
 
 Encrypted document payloads are stored off-chain in a private two-node
 InterPlanetary File System (IPFS) swarm~\cite{benet2014ipfs}. SHA-256 hashes
@@ -373,16 +371,6 @@ regulatory considerations. Section~\ref{sec:discussion} discusses the
 research-question findings and interprets the experimental results.
 Section~\ref{sec:conclusion} concludes the paper.
 
-% Fig 1 - role hierarchy: single-column is appropriate (simple org-chart)
-\begin{figure}[H]
-\centering
-\includegraphics[width=\linewidth]{Hierarchy.pdf}
-\caption{Role hierarchy enforced by the proposed framework, from
-managing partners with full case visibility to paralegals
-restricted to assigned documents only.}
-\label{fig:rbac_hierarchy}
-\end{figure}
-\FloatBarrier
 
 % =========================================================================
 % SECTION II - LITERATURE REVIEW
@@ -394,7 +382,7 @@ restricted to assigned documents only.}
 \label{sec:literature_review}
 
 Blockchain applications in data management have expanded rapidly, evolving from integrity-preservation prototypes to systems that also address provenance, access control, and compliance
-workflows~\cite{jaoude2019blockchain,casino2019systematic}. Two recent systematic reviews frame the specific problem addressed in this paper. Alkhatib \cite{alkhatib2022towards} reviewed blockchain-based identity and access management systems and found that independently verifiable audit trails and insider-aware access control remain open deployment challenges: many systems record access events after they occur, but still rely on a centralized application server or institutional database to decide whether an access request should be allowed. Precht et al.~\cite{paperlessEverything2025} similarly identify the absence of production-grade access-control enforcement in document management prototypes as a barrier to adoption. These reviews do not
+workflows~\cite{jaoude2019blockchain,casino2019systematic}. Two recent systematic reviews frame the specific problem addressed in this paper. Alkhatib \cite{alkhatib2022towards} reviewed blockchain-based identity and access management systems and found that independently verifiable audit trails and insider-aware access control remain open deployment challenges. Many systems record access events after they occur but still rely on a centralized application server or institutional database to decide whether an access request should be allowed. Precht et al.~\cite{paperlessEverything2025} similarly identify the absence of production-grade access-control enforcement in document management prototypes as a barrier to adoption. These reviews do not
 imply that prior systems lack all access control; rather, they show
 that the enforcement boundary often remains outside the ledger, so an
 auditor must still trust the system that made the decision.
@@ -959,9 +947,9 @@ for document key wrapping and an ECDSA~P-256 keypair ($sk_{sign}$,
 $pk_{sign}$) for document signing (Section~\ref{sec:crypto}). The
 two keypairs are intentionally distinct so that a key used for
 encryption is never used for signing, following key-separation
-practice~\cite{nist800131a}. In the measured prototype, Fabric transaction submission is performed
-through server-managed MSP credentials rather than per-user Fabric
-certificates; per-user X.509 enrollment is the production path.
+practice~\cite{nist800131a}. In the measured prototype, Fabric
+transaction submission uses server-managed MSP credentials
+(custodial-identity caveat, Section~\ref{sec:prototype_scope}).
 
 % Fig 2 - complex multi-swimlane diagram: two-column
 \begin{figure*}[!t]
@@ -997,9 +985,8 @@ attempt to swap the IPFS ciphertext invalidates the signature.
 After IPFS returns the CID, the server invokes the \texttt{RegisterDocument}
 chaincode with $\mathcal{H}_D$, the CID, metadata, and $\sigma$. The
 prototype signature does not bind upload timestamp or owner metadata;
-that binding is a production hardening item~\cite{fips1865}. Fabric
-transaction-level non-repudiation also remains custodial because the
-prototype submits transactions through server-managed MSP credentials
+that binding is a production hardening item~\cite{fips1865}.
+Transaction-level attribution remains custodial
 (Section~\ref{sec:prototype_scope}).
 
 
@@ -1021,14 +1008,13 @@ from ledger storage. The client unwraps $k_{enc}$ using $sk_{ecies}$ and
 decrypts locally.
 
 On the evaluated document-download path, Fabric unavailability causes
-HTTP~503 denial and no database ACL fallback. Other Fabric-gateway paths
-follow the same fail-closed pattern by design but were not independently
-outage-tested. The service records a \texttt{FABRIC\_OUTAGE\_ACCESS\_DENIED}
+HTTP~503 denial and no database ACL fallback. The service records a \texttt{FABRIC\_OUTAGE\_ACCESS\_DENIED}
 event in the operational \mbox{PostgreSQL} audit log. Because Fabric is unavailable at the time of denial, these outage events are not
 synchronously committed to the ledger and therefore inherit
 operational-log trust limits rather than ledger-verifiability guarantees.
-This prevents new document releases during the tested Fabric outage and
-prevents bypass of the chaincode authority~\cite{RBACSandhu,androulaki2018hyperledger}.
+During Fabric unavailability, no new documents are released through
+this path, and the chaincode authority cannot be
+bypassed~\cite{RBACSandhu,androulaki2018hyperledger}.
 
 
 \begin{figure*}[!tbp]
@@ -1090,10 +1076,10 @@ Scheme (ECIES) over P-256 distributes document keys to
 authorized recipients. Digital signatures (ECDSA~P-256) bind each
 document action to the acting user's identity. Fabric MSP
 infrastructure uses ECDSA~P-256 for transaction signing
-independently~\cite{fabricMSP,fips1865}. In the measured prototype, user-level document signatures and Fabric
-transaction identity should therefore be interpreted separately because
-Fabric transactions are submitted through server-managed MSP
-credentials.
+independently~\cite{fabricMSP,fips1865}. In the measured prototype,
+user-level document signatures and Fabric transaction identity are
+therefore distinct (custodial-identity caveat,
+Section~\ref{sec:prototype_scope}).
 
 \subsubsection{Notation}
 
@@ -1182,7 +1168,7 @@ The registration workflow uses a sign-then-store ordering. Before the IPFS uploa
 
 Signing $\mathcal{H}_C$ still commits the user to the exact IPFS storage payload, including the prepended IV from which the CID is derived. An attacker therefore cannot swap the stored ciphertext later without invalidating the signature. The resulting construction binds both plaintext and ciphertext hashes, which is stronger than signing only plaintext while preserving the non-repudiation property of plaintext signing~\cite{fips1865,ieee1363a2004}.
 
-The prototype relies on standard assumptions for ECIES-style wrapping, AES-GCM encryption, and ECDSA signatures, but it does not claim a new formal reduction for their exact WebCrypto composition. ECIES protects $k_{enc}$ in transit~\cite{ieee1363a2004}; AES-GCM protects document content at rest~\cite{fips197}; and ECDSA provides the user-key binding~\cite{fips1865}.
+ECIES protects $k_{enc}$ in transit~\cite{ieee1363a2004}; AES-GCM protects document content at rest~\cite{fips197}; and ECDSA provides the user-key binding~\cite{fips1865}.
 
 \begin{algorithm}[H]
 \caption{Document Registration (Sign-Then-Store Pattern)}
@@ -1329,12 +1315,10 @@ served the existing ciphertext under the original $k_{enc}$ during this
 window. This limitation is disclosed in Table~\ref{tab:framework_vs_prototype}
 and motivates the proxy re-encryption production path.
 
-Two prototype limitations remain. First, Fabric MSP wallets are managed
-under a shared administrative identity rather than per-user X.509
-certificates; the production path is per-user HSM-backed enrollment~\cite{fabricCADoc,fips1403}.
-Second, ECDSA signing keys are held in \texttt{localStorage} under PBKDF2
-protection; the production path is WebAuthn/FIDO2 hardware-backed key
-storage~\cite{nist800634,w3cWebAuthnL3}.
+The two residual key-custody limitations --- server-managed MSP
+wallets and \texttt{localStorage}-held signing keys --- are cataloged
+with their production paths in
+Table~\ref{tab:framework_vs_prototype}~\cite{fabricCADoc,fips1403,nist800634,w3cWebAuthnL3}.
 
 \begin{figure}[!t]
     \centering
@@ -1396,7 +1380,9 @@ organization-level grants are stored under a prefixed key
 (\texttt{ACL["ORG:"+userOrg]}). Both per-user and organization-level
 grants support time-bounded expiry evaluated at query time. The owner
 organization retains implicit read access via the \texttt{doc.OwnerOrg ==
-userOrg} fallback. To prevent Multi-Version Concurrency Control (MVCC) conflicts and ledger bloat under high concurrent read loads, the chaincode dynamically evaluates expiry but does not attempt a state write-back during the read path. To maintain strict audit fidelity in the CouchDB world state without introducing read-path latency, the system design relies on a dedicated, asynchronous administrative chaincode invocation (\texttt{CleanExpiredTokens}) executed periodically as a background cron-job to formally deprecate expired tokens.  Listing~\ref{lst:checkaccess} shows the chaincode implementation. Token deprecation therefore follows an \emph{eventual consistency} model: expiry is enforced immediately at chaincode evaluation time, but the CouchDB world state reflects \texttt{StatusExpired} only after the next \texttt{CleanExpiredTokens} invocation; a direct world-state query between these two points will show the token as \texttt{StatusActive} despite being denied at runtime.
+userOrg} fallback.
+
+To prevent Multi-Version Concurrency Control (MVCC) conflicts and ledger bloat under high concurrent read loads, the chaincode dynamically evaluates expiry but does not attempt a state write-back during the read path. To maintain strict audit fidelity in the CouchDB world state without introducing read-path latency, the system design relies on a dedicated, asynchronous administrative chaincode invocation (\texttt{CleanExpiredTokens}) executed periodically as a background cron-job to formally deprecate expired tokens.  Listing~\ref{lst:checkaccess} shows the chaincode implementation. Token deprecation therefore follows an \emph{eventual consistency} model: expiry is enforced immediately at chaincode evaluation time, but the CouchDB world state reflects \texttt{StatusExpired} only after the next \texttt{CleanExpiredTokens} invocation; a direct world-state query between these two points will show the token as \texttt{StatusActive} despite being denied at runtime.
 
 % Listing 4 - Go CheckAccess chaincode
 \begin{lstlisting}[language=Go,
@@ -1461,15 +1447,12 @@ func (c *LegalContract) CheckAccess(
 \end{lstlisting}
 
 On the evaluated document-download path, Fabric unavailability causes
-HTTP~503 denial and no database ACL fallback. Other Fabric-gateway paths
-follow the same fail-closed pattern by design but were not independently
-outage-tested. The service immediately logs a
+HTTP~503 denial and no database ACL fallback. The service immediately logs a
 \texttt{FABRIC\_OUTAGE\_ACCESS\_DENIED} audit event containing the
 failure reason and throws a \texttt{ServiceUnavailableException},
-returning HTTP~503 to the caller. This prevents new document releases
-through this path during the tested Fabric outage and prevents a malicious
-actor from using a Fabric disruption to bypass the chaincode authorization
-layer. Listing~\ref{lst:download} (Appendix~\ref{app:listings}) shows the two-layer
+returning HTTP~503 to the caller. During Fabric unavailability, no new
+documents are released through this path, and a malicious actor cannot
+use a Fabric disruption to bypass the chaincode authorization layer. Listing~\ref{lst:download} (Appendix~\ref{app:listings}) shows the two-layer
 enforcement in the download path. If the requester has no firm or MSP binding,
 the service throws \texttt{AccessDeniedException} before invoking the
 Fabric gateway, ensuring the download path is fail-closed
@@ -1589,9 +1572,7 @@ transactions are validated by endorsement policies before being
 ordered and committed. Under normal operation, document access is
 evaluated through the \texttt{CheckAccess} chaincode before protected
 material is released. On the evaluated document-download path, Fabric
-unavailability causes HTTP~503 denial and no database ACL fallback. Other
-Fabric-gateway paths follow the same fail-closed pattern by design but
-were not independently outage-tested.
+unavailability causes HTTP~503 denial and no database ACL fallback.
 
 \subsubsection{Trust Assumptions per Component}
 \label{sec:trust_assumptions}
@@ -1803,46 +1784,6 @@ query-provenance checks where appropriate, and governance sanctions.
 \end{minipage}
 \endgroup
 
-\begin{table}[!t]
-\centering
-\caption{Compact security argument sketch. Residual risks are not eliminated by the prototype.}
-\label{tab:security_claims}
-\renewcommand{\arraystretch}{1.08}
-\setlength{\tabcolsep}{1.8pt}
-\tiny
-\begin{tabularx}{\columnwidth}{|>{\RaggedRight\arraybackslash}p{1.25cm}|>{\RaggedRight\arraybackslash}p{2.55cm}|>{\RaggedRight\arraybackslash}X|}
-\hline
-\textbf{Claim} & \textbf{Argument} & \textbf{Residual risk} \\
-\hline
-Fabric audit history cannot be silently altered by a DB admin &
-Fabric is append-only across endorsing peers; PostgreSQL triggers are only operational support~\cite{androulaki2018hyperledger}. &
-DB superuser can alter off-chain identity data; production path anchors public keys on-chain. \\
-\hline
-IPFS ciphertext cannot be modified undetectably &
-Plaintext hash $\mathcal{H}_D$ is anchored on-chain; altered ciphertext causes client-side verification failure~\cite{benet2014ipfs}. &
-Content availability still needs $\geq$3 pinning nodes or an SLA-backed pinning service. \\
-\hline
-Fabric outage fails closed &
-\texttt{CheckAccess} is on the document-release path; Fabric failure returns HTTP~503 and logs \texttt{FABRIC\_\allowbreak OUTAGE\_\allowbreak ACCESS\_\allowbreak DENIED}. &
-None observed on download path; upload, grant, and revoke paths are fail-closed by design but not independently validated. \\
-\hline
-API compromise remains residual &
-ECDSA binds document commitments to user keys, and Fabric records ledger-mediated events; prototype MSP credentials remain server-managed. &
-Compromised server can abuse custodial MSP credentials; production requires per-user Fabric identities. \\
-\hline
-Browser/XSS compromise remains residual &
-Keys are PBKDF2-protected in \texttt{localStorage}; signing/decryption are intended to occur client-side. &
-Active XSS can capture keys or plaintext; mitigation requires WebAuthn/FIDO2, CSP, and supply-chain controls. \\
-\hline
-2-of-3 Raft orderer collusion remains residual &
-Peers validate blocks independently after ordering~\cite{androulaki2018hyperledger}; governance reduces but does not cryptographically prevent collusion. &
-CFT does not stop Byzantine ordering; SmartBFT is the documented high-threat production path~\cite{fabricWhatsNew3x,fabricBFTConfigurationDoc}. \\
-\hline
-\end{tabularx}
-\end{table}
-
-Table~\ref{tab:security_claims} summarizes the principal security claims, their architectural support, and the residual risks left by the current prototype.
-
 \subsubsection{Security Properties}
 \label{sec:security_properties}
 
@@ -1917,9 +1858,8 @@ induced outage, denial events audited; the analogous storage-tier
 attack (disabling IPFS replicas) degrades availability but never
 substitutes content (Experiment~\hyperref[sec:exp_ipfscost]{10}, P3).
 
-\paragraph{S3: Public-key substitution.} This scenario is promoted
-from the prototype-limitations discussion because it is the sharpest
-residual risk. A database or API adversary violating A5 replaces a
+\paragraph{S3: Public-key substitution.} This is the sharpest
+residual risk in the prototype. A database or API adversary violating A5 replaces a
 legitimate user's \texttt{pk\_ecies} before a grant is formed.
 Subsequent \texttt{GrantAccess} operations wrap the document key
 $k_{enc}$ under the attacker's key, and the ledger commits a
@@ -1932,8 +1872,7 @@ via a \texttt{RegisterIdentity} chaincode function at enrollment, so
 any post-registration substitution is detectable by any consortium
 peer; deferred to future work alongside per-user X.509 enrollment
 (Section~\ref{sec:future_work}). \emph{Traces to:} violation of A5;
-residual-risk rows of Tables~\ref{tab:threat_model}
-and~\ref{tab:security_claims}.
+residual-risk rows of Table~\ref{tab:threat_model}.
 
 \paragraph{S4: Storage-tier content substitution.} A compromised IPFS
 node (or an attacker who obtains swarm access) serves modified
@@ -1987,22 +1926,7 @@ path~\cite{fabricWhatsNew3x,fabricOrderingServiceLatest,fabricBFTConfigurationDo
 prototype uses Fabric~v2.4 Raft; migration to SmartBFT does not
 require changes to chaincode or application logic.
 
-\textbf{SmartBFT migration boundary.} Fabric's BFT configuration
-guide provides operational guidance for BFT orderer deployments~\cite{fabricBFTConfigurationDoc}. Migrating from Raft to BFT requires
-a Fabric v3.0-or-later network, channel capability \texttt{V3\_0} or
-later, and a BFT orderer set sized as $3f+1$ for the desired Byzantine
-fault bound. SmartBFT can reduce throughput because Byzantine
-agreement requires additional consensus messages and a larger minimum
-orderer set than a 3-node Raft cluster. The evaluated
-prototype did not implement or measure SmartBFT, so this paper does
-not project SmartBFT throughput from the Raft measurements. BFT
-ordering is treated as production hardening and future work for
-high-threat deployments requiring protection against Byzantine orderer
-collusion.
-
-\textbf{Cryptographic security properties.} The threat model above
-is a structured operational analysis, not a formal cryptographic
-proof with security games or reduction arguments. The individual
+\textbf{Cryptographic security properties.} The individual
 primitives are used within standard design assumptions: AES-256-GCM
 provides authenticated encryption under nonce-uniqueness assumptions,
 as specified in NIST SP~800-38D~\cite{nist80038d}; ECDSA~P-256
@@ -2010,9 +1934,7 @@ provides digital-signature unforgeability under the elliptic curve
 discrete logarithm assumption, per FIPS~186-5~\cite{fips1865}; and
 the ECIES-style ECDH + KDF + AES-GCM construction follows the
 standard hybrid-encryption pattern for wrapping document keys
-\cite{ieee1363a2004}. The analysis does not claim a new reduction
-for the composed protocol, and a full compositional security proof is
-left as future work.
+\cite{ieee1363a2004}.
 
 \flushbottom
 \subsection{Security Architecture}
@@ -2024,9 +1946,8 @@ framework boundary from the measured prototype boundary. The
 framework design places encryption, signing, and key unwrapping in
 the browser and uses Fabric as the independently verifiable authority
 for ACL and audit state. The measured prototype preserves the main ledger-visible checks and
-enforces strict fail-closed access control, but still includes
-server-managed Fabric MSP credentials and \texttt{localStorage}-based
-signing keys as residual prototype limitations.
+enforces strict fail-closed access control; its residual key-custody
+limitations are cataloged in Section~\ref{sec:prototype_scope}.
 
 \subsubsection{Cryptographic Framework}
 The system employs a three-tier hybrid cryptographic approach. At the
@@ -2062,20 +1983,21 @@ The Raft ordering service is configured as a cluster of three ordering nodes
 operated by distinct, audited consortium members: one node operated by the
 regulator and two nodes operated by separate law-firm organizations. This
 configuration is crash-fault tolerant: with $n=3$, Raft tolerates one crash
-fault ($f=1$) while maintaining consensus progress. This governance claim
+fault ($f=1$) while maintaining consensus progress.
+
+This governance claim
 refers to operational control of the ordering nodes. A production deployment
 should also avoid a single administrative trust point for orderer identity
 issuance, either by using member-controlled orderer MSP/CA administration or
-by placing any shared ordering CA under multi-party consortium control. If a prototype or repository configuration represents the orderers under a shared
-\texttt{OrdererOrg} CA, that should be interpreted as a deployment
-simplification and residual governance limitation rather than as the
-production governance model. In the current prototype, the Regulator organization participates as an ordering node and a passive channel peer; application-layer regulatory audit interfaces, dedicated read-only compliance views, and regulator-specific endorsement
+by placing any shared ordering CA under multi-party consortium control
+(the prototype's shared \texttt{OrdererOrg} CA is a deployment
+simplification; Section~\ref{sec:topology}). In the current prototype, the Regulator organization participates as an ordering node and a passive channel peer; application-layer regulatory audit interfaces, dedicated read-only compliance views, and regulator-specific endorsement
 policies (e.g., \texttt{AND(}\allowbreak\texttt{'LawFirmAMSP.peer',}\allowbreak
-\texttt{'RegulatorMSP.peer')} for high-value asset transfers) are deferred to future work (Section~\ref{sec:regulator_interfaces}). It does not provide Byzantine-fault tolerance and
-does not protect against malicious 2-of-3 orderer collusion. No single institution unilaterally controls transaction ordering under
+\texttt{'RegulatorMSP.peer')} for high-value asset transfers) are deferred to future work (Section~\ref{sec:regulator_interfaces}). No single institution unilaterally controls transaction ordering under
 the stated consortium-governance assumption, provided that both orderer
 operation and orderer-identity administration are governed across consortium
 members.
+
 Every transaction undergoes a multi-stage validation process before
 being committed to the
 ledger~\cite{androulaki2018hyperledger,fabricEndorsementDoc}. For
@@ -2121,7 +2043,10 @@ When Fabric is unreachable, the prototype fails closed. It records a
 \texttt{FABRIC\_OUTAGE\_ACCESS\_DENIED} event, returns HTTP 503, and does
 not bypass the blockchain authorization layer~\cite{RBACSandhu}. The
 prototype implements a 2-node private IPFS swarm with cross-pinning and
-logical deletion~\cite{politou2019metadata,finck2019blockchain}.
+logical deletion~\cite{politou2019metadata,finck2019blockchain}. The
+upload path's parallel IPFS-storage and ledger-anchoring fork/join
+thread model is a framework-design detail not independently validated
+in the experiment campaign.
 
 Fabric transaction-level attribution remains custodial because the
 prototype uses server-managed Fabric MSP credentials. User-level ECDSA
@@ -2284,19 +2209,22 @@ Experiment~\hyperref[sec:exp_crypto]{6} used Node.js WebCrypto as a same-API fal
 automation was unavailable. PBKDF2-SHA256 at 600,000 iterations measured
 100.44\,ms P50 over 10 trials, and ECIES-style P-256 reduced the wrapped-key
 token from 256 bytes under RSA-OAEP~2048 to 125 bytes. The production stack
-uses Java~21. The prototype manages user MSP wallets custodially on the
-server under a shared administrative identity; production deployment would
-shift to per-user X.509 enrollment with non-custodial browser-based
-signing~\cite{fabricSdkNode_wallet,fabricCADoc}.
+uses Java~21.
 
 \subsection{Blockchain Network Topology}
 \label{sec:topology}
 
 The repository contains configuration artifacts for a larger
 six-peer-organization topology: five representing law firms
-(Firm-A to Firm-E) and one representing a regulator, plus a separate ordering organization, as depicted in Fig.~\ref{fig:fabric_topology}. The
-separate \texttt{OrdererOrg} representation is a prototype/repository identity layout. If the orderers are issued under one shared ordering CA, that CA remains a residual administrative trust point unless its administration is
-controlled by multiple consortium members. The production governance model in Section~\ref{sec:consensus} therefore requires member-controlled orderer identity administration or multi-party control over any shared ordering CA. The measured prototype deployment used a shared \texttt{OrdererOrg} CA to issue the three orderer identities across the three-organization configuration described in the evaluation: LawFirmA, LawFirmB, and RegulatorOrg, with three orderers and three peers; this repository-level simplification does not reflect the member-controlled CA governance model in Section~\ref{sec:consensus}, which is the production target. The ordering
+(Firm-A to Firm-E) and one representing a regulator, plus a separate ordering organization, as depicted in Fig.~\ref{fig:fabric_topology}.
+The measured prototype deployment used a shared \texttt{OrdererOrg} CA
+to issue the three orderer identities for the evaluated
+three-organization configuration (LawFirmA, LawFirmB, and RegulatorOrg;
+three orderers, three peers) --- a repository-level simplification. The
+production governance model (Section~\ref{sec:consensus}) instead
+requires member-controlled orderer-identity administration or
+multi-party control of any shared ordering CA, which otherwise remains
+a residual administrative trust point. The ordering
 service is a 3-node EtcdRaft cluster operated by three distinct consortium members (one regulator node and two law-firm nodes), consistent with the governance configuration described in Section~\ref{sec:governance_security}. This configuration is
 crash-fault tolerant under Raft assumptions, tolerating one crash
 fault in a three-node cluster~\cite{hyperledgerFabricOrderingService_v24}.
@@ -2333,79 +2261,15 @@ document hash, CID, and ECDSA signature as a ledger asset);
 \texttt{GrantAccess} and \texttt{RevokeAccess} (manage capability
 tokens with optional expiry in the on-chain ACL map);
 \texttt{CheckAccess} (evaluates the on-chain ACL at query time with
-time-bounded token enforcement; expiry write-back is omitted on the read
-path to prevent MVCC read-write conflict crashes, as documented in
-Listing~\ref{lst:checkaccess});
+time-bounded token enforcement; Listing~\ref{lst:checkaccess});
 \texttt{GetHistoryForKey} (returns the full hash-linked transaction
 history for any document key); and \texttt{CleanExpiredTokens}
-(asynchronous administrative function that formally deprecates expired
-grants in world state, invoked periodically via a background cron-job;
-not required for authorization correctness, since \texttt{CheckAccess}
-evaluates expiry dynamically at query time)~\cite{fabricChaincodeStubDoc}. Expiry
-write-back is not relied on for authorization correctness: expired
-grants are denied based on their \texttt{ExpiresAt} value. Concurrent
+(asynchronous world-state cleanup of expired grants; the
+eventual-consistency model is described in
+Section~\ref{sec:acl})~\cite{fabricChaincodeStubDoc}. Concurrent
 write-back behavior for the same expired grant was not isolated in
 the experiment campaign and is treated as a production hardening
 issue.
-
-\subsection{Demonstration of Core System Workflows}
-\label{sec:workflows_demo}
-
-\subsubsection{Workflow 1: Granting Access Permissions}
-Fig.~\ref{fig:grant_access_seq} shows the access grant sequence.
-The document owner invokes \texttt{GrantAccess} through the frontend;
-the application server relays to the chaincode, which writes the
-time-bounded capability token to the ACL map in world state and emits
-an \texttt{ACCESS\_GRANTED} audit event.
-
-\begin{figure*}[!t]
-    \centering
-    \includegraphics[width=0.82\textwidth]{grant_access_sequence.pdf}
-    \caption{Sequence diagram for granting access permissions. The
-    \texttt{GrantAccess} chaincode writes a time-bounded capability
-    token to the on-chain ACL map, producing a ledger-verifiable record
-    of the delegation.}
-    \label{fig:grant_access_seq}
-\end{figure*}
-
-\subsubsection{Workflow 2: Verifying Access and Retrieving a Document}
-Fig.~\ref{fig:verify_access_seq} illustrates the document retrieval
-sequence. The application server enforces Layer~1 Spring Security
-RBAC~\cite{RBACSandhu}, then invokes \texttt{CheckAccess} chaincode
-(Layer~2). If both layers approve, the server retrieves the IPFS
-ciphertext and returns it with the ECIES-wrapped key token for
-client-side decryption.
-
-\begin{figure*}[!t]
-    \centering
-    \includegraphics[width=0.88\textwidth]{verify_access_sequence.pdf}
-    \caption{Access verification and document retrieval: Layer~1 (RBAC)
-    and Layer~2 (\texttt{CheckAccess}) authorization, followed by
-    ciphertext release on success or HTTP~403 denial on failure. Fail-closed
-    handling of Fabric unavailability is shown separately in
-    Fig.~\ref{fig:failclosed} and Listing~\ref{lst:download}.}
-    \label{fig:verify_access_seq}
-\end{figure*}
-
-\subsubsection{Workflow 3: Activity Flow for Document Upload}
-Fig.~\ref{fig:activity_diagram} presents the upload activity diagram.
-In the framework design, encryption occurs client-side before the
-application server forks two parallel threads: IPFS storage and
-blockchain anchoring. A join node ensures both must complete before
-confirmation is returned. The measured prototype fully implements the client-side encryption boundary;
-the parallel fork/join thread model in this diagram is a framework-design
-detail not independently validated in the experiment campaign.
-
-\begin{figure*}[!t]
-    \centering
-    \includegraphics[width=1.4\columnwidth]{activity_diagram.pdf}
-    \caption{Secure document upload and registration activity diagram.
-    Strict client-side encryption is enforced before IPFS
-    storage and blockchain anchoring proceed. The measured prototype
-    fully implements this confidentiality boundary.}
-    \label{fig:activity_diagram}
-\end{figure*}
-
 
 \subsection{User Interface and Functional Showcase}
 \label{sec:ui}
@@ -2445,8 +2309,8 @@ as supplementary material.
 
 
 Fifteen experiments evaluate RQ1–RQ3. Experiments~1--9 form the core
-campaign; Experiments~10--15 extend it along the axes reviewers of
-permissioned-blockchain systems most often probe: off-chain storage
+campaign; Experiments~10--15 extend it along axes the core campaign
+leaves open: off-chain storage
 cost, standard-instrument comparability, world-state scale, network
 size, an architectural baseline, and consolidated statistics.
 Measurements were collected on
@@ -2476,6 +2340,10 @@ harness targeted the Spring Boot REST gateway with a
 20\,\%\,write\,/\,80\,\%\,read mix. Each data point is the mean of five
 independent runs after a discarded warm-up round, following standard
 Hyperledger Fabric benchmarking practice~\cite{caliper2021,woznica2022}.
+The load generator ran co-located with the network containers on the
+single evaluation host; generator CPU was recorded to detect
+client-side saturation and remained far below it in the sensitivity
+runs (2--14\,\%, Experiment~\hyperref[sec:exp_sensitivity]{8}).
 Table~\ref{tab:hardware} summarizes the configurations.
 
 Direct numerical comparison of the REST-gateway workload with prior
@@ -2536,8 +2404,11 @@ requests and reads as \texttt{GET /wrapped-key}, with a 10\,s per-request
 timeout and five repetitions per concurrency level.
 
 The framework REST gateway with Fabric sustained approximately
-68--70\,TPS across the measured 50--600 client range, remaining
-about 4.1 to $4.2\times$ above the synthetic baseline used as an illustrative capacity-planning assumption~\cite{aba2023,ilta2023} for a 1,000-user firm performing one document action per minute per user and showing zero transaction errors up to 400 clients. Throughput
+68--70\,TPS across the measured 50--600 client range, with zero
+transaction errors up to 400 clients. This is about 4.1 to
+$4.2\times$ above the 16.7\,TPS baseline of RQ3 --- an illustrative
+capacity-planning assumption for a 1,000-user firm performing one
+document action per minute per user~\cite{aba2023,ilta2023}. Throughput
 is invariant with respect to concurrency: as load rises, per-request
 latency grows while committed throughput holds flat, the signature
 of a system gated by the fixed 2\,s Raft batch window rather than by
@@ -2547,10 +2418,6 @@ peaked near 279\,TPS in the stable region. Beyond that point,
 the closed-loop load generator saturates, so the shaded region in
 Fig.~\ref{fig:scalability} is treated as a client-side limit rather
 than a database-server failure.
-
-To evaluate operational viability, we establish a synthetic steady-state
-baseline $1000/60 \approx 16.7$\,TPS. The sustained $\approx$68--70\,TPS
-throughput provides a 4.2$\times$ safety margin over this average.
 
 Three considerations bound this interpretation. First, the experiment used
 the measured 3-organization deployment rather than the larger repository
@@ -2667,16 +2534,11 @@ P99 (ms)    & 15.498 & 13.232 \\
 \end{tabular}
 \end{table}
 
-The 0.65\,ms median difference between the Fabric and
-PostgreSQL-only paths (Table~\ref{tab:exp2dist}) is statistically
-insignificant, as shown above.
-The absolute difference of 0.65\,ms is well within baseline
-HTTP round-trip noise and meets the RQ2 read-overhead threshold
-of 50\,ms with substantial headroom.
+The 0.65\,ms median difference is well within HTTP round-trip noise
+and meets the RQ2 50\,ms read-overhead threshold with substantial
+headroom.
 The write-latency SLO is met in absolute terms (2{,}084\,ms P50
-vs.\ the 5\,s threshold); the incremental overhead of the Fabric path
-over a PostgreSQL-only write was not separately measured, as no such
-bypass path exists in the framework design.
+vs.\ the 5\,s threshold).
 Experiment~\hyperref[sec:exp_scalability]{1} confirms the latency is orderer-dominated rather than
 database-dominated (PostgreSQL operating at $\approx$25\% of its
 write-capacity reference, CPU below 23\%), so the SLO headroom is structurally
@@ -2723,7 +2585,9 @@ with near-linear Kubo chunk hashing. Total server-side P50 ranged from
 \label{sec:exp_audit}
 % -----------------------------------------------------------------
 
-This experiment quantifies operational audit-query latency for PostgreSQL and CSV-based verification over 1,000 events, and compares those results with the Fabric \texttt{GetHistoryForKey} measurement from Experiment~\hyperref[sec:exp_gethistory]{7} at a 107-entry document history. These paths provide different trust guarantees and are not identical workloads: PostgreSQL is the low-latency operational index, CSV+SHA-256 is a manual verification baseline, and Fabric provides ledger-verifiable history. A PostgreSQL \texttt{audit\_log} table was seeded with 1,000 real Fabric-anchored events. Automated query time was measured via \texttt{GET /api/audit?size=1000} over five runs. Manual verification time was the wall-clock cost of a Python script that fetches the CSV export and recomputes the SHA-256 digest of each of the 1,000 exported records and cross-checks them against the on-chain validation anchors: a computational lower bound, since operational manual audit additionally requires human download, inspection, and cross-referencing.
+This experiment quantifies operational audit-query latency for PostgreSQL and CSV-based verification over 1,000 events, and compares those results with the Fabric \texttt{GetHistoryForKey} measurement from Experiment~\hyperref[sec:exp_gethistory]{7} at a 107-entry document history. These paths provide different trust guarantees and are not identical workloads: PostgreSQL is the low-latency operational index, CSV+SHA-256 is a manual verification baseline, and Fabric provides ledger-verifiable history.
+
+A PostgreSQL \texttt{audit\_log} table was seeded with 1,000 real Fabric-anchored events. Automated query time was measured via \texttt{GET /api/audit?size=1000} over five runs. Manual verification time was the wall-clock cost of a Python script that fetches the CSV export and recomputes the SHA-256 digest of each of the 1,000 exported records and cross-checks them against the on-chain validation anchors. This is a computational lower bound, since operational manual audit additionally requires human download, inspection, and cross-referencing.
 
 The automated PostgreSQL query completed in 3.9\,ms median (mean 3.45\,ms; $n{=}10$ trials, conventional median as the average of the 5th and 6th sorted values). Manual script verification took 86.3\,ms,
 22$\times$ slower in raw compute, and orders of magnitude
@@ -2929,7 +2793,7 @@ no secondary index, so latency is expected to grow approximately linearly
 with history depth. Fig.~\ref{fig:gethistory} therefore shows only the
 measured depth: all ten trials at 107 entries with the median and its
 bootstrap 95\,\% confidence interval. As a back-of-envelope linear
-extrapolation (stated in text, deliberately not plotted), 135.5\,ms at
+extrapolation (stated in text, not plotted), 135.5\,ms at
 107 entries implies $\approx$1,266\,ms at 1,000 entries --- suitable for
 background forensic reports, but past the 200\,ms interactive threshold,
 which would be crossed at approximately 158 entries. Multi-depth
@@ -3008,7 +2872,11 @@ optimum shown in Fig.~\ref{fig:sensitivity}.
 \label{sec:exp_failclosed}
 % -----------------------------------------------------------------
 
-The threat model (Section~\ref{sec:threat_model}) specifies a strict \emph{fail-closed} architecture for protected document release during network partitions: if the Fabric peers become unreachable, the evaluated download path denies access rather than falling back to a database ACL. This experiment validates that behavior empirically. Under a steady 50-client ciphertext-download load, all three Fabric peers were stopped at $t = 30$\,s and restarted at $t = 75$\,s, a 45-second total Fabric peer outage. Fig.~\ref{fig:failclosed} shows the per-second timeline. Successful downloads dropped to exactly zero requests per second for the entire outage window; peers were restarted at $t = 75$\,s, with the first successful download at $t = 95$\,s --- an approximately 20-second recovery lag whose dominant component is the access-path circuit breaker (resilience4j, 30\,s open-state window with automatic half-open transition) completing its open interval before probe calls readmit Fabric, with gRPC reconnection contributing the remainder. During the outage, the service sustained 25--45 HTTP~503 fail-closed denials per second, securely blocking all tested download requests (1,340 denial responses and 2,013 \mbox{PostgreSQL} audit rows; the difference reflects additional system-level audit events recorded per denial beyond the HTTP response itself). \texttt{FABRIC\_OUTAGE\_ACCESS\_DENIED} audit rows were written to the operational \mbox{PostgreSQL} log capturing the gRPC failure reason. On peer restart, normal Fabric evaluation resumed cleanly with no manual intervention.
+The threat model (Section~\ref{sec:threat_model}) specifies a strict \emph{fail-closed} architecture for protected document release during network partitions: if the Fabric peers become unreachable, the evaluated download path denies access rather than falling back to a database ACL. This experiment validates that behavior empirically. Under a steady 50-client ciphertext-download load, all three Fabric peers were stopped at $t = 30$\,s and restarted at $t = 75$\,s, a 45-second total Fabric peer outage. Fig.~\ref{fig:failclosed} shows the per-second timeline.
+
+Successful downloads dropped to exactly zero requests per second for the entire outage window; peers were restarted at $t = 75$\,s, with the first successful download at $t = 95$\,s --- an approximately 20-second recovery lag whose dominant component is the access-path circuit breaker (resilience4j, 30\,s open-state window with automatic half-open transition) completing its open interval before probe calls readmit Fabric, with gRPC reconnection contributing the remainder.
+
+During the outage, the service sustained 25--45 HTTP~503 fail-closed denials per second, securely blocking all tested download requests (1,340 denial responses and 2,013 \mbox{PostgreSQL} audit rows; the difference reflects additional system-level audit events recorded per denial beyond the HTTP response itself). \texttt{FABRIC\_OUTAGE\_ACCESS\_DENIED} audit rows were written to the operational \mbox{PostgreSQL} log capturing the gRPC failure reason. On peer restart, normal Fabric evaluation resumed cleanly with no manual intervention.
 
 This result substantiates the fail-closed behavior for the evaluated document-download path: a peer outage degrades to a secure denial state, prioritizing confidentiality over availability. A malicious DB administrator who deliberately induces an outage cannot force a fallback to the database ACL to bypass chaincode authorization on this path.
 
@@ -3089,7 +2957,12 @@ in-flight transactions for the two release-path functions
 \texttt{CheckAccess} (evaluate, read path) reaches 875\,TPS at
 load~600 with a flat 20\,ms average latency and zero failures ---
 confirming that the ledger-side access decision is not the release-path
-bottleneck. \texttt{RegisterDocument} (submit, write path) climbs to
+bottleneck. The 20\,ms Caliper average and Experiment~%
+\hyperref[sec:exp_latency]{2}'s 6.51\,ms P50 measure different regimes
+--- 600 concurrent in-flight transactions on the direct peer-gateway
+path versus a single sequential client through the REST gateway --- and
+are complementary rather than conflicting.
+\texttt{RegisterDocument} (submit, write path) climbs to
 172\,TPS, approaching the $\approx$193\,TPS ordering ceiling of
 Experiment~\hyperref[sec:exp_sensitivity]{8}, with write latency pinned
 at 1.7--2.0\,s by the 2\,s \texttt{BatchTimeout} at every load --- an
@@ -3276,7 +3149,7 @@ decision consistently lands at 4--9\,ms P50.
 
 Table~\ref{tab:numbers_comparison} positions the measured numbers
 against the figures reported by the closest published systems. The
-numbers are deliberately \emph{not} hardware-normalized: each row
+numbers are \emph{not} hardware-normalized: each row
 reports the system's own published values on its own testbed, so
 order-of-magnitude positioning and measurement coverage --- not a
 throughput race --- are the comparison targets. Where prior systems
@@ -3408,18 +3281,13 @@ geographically distributed load.
 
 
 \subsubsection{Crash-Fault Tolerance vs.\ Byzantine Fault Tolerance}
-The 3-node EtcdRaft ordering service provides CFT: it tolerates the
-failure of any single ordering node. CFT does not protect against
-Byzantine orderer behavior. In the proposed legal consortium, this
-risk is mitigated architecturally: all ordering nodes are operated
-by legally bound institutions under audited consortium agreements,
-and Fabric's execute-order-validate pipeline ensures peers
-independently validate every block regardless of orderer
-behavior~\cite{androulaki2018hyperledger}. For deployments requiring
-a stricter Byzantine threat model, Hyperledger Fabric~v3.0
-introduces SmartBFT ordering as a production-hardening path that does
-not change the document-management chaincode semantics, although it
-does require ordering-service and channel-configuration changes~\cite{fabricWhatsNew3x,fabricOrderingServiceLatest,fabricBFTConfigurationDoc}.
+The 3-node EtcdRaft ordering service is crash-fault tolerant only;
+Byzantine orderer behavior is out of scope, as analyzed in
+Section~\ref{sec:out_of_scope}. For deployments requiring a Byzantine
+threat model, SmartBFT ordering (Fabric~v3.0) is the production path:
+migration changes the ordering service and channel configuration but
+not the document-management
+chaincode~\cite{fabricWhatsNew3x,fabricOrderingServiceLatest,fabricBFTConfigurationDoc}.
 
 \subsubsection{Key Management and Browser Dependency}
 Three key management limitations arise. First, key rotation is
@@ -3473,24 +3341,19 @@ AAL2 and AAL3 upgrade without chaincode modification.
 
 \subsubsection{Identity Database Public Key Integrity}
 
-The PostgreSQL identity database stores each user's public keys
-(\texttt{pk\_ecies}, \texttt{pk\_sign}). The audit architecture
-protects the \texttt{audit\_log} table against modification, but the
-identity table is not subject to equivalent cryptographic protection.
-The resulting public-key substitution attack is analyzed as
-Scenario~S3 of the threat model
-(Section~\ref{sec:attack_scenarios}): a database administrator who
-replaces a user's \texttt{pk\_ecies} causes subsequent grants to wrap
-$k_{enc}$ under an attacker key while the ledger commits an apparently
-valid transaction. The production mitigation --- ledger-anchoring key
-registrations via a \texttt{RegisterIdentity} chaincode function so
-any post-registration substitution is detectable by any consortium
-peer --- is deferred to future work alongside full per-user X.509
-enrollment (Section~\ref{sec:future_work}).
+The PostgreSQL identity table binding users to their public keys
+(\texttt{pk\_ecies}, \texttt{pk\_sign}) is not cryptographically
+protected the way the \texttt{audit\_log} table is. The resulting
+public-key substitution attack, its consequences, and the
+ledger-anchored-registration mitigation are analyzed as Scenario~S3
+(Section~\ref{sec:attack_scenarios}); it remains the highest-priority
+hardening item (Section~\ref{sec:future_work}).
 
 \subsubsection{IPFS Retrieval Timeout and Thread Management}
 
-The prototype does not enforce an explicit timeout on IPFS \texttt{GetFile} calls in the document download path. Under normal operation, the Fabric \texttt{CheckAccess} invocation completes before the IPFS retrieval begins. However, if the IPFS swarm experiences a node failure, disk fault, or network partition \emph{after} chaincode authorization succeeds, the Spring Boot HTTP thread handling the request may block indefinitely waiting for the ciphertext. Under sustained load, this could exhaust the application server's thread pool, causing a cascading failure that degrades or disables endpoints unrelated to IPFS. The production mitigation is a circuit-breaker pattern with a hard timeout (e.g., 5\,s) on all IPFS retrieval calls, returning HTTP~504 to the caller and logging an \texttt{IPFS\_RETRIEVAL\_TIMEOUT} audit event. This ensures IPFS unavailability degrades gracefully rather than propagating to a full service outage. Experiment~\hyperref[sec:exp_failclosed]{9} validates fail-closed behavior only for the document download path (\texttt{downloadCiphertext()}); the fail-closed behavior of the upload, grant, revoke, and audit-query paths is asserted by design (all paths invoke the same \texttt{FabricGatewayService} pattern and return \texttt{HTTP~503} on any \texttt{ServiceUnavailableException}) but was not independently validated empirically and is deferred to future work.
+The prototype does not enforce an explicit timeout on IPFS \texttt{GetFile} calls in the document download path. Under normal operation, the Fabric \texttt{CheckAccess} invocation completes before the IPFS retrieval begins. However, if the IPFS swarm experiences a node failure, disk fault, or network partition \emph{after} chaincode authorization succeeds, the Spring Boot HTTP thread handling the request may block indefinitely waiting for the ciphertext. Under sustained load, this could exhaust the application server's thread pool, causing a cascading failure that degrades or disables endpoints unrelated to IPFS. The production mitigation is a circuit-breaker pattern with a hard timeout (e.g., 5\,s) on all IPFS retrieval calls, returning HTTP~504 to the caller and logging an \texttt{IPFS\_RETRIEVAL\_TIMEOUT} audit event. This ensures IPFS unavailability degrades gracefully rather than propagating to a full service outage.
+
+Experiment~\hyperref[sec:exp_failclosed]{9} validates fail-closed behavior only for the document download path (\texttt{downloadCiphertext()}); the fail-closed behavior of the upload, grant, revoke, and audit-query paths is asserted by design (all paths invoke the same \texttt{FabricGatewayService} pattern and return \texttt{HTTP~503} on any \texttt{ServiceUnavailableException}) but was not independently validated empirically and is deferred to future work.
 
 \subsubsection{GDPR and Regulatory Compliance}
 \label{sec:gdpr}
@@ -3501,28 +3364,29 @@ be deleted upon request. Hyperledger Fabric's append-only ledger
 provides tamper-evidence precisely because committed transactions
 cannot be deleted.
 
-The proposed framework partially resolves this tension through design decomposition. Document content is stored off-chain in IPFS and can be unpinned and garbage-collected, effectively erasing the ciphertext from distributed storage~\cite{ipfsDocsQuickstartPin2025,ipfsDocsKuboGarbageCollection}. The on-chain ledger retains SHA-256 hashes, CIDs, timestamps, and MSP
-identity references. Whether these values constitute personal data under GDPR Article~4(1)~\cite{gdpr2016} is context-dependent and legally contested.
-Although hashes and CIDs cannot reconstruct the original document without the ciphertext and key, data-protection analysis often treats
-cryptographic hashes of personal data as \emph{pseudonymised} rather
-than anonymous, especially when linked to persistent institutional or user identities~\cite{finck2019blockchain,politou2019metadata}.
-
-Article~17 compliance is therefore not fully solved by the prototype.
-Off-chain erasure can remove encrypted document payloads from IPFS,
-but append-only on-chain metadata may remain linkable to a person,
-case, or institution depending on the deployment context. Production
+The proposed framework partially resolves this tension through design
+decomposition: document ciphertext is stored off-chain in IPFS and can
+be unpinned and garbage-collected, while the ledger retains only
+SHA-256 hashes, CIDs, timestamps, and MSP identity
+references~\cite{ipfsDocsQuickstartPin2025,ipfsDocsKuboGarbageCollection}.
+Whether those residual values constitute personal data under GDPR
+Article~4(1)~\cite{gdpr2016} is context-dependent and legally
+contested: data-protection analysis often treats cryptographic hashes
+of personal data as \emph{pseudonymised} rather than anonymous,
+especially when linked to persistent institutional or user
+identities~\cite{finck2019blockchain,politou2019metadata}. Article~17
+compliance is therefore not fully solved by the prototype: production
 use in jurisdictions applying GDPR erasure obligations requires a
 deployment-specific legal basis and governance process, together with
 technical hardening such as metadata minimization, narrower channels,
 private data collections, off-chain redaction workflows, or
-redactable-ledger mechanisms where legally required. Cross-jurisdiction data-residency obligations must also be resolved at
-deployment time because the relevant legal exposure depends on where IPFS
-pinning nodes, Fabric peers, and orderers are operated, and on which
-jurisdictions treat on-chain hashes, CIDs, timestamps, or MSP identity
-references as personal or regulated data.
+redactable-ledger mechanisms where legally required.
+Cross-jurisdiction data-residency obligations must likewise be
+resolved at deployment time, since legal exposure depends on where
+IPFS pinning nodes, Fabric peers, and orderers are operated.
 
 Accordingly, the framework treats the ledger as evidentiary rather than dispositive: the consortium agreement, not the chaincode, remains the legal instrument governing access and erasure obligations. If on-chain metadata is treated as personal data in a deployment jurisdiction, full compliance may require a legal determination specific to the consortium or a technical mechanism for selective
-record modification under governance. Redactable-blockchain mechanisms based on chameleon hashes are a possible research direction, but adopting them in Fabric would require modifying the block-hash construction and defining threshold governance for trapdoor use~\cite{ateniese2017redactable,lyons2018integration}. Without such advanced cryptographic deletion methodologies or explicit off-chain zero-knowledge verification patterns, the system may face significant compliance barriers to deployment in strict European jurisdictions handling personally identifiable legal records, a regulatory risk assessment consistent with EDPB guidance on pseudonymization and blockchain data governance~\cite{EDPB2025Pseudonymisation,Finck2020}.
+record modification under governance. Redactable-blockchain mechanisms based on chameleon hashes are a possible research direction, but adopting them in Fabric would require modifying the block-hash construction and defining threshold governance for trapdoor use~\cite{ateniese2017redactable,lyons2018integration}. Without such advanced cryptographic deletion methodologies or explicit off-chain zero-knowledge verification patterns, the system may face significant compliance barriers to deployment in strict European jurisdictions handling personally identifiable legal records; this risk assessment is consistent with EDPB guidance on pseudonymization and blockchain data governance~\cite{EDPB2025Pseudonymisation,Finck2020}.
 
 \subsubsection{Integration with Legacy Legal Systems}
 The prototype operates as a self-contained system. Production
@@ -3625,9 +3489,7 @@ audit-log, and on-path authorization architectures.
 This section interprets the experimental results in relation to the three
 research questions and clarifies the boundaries of the measured prototype.
 The framework combines Hyperledger Fabric, encrypted IPFS storage, and a
-REST-based application gateway. Its central contribution is not a new
-access-control primitive, not a Byzantine-fault-tolerant ordering protocol,
-and not a production-ready legal deployment. Instead, the work evaluates the
+REST-based application gateway. The work evaluates the
 practical effect of moving the document-release authorization boundary from
 application-only trust to ledger-verifiable access-control state on the
 normal release path, with fail-closed behavior empirically confirmed for the
@@ -3637,16 +3499,17 @@ it implements strict client-side encryption and, on the evaluated
 document-download path, a fail-closed security policy during Fabric
 unavailability.
 
-\textbf{RQ1} asked whether a permissioned blockchain architecture can make
-legal-document access decisions and audit events independently verifiable
-while preserving confidentiality during Fabric unavailability. The answer is
-affirmative within the evaluated scope. Access-control \emph{state}, namely
+\textbf{RQ1} asked whether a permissioned blockchain architecture can
+provide ledger-verifiable access-control state to consortium peers
+under normal operation while enforcing a strict fail-closed policy on
+the evaluated document-download path during Fabric unavailability. The
+answer is affirmative, with two boundaries. Access-control \emph{state}, namely
 grants, revocations, and document registrations, is independently
 verifiable by consortium peers. \texttt{CheckAccess} derives each download
 decision from that state at request time, although individual query results
 are not themselves committed as transactions.
 
-This result has two important boundaries. First, ledger transactions remain
+First, ledger transactions remain
 attributable to the prototype's server-managed MSP identity until per-user
 Fabric CA enrollment is implemented (Table~\ref{tab:framework_vs_prototype}).
 Second, per-user \texttt{CheckAccess} enforcement was demonstrated for
@@ -3710,10 +3573,8 @@ outage-anchoring limitation noted under RQ1.
 
 Normal operation resumed automatically after an approximately 20-second
 recovery lag (circuit-breaker open-state completion plus gRPC
-reconnection). The upload, grant, revoke, and audit-query paths enforce the
-same policy by design through the same \texttt{FabricGatewayService} pattern,
-but were not independently validated in the experiment campaign and are
-identified as future empirical work.
+reconnection). The remaining Fabric-gateway paths share the same
+fail-closed design (Section~\ref{sec:limitations}).
 
 The evaluation also shows that the cryptographic layer is not the dominant
 performance cost. Using Node.js WebCrypto as a same-API fallback,
@@ -3764,10 +3625,9 @@ download path; the closest measurement is the 146--156\,ms end-to-end
 retrieval authorization that RBAC-IPFS reports for generic file sharing
 under an emulated 50\,ms wide-area network~\cite{liu2026rbacipfs}, which
 is complementary to, but not directly comparable with, the LAN-scale
-function-level isolation reported here. The negligible read overhead
-measured here (6.51\,ms vs.\ 7.16\,ms P50, a 0.65\,ms difference,
-$n{=}100$) confirms that this architectural choice imposes negligible
-interactive overhead. It also establishes a reproducible baseline
+function-level isolation reported here. The measured read overhead
+(6.51 vs.\ 7.16\,ms P50, $n{=}100$) confirms that this architectural
+choice imposes no practical interactive cost. It also establishes a reproducible baseline
 against which future on-path enforcement designs can be evaluated.
 
 Future work will focus on per-user Fabric CA enrollment, HSM/WebAuthn-backed

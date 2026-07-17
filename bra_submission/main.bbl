@@ -548,12 +548,6 @@ P.~Webb, D.~Syer, J.~Long, S.~Nicoll, R.~Winch, A.~Wilkinson, M.~Halbritter,
   16 documentation: Trigger functions}, accessed: Jan.\ 2026 (2024).
 \newline\urlprefix\url{https://www.postgresql.org/docs/16/plpgsql-trigger.html}
 
-\bibitem{fabricSdkNode_wallet}
-{Hyperledger Fabric Documentation Contributors},
-  \href{https://hyperledger.github.io/fabric-sdk-node/release-2.2/module-fabric-network.Wallets.html}{Wallet},
-  accessed: Dec.\ 26, 2025 (2025).
-\newline\urlprefix\url{https://hyperledger.github.io/fabric-sdk-node/release-2.2/module-fabric-network.Wallets.html}
-
 \bibitem{lajam2021ipfsPrivate}
 O.~Abdullah~Lajam, T.~Ahmed~Helmy, Performance evaluation of {IPFS} in private
   networks, in: Proceedings of the 2021 4th International Conference on Data

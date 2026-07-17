@@ -4,45 +4,45 @@ The top-level auxiliary file: main.aux
 The style file: elsarticle-num.bst
 Database file #1: references.bib
 Warning--empty pages in macaroons2014
-You've used 98 entries,
+You've used 97 entries,
             2952 wiz_defined-function locations,
-            1289 strings with 27617 characters,
-and the built_in function-call counts, 29987 in all, are:
-= -- 3023
-> -- 935
+            1285 strings with 27479 characters,
+and the built_in function-call counts, 29758 in all, are:
+= -- 2999
+> -- 931
 < -- 30
-+ -- 377
-- -- 279
-* -- 2064
-:= -- 4017
-add.period$ -- 153
-call.type$ -- 98
-change.case$ -- 137
++ -- 375
+- -- 278
+* -- 2053
+:= -- 3987
+add.period$ -- 152
+call.type$ -- 97
+change.case$ -- 135
 chr.to.int$ -- 0
-cite$ -- 99
-duplicate$ -- 1033
-empty$ -- 3412
-format.name$ -- 335
-if$ -- 7982
+cite$ -- 98
+duplicate$ -- 1024
+empty$ -- 3381
+format.name$ -- 334
+if$ -- 7917
 int.to.chr$ -- 0
-int.to.str$ -- 98
+int.to.str$ -- 97
 missing$ -- 46
-newline$ -- 395
-num.names$ -- 98
-pop$ -- 713
+newline$ -- 391
+num.names$ -- 97
+pop$ -- 703
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 0
-skip$ -- 2054
+skip$ -- 2039
 stack$ -- 0
-substring$ -- 930
-swap$ -- 384
+substring$ -- 928
+swap$ -- 382
 text.length$ -- 30
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 0
 warning$ -- 1
-while$ -- 167
-width$ -- 100
-write$ -- 996
+while$ -- 166
+width$ -- 99
+write$ -- 987
 (There was 1 warning)
