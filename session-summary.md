@@ -219,3 +219,25 @@ ready pre-proof re-checks. See MANUSCRIPT_TODO.md on bra-submission.
   Exp 14-era 3-org deployment) — `make up && make chaincode` in
   pangochain-fabric for a fresh network if needed.
 - TeX Live docker image (~5 GB) retained for future manuscript compiles.
+
+## Post-campaign: coherence audit F1–F10 resolved (2026-07-17)
+
+- Full-manuscript audit findings recorded in `AUDIT_FINDINGS.md`
+  (bra-submission d5fbf37); author selected: apply F1–F8, skip F9,
+  verify-then-fix F10.
+- Applied on bra-submission @ cd37581 (pushed): F1 median-convention
+  footnote in `sec:exp_consolidated` (author chose footnote over fig6
+  regen); F2 fig1 caption `\hyperref` (was rendering "Experiment 6.8");
+  F3–F5 redundancy trims (author-reviewed diffs before commit); F6
+  LawFirmA/B naming; F7 `legal-channel` (matches backend
+  application.yml + Exp 13 topologies); F8 en dash.
+- **F10 was an audit false positive**: `results/exp1_throughput.csv`
+  at canonical 2000 ms rows shows errors=0 through 400 clients, then
+  3@500 / 22@600 — the audit claimed errors=0 through 600. Existing
+  manuscript claim ("zero errors up to 400 clients") verified correct,
+  no edit. Rule going forward: recompute flagged numeric claims from
+  raw CSVs (DELTAS.md filters) before editing; outcome recorded in
+  AUDIT_FINDINGS.md.
+- Compile checkpoint: 108 pages, zero errors; **overfull baseline is
+  now 26** (F4 trim removed one), was 27 — future checkpoints should
+  expect 26.
