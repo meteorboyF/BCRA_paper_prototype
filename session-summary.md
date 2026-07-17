@@ -286,3 +286,7 @@ ready pre-proof re-checks. See MANUSCRIPT_TODO.md on bra-submission.
 - NEW COMPILE BASELINES: 103 pages (was 108), overfull 23 (was 26).
   Surviving large overfulls (72.5/67.2/67.0pt) are pre-existing texttt
   lines. Dropped cite: fabricSdkNode_wallet (bbl changed).
+
+- Addendum (2026-07-17): N1 REVERTED at author request — role-hierarchy
+  figure (Hierarchy.pdf) + intro reference restored (bra-submission
+  2fc2c01). Baselines unchanged: 103 pages, overfull 23.
