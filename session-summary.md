@@ -290,3 +290,7 @@ ready pre-proof re-checks. See MANUSCRIPT_TODO.md on bra-submission.
 - Addendum (2026-07-17): N1 REVERTED at author request — role-hierarchy
   figure (Hierarchy.pdf) + intro reference restored (bra-submission
   2fc2c01). Baselines unchanged: 103 pages, overfull 23.
+
+- HANDOFF.md added (bra-submission 2cfc938): one-page co-author map of
+  all four editing passes with pointers; also closes the R1-R8
+  documentation gap (previously commit-message-only).
