@@ -241,3 +241,18 @@ ready pre-proof re-checks. See MANUSCRIPT_TODO.md on bra-submission.
 - Compile checkpoint: 108 pages, zero errors; **overfull baseline is
   now 26** (F4 trim removed one), was 27 — future checkpoints should
   expect 26.
+
+## Polish pass: revision-history language stripped (2026-07-17)
+
+- bra-submission @ 759ee40 (pushed): swept all reader-facing prose for
+  edit-history language (R1–R8, author-approved list). fig7 caption
+  rewritten standalone (was describing "earlier versions" and omitted
+  projections); fig5 caption's "supersedes the pre-tuning regime"
+  sentence deleted; the word "regenerated" removed from 8 figure
+  captions + the median-convention footnote; editorial "now" removed in
+  the threat-model table (null-MSP row), Exp 5 WAN prose, Exp 14
+  discussion, and the consolidated section. Judged fine and kept:
+  "formerly authorized user" (S1 semantics), the Exp 14 @Async defect
+  disclosure, Phase-4 "replaced by" (roadmap).
+- Compile: 108 pages, zero errors, overfull 26 (holds at the post-F4
+  baseline).
