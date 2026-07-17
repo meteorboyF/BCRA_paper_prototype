@@ -1697,7 +1697,7 @@ protection from a PostgreSQL superuser. The DB admin cannot directly
 alter Fabric ACL or audit history, and Fabric outages deny access;
 however, replacing \texttt{pk\_ecies} can make later grants wrap
 $k_{enc}$ to an attacker key while the ledger records an apparently
-valid grant. Null firm/MSP now raises \texttt{AccessDeniedException}
+valid grant. A null firm/MSP raises \texttt{AccessDeniedException}
 before the Fabric gateway; no default organization is assumed
 (Listing~\ref{lst:download}). \\
 \hline
@@ -2574,7 +2574,7 @@ trade-off, not an architectural barrier.
     \centering
     \includegraphics[width=0.78\textwidth]{fig1_scalability.pdf}
     \caption{Experiment~1 scalability under concurrent load on
-    Linux~\texttt{x86\_64} (regenerated from released raw data; mean with
+    Linux~\texttt{x86\_64} (computed from the released raw data; mean with
     95\,\% $t$ confidence intervals, $n{=}5$ per point): Fabric
     REST-gateway throughput compared with the PostgreSQL-only baseline
     restricted to its harness-valid region (conc $\leq$ 100); the shaded
@@ -2687,7 +2687,7 @@ grounded, as summarized in Fig.~\ref{fig:latency}.
     \centering
     \includegraphics[width=0.78\textwidth]{fig2_latency.pdf}
 \caption{Experiment~2 function-level latency (P50, log scale; Linux,
-JVM-warmed; regenerated with bootstrap 95\,\% confidence intervals):
+JVM-warmed; bootstrap 95\,\% confidence intervals):
 \texttt{CheckAccess} in both modes ($n{=}100$ each, overlapping CIs),
 \texttt{RegisterDocument} ($n{=}100$), and the Experiment~4 audit
 trust/latency baselines ($n{=}10$ each).}
@@ -2711,7 +2711,7 @@ with near-linear Kubo chunk hashing. Total server-side P50 ranged from
     \centering
     \includegraphics[width=0.78\textwidth]{fig3_filesize.pdf}
    \caption{Experiment~3 file-size independence of ledger latency (Linux,
-   direct Kubo API; regenerated with bootstrap 95\,\% CIs, $n{=}10$ per
+   direct Kubo API; bootstrap 95\,\% CIs, $n{=}10$ per
    size): IPFS upload P50 (10--95\,ms across 1--50\,MB), the constant
    Fabric commit latency (2{,}132\,ms band), and the derived end-to-end
    upload cost (commit $+$ IPFS P50), matching the 2{,}142--2{,}226\,ms
@@ -2746,8 +2746,8 @@ leaves the on-chain Fabric record intact and independently verifiable, as compar
 \begin{figure*}[!tbp]
     \centering
     \includegraphics[width=0.86\textwidth]{fig4_audit.pdf}
-    \caption{Experiment~4 audit verification efficiency (regenerated;
-    P50 with bootstrap 95\,\% CIs, $n{=}10$ each): PostgreSQL indexed
+    \caption{Experiment~4 audit verification efficiency (P50 with
+    bootstrap 95\,\% CIs, $n{=}10$ each): PostgreSQL indexed
     queries, manual CSV\,+\,SHA-256 chain verification, and Fabric
     \texttt{GetHistoryForKey} ledger-verifiable history (depth 107,
     from Experiment~\hyperref[sec:exp_gethistory]{7}).}
@@ -2795,8 +2795,8 @@ Throughput declined to 50.9\,TPS at 50\,ms RTT,
 a 44.8\,\% total reduction from baseline. P50 commit latency grew
 to 2,919\,ms (+778\,ms), 3,132\,ms (+991\,ms), and 3,588\,ms
 (+1,447\,ms), respectively. The larger degradation relative to bridge-only
-delay reflects Raft AppendEntries round-trip latency, now captured by the
-per-container delay.
+delay reflects Raft AppendEntries round-trip latency, which the
+per-container delay injection captures.
 
 At the highest-RTT, most-delayed point, some requests exceeded the 10\,s
 client timeout; reported TPS is therefore successful-commit throughput. Even
@@ -2837,11 +2837,10 @@ bridge plus per-orderer-container \texttt{veth} delay (200 clients,
     \centering
     \includegraphics[width=0.94\textwidth]{fig5_wan.pdf}
     \caption{Experiment~5 WAN resilience (\texttt{tc netem},
-    Linux~\texttt{x86\_64}, 200 clients; regenerated full 8-point sweep,
+    Linux~\texttt{x86\_64}, 200 clients; full 8-point sweep,
     $n{=}5$ per point): (a) throughput (mean, $t$ 95\,\% CI) and
     (b) request latency (P50, bootstrap 95\,\% CI) for bridge-only vs.\
-    bridge\,+\,\texttt{veth} delay injection. Supersedes the earlier
-    0\,ms-only baselines from the pre-tuning measurement regime.}
+    bridge\,+\,\texttt{veth} delay injection.}
     \label{fig:wan}
 \end{figure*}
 % -----------------------------------------------------------------
@@ -2889,7 +2888,7 @@ ledger and network storage per access-grant event.
     \centering
     \includegraphics[width=0.90\textwidth]{fig6_crypto.pdf}
     \caption{Experiment~6 cryptographic primitive benchmark using Node.js
-    WebCrypto fallback (Linux; regenerated, P50 with bootstrap 95\,\% CIs,
+    WebCrypto fallback (Linux; P50 with bootstrap 95\,\% CIs,
     $n{=}10$, log scale): PBKDF2-SHA256, ECDH/ECDSA operations, ECIES and
     RSA-OAEP key wrapping, AES-GCM, and SHA-256, with the wrapped-key
     token-size comparison (ECIES 125\,B vs.\ RSA-OAEP-2048 256\,B)
@@ -2947,12 +2946,11 @@ answer to RQ1~\cite{nistir8202,fabricChaincodeStubDoc}.
     \centering
     \includegraphics[width=0.78\textwidth]{fig7_gethistory.pdf}
     \caption{Experiment~7 Fabric \texttt{GetHistoryForKey} latency at the
-    measured 107-entry history depth (regenerated): all ten individual
-    trials with the median (135.5\,ms) and its bootstrap 95\,\%
-    confidence interval. Only the measured depth is shown; earlier
-    versions displayed linear projections to deeper histories, which are
-    now omitted in favor of measured data. Multi-depth validation is
-    future work.}
+    measured 107-entry history depth: all ten individual trials
+    ($n{=}10$) with the median (135.5\,ms) and its bootstrap 95\,\%
+    confidence interval. Only measured data are shown; no extrapolation
+    to deeper histories is plotted. Multi-depth validation is future
+    work.}
     \label{fig:gethistory}
 \end{figure*}
 
@@ -2998,7 +2996,7 @@ optimum shown in Fig.~\ref{fig:sensitivity}.
     \centering
     \includegraphics[width=\columnwidth]{fig8_sensitivity.pdf}
     \caption{Experiment~8 \texttt{BatchTimeout} sensitivity
-    (Linux~\texttt{x86\_64}, 50 clients; regenerated, $n{=}10$ per
+    (Linux~\texttt{x86\_64}, 50 clients; $n{=}10$ per
     setting, zero-error runs): (a) sustained throughput (mean, $t$
     95\,\% CI) and (b) request latency (P50, bootstrap 95\,\% CI) at
     2\,s, 500\,ms, and 250\,ms, showing the reproducible 500\,ms
@@ -3018,8 +3016,8 @@ This result substantiates the fail-closed behavior for the evaluated document-do
 \begin{figure*}[!t]
     \centering
     \includegraphics[width=0.85\textwidth]{fig9_failclosed_outage.pdf}
-    \caption{Experiment~9 fail-closed Fabric peer outage (regenerated
-    from the released raw data): zero successful downloads during the
+    \caption{Experiment~9 fail-closed Fabric peer outage (computed from
+    the released raw data): zero successful downloads during the
     45\,s outage window; 1{,}340 HTTP~503 denial responses and 2{,}013
     \mbox{PostgreSQL} audit rows (the difference reflects additional
     system-level audit events per denial). Denials visibly persist
@@ -3217,8 +3215,8 @@ and at most 10\,\% throughput at saturation; at 200 clients the
 on-path P95 is actually \emph{below} the baseline's. The end-to-end
 premium independently corroborates Experiment~%
 \hyperref[sec:exp_latency]{2}'s function-level 6.51\,ms figure on a
-different build five weeks later. The baseline's hidden cost is also
-now quantified: its fire-and-forget anchors drained at only 3--8
+different build five weeks later. This experiment also quantifies the
+baseline's hidden cost: its fire-and-forget anchors drained at only 3--8
 transactions per second against 700+ generated per second at gateway
 saturation, so during the benchmark window just 144 of $\approx$24{,}000
 audit anchors reached the ledger and the backlog was lost at process
@@ -3257,11 +3255,11 @@ consolidates 37 headline metrics across all fifteen experiments with
 (10{,}000 resamples) for medians computed from per-sample data, and
 Student-$t$ intervals for means of trial-level
 throughput.\footnote{Medians in the consolidated dataset and in the
-regenerated figure annotations are computed with the
+figure annotations are computed with the
 central-pair-averaging convention (\texttt{statistics.median}) over the
 released per-sample data, whereas P50 values quoted in the prose retain
-the floor-index percentile convention of the original per-experiment
-run summaries. The two conventions can differ marginally (e.g.,
+the floor-index percentile convention of the per-experiment run
+summaries in the released dataset. The two conventions can differ marginally (e.g.,
 100.59 vs.\ 100.44\,ms for the PBKDF2 annotation in
 Fig.~\ref{fig:crypto}); the prose uses the run-summary convention
 consistently throughout.}
@@ -3270,7 +3268,7 @@ function-level ACL comparison of Experiment~\hyperref[sec:exp_latency]{2}
 yields \emph{overlapping} intervals --- Fabric \texttt{CheckAccess}
 6.51\,ms [6.33, 7.22] vs.\ PostgreSQL 7.16\,ms [6.60, 7.81]
 ($n{=}100$ each) --- so the ``no statistically significant added
-delay'' claim is now interval-supported rather than asserted. Second,
+delay'' claim is interval-supported rather than merely asserted. Second,
 Experiment~\hyperref[sec:exp_baseline]{14}'s end-to-end premium is
 significant but small: 21.62\,ms [21.39, 21.84] vs.\ 15.09\,ms
 [14.84, 15.36] at concurrency~10 ($n{=}2{,}000$ each). Across four
