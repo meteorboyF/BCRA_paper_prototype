@@ -2592,8 +2592,7 @@ trade-off, not an architectural barrier.
 
 This experiment isolates per-operation latency for \texttt{CheckAccess}
 (read) and \texttt{RegisterDocument} (write) in Fabric and DB-only modes,
-providing the direct answer to RQ2 and resolving the baseline inconsistency
-cited in prior review.
+providing the direct answer to RQ2.
 
 \texttt{CheckAccess} latency was measured with a Node.js
 \texttt{performance.now()} timer under sequential single-client load. Twenty
@@ -3401,7 +3400,7 @@ channel and placement choices~\cite{hyperledgerFabricOrderingService_v24,woznica
 
 The WAN experiment also does not independently test orderer-node failover,
 multi-peer failure combinations, or recovery during concurrent production-like
-legal workloads. Likewise, the 16.7,TPS workload model is a synthetic
+legal workloads. Likewise, the 16.7\,TPS workload model is a synthetic
 capacity-planning assumption rather than a replay of real legal transaction
 logs. Future empirical work should replay anonymized legal document-management
 transaction logs and test peer failure, orderer failover, and recovery under
@@ -3753,7 +3752,7 @@ Section~\ref{sec:contributions}: a measured relocation of the enforcement
 boundary to ledger-verifiable access-control state, chaincode-enforced
 time-bounded grants and revocation, a dual-store audit design separating
 low-latency operational queries from ledger-verifiable history, and a
-nine-experiment evaluation spanning throughput to fail-closed outage
+fifteen-experiment evaluation spanning throughput to fail-closed outage
 behavior.
 
 Table~\ref{tab:framework_vs_prototype} documents the gaps between framework
