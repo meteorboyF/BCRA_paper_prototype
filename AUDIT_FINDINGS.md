@@ -1,9 +1,23 @@
 # Manuscript Coherence & Redundancy Audit — Findings (2026-07-17)
 
 Full-manuscript audit (not diff-based) of `bra_submission/main.tex` at
-commit 406f306. **No edits applied — awaiting author selection.**
-Recommended action: apply F1–F8, skip F9, verify-then-fix F10.
-Line numbers refer to main.tex at 406f306.
+commit 406f306. **RESOLVED 2026-07-17: F1–F8 applied (F1 as a
+median-convention footnote in `sec:exp_consolidated`, no fig6 regen);
+F9 skipped by author decision; F10 verified — no edit (see below).**
+Line numbers refer to main.tex at 406f306 (pre-fix).
+
+## F10 outcome — claim verified correct, no edit made
+
+Checked `results/exp1_throughput.csv` (prototype-fixes): at the
+canonical `BatchTimeout=2000ms` scaling rows, errors = 0 through 400
+clients, then 3 errors at 500 (0.012 %) and 22 at 600 (0.073 %). The
+manuscript's "zero transaction errors up to 400 clients" is exactly
+what the raw data supports; the audit's premise ("raw fabric rows show
+errors=0 through 600") was a **false positive** (cause unclear — the
+500/600-client errors are present even without canonical filters).
+Lesson for future audit re-runs: the audit itself can misread data, so
+recompute any flagged numeric claim directly from the raw CSVs (with
+DELTAS.md canonical filters applied) before editing the manuscript.
 
 | # | Location (line) | Type | Finding | Suggested fix |
 |---|---|---|---|---|
@@ -38,7 +52,8 @@ woznica2022) match intent.
    log; `experiments/README.md` indexes every experiment's RESULTS.md.
 3. Compile: `cd bra_submission && docker run --rm -v "$PWD:/work" -w /work
    texlive/texlive:latest sh -c "pdflatex …; bibtex main; pdflatex ×2"`
-   (no local LaTeX; overfull baseline = 27).
+   (no local LaTeX; overfull baseline = 26 since the F4 trim — was 27
+   before the F1–F8 fixes).
 4. F1's figure fix happens in
    `experiments/legacy_figures/regen_figs.py` on prototype-fixes, then
    copy the PDF over and recompile here.

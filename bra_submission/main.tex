@@ -255,7 +255,7 @@ Encrypted document payloads are stored off-chain in a private two-node
 InterPlanetary File System (IPFS) swarm~\cite{benet2014ipfs}. SHA-256 hashes
 and content identifiers are anchored on-chain, keeping Fabric commit latency
 independent of document size. The ordering service is a 3-node EtcdRaft
-cluster distributed across FirmA, FirmB, and a regulator organization. This
+cluster distributed across LawFirmA, LawFirmB, and a regulator organization. This
 provides crash-fault tolerance under Raft assumptions, not Byzantine
 resistance to malicious orderer collusion~\cite{hyperledgerFabricOrderingService_v24,Ongaro2014}.
 
@@ -347,7 +347,7 @@ throughput, latency, file-size effects, audit-query cost, synthetic WAN
 latency, \texttt{BatchTimeout} sensitivity, cryptographic operation cost,
 ledger-history depth, and outage behavior. At the canonical
 \texttt{BatchTimeout=2s} and \texttt{MaxMessageCount=500}, the REST-gateway
-workload sustains approximately 68-70\,TPS, about 4.1 to 4.2$\times$ above the estimated
+workload sustains approximately 68--70\,TPS, about 4.1 to 4.2$\times$ above the estimated
 16.7\,TPS legal workload. Reducing \texttt{BatchTimeout} to 500\,ms produced
 the highest measured throughput, 193.0\,TPS, for the evaluated
 three-organization deployment.
@@ -607,7 +607,7 @@ More recent systems use permissioned blockchains to support
 multi-institution evidence workflows. Kim et al.~\cite{twoLevelBlockchain}
 organize evidence across active and static chains, and Onyeashie
 et al.~\cite{onyeashie2025fabricEvidence} use Fabric and IPFS to separate law-enforcement, forensic, and judicial workflows. Hanafi et al.~\cite{hanafi2021ipfschain} and Guo et al. \cite{guo2024efficient} also combine IPFS and Fabric for secure record storage and event auditing, demonstrating the architecture's viability for highly confidential, role-based document sharing. These systems move closer to the legal-consortium model considered in this paper, but their
-primary contribution remains evidence management and audit recording. To the best of the authors' knowledge, none of the prior legal and evidence-management systems in Table~\ref{tab:literature_review} report evaluating an access-control decision against chaincode on the critical path of every document download or measuring the latency cost of doing so in a REST-gateway legal-document workflow, leaving an open baseline against which future permissioned-blockchain document-access systems can calibrate their access-control overhead.
+primary contribution remains evidence management and audit recording. To the best of the authors' knowledge, none of the prior legal and evidence-management systems in Table~\ref{tab:literature_review} report evaluating an access-control decision against chaincode on the critical path of every document download or measuring the latency cost of doing so in a REST-gateway legal-document workflow, leaving an open baseline against which future permissioned-blockchain document-access systems can calibrate their access-control overhead; the access-control-centric line of work reviewed next narrows, but does not close, this gap.
 
 \subsubsection{Access-Control-Centric Fabric and IPFS Systems}
 
@@ -649,9 +649,8 @@ ledger state before release, so a compromised or overly privileged
 application server may still authorize access using state that is not
 independently verifiable at the time of access. RBAC-IPFS
 \cite{liu2026rbacipfs} closes part of this gap for generic file sharing
-by pricing an on-path authorization, but reports neither
-ledger-outage behavior nor the cost of on-path enforcement relative to
-an audit-log-only baseline. Second, access-control models are often
+by pricing an on-path authorization; its remaining unmeasured aspects
+are those identified at the close of the previous subsection. Second, access-control models are often
 coarse-grained or static: capability delegation is verified on-ledger
 without gating any storage tier~\cite{mukta2026zerotrust}, and
 file-management ACLs lack expiry and revocation
@@ -665,14 +664,11 @@ recorded~\cite{peelam2026decentralized}. Fourth, off-chain storage
 availability is frequently assumed rather than governed; IPFS content
 must be pinned and replicated deliberately.
 
-The proposed framework addresses these gaps by moving the enforcement boundary onto the normal document-release path.
-The contribution is not a new access-control primitive, not a
-Byzantine-fault-tolerant ordering protocol, and not a
-production-ready legal deployment: it is a measured relocation of
-the document-release authorization boundary from application-only
-trust to ledger-verifiable access-control state on the
-normal release path, with fail-closed behavior empirically
-confirmed for the download path. The prototype still has limitations, including custodial Fabric
+The proposed framework addresses these gaps by moving the enforcement
+boundary onto the normal document-release path; the scope of that
+contribution --- a measured relocation of the authorization boundary
+rather than a new access-control primitive or ordering protocol --- is
+delimited in Section~\ref{sec:contributions}. The prototype still has limitations, including custodial Fabric
 identity handling and \texttt{localStorage}-based key storage, and
 those limitations are disclosed in
 Section~\ref{sec:prototype_implementation} and
@@ -2321,7 +2317,7 @@ configuration.
     \includegraphics[width=2\columnwidth]{fabric_topology4.pdf}
     \caption{Six-peer-organization Fabric reference topology with a
 consortium-governed three-node EtcdRaft ordering service. The orderer nodes
-are operated by the regulator, FirmA, and FirmB under member-controlled
+are operated by the regulator, LawFirmA, and LawFirmB under member-controlled
 orderer identity administration or multi-party CA governance. Raft provides
 crash-fault tolerance for one orderer failure; Byzantine-fault-tolerant
 ordering is outside the prototype scope.}
@@ -2466,7 +2462,7 @@ revision (Docker~29, Node.js~20); a per-run machine-readable
 environment record accompanies each released dataset.
 
 The evaluated Fabric network used three peer organizations
-(LawFirmA, LawFirmB, RegulatorOrg) on a shared \texttt{legalchannel},
+(LawFirmA, LawFirmB, RegulatorOrg) on a shared \texttt{legal-channel},
 each backed by CouchDB~3.2. The ordering service was a 3-node EtcdRaft
 cluster across three distinct consortium members. This configuration
 tolerates one crash fault under CFT assumptions, but the experiment
@@ -2584,7 +2580,7 @@ trade-off, not an architectural barrier.
     restricted to its harness-valid region (conc $\leq$ 100); the shaded
     region marks PostgreSQL-mode client-side load-generator saturation
     (self-flagged invalid rows, excluded from analysis), and the dotted
-    line is the Experiment~\ref{sec:exp_sensitivity} \texttt{BatchTimeout}
+    line is the Experiment~\hyperref[sec:exp_sensitivity]{8} \texttt{BatchTimeout}
     tuning reference (193\,TPS at 500\,ms).}
     \label{fig:scalability}
 \end{figure*}
@@ -3259,7 +3255,16 @@ To counter point estimates masking variance, the released dataset
 consolidates 37 headline metrics across all fifteen experiments with
 95\,\% confidence intervals: bootstrap percentile intervals
 (10{,}000 resamples) for medians computed from per-sample data, and
-Student-$t$ intervals for means of trial-level throughput.
+Student-$t$ intervals for means of trial-level
+throughput.\footnote{Medians in the consolidated dataset and in the
+regenerated figure annotations are computed with the
+central-pair-averaging convention (\texttt{statistics.median}) over the
+released per-sample data, whereas P50 values quoted in the prose retain
+the floor-index percentile convention of the original per-experiment
+run summaries. The two conventions can differ marginally (e.g.,
+100.59 vs.\ 100.44\,ms for the PBKDF2 annotation in
+Fig.~\ref{fig:crypto}); the prose uses the run-summary convention
+consistently throughout.}
 Two intervals carry the paper's central claims. First, the
 function-level ACL comparison of Experiment~\hyperref[sec:exp_latency]{2}
 yields \emph{overlapping} intervals --- Fabric \texttt{CheckAccess}
