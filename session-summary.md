@@ -256,3 +256,16 @@ ready pre-proof re-checks. See MANUSCRIPT_TODO.md on bra-submission.
   disclosure, Phase-4 "replaced by" (roadmap).
 - Compile: 108 pages, zero errors, overfull 26 (holds at the post-F4
   baseline).
+
+## Reviewer-lens critique pass (2026-07-17)
+
+- bra-submission @ 0caac55 (pushed): `REVIEWER_LENS_FINDINGS.md` (repo
+  root) holds a full reviewer-simulation audit — wording (W1–W8),
+  coherency (C1–C3), density (D1–D3), redundancy with counts (R1–R8),
+  cut candidates with what-is-lost (N1–N6), hedging load-bearing-vs-
+  defensive analysis (H1–H7), ranked reviewer synthesis. Applied so
+  far: V1 stale "nine-experiment" → "fifteen-experiment" (conclusion);
+  V2 deleted "resolving the baseline inconsistency cited in prior
+  review" (draft-history leak the R-sweep missed); V3 `16.7,TPS` typo.
+  All other IDs await author selection under the standing
+  review-then-fix gate. Compile: 108 pages, overfull 26 (baseline).
