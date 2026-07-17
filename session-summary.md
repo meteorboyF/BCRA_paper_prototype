@@ -269,3 +269,20 @@ ready pre-proof re-checks. See MANUSCRIPT_TODO.md on bra-submission.
   review" (draft-history leak the R-sweep missed); V3 `16.7,TPS` typo.
   All other IDs await author selection under the standing
   review-then-fix gate. Compile: 108 pages, overfull 26 (baseline).
+
+## Reviewer-lens pass RESOLVED (2026-07-17, bra-submission 34fca0c)
+
+- All ruled findings applied in one commit: cuts (workflow-demo
+  subsection, security-claims table, role-hierarchy figure, SmartBFT
+  migration ¶), dedup (custodial identity 13→7, SmartBFT 11→6,
+  outage-scope caveat 6→2, proof disclaimers 5→2), clarity rewrites
+  (topology CA ¶ fact-first, consensus split, RQ1 aligned, tautology
+  sentences, GDPR merge), two reviewer-preemption sentences (generator
+  co-location; gateway-vs-Caliper reconciliation).
+- `REVIEWER_LENS_CHANGES.md` (repo root) = full per-ID change record;
+  `REVIEWER_LENS_FINDINGS.md` header marks resolution. Still open:
+  N3 (UI compress), N5 (key-lifecycle figure merge), optional abstract
+  "cross-organization" qualifier.
+- NEW COMPILE BASELINES: 103 pages (was 108), overfull 23 (was 26).
+  Surviving large overfulls (72.5/67.2/67.0pt) are pre-existing texttt
+  lines. Dropped cite: fabricSdkNode_wallet (bbl changed).
