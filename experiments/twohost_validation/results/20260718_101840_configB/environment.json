@@ -1,0 +1,17 @@
+{
+  "role": "load generator (client) \u2014 two-host validation",
+  "config": "B",
+  "trials": 5,
+  "warmup_discarded": 1,
+  "utc": "2026-07-18T10:25:42.007870Z",
+  "hostname": "meteorboyf-VivoBook-ASUSLaptop-X515JAB-X515JA",
+  "kernel": "7.0.0-27-generic",
+  "cpu": "Intel(R) Core(TM) i5-1035G1 CPU @ 1.00GHz",
+  "nproc": "8",
+  "mem": "14Gi",
+  "node": "v22.22.1",
+  "network_note": "Wi-Fi, UIU-Faculty-Staff campus network, both hosts wireless \u2014 not wired LAN",
+  "api_url": "http://10.10.206.50:8080/api",
+  "concurrency": "50",
+  "duration_sec": "60"
+}
