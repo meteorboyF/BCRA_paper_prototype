@@ -1,0 +1,6 @@
+Client-side dependencies (all stock; no npm/pip installs needed):
+- Node.js >= 18 (loadtest.js uses only the http stdlib module)
+- Python 3 (setup_bench_data.py / URL parsing use only the stdlib)
+- GNU time (/usr/bin/time -v, for per-trial client CPU%):  sudo apt install time
+- ping (iputils)
+- git (to push results to the linux-validation branch)
