@@ -21,6 +21,9 @@ showcase), N5 (merge key-lifecycle figures 1–4), and synthesis #6's
 optional "cross-organization" qualifier in the abstract.
 Line numbers in the tables below refer to 759ee40 (pre-fix).
 Overfull baseline after this pass: 23 (was 26); pages: 103 (was 108).
+[Later additions — two-host validation paragraph and the owner-org
+fallback precision pass — moved the page baseline to 104; overfull
+remains 23.]
 
 ## A. Factual / mechanical catches
 

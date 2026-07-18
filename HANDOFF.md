@@ -7,7 +7,7 @@ on `bra-submission` unless noted. The full chronological campaign log
 
 ## Current state
 
-- **103 pages**, zero compile errors, no undefined/multiply-defined
+- **104 pages**, zero compile errors, no undefined/multiply-defined
   references, 23 overfull-hbox warnings (all cosmetic; the three large
   ones are pre-existing unbreakable `\texttt` lines), 1 documented
   bibtex warning.
@@ -111,4 +111,10 @@ two-host validation paragraph added to the evaluation setup
 vs co-located 193.0 @500 ms and 70.5 [67.8, 73.2] vs 66.3 @2 s — both
 above the committed CIs, so co-location depressed the published
 numbers (conservative). Raw data: branch `linux-validation`,
-`experiments/twohost_validation/RESULTS.md`.
+`experiments/twohost_validation/RESULTS.md`. → owner-org-fallback
+precision pass (2026-07-18, code-verified): seven sites now state the
+fallback authorizes ciphertext release only — wrapped document keys
+are gated by per-recipient grants in all cases — plus a reasoned
+timestamp-deferral note in the ECDSA section (trusted time = tx
+timestamp; client clocks bind claimed time only). Page baseline
+103→104; overfull stays 23.

@@ -1266,7 +1266,13 @@ This payload binds the signing key to the exact document content and IPFS
 storage payload. Timestamp, owner identity, filename, and case metadata
 are not included in the prototype signed payload. Binding full document
 metadata through deterministic canonicalization, such as JCS~\cite{rfc8785jcs},
-is a framework design goal and production hardening item.
+is a framework design goal and production hardening item. For the
+timestamp specifically, a client-signed clock value would bind only the
+signer's \emph{claimed} creation time; the trusted time in this design
+is the deterministic transaction timestamp assigned at commit, which
+cannot appear in a payload signed before submission without a second
+round trip --- the same circular dependency that excludes the CID from
+the signed payload.
 
 The resulting signature is a 64-byte IEEE~P1363 raw signature ($r \| s$,
 32~bytes each for P-256). The server verifies it with
@@ -1392,7 +1398,11 @@ organization-level grants are stored under a prefixed key
 (\texttt{ACL["ORG:"+userOrg]}). Both per-user and organization-level
 grants support time-bounded expiry evaluated at query time. The owner
 organization retains implicit read access via the \texttt{doc.OwnerOrg ==
-userOrg} fallback.
+userOrg} fallback. This fallback governs the ledger-side authorization
+decision only: at the release layer, a wrapped document key is issued
+solely against the requester's own per-recipient grant entry, so
+organization membership alone can yield at most ciphertext, never a
+document key (Section~\ref{sec:limitations}).
 
 To prevent Multi-Version Concurrency Control (MVCC) conflicts and ledger bloat under high concurrent read loads, the chaincode dynamically evaluates expiry but does not attempt a state write-back during the read path. To maintain strict audit fidelity in the CouchDB world state without introducing read-path latency, the system design relies on a dedicated, asynchronous administrative chaincode invocation (\texttt{CleanExpiredTokens}) executed periodically as a background cron-job to formally deprecate expired tokens.  Listing~\ref{lst:checkaccess} shows the chaincode implementation. Token deprecation therefore follows an \emph{eventual consistency} model: expiry is enforced immediately at chaincode evaluation time, but the CouchDB world state reflects \texttt{StatusExpired} only after the next \texttt{CleanExpiredTokens} invocation; a direct world-state query between these two points will show the token as \texttt{StatusActive} despite being denied at runtime.
 
@@ -1672,7 +1682,9 @@ Channel members still see CIDs, timestamps, accessor MSP identities,
 PDC hashes, and plaintext hash \(\mathcal{H}_D\), leaking frequency
 patterns and enabling candidate-document confirmation via local
 \texttt{SHA-256}. The prototype uses organization-level membership
-(\texttt{doc.OwnerOrg == userOrg}) as first-pass control; per-user
+(\texttt{doc.OwnerOrg == userOrg}) as first-pass control, gating
+ciphertext release only --- document keys require an explicit
+per-recipient grant; per-user
 intra-organization ACLs and moving \(\mathcal{H}_D\) to a PDC or keyed
 commitment \(\text{HMAC}_k(D)\) remain production hardening. \\
 \hline
@@ -2123,7 +2135,7 @@ Implemented \\
 Fine-grained intra-organization per-user ACL &
 Remove \texttt{doc.OwnerOrg == userOrg} owner-org fallback; require explicit per-user grants for all principals, including intra-organization peers &
 P &
-Prototype currently grants access to any member of the document owner's organization; per-user grants are enforced only for cross-organization access. Production hardening item. \\
+Prototype currently authorizes ledger-level read (ciphertext release) for any member of the document owner's organization; document keys remain per-recipient-granted in all cases, and per-user ledger grants are enforced only for cross-organization access. Production hardening item. \\
 \hline
 Time-bounded capability tokens &
 On-chain expiry enforced in chaincode; expired grants denied by
@@ -2189,7 +2201,9 @@ cross-organization grant evaluation in the access-control logic, whereas
 ``Intra-organization access control'' refers to finer-grained per-user
 enforcement within the same owner organization. The latter remains partial
 because owner-organization fallback access can bypass strict
-intra-organization per-user granularity.
+intra-organization per-user granularity at the ledger-authorization
+layer; wrapped document keys remain gated by explicit per-recipient
+grants in all cases.
 \end{minipage}
 \endgroup
 
@@ -3249,15 +3263,24 @@ Each limitation is accompanied by a concrete mitigation path.
 \begin{itemize}
 \item \textbf{Coarse-grained intra-organization access control.}
 The prototype \texttt{CheckAccess} chaincode (Listing~\ref{lst:checkaccess},
-lines~37--39) grants read access to any peer whose MSP organization
+lines~37--39) authorizes read access for any peer whose MSP organization
 matches the document owner's organization
 (\texttt{doc.OwnerOrg == userOrg}), without requiring an individual
-ACL entry. This constitutes an owner-org bypass: any member of
-\texttt{LawFirmA} can access any document registered by any user in
-\texttt{LawFirmA}. The framework design specifies per-user grants for
-all principals; closing this gap in production requires removing the
-organization-level fallback and enforcing explicit grants for
-intra-organization peers, consistent with a zero-trust access model.
+ACL entry. The service layer bounds what this authorization can
+release: the wrapped-key endpoint issues a document key only against
+the requester's own per-recipient grant entry, $k_{enc}$ is never
+wrapped for ungranted principals, and document listings are likewise
+scoped to explicit grants. An ungranted member of \texttt{LawFirmA}
+who learns a document identifier can therefore retrieve the
+AES-256-GCM ciphertext of any \texttt{LawFirmA} document, but not its
+key or plaintext. The exposure is bounded to ciphertext, metadata,
+and document existence rather than plaintext --- still a
+least-privilege violation within a firm and a
+harvest-now-decrypt-later surface. The framework design specifies
+per-user grants for all principals; closing this gap in production
+requires removing the organization-level fallback and enforcing
+explicit grants for intra-organization peers, consistent with a
+zero-trust access model.
 
 \item \textbf{Access-decision replay granularity.}
 The \texttt{CheckAccess} chaincode uses the Fabric transaction timestamp
@@ -3536,8 +3559,10 @@ First, ledger transactions remain
 attributable to the prototype's server-managed MSP identity until per-user
 Fabric CA enrollment is implemented (Table~\ref{tab:framework_vs_prototype}).
 Second, per-user \texttt{CheckAccess} enforcement was demonstrated for
-cross-organization access. Intra-organization access still falls back to
-organization-level membership; removing that fallback is the primary
+cross-organization access. Intra-organization requests still authorize
+by organization membership at the ledger layer --- an exposure bounded
+to ciphertext release, since document keys are issued only against
+per-recipient grants --- and removing that fallback is the primary
 production hardening step.
 
 The dual-store audit design separates operational speed from independent
