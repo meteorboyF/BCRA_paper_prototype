@@ -3,9 +3,11 @@ import { useQuery } from '@tanstack/react-query'
 import {
   Activity, Search, Filter, Loader2, AlertCircle,
   ExternalLink, Hash, Clock, User, Shield, ChevronDown, ChevronUp,
+  Box, Layers,
 } from 'lucide-react'
 import api from '../lib/api'
 import { queryKeys } from '../lib/queryKeys'
+import { mspDisplay } from '../lib/mspDisplay'
 
 interface AuditEntry {
   id: string
@@ -15,6 +17,29 @@ interface AuditEntry {
   contextJson: string
   fabricTxId: string | null
   timestamp: string
+}
+
+interface BlockTx {
+  txId: string
+  eventType: string
+  actor: string
+  actorRole: string
+  resourceType: string
+  resourceId: string
+  timestamp: string
+}
+
+interface LedgerBlock {
+  blockNumber: number | null
+  chaincode: string
+  transactions: BlockTx[]
+}
+
+interface BlocksResponse {
+  channel: string | null
+  height: number | null
+  submittingMsp: string | null
+  blocks: LedgerBlock[]
 }
 
 const EVENT_COLORS: Record<string, string> = {
@@ -57,6 +82,13 @@ export default function LedgerExplorer() {
   const error = isError ? 'Failed to load ledger' : ''
   const load = () => refetch()
 
+  // Recent blocks: ledger-anchored events grouped by committing block
+  // (block numbers + height live from qscc via the backend).
+  const { data: blockData } = useQuery<BlocksResponse>({
+    queryKey: [...queryKeys.ledger(), 'blocks'],
+    queryFn: async () => (await api.get('/ledger/blocks', { params: { limit: 12 } })).data,
+  })
+
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
@@ -66,10 +98,61 @@ export default function LedgerExplorer() {
             Immutable audit trail · anchored on Hyperledger Fabric 2.4
           </p>
         </div>
-        <div className="flex items-center gap-2 bg-[#C9A84C]/10 text-[#C9A84C] rounded-lg px-3 py-1.5 text-xs font-semibold">
-          <Activity className="w-3.5 h-3.5" /> {entries.length} records
+        <div className="flex items-center gap-2">
+          {blockData?.channel && (
+            <div className="flex items-center gap-2 bg-surface-muted text-text-secondary rounded-lg px-3 py-1.5 text-xs font-semibold">
+              <Layers className="w-3.5 h-3.5" /> Channel: <span className="font-mono">{blockData.channel}</span>
+            </div>
+          )}
+          {blockData?.height != null && (
+            <div className="flex items-center gap-2 bg-surface-muted text-text-secondary rounded-lg px-3 py-1.5 text-xs font-semibold">
+              <Box className="w-3.5 h-3.5" /> Height: {blockData.height}
+            </div>
+          )}
+          <div className="flex items-center gap-2 bg-[#C9A84C]/10 text-[#C9A84C] rounded-lg px-3 py-1.5 text-xs font-semibold">
+            <Activity className="w-3.5 h-3.5" /> {entries.length} records
+          </div>
         </div>
       </div>
+
+      {/* ── Recent blocks (ledger-anchored events grouped by committing block) ── */}
+      {blockData && blockData.blocks.length > 0 && (
+        <div className="space-y-3">
+          {blockData.blocks.filter((b) => b.blockNumber != null).slice(0, 4).map((b) => (
+            <div key={b.blockNumber} className="card p-0 overflow-hidden">
+              <div className="flex items-center justify-between px-4 py-2.5 bg-surface-muted border-b border-border">
+                <div className="flex items-center gap-2">
+                  <Box className="w-4 h-4 text-[#C9A84C]" />
+                  <span className="font-heading text-sm font-bold text-text-primary">Block {b.blockNumber}</span>
+                  <span className="text-[11px] text-text-muted">chaincode: <span className="font-mono">{b.chaincode}</span></span>
+                </div>
+                <span className="text-[11px] text-text-muted">
+                  submitted via <span className="font-mono">{mspDisplay(blockData.submittingMsp)}</span>
+                </span>
+              </div>
+              <div className="divide-y divide-border">
+                {b.transactions.map((tx) => (
+                  <div key={tx.txId} className="px-4 py-2.5 flex flex-wrap items-center gap-x-4 gap-y-1">
+                    <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${EVENT_COLORS[tx.eventType] ?? EVENT_COLORS.GENERAL}`}>
+                      {tx.eventType.replace(/_/g, ' ')}
+                    </span>
+                    {tx.actor && <span className="text-xs text-text-secondary">{tx.actor}</span>}
+                    <span className="text-[10px] font-mono text-text-muted truncate max-w-[220px]">
+                      {tx.resourceType && `${tx.resourceType.toLowerCase()}/`}{tx.resourceId}
+                    </span>
+                    <span className="text-[10px] font-mono text-[#C9A84C] truncate max-w-[180px]" title={tx.txId}>
+                      tx {tx.txId.slice(0, 16)}…
+                    </span>
+                    <span className="text-[10px] text-text-muted ml-auto whitespace-nowrap">
+                      {new Date(tx.timestamp).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* ── Filters ───────────────────────────────────────────────────────────── */}
       <div className="card">
@@ -78,7 +161,7 @@ export default function LedgerExplorer() {
             <label className="label">Event Type</label>
             <select className="input" value={eventType} onChange={(e) => { setEventType(e.target.value); setPage(0) }}>
               {EVENT_TYPES.map((t) => (
-                <option key={t} value={t}>{t ? t.replace(/_/g, ' ') : '— All events —'}</option>
+                <option key={t} value={t}>{t ? t.replace(/_/g, ' ') : 'All events'}</option>
               ))}
             </select>
           </div>
