@@ -2355,7 +2355,18 @@ Hyperledger Fabric benchmarking practice~\cite{caliper2021,woznica2022}.
 The load generator ran co-located with the network containers on the
 single evaluation host; generator CPU was recorded to detect
 client-side saturation and remained far below it in the sensitivity
-runs (2--14\,\%, Experiment~\hyperref[sec:exp_sensitivity]{8}).
+runs (2--14\,\%, Experiment~\hyperref[sec:exp_sensitivity]{8}). A
+post-campaign two-host validation additionally repeated both reference
+configurations with the same closed-loop harness on a separate
+consumer laptop (Intel i5-1035G1) over campus Wi-Fi: cross-host
+throughput measured 228.0\,TPS [222.7, 233.3] at the 500\,ms
+\texttt{BatchTimeout} ($n{=}10$; vs.\ 193.0 [182.8, 203.2]
+co-located) and 70.5\,TPS [67.8, 73.2] at 2\,s ($n{=}5$; vs.\ 66.3
+[63.7, 68.9]), with zero transaction errors and client CPU at
+4--12\,\%. Cross-host throughput therefore exceeds the co-located
+values reported throughout this paper --- co-location depressed rather
+than inflated the measured numbers --- and the co-located figures are
+retained as the conservative baseline.
 Table~\ref{tab:hardware} summarizes the configurations.
 
 Direct numerical comparison of the REST-gateway workload with prior
@@ -3870,7 +3881,9 @@ and table in this paper, together with the measured-versus-manuscript
 reconciliation log, are openly available in the project repository at
 \url{https://github.com/meteorboyF/Fardeen_Codex_Dhaka_Meetup_Hackathon}
 (directories \texttt{results/} and \texttt{experiments/}, branch
-\texttt{prototype-fixes}).
+\texttt{prototype-fixes}; the post-campaign two-host validation
+dataset, including the client-side trial logs and RTT records, is on
+branch \texttt{linux-validation}).
 %%
 %% ---- Variant B2 (archival DOI) — SWAP IN once a release is deposited: ----
 %% The raw measurement data for all fifteen experiments (per-sample CSVs

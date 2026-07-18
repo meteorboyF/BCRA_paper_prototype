@@ -105,4 +105,10 @@ dfc7e79/ddb4066/ee0aaae/3738c87/2661361 (writing campaign, items
 1→0→4→2→5) → 406f306 (fig1–8 regeneration swap) → d5fbf37 (audit
 findings) → cd37581 (F1–F8 + F10 record) → 759ee40 (R1–R8 sweep) →
 0caac55 (V1–V3 + reviewer-lens findings) → 34fca0c (reviewer-lens main
-wave) → 2fc2c01 (hierarchy figure restored).
+wave) → 2fc2c01 (hierarchy figure restored) → 2cfc938 (this file) →
+two-host validation paragraph added to the evaluation setup
+(2026-07-18): cross-host generator runs measured 228.0 [222.7, 233.3]
+vs co-located 193.0 @500 ms and 70.5 [67.8, 73.2] vs 66.3 @2 s — both
+above the committed CIs, so co-location depressed the published
+numbers (conservative). Raw data: branch `linux-validation`,
+`experiments/twohost_validation/RESULTS.md`.

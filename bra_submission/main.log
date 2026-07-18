@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.7.12)  17 JUL 2026 16:35
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.7.12)  18 JUL 2026 12:43
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -2385,7 +2385,7 @@ File: figures/ui_audit_log.png Graphic file (type png)
 Package pdftex.def Info: figures/ui_audit_log.png  used on input line 2311.
 (pdftex.def)             Requested size: 187.19833pt x 105.24644pt.
 
-Overfull \hbox (67.02524pt too wide) in paragraph at lines 2347--2360
+Overfull \hbox (67.02524pt too wide) in paragraph at lines 2347--2371
 []\T1/cmr/m/n/12 (-20) Unless oth-er-wise stated, \T1/cmtt/m/n/12 BatchTimeout 
 \T1/cmr/m/n/12 (-20) was set to 2s and \T1/cmtt/m/n/12 BatchSize.MaxMessageCoun
 t
@@ -2395,62 +2395,59 @@ t
 <figures/fig1_scalability.pdf, id=5113, 722.7pt x 346.89601pt>
 File: figures/fig1_scalability.pdf Graphic file (type pdf)
 <use figures/fig1_scalability.pdf>
-Package pdftex.def Info: figures/fig1_scalability.pdf  used on input line 2454.
+Package pdftex.def Info: figures/fig1_scalability.pdf  used on input line 2465.
 
 (pdftex.def)             Requested size: 304.19952pt x 146.01291pt.
  [52] [53]
 <figures/fig2_latency.pdf, id=5134, 722.7pt x 346.89601pt>
 File: figures/fig2_latency.pdf Graphic file (type pdf)
 <use figures/fig2_latency.pdf>
-Package pdftex.def Info: figures/fig2_latency.pdf  used on input line 2561.
-(pdftex.def)             Requested size: 304.19952pt x 146.01291pt.
-<figures/fig3_filesize.pdf, id=5136, 722.7pt x 346.89601pt>
-File: figures/fig3_filesize.pdf Graphic file (type pdf)
-<use figures/fig3_filesize.pdf>
-Package pdftex.def Info: figures/fig3_filesize.pdf  used on input line 2585.
+Package pdftex.def Info: figures/fig2_latency.pdf  used on input line 2572.
 (pdftex.def)             Requested size: 304.19952pt x 146.01291pt.
  [54]
-Overfull \hbox (0.7102pt too wide) in paragraph at lines 2602--2603
+<figures/fig3_filesize.pdf, id=5141, 722.7pt x 346.89601pt>
+File: figures/fig3_filesize.pdf Graphic file (type pdf)
+<use figures/fig3_filesize.pdf>
+Package pdftex.def Info: figures/fig3_filesize.pdf  used on input line 2596.
+(pdftex.def)             Requested size: 304.19952pt x 146.01291pt.
+
+Overfull \hbox (0.7102pt too wide) in paragraph at lines 2613--2614
 \T1/cmr/m/n/12 (-20) events. Au-to-mated query time was mea-sured via \T1/cmtt/
 m/n/12 GET /api/audit?size=1000
  []
 
-<figures/fig4_audit.pdf, id=5148, 722.7pt x 346.89601pt>
+[55]
+<figures/fig4_audit.pdf, id=5153, 722.7pt x 346.89601pt>
 File: figures/fig4_audit.pdf Graphic file (type pdf)
 <use figures/fig4_audit.pdf>
-Package pdftex.def Info: figures/fig4_audit.pdf  used on input line 2623.
+Package pdftex.def Info: figures/fig4_audit.pdf  used on input line 2634.
 (pdftex.def)             Requested size: 335.40024pt x 160.99268pt.
-[55]
-<figures/fig5_wan.pdf, id=5164, 722.7pt x 346.89601pt>
+ [56]
+<figures/fig5_wan.pdf, id=5169, 722.7pt x 346.89601pt>
 File: figures/fig5_wan.pdf Graphic file (type pdf)
 <use figures/fig5_wan.pdf>
-Package pdftex.def Info: figures/fig5_wan.pdf  used on input line 2713.
+Package pdftex.def Info: figures/fig5_wan.pdf  used on input line 2724.
 (pdftex.def)             Requested size: 366.60095pt x 175.96713pt.
- [56]
-<figures/fig6_crypto.pdf, id=5175, 722.7pt x 404.712pt>
+ [57]
+<figures/fig6_crypto.pdf, id=5180, 722.7pt x 404.712pt>
 File: figures/fig6_crypto.pdf Graphic file (type pdf)
 <use figures/fig6_crypto.pdf>
-Package pdftex.def Info: figures/fig6_crypto.pdf  used on input line 2764.
+Package pdftex.def Info: figures/fig6_crypto.pdf  used on input line 2775.
 (pdftex.def)             Requested size: 350.99762pt x 196.5568pt.
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [57]
-<figures/fig7_gethistory.pdf, id=5186, 722.7pt x 346.89601pt>
+ [58]
+<figures/fig7_gethistory.pdf, id=5191, 722.7pt x 346.89601pt>
 File: figures/fig7_gethistory.pdf Graphic file (type pdf)
 <use figures/fig7_gethistory.pdf>
-Package pdftex.def Info: figures/fig7_gethistory.pdf  used on input line 2822.
+Package pdftex.def Info: figures/fig7_gethistory.pdf  used on input line 2833.
 (pdftex.def)             Requested size: 304.19952pt x 146.01291pt.
-
-[58]
 <figures/fig8_sensitivity.pdf, id=5194, 722.7pt x 346.89601pt>
 File: figures/fig8_sensitivity.pdf Graphic file (type pdf)
 <use figures/fig8_sensitivity.pdf>
-Package pdftex.def Info: figures/fig8_sensitivity.pdf  used on input line 2872.
+Package pdftex.def Info: figures/fig8_sensitivity.pdf  used on input line 2883.
 
 (pdftex.def)             Requested size: 390.0pt x 187.19931pt.
  [59]
-Overfull \hbox (4.79622pt too wide) in paragraph at lines 2893--2894
+Overfull \hbox (4.79622pt too wide) in paragraph at lines 2904--2905
 []\T1/cmr/m/n/12 (-20) This re-sult sub-stan-ti-ates the fail-closed be-hav-ior
  for the eval-u-ated document-
  []
@@ -2459,88 +2456,96 @@ Overfull \hbox (4.79622pt too wide) in paragraph at lines 2893--2894
 File: figures/fig9_failclosed_outage.pdf Graphic file (type pdf)
 <use figures/fig9_failclosed_outage.pdf>
 Package pdftex.def Info: figures/fig9_failclosed_outage.pdf  used on input line
- 2897.
+ 2908.
 (pdftex.def)             Requested size: 331.50238pt x 159.11888pt.
-<figures/fig10_ipfs_cost.pdf, id=5208, 794.97pt x 592.61403pt>
+[60]
+<figures/fig10_ipfs_cost.pdf, id=5213, 794.97pt x 592.61403pt>
 File: figures/fig10_ipfs_cost.pdf Graphic file (type pdf)
 <use figures/fig10_ipfs_cost.pdf>
-Package pdftex.def Info: figures/fig10_ipfs_cost.pdf  used on input line 2946.
+Package pdftex.def Info: figures/fig10_ipfs_cost.pdf  used on input line 2957.
 (pdftex.def)             Requested size: 382.19833pt x 284.9217pt.
-[60]
 <figures/fig11_caliper.pdf, id=5218, 794.97pt x 332.44202pt>
 File: figures/fig11_caliper.pdf Graphic file (type pdf)
 <use figures/fig11_caliper.pdf>
-Package pdftex.def Info: figures/fig11_caliper.pdf  used on input line 2991.
+Package pdftex.def Info: figures/fig11_caliper.pdf  used on input line 3002.
 (pdftex.def)             Requested size: 350.99762pt x 146.7822pt.
+
+Underfull \vbox (badness 2351) has occurred while \output is active []
+
  [61]
-<figures/fig12_ledger_growth.pdf, id=5229, 794.97pt x 332.44202pt>
+<figures/fig12_ledger_growth.pdf, id=5228, 794.97pt x 332.44202pt>
 File: figures/fig12_ledger_growth.pdf Graphic file (type pdf)
 <use figures/fig12_ledger_growth.pdf>
 Package pdftex.def Info: figures/fig12_ledger_growth.pdf  used on input line 30
-30.
+41.
 (pdftex.def)             Requested size: 350.99762pt x 146.7822pt.
-<figures/fig13_network_scaling.pdf, id=5232, 794.97pt x 332.44202pt>
+
+[62]
+<figures/fig13_network_scaling.pdf, id=5237, 794.97pt x 332.44202pt>
 File: figures/fig13_network_scaling.pdf Graphic file (type pdf)
 <use figures/fig13_network_scaling.pdf>
 Package pdftex.def Info: figures/fig13_network_scaling.pdf  used on input line 
-3071.
+3082.
 (pdftex.def)             Requested size: 350.99762pt x 146.7822pt.
- [62]
 <figures/fig14_baseline.pdf, id=5241, 794.97pt x 332.44202pt>
 File: figures/fig14_baseline.pdf Graphic file (type pdf)
 <use figures/fig14_baseline.pdf>
-Package pdftex.def Info: figures/fig14_baseline.pdf  used on input line 3122.
+Package pdftex.def Info: figures/fig14_baseline.pdf  used on input line 3133.
 (pdftex.def)             Requested size: 350.99762pt x 146.7822pt.
- [63]
-Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [64]
-Overfull \hbox (22.75832pt too wide) in paragraph at lines 3251--3262
+Underfull \vbox (badness 1590) has occurred while \output is active []
+
+ [63]
+[64]
+Overfull \hbox (22.75832pt too wide) in paragraph at lines 3262--3273
 \T1/cmr/m/n/12 (-20) uses the Fab-ric trans-ac-tion times-tamp (\T1/cmtt/m/n/12
  ctx.GetStub().GetTxTimestamp()\T1/cmr/m/n/12 (-20) )
  []
 
-
-Overfull \hbox (4.18654pt too wide) in paragraph at lines 3278--3285
+[65]
+Overfull \hbox (4.18654pt too wide) in paragraph at lines 3289--3296
 \T1/cmr/m/n/12 (-20) been val-i-dated at pro-duc-tion scale. Mit-i-ga-tions in-
 clude re-duc-ing \T1/cmtt/m/n/12 BatchTimeout
  []
 
-[65]
-Overfull \hbox (18.3314pt too wide) in paragraph at lines 3286--3293
+
+Overfull \hbox (18.3314pt too wide) in paragraph at lines 3297--3304
 \T1/cmr/m/n/12 (-20) failover, multi-peer fail-ure com-bi-na-tions, or re-cov-e
 ry dur-ing con-cur-rent production-
  []
 
-[66]
-Overfull \hbox (1.6613pt too wide) in paragraph at lines 3356--3363
+[66] [67]
+Overfull \hbox (1.6613pt too wide) in paragraph at lines 3367--3374
 []\T1/cmr/m/n/12 (-20) The Post-greSQL iden-tity ta-ble bind-ing users to their
  pub-lic keys (\T1/cmtt/m/n/12 pk_ecies\T1/cmr/m/n/12 (-20) ,
  []
 
-[67] [68]
-Overfull \hbox (72.48236pt too wide) in paragraph at lines 3410--3419
+[68]
+Overfull \hbox (72.48236pt too wide) in paragraph at lines 3421--3430
 \T1/cmtt/m/n/12 /documents/{id}/download\T1/cmr/m/n/12 (-20) ), ac-cess grant a
 nd re-vo-ca-tion (\T1/cmtt/m/n/12 POST /documents/{id}/grant\T1/cmr/m/n/12 (-20
 ) ,
  []
 
 [69]
-Overfull \hbox (26.30418pt too wide) in paragraph at lines 3483--3497
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [70]
+Overfull \hbox (26.30418pt too wide) in paragraph at lines 3494--3508
 \T1/cmr/m/n/12 (-20) au-dit dash-boards and joint en-dorse-ment poli-cies such 
 as \T1/cmtt/m/n/12 AND('LawFirmAMSP.peer',
  []
 
-[70] [71] [72 <./figures/access_and_decryption.pdf>] [73 <./figures/key_rotatio
-n_and_recovery.pdf>] [74 <./figures/rbac_acl_pipeline.pdf>] [75 <./figures/fabr
-ic_topology4.pdf>] [76 <./figures/ui_ledger_explorer.png> <./figures/ui_audit_l
-og.png> <./figures/fig1_scalability.pdf>] [77 <./figures/fig2_latency.pdf> <./f
-igures/fig3_filesize.pdf>] [78 <./figures/fig4_audit.pdf> <./figures/fig5_wan.p
-df>] [79 <./figures/fig6_crypto.pdf> <./figures/fig7_gethistory.pdf>] [80 <./fi
-gures/fig8_sensitivity.pdf> <./figures/fig9_failclosed_outage.pdf>] [81 <./figu
-res/fig10_ipfs_cost.pdf>] [82 <./figures/fig11_caliper.pdf> <./figures/fig12_le
-dger_growth.pdf>] [83 <./figures/fig13_network_scaling.pdf> <./figures/fig14_ba
-seline.pdf>] [84
+[71] [72 <./figures/access_and_decryption.pdf>] [73 <./figures/key_rotation_and
+_recovery.pdf>] [74 <./figures/rbac_acl_pipeline.pdf>] [75 <./figures/fabric_to
+pology4.pdf>] [76 <./figures/ui_ledger_explorer.png> <./figures/ui_audit_log.pn
+g> <./figures/fig1_scalability.pdf>] [77 <./figures/fig2_latency.pdf> <./figure
+s/fig3_filesize.pdf>] [78 <./figures/fig4_audit.pdf> <./figures/fig5_wan.pdf>]
+[79 <./figures/fig6_crypto.pdf> <./figures/fig7_gethistory.pdf>] [80 <./figures
+/fig8_sensitivity.pdf> <./figures/fig9_failclosed_outage.pdf>] [81 <./figures/f
+ig10_ipfs_cost.pdf>] [82 <./figures/fig11_caliper.pdf> <./figures/fig12_ledger_
+growth.pdf>] [83 <./figures/fig13_network_scaling.pdf> <./figures/fig14_baselin
+e.pdf>] [84
 
 ] [85] [86]
 (/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstlang1.sty
@@ -2570,11 +2575,11 @@ Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: D4CF765C801D2C426363847931AA70E6;17125.
  ) 
 Here is how much of TeX's memory you used:
- 19316 strings out of 467168
- 307159 string characters out of 5409468
+ 19318 strings out of 467168
+ 307173 string characters out of 5409468
  1161638 words of memory out of 5000000
  47312 multiletter control sequences out of 15000+600000
- 671988 words of font info for 333 fonts, out of 8000000 for 9000
+ 672037 words of font info for 334 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  74i,14n,79p,1485b,2329s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb
@@ -2612,10 +2617,10 @@ super/sftt0800.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-su
 per/sftt1000.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-supe
 r/sftt1095.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/
 sftt1200.pfb>
-Output written on main.pdf (103 pages, 6141581 bytes).
+Output written on main.pdf (103 pages, 6142709 bytes).
 PDF statistics:
- 8442 PDF objects out of 8907 (max. 8388607)
- 4656 compressed objects within 47 object streams
+ 8440 PDF objects out of 8907 (max. 8388607)
+ 4654 compressed objects within 47 object streams
  551 named destinations out of 1000 (max. 500000)
  78055 words of extra memory for PDF output out of 89155 (max. 10000000)
 
