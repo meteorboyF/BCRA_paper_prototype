@@ -39,8 +39,8 @@ public class DocumentService {
     private final IpfsService ipfsService;
     @Autowired(required = false)
     private FabricGatewayService fabricGatewayService;
-    @Value("${documents.material-db-fallback-enabled:true}")
-    private boolean materialDbFallbackEnabled = true;
+    @Value("${documents.material-db-fallback-enabled:false}")
+    private boolean materialDbFallbackEnabled = false;
     private final AuditService auditService;
     private final ObjectMapper objectMapper;
     private final Environment environment;
@@ -432,10 +432,13 @@ public class DocumentService {
     }
 
     /**
-     * Protected document material uses Fabric CheckAccess first, then falls back to the local
-     * document_access ACL when Fabric is unavailable. This is fail-open with respect to Fabric,
-     * but not open access: the requester must still have an active DB grant, and every fallback
-     * access is audited. Strict fail-closed mode is available by disabling materialDbFallbackEnabled.
+     * Protected document material uses Fabric CheckAccess on the release path. STRICT
+     * FAIL-CLOSED is the default (materialDbFallbackEnabled=false): Fabric unavailability
+     * denies with HTTP 503, audited as FABRIC_OUTAGE_ACCESS_DENIED — the behavior measured
+     * in Experiment 9. Setting materialDbFallbackEnabled=true opts in to an
+     * availability-first fallback to the local document_access ACL (not open access: the
+     * requester still needs an active DB grant, and every fallback access is audited as
+     * ACL_FABRIC_FALLBACK); no published measurement exercises that mode.
      */
     private void enforceFabricAccessOrFailClosed(UUID docId, User requester) throws FabricException {
         // EXPERIMENTAL BASELINE (Spring profile "audit-log-only", default OFF):

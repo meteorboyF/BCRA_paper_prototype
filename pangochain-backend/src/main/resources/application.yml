@@ -80,10 +80,13 @@ fabric:
   chaincode-name: ${FABRIC_CHAINCODE:legalcc}
 
 documents:
-  # Fabric CheckAccess is attempted first. If Fabric is unavailable, document material falls
-  # back to the PostgreSQL document_access ACL so authorized users can still decrypt/redact.
-  # Set DOCUMENT_MATERIAL_DB_FALLBACK=false for strict fail-closed outage tests.
-  material-db-fallback-enabled: ${DOCUMENT_MATERIAL_DB_FALLBACK:true}
+  # Fabric CheckAccess gates every protected-material release. STRICT FAIL-CLOSED is the
+  # default: if Fabric is unavailable, material requests are denied with HTTP 503 and
+  # audited as FABRIC_OUTAGE_ACCESS_DENIED (the behavior measured in Experiment 9).
+  # Set DOCUMENT_MATERIAL_DB_FALLBACK=true to opt in to an availability-first fallback
+  # to the PostgreSQL document_access ACL (audited as ACL_FABRIC_FALLBACK); no
+  # measurement in the paper exercises that mode.
+  material-db-fallback-enabled: ${DOCUMENT_MATERIAL_DB_FALLBACK:false}
 
 ipfs:
   api:
