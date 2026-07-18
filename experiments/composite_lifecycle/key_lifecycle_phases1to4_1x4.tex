@@ -1,0 +1,19 @@
+% Vector-preserving single-column (1x4) fallback composite of the four
+% key-lifecycle phase figures, each at full 390pt column width.
+\documentclass[border=4pt]{standalone}
+\usepackage{graphicx}
+\begin{document}
+\begin{minipage}{390pt}\centering
+\includegraphics[width=390pt]{key_gen_and_storage.pdf}\\[3pt]
+{\fontsize{9}{11}\selectfont (a) Phase 1: key generation and storage}
+\par\vspace{12pt}
+\includegraphics[width=390pt]{document_encryption.pdf}\\[3pt]
+{\fontsize{9}{11}\selectfont (b) Phase 2: document encryption and registration}
+\par\vspace{12pt}
+\includegraphics[width=390pt]{access_grant.pdf}\\[3pt]
+{\fontsize{9}{11}\selectfont (c) Phase 3: access grant and key wrapping}
+\par\vspace{12pt}
+\includegraphics[width=390pt]{access_and_decryption.pdf}\\[3pt]
+{\fontsize{9}{11}\selectfont (d) Phase 4: access and decryption}
+\end{minipage}
+\end{document}

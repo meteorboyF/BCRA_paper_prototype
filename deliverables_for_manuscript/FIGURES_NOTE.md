@@ -52,4 +52,33 @@ drawing tool/source held outside the repo.
 
 ## Key-lifecycle composites (Task 3)
 
-(appended below when built)
+Sources: the four phase PDFs extracted from
+`origin/bra-submission:bra_submission/figures/` (key_gen_and_storage
+1875x1416 pt, document_encryption 2420x2460 pt, access_grant
+2534x1920 pt, access_and_decryption 2296x3013 pt — the last is
+portrait, aspect 0.76 w/h). Composites built with a LaTeX standalone
+document and `\includegraphics` only — fully vector-preserving, no
+rasterization. Both are laid out at exactly 390 pt total width (a 12 pt
+article's single-column text width), so the 9 pt panel labels render at
+true size and need no further scaling. Build sources:
+`experiments/composite_lifecycle/*.tex`.
+
+### Legibility verdicts (inspected at 100 % of 390 pt column width)
+
+- **key_lifecycle_phases1to4_2x2.pdf** — NOT legible at single-column
+  width: the equal-height rows force each diagram to roughly 140–240 pt
+  wide, and the smallest in-diagram text (step-box contents, message
+  labels — worst in panel (d), whose portrait aspect squeezes it to
+  ~140 pt) renders at an effective 2–3 pt. Panel titles and lane
+  headers are readable; nothing inside the boxes is. Usable only as a
+  full-text-width `figure*` (~1.8x scale-up) or after redrawing the
+  diagrams with larger base fonts.
+- **key_lifecycle_phases1to4_1x4.pdf** — per-panel text IS legible at
+  full column width (effective ~5–7 pt; panel (c) clearly readable,
+  (a)/(b)/(d) readable with effort at 100 %). The honest cost: total
+  height is ~1,560 pt ≈ 2.4 pages of 12 pt text height, so it cannot
+  float as one figure at this width — it would have to be split across
+  two floats (a+b / c+d) or accepted as a multi-page appendix figure.
+
+Deep "pango" scan (raw bytes + every FlateDecode stream decompressed):
+0 hits across all files in `deliverables_for_manuscript/`.
