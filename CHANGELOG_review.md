@@ -87,6 +87,45 @@ then:
   (tab:framework_vs_prototype, fig:failclosed) and the key-lifecycle
   stack (d=6, inherent to five stacked figures; N5 resolved as keep).
 
+---
+
+## Addendum 2026-07-19 — readability/formatting pass (single-column polish)
+
+Visual inspection of every diagram-bearing page at 150 dpi print size,
+then:
+
+- **Figure sizing (the big win):** the workflow diagrams were being
+  shrunk to 39–55 % scale by leftover width overrides (0.72–0.86
+  \textwidth) plus an aggressive 0.34\textheight cap, which is why
+  their in-diagram text read at ~3–4 pt. The `\workflowfigure` cap is
+  now 0.42\textheight, the per-figure shrink overrides are removed
+  (document_upload, access_control, document_retrieval, audit_trail),
+  and rbac_acl_pipeline goes 0.82→1.0\textwidth. All 14 experiment
+  plots (fig1–fig14) unified from mixed 0.78–0.98 widths to full
+  \textwidth: consistent look, ~10–28 % larger tick/legend text.
+  Verified on re-rendered pages (audit-trail box text now legible).
+- **Overfull hboxes 22 → 15, max 72.5 pt → 26.3 pt**, and every
+  body-text overfull ≥20 pt eliminated: break opportunities added in
+  long \texttt tokens (window.crypto.getRandomValues,
+  BatchSize.MaxMessageCount, ctx.GetStub().GetTxTimestamp(),
+  FABRIC\_OUTAGE\_ACCESS\_DENIED table cell, AND('LawFirmAMSP.peer'…)),
+  ECDH/KDF/AES-GCM reworded to "ECDH, KDF, and AES-GCM", canonical
+  batch-configuration sentence restructured, and the legacy-API
+  endpoint run-on converted to an itemized list (clearer anyway). The
+  remaining 15 are sub-visible table-cell overhangs at scriptsize.
+- **Style normalization:** the two "Figure~/Figures~" in-text references
+  normalized to the majority "Fig.~/Figs.~" form (28 existing uses).
+- Diagram-content correctness re-checked visually: Fig. 13's CheckAccess
+  branch logic matches Listing 1; topology diagram consistent with the
+  ordering-service prose (its FirmA/`lawchain.com` labels remain the
+  known no-source flag); page-3 hierarchy and page-28 lifecycle figures
+  confirmed legible.
+- Build: **103 pages** (+1 from larger figures), 0 errors, 0 undefined
+  refs, 0 "??", 15 cosmetic overfulls, 1 documented bibtex warning.
+  Float locality: worst non-intentional drift is 2 pages (a handful of
+  full-width figures land one page later than before — accepted trade
+  for legibility); key-lifecycle stack d=5.
+
 Every change made to `bra_submission/` in this pass, grouped by type, so each
 edit can be reviewed and reverted individually. Baseline = the authors' local
 copy of 2026-07-17 (verified byte-identical in source content to branch
