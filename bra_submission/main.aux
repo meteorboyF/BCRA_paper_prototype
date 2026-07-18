@@ -130,96 +130,96 @@
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {3.2.1}User Registration}{17}{subsubsection.3.2.1}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Mapping from legal requirements to framework mechanisms and supporting evidence. US authorities are cited as concrete anchors; comparable duties arise in other jurisdictions.}}{18}{table.3}\protected@file@percent }
 \newlabel{tab:legal_mapping}{{3}{18}{Mapping from legal requirements to framework mechanisms and supporting evidence. US authorities are cited as concrete anchors; comparable duties arise in other jurisdictions}{table.3}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.2.2}Document Upload and Registration}{18}{subsubsection.3.2.2}\protected@file@percent }
 \citation{fips1865}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces User registration workflow: browser-side P-256 keypair generation, PBKDF2-wrapped key storage in \texttt  {localStorage}, public-key registration, and (in the framework design) Fabric CA enrollment; per-user enrollment is not implemented in the prototype.}}{19}{figure.2}\protected@file@percent }
+\newlabel{fig:user_registration}{{2}{19}{User registration workflow: browser-side P-256 keypair generation, PBKDF2-wrapped key storage in \texttt {localStorage}, public-key registration, and (in the framework design) Fabric CA enrollment; per-user enrollment is not implemented in the prototype}{figure.2}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.2.2}Document Upload and Registration}{19}{subsubsection.3.2.2}\protected@file@percent }
 \citation{RBACSandhu,androulaki2018hyperledger}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces User registration workflow: browser-side P-256 keypair generation, PBKDF2-wrapped key storage in \texttt  {localStorage}, public-key registration, and Fabric CA enrollment.}}{19}{figure.2}\protected@file@percent }
-\newlabel{fig:user_registration}{{2}{19}{User registration workflow: browser-side P-256 keypair generation, PBKDF2-wrapped key storage in \texttt {localStorage}, public-key registration, and Fabric CA enrollment}{figure.2}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.2.3}Access Control and Document Retrieval}{19}{subsubsection.3.2.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Document upload and on-chain registration, showing browser-side $k_{enc}$ generation, plaintext hashing before encryption, sign-then-store ordering, IPFS upload, and CID anchoring. The in-figure signature verification at upload depicts the framework design; the prototype verifies $\sigma $ in a dedicated signing action anchored as a ledger audit event (Section~\ref {sec:workflows}).}}{20}{figure.3}\protected@file@percent }
+\newlabel{fig:document_upload}{{3}{20}{Document upload and on-chain registration, showing browser-side $k_{enc}$ generation, plaintext hashing before encryption, sign-then-store ordering, IPFS upload, and CID anchoring. The in-figure signature verification at upload depicts the framework design; the prototype verifies $\sigma $ in a dedicated signing action anchored as a ledger audit event (Section~\ref {sec:workflows})}{figure.3}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.2.3}Access Control and Document Retrieval}{20}{subsubsection.3.2.3}\protected@file@percent }
 \citation{fabricMSP,fips1865}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Document upload and on-chain registration, showing browser-side $k_{enc}$ generation, plaintext hashing before encryption, sign-then-store ordering, IPFS upload, and CID anchoring.}}{20}{figure.3}\protected@file@percent }
-\newlabel{fig:document_upload}{{3}{20}{Document upload and on-chain registration, showing browser-side $k_{enc}$ generation, plaintext hashing before encryption, sign-then-store ordering, IPFS upload, and CID anchoring}{figure.3}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.2.4}Audit and Integrity Verification}{20}{subsubsection.3.2.4}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Layer~1 access control: Spring Security JWT RBAC at the API gateway. Requests failing role validation are rejected before reaching the blockchain layer.}}{21}{figure.4}\protected@file@percent }
 \newlabel{fig:access_control}{{4}{21}{Layer~1 access control: Spring Security JWT RBAC at the API gateway. Requests failing role validation are rejected before reaching the blockchain layer}{figure.4}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Layer 2 access control and document retrieval: \texttt  {CheckAccess} chaincode evaluates the on-chain ACL at query time. The client decrypts locally; the server handles only ciphertext and ECIES-wrapped key tokens stored as encrypted ledger/world-state values.}}{21}{figure.5}\protected@file@percent }
-\newlabel{fig:document_retrieval}{{5}{21}{Layer 2 access control and document retrieval: \texttt {CheckAccess} chaincode evaluates the on-chain ACL at query time. The client decrypts locally; the server handles only ciphertext and ECIES-wrapped key tokens stored as encrypted ledger/world-state values}{figure.5}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.2.4}Audit and Integrity Verification}{21}{subsubsection.3.2.4}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Layer 2 access control and document retrieval: \texttt  {CheckAccess} chaincode evaluates the on-chain ACL at query time. The client decrypts locally; the server handles only ciphertext and ECIES-wrapped key tokens, anchored on-chain at grant time and served from the requester's own operational access entry.}}{22}{figure.5}\protected@file@percent }
+\newlabel{fig:document_retrieval}{{5}{22}{Layer 2 access control and document retrieval: \texttt {CheckAccess} chaincode evaluates the on-chain ACL at query time. The client decrypts locally; the server handles only ciphertext and ECIES-wrapped key tokens, anchored on-chain at grant time and served from the requester's own operational access entry}{figure.5}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Audit trail retrieval. \texttt  {GetHistoryForKey} returns the full transaction history for a document key and is independently verifiable by any consortium peer without trusting the application server.}}{22}{figure.6}\protected@file@percent }
 \newlabel{fig:audit_trail}{{6}{22}{Audit trail retrieval. \texttt {GetHistoryForKey} returns the full transaction history for a document key and is independently verifiable by any consortium peer without trusting the application server}{figure.6}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Document integrity verification by comparing on-chain $\mathcal  {H}_D$ with the SHA-256 hash of the locally decrypted document.}}{22}{figure.7}\protected@file@percent }
-\newlabel{fig:integrity_check}{{7}{22}{Document integrity verification by comparing on-chain $\mathcal {H}_D$ with the SHA-256 hash of the locally decrypted document}{figure.7}{}}
 \citation{nist80038d}
 \citation{nist80038d}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Document integrity verification by comparing on-chain $\mathcal  {H}_D$ with the SHA-256 hash of the locally decrypted document.}}{23}{figure.7}\protected@file@percent }
+\newlabel{fig:integrity_check}{{7}{23}{Document integrity verification by comparing on-chain $\mathcal {H}_D$ with the SHA-256 hash of the locally decrypted document}{figure.7}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Cryptographic Layer}{23}{subsection.3.3}\protected@file@percent }
 \newlabel{sec:crypto}{{3.3}{23}{Cryptographic Layer}{subsection.3.3}{}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {3.3.1}Notation}{23}{subsubsection.3.3.1}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Notation}}{23}{table.4}\protected@file@percent }
 \citation{shoup2001ecies,ieee1363a2004}
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Notation}}{24}{table.4}\protected@file@percent }
 \citation{fips1865}
-\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces ECIES-Style 125-Byte Wrapped-Key Token Format.}}{24}{table.5}\protected@file@percent }
-\newlabel{tab:eciestoken}{{5}{24}{ECIES-Style 125-Byte Wrapped-Key Token Format}{table.5}{}}
 \citation{fips1865,ieee1363a2004}
 \citation{ieee1363a2004}
 \citation{fips197}
 \citation{fips1865}
 \citation{rfc8785jcs}
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces ECIES-Style 125-Byte Wrapped-Key Token Format.}}{25}{table.5}\protected@file@percent }
+\newlabel{tab:eciestoken}{{5}{25}{ECIES-Style 125-Byte Wrapped-Key Token Format}{table.5}{}}
 \citation{owaspPasswordStorage2024}
 \citation{nist800132}
-\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Document Registration (Sign-Then-Store Pattern)}}{25}{algorithm.1}\protected@file@percent }
-\newlabel{alg:doc_registration}{{1}{25}{Notation}{algorithm.1}{}}
 \citation{nist800131a}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Document Registration (Sign-Then-Store Pattern)}}{26}{algorithm.1}\protected@file@percent }
+\newlabel{alg:doc_registration}{{1}{26}{Notation}{algorithm.1}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.3.2}Key Derivation}{26}{subsubsection.3.3.2}\protected@file@percent }
 \citation{rfc8785jcs}
 \citation{fips1865}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.3.2}Key Derivation}{26}{subsubsection.3.3.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.3.3}ECDSA Document Signatures}{26}{subsubsection.3.3.3}\protected@file@percent }
-\newlabel{sec:ecdsa}{{3.3.3}{26}{ECDSA Document Signatures}{subsubsection.3.3.3}{}}
-\newlabel{eq:sigpayload}{{1}{26}{ECDSA Document Signatures}{equation.1}{}}
-\citation{rfc8017}
-\citation{agyekum2022pre,park2021pre}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.3.3}ECDSA Document Signatures}{27}{subsubsection.3.3.3}\protected@file@percent }
+\newlabel{sec:ecdsa}{{3.3.3}{27}{ECDSA Document Signatures}{subsubsection.3.3.3}{}}
+\newlabel{eq:sigpayload}{{1}{27}{ECDSA Document Signatures}{equation.1}{}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {3.3.4}Key Management Lifecycle}{27}{subsubsection.3.3.4}\protected@file@percent }
 \newlabel{sec:keymgmt}{{3.3.4}{27}{Key Management Lifecycle}{subsubsection.3.3.4}{}}
+\citation{rfc8017}
+\citation{agyekum2022pre,park2021pre}
 \citation{fabricCADoc,fips1403,nist800634,w3cWebAuthnL3}
 \citation{rfc7519jwt,RBACSandhu}
-\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Phase~1: Client-side key generation. ECIES/ECDSA keys wrapped via PBKDF2-derived key and stored in \texttt  {localStorage}, per NIST SP~800-131A key-separation practice.}}{28}{figure.8}\protected@file@percent }
-\newlabel{fig:key_gen_and_storage}{{8}{28}{Phase~1: Client-side key generation. ECIES/ECDSA keys wrapped via PBKDF2-derived key and stored in \texttt {localStorage}, per NIST SP~800-131A key-separation practice}{figure.8}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Two-Layer Access Control Architecture}{28}{subsection.3.4}\protected@file@percent }
 \newlabel{sec:acl}{{3.4}{28}{Two-Layer Access Control Architecture}{subsection.3.4}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Phase~2 browser-side document encryption and registration with plaintext hashing before encryption, IV-prepended ciphertext, and ECDSA sign-then-store ordering.}}{29}{figure.9}\protected@file@percent }
-\newlabel{fig:document_encryption_registration}{{9}{29}{Phase~2 browser-side document encryption and registration with plaintext hashing before encryption, IV-prepended ciphertext, and ECDSA sign-then-store ordering}{figure.9}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Phase~3 ECIES-style P-256 key wrapping, showing owner-wrapped $k_{enc}$, on-chain \texttt  {GrantAccess} storage, and ECIES/RSA-OAEP token-size comparison.}}{30}{figure.10}\protected@file@percent }
-\newlabel{fig:access_grant_key_distribution}{{10}{30}{Phase~3 ECIES-style P-256 key wrapping, showing owner-wrapped $k_{enc}$, on-chain \texttt {GrantAccess} storage, and ECIES/RSA-OAEP token-size comparison}{figure.10}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces Phase~4: Recipient unwraps $k_{enc}$ with $sk_{ecies}$, extracts IV from first 12~bytes of stored ciphertext, and decrypts locally. Server delivers only ciphertext and wrapped key token.}}{31}{figure.11}\protected@file@percent }
-\newlabel{fig:access_and_decryption}{{11}{31}{Phase~4: Recipient unwraps $k_{enc}$ with $sk_{ecies}$, extracts IV from first 12~bytes of stored ciphertext, and decrypts locally. Server delivers only ciphertext and wrapped key token}{figure.11}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces Phase~5: Key recovery via consortium KMS/HSM and revocation workflow (framework design, not implemented in prototype). Re-encryption requires the document owner's browser; the server does not hold $k_{enc}$.}}{32}{figure.12}\protected@file@percent }
-\newlabel{fig:key_rotation_and_recovery}{{12}{32}{Phase~5: Key recovery via consortium KMS/HSM and revocation workflow (framework design, not implemented in prototype). Re-encryption requires the document owner's browser; the server does not hold $k_{enc}$}{figure.12}{}}
-\newlabel{lst:checkaccess}{{1}{32}{\texttt {CheckAccess} chaincode enforcing time-bounded capability tokens (see Section~\ref {sec:acl} for the eventual-consistency model). All five access branches shown: per-user grants (Branches~1--2), owner-organization fallback (Branch~3), and org-prefix grants (Branches~4--5)}{lstlisting.1}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {1}\texttt  {CheckAccess} chaincode enforcing time-bounded capability tokens (see Section~\ref {sec:acl} for the eventual-consistency model). All five access branches shown: per-user grants (Branches~1--2), owner-organization fallback (Branch~3), and org-prefix grants (Branches~4--5).}{32}{lstlisting.1}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {13}{\ignorespaces Two-layer access control pipeline: API-gateway JWT RBAC, on-chain \texttt  {CheckAccess}, and fail-closed \texttt  {FABRIC\_OUTAGE\_ACCESS\_DENIED} blocking.}}{34}{figure.13}\protected@file@percent }
-\newlabel{fig:rbac_acl_pipeline}{{13}{34}{Two-layer access control pipeline: API-gateway JWT RBAC, on-chain \texttt {CheckAccess}, and fail-closed \texttt {FABRIC\_OUTAGE\_ACCESS\_DENIED} blocking}{figure.13}{}}
-\@writefile{loa}{\contentsline {algorithm}{\numberline {2}{\ignorespaces Capability-Based Access Grant}}{34}{algorithm.2}\protected@file@percent }
-\newlabel{alg:access_grant}{{2}{34}{Two-Layer Access Control Architecture}{algorithm.2}{}}
-\citation{androulaki2018hyperledger}
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Phase~1: Client-side key generation. ECIES/ECDSA keys wrapped via PBKDF2-derived key and stored in \texttt  {localStorage}, per NIST SP~800-131A key-separation practice.}}{29}{figure.8}\protected@file@percent }
+\newlabel{fig:key_gen_and_storage}{{8}{29}{Phase~1: Client-side key generation. ECIES/ECDSA keys wrapped via PBKDF2-derived key and stored in \texttt {localStorage}, per NIST SP~800-131A key-separation practice}{figure.8}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Phase~2 browser-side document encryption and registration with plaintext hashing before encryption, IV-prepended ciphertext, and ECDSA sign-then-store ordering. The $\sigma $ shown in the registration step depicts the framework design; the prototype anchors $\sigma $ through the dedicated signing action (Section~\ref {sec:workflows}).}}{30}{figure.9}\protected@file@percent }
+\newlabel{fig:document_encryption_registration}{{9}{30}{Phase~2 browser-side document encryption and registration with plaintext hashing before encryption, IV-prepended ciphertext, and ECDSA sign-then-store ordering. The $\sigma $ shown in the registration step depicts the framework design; the prototype anchors $\sigma $ through the dedicated signing action (Section~\ref {sec:workflows})}{figure.9}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Phase~3 ECIES-style P-256 key wrapping, showing owner-wrapped $k_{enc}$, on-chain \texttt  {GrantAccess} storage, and the wrapped-token size comparison. Two in-figure labels predate the final design: the 256-byte comparison baseline is RSA-OAEP-2048 (not ECIES), and the depicted signed-proposal validation is framework design; the prototype submits grants without a proposal signature.}}{31}{figure.10}\protected@file@percent }
+\newlabel{fig:access_grant_key_distribution}{{10}{31}{Phase~3 ECIES-style P-256 key wrapping, showing owner-wrapped $k_{enc}$, on-chain \texttt {GrantAccess} storage, and the wrapped-token size comparison. Two in-figure labels predate the final design: the 256-byte comparison baseline is RSA-OAEP-2048 (not ECIES), and the depicted signed-proposal validation is framework design; the prototype submits grants without a proposal signature}{figure.10}{}}
+\newlabel{lst:checkaccess}{{1}{31}{\texttt {CheckAccess} chaincode enforcing time-bounded capability tokens (see Section~\ref {sec:acl} for the eventual-consistency model). All five access branches shown: per-user grants (Branches~1--2), owner-organization fallback (Branch~3), and org-prefix grants (Branches~4--5)}{lstlisting.1}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {1}\texttt  {CheckAccess} chaincode enforcing time-bounded capability tokens (see Section~\ref {sec:acl} for the eventual-consistency model). All five access branches shown: per-user grants (Branches~1--2), owner-organization fallback (Branch~3), and org-prefix grants (Branches~4--5).}{31}{lstlisting.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces Phase~4: Recipient unwraps $k_{enc}$ with $sk_{ecies}$, extracts IV from first 12~bytes of stored ciphertext, and decrypts locally. Server delivers only ciphertext and wrapped key token.}}{32}{figure.11}\protected@file@percent }
+\newlabel{fig:access_and_decryption}{{11}{32}{Phase~4: Recipient unwraps $k_{enc}$ with $sk_{ecies}$, extracts IV from first 12~bytes of stored ciphertext, and decrypts locally. Server delivers only ciphertext and wrapped key token}{figure.11}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces Phase~5: Key recovery via consortium KMS/HSM and revocation workflow (framework design, not implemented in prototype). Re-encryption requires the document owner's browser; the server does not hold $k_{enc}$.}}{33}{figure.12}\protected@file@percent }
+\newlabel{fig:key_rotation_and_recovery}{{12}{33}{Phase~5: Key recovery via consortium KMS/HSM and revocation workflow (framework design, not implemented in prototype). Re-encryption requires the document owner's browser; the server does not hold $k_{enc}$}{figure.12}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {13}{\ignorespaces Two-layer access control pipeline: API-gateway JWT RBAC, on-chain \texttt  {CheckAccess}, and fail-closed \texttt  {FABRIC\_OUTAGE\_ACCESS\_DENIED} blocking.}}{35}{figure.13}\protected@file@percent }
+\newlabel{fig:rbac_acl_pipeline}{{13}{35}{Two-layer access control pipeline: API-gateway JWT RBAC, on-chain \texttt {CheckAccess}, and fail-closed \texttt {FABRIC\_OUTAGE\_ACCESS\_DENIED} blocking}{figure.13}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {2}{\ignorespaces Capability-Based Access Grant}}{35}{algorithm.2}\protected@file@percent }
+\newlabel{alg:access_grant}{{2}{35}{Two-Layer Access Control Architecture}{algorithm.2}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.5}Audit Architecture}{35}{subsection.3.5}\protected@file@percent }
 \newlabel{sec:audit}{{3.5}{35}{Audit Architecture}{subsection.3.5}{}}
-\citation{Ongaro2014}
+\citation{androulaki2018hyperledger}
 \@writefile{toc}{\contentsline {section}{\numberline {4}Governance, Security, and Consensus}{36}{section.4}\protected@file@percent }
 \newlabel{sec:governance_security}{{4}{36}{Governance, Security, and Consensus}{section.4}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Operational Threat Model}{36}{subsection.4.1}\protected@file@percent }
 \newlabel{sec:threat_model}{{4.1}{36}{Operational Threat Model}{subsection.4.1}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.1}Trust Assumptions per Component}{36}{subsubsection.4.1.1}\protected@file@percent }
-\newlabel{sec:trust_assumptions}{{4.1.1}{36}{Trust Assumptions per Component}{subsubsection.4.1.1}{}}
+\citation{Ongaro2014}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.1}Trust Assumptions per Component}{37}{subsubsection.4.1.1}\protected@file@percent }
+\newlabel{sec:trust_assumptions}{{4.1.1}{37}{Trust Assumptions per Component}{subsubsection.4.1.1}{}}
 \citation{fabricPDCDoc}
 \citation{androulaki2018hyperledger,hyperledgerFabricOrderingService_v24}
 \citation{fabricWhatsNew3x,fabricOrderingServiceLatest}
 \citation{fabricPDCDoc}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.2}Adversary Capability Matrix}{37}{subsubsection.4.1.2}\protected@file@percent }
-\newlabel{sec:adversary_matrix}{{4.1.2}{37}{Adversary Capability Matrix}{subsubsection.4.1.2}{}}
 \gdef \LT@iii {\LT@entry 
     {1}{75.39595pt}\LT@entry 
     {1}{81.76619pt}\LT@entry 
     {1}{69.3055pt}\LT@entry 
     {1}{81.76619pt}\LT@entry 
     {1}{81.76619pt}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.2}Adversary Capability Matrix}{38}{subsubsection.4.1.2}\protected@file@percent }
+\newlabel{sec:adversary_matrix}{{4.1.2}{38}{Adversary Capability Matrix}{subsubsection.4.1.2}{}}
 \@writefile{lot}{\contentsline {table}{\numberline {6}{Operational Threat Model: Adversary Classes and System Defenses. This is a structured adversary analysis, not a formal cryptographic security proof. Residual risk column identifies properties that require governance controls or hardware beyond the current prototype.}}{38}{table.6}\protected@file@percent }
 \newlabel{tab:threat_model}{{6}{38}{Operational Threat Model: Adversary Classes and System Defenses. This is a structured adversary analysis, not a formal cryptographic security proof. Residual risk column identifies properties that require governance controls or hardware beyond the current prototype}{table.6}{}}
 \citation{androulaki2018hyperledger,hyperledgerFabricOrderingService_v24}
@@ -263,8 +263,8 @@
     {1}{119.80405pt}\LT@entry 
     {1}{52.23367pt}\LT@entry 
     {1}{119.80405pt}}
-\@writefile{lot}{\contentsline {table}{\numberline {7}{Framework Design vs.\ Prototype Implementation. Y~=~implemented; Y*~=~implemented with a known availability or governance caveat (see Production path column); P~=~partial; N~=~not yet implemented. Production path column identifies the engineering step required to close each gap. \textsuperscript  {$\dagger $}The ECDSA signing/verification mechanism is implemented and binds the signing key to $\mathcal  {H}_D$, $\mathcal  {H}_C$, and $id_D$; binding upload timestamp and owner metadata is a production hardening item. Fabric transaction-level attribution remains custodial because the prototype submits Fabric transactions through server-managed MSP credentials (Section~\ref {sec:prototype_scope}).}}{48}{table.7}\protected@file@percent }
-\newlabel{tab:framework_vs_prototype}{{7}{48}{Framework Design vs.\ Prototype Implementation. Y~=~implemented; Y*~=~implemented with a known availability or governance caveat (see Production path column); P~=~partial; N~=~not yet implemented. Production path column identifies the engineering step required to close each gap. \textsuperscript {$\dagger $}The ECDSA signing/verification mechanism is implemented and binds the signing key to $\mathcal {H}_D$, $\mathcal {H}_C$, and $id_D$; binding upload timestamp and owner metadata is a production hardening item. Fabric transaction-level attribution remains custodial because the prototype submits Fabric transactions through server-managed MSP credentials (Section~\ref {sec:prototype_scope})}{table.7}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {7}{Framework Design vs.\ Prototype Implementation. Y~=~implemented; Y*~=~implemented with a known availability or governance caveat (see Production path column); P~=~partial; N~=~not yet implemented. Production path column identifies the engineering step required to close each gap. \textsuperscript  {$\dagger $}The ECDSA signing/verification mechanism is implemented and binds the signing key to $\mathcal  {H}_D$, $\mathcal  {H}_C$, and $id_D$; in the prototype, verification occurs in a dedicated signing action anchored as a ledger audit event rather than inline in the registration transaction, and binding upload timestamp and owner metadata is a production hardening item. Fabric transaction-level attribution remains custodial because the prototype submits Fabric transactions through server-managed MSP credentials (Section~\ref {sec:prototype_scope}).}}{48}{table.7}\protected@file@percent }
+\newlabel{tab:framework_vs_prototype}{{7}{48}{Framework Design vs.\ Prototype Implementation. Y~=~implemented; Y*~=~implemented with a known availability or governance caveat (see Production path column); P~=~partial; N~=~not yet implemented. Production path column identifies the engineering step required to close each gap. \textsuperscript {$\dagger $}The ECDSA signing/verification mechanism is implemented and binds the signing key to $\mathcal {H}_D$, $\mathcal {H}_C$, and $id_D$; in the prototype, verification occurs in a dedicated signing action anchored as a ledger audit event rather than inline in the registration transaction, and binding upload timestamp and owner metadata is a production hardening item. Fabric transaction-level attribution remains custodial because the prototype submits Fabric transactions through server-managed MSP credentials (Section~\ref {sec:prototype_scope})}{table.7}{}}
 \citation{androulaki2018hyperledger}
 \citation{fabricCouchDBStateDB_v24}
 \citation{fabricChaincodeLifecycleDoc}
@@ -404,10 +404,10 @@
 \citation{ipfsDocsQuickstartPin2025,ipfsDocsKuboGarbageCollection}
 \citation{gdpr2016}
 \citation{finck2019blockchain,politou2019metadata}
-\citation{ateniese2017redactable,lyons2018integration}
-\citation{EDPB2025Pseudonymisation,Finck2020}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.8}GDPR and Regulatory Compliance}{80}{subsubsection.7.1.8}\protected@file@percent }
 \newlabel{sec:gdpr}{{7.1.8}{80}{GDPR and Regulatory Compliance}{subsubsection.7.1.8}{}}
+\citation{ateniese2017redactable,lyons2018integration}
+\citation{EDPB2025Pseudonymisation,Finck2020}
 \citation{springBoot325}
 \citation{fabricCADoc,rfc7519jwt}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.9}Integration with Legacy Legal Systems}{81}{subsubsection.7.1.9}\protected@file@percent }
@@ -435,8 +435,8 @@
 \@writefile{lol}{\contentsline {lstlisting}{\numberline {2}Browser AES-256-GCM document encryption. Fresh 256-bit key and 96-bit IV generated per document via \texttt  {window.crypto.getRandomValues}. SHA-256 hash computed of plaintext \emph  {before} encryption. Server receives only IV-prepended ciphertext.}{87}{lstlisting.2}\protected@file@percent }
 \newlabel{lst:pbkdf2}{{3}{87}{PBKDF2-SHA256 key derivation at 600,000 iterations (OWASP password-storage guidance; exceeds the NIST SP~800-132 minimum work factor). Derives the AES-256-GCM wrapping key protecting both ECIES and ECDSA private keys in \texttt {localStorage}}{lstlisting.3}{}}
 \@writefile{lol}{\contentsline {lstlisting}{\numberline {3}PBKDF2-SHA256 key derivation at 600,000 iterations (OWASP password-storage guidance; exceeds the NIST SP~800-132 minimum work factor). Derives the AES-256-GCM wrapping key protecting both ECIES and ECDSA private keys in \texttt  {localStorage}.}{87}{lstlisting.3}\protected@file@percent }
-\newlabel{lst:ecdsa}{{4}{87}{Server-side ECDSA P-256 verification. \texttt {SHA256withECDSAinP1363Format} natively consumes WebCrypto's raw $r \| s$ output without format conversion}{lstlisting.4}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {4}Server-side ECDSA P-256 verification. \texttt  {SHA256withECDSAinP1363Format} natively consumes WebCrypto's raw $r \| s$ output without format conversion.}{87}{lstlisting.4}\protected@file@percent }
+\newlabel{lst:ecdsa}{{4}{88}{Server-side ECDSA P-256 verification. \texttt {SHA256withECDSAinP1363Format} natively consumes WebCrypto's raw $r \| s$ output without format conversion}{lstlisting.4}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {4}Server-side ECDSA P-256 verification. \texttt  {SHA256withECDSAinP1363Format} natively consumes WebCrypto's raw $r \| s$ output without format conversion.}{88}{lstlisting.4}\protected@file@percent }
 \newlabel{lst:download}{{5}{88}{Strict fail-closed ACL in the document download path. Layer 1: Spring Security \texttt {@PreAuthorize}. Layer 2: \texttt {CheckAccess} chaincode. If Fabric is unreachable, the system strictly denies access and logs \texttt {FABRIC\_OUTAGE\_ACCESS\_DENIED}}{lstlisting.5}{}}
 \@writefile{lol}{\contentsline {lstlisting}{\numberline {5}Strict fail-closed ACL in the document download path. Layer 1: Spring Security \texttt  {@PreAuthorize}. Layer 2: \texttt  {CheckAccess} chaincode. If Fabric is unreachable, the system strictly denies access and logs \texttt  {FABRIC\_OUTAGE\_ACCESS\_DENIED}.}{88}{lstlisting.5}\protected@file@percent }
 \newlabel{lst:audittrigger}{{6}{89}{INSERT-only enforcement on \texttt {audit\_log}. Row-level triggers block UPDATE and DELETE; a statement-level trigger blocks TRUNCATE (which bypasses row-level triggers in PostgreSQL). TRUNCATE privilege is also revoked from application roles}{lstlisting.6}{}}

@@ -255,10 +255,11 @@ the fact. It provides the verifiable policy state against which the access
 request is evaluated (cross-organization access; see
 Section~\ref{sec:limitations} for intra-organization scope). When Fabric is
 unavailable, the evaluated document-download path returns HTTP~503 and does
-not fall back to a database ACL. Other Fabric-gateway paths follow the same
-fail-closed pattern by design but were not independently outage-tested.
-During Fabric unavailability, no new documents are released through
-this path.
+not fall back to a database ACL; no new documents are released through
+this path during an outage. The prototype's write paths (upload, grant,
+and revocation) are, by contrast, availability-first: on Fabric
+unavailability they complete the operational write and log the failed
+ledger anchoring rather than deny (Section~\ref{sec:limitations}).
 
 Encrypted document payloads are stored off-chain in a private two-node
 InterPlanetary File System (IPFS) swarm~\cite{benet2014ipfs}. SHA-256 hashes
@@ -747,7 +748,7 @@ Fail-closed on outage &
 No &
 No &
 No &
-Yes (empirically validated on document-download path; other paths fail-closed by design) \\
+Yes on the document-release path (empirically validated); prototype write paths are availability-first (Section~\ref{sec:limitations}) \\
 \hline
 Ciphertext integrity verifiable by client &
 No &
@@ -851,9 +852,13 @@ When the window lapses, expiry is enforced by the chaincode's
 deterministic timestamp comparison: no cleanup job, no trust in
 either firm's schedulers. If LawFirmA discovers an inadvertently
 produced privileged document, the FRCP~26(b)(5)(B) clawback procedure
-maps to \texttt{RevokeAccess}: the revocation is a ledger transaction
-both parties can see, and subsequent download attempts are denied and
-audited (Scenario~S1, Section~\ref{sec:attack_scenarios}).
+maps to \texttt{RevokeAccess}: the revocation is committed as a ledger
+transaction both parties can see, and subsequent download attempts are
+denied and audited (Scenario~S1, Section~\ref{sec:attack_scenarios}).
+If the ledger is unreachable at revocation time, the prototype records
+the revocation operationally and logs the failed anchoring; the
+divergence window this opens is a disclosed limitation
+(Section~\ref{sec:limitations}).
 
 \emph{Audit.} When the regulator examines the production, or when
 the parties dispute whether a document was altered or accessed outside
@@ -957,10 +962,12 @@ mapping from each to its legal anchor is Table~\ref{tab:legal_mapping}.
 
 \subsubsection{User Registration}
 Fig.~\ref{fig:user_registration} shows the registration workflow.
-The user submits identity attributes; the application server creates
-a profile in the off-chain PostgreSQL identity database and enrolls
-the user with the Fabric CA, issuing an X.509 certificate under the
-organization's MSP~\cite{fabricCADoc,fabricMSP}. In the framework
+The user submits identity attributes, and the application server creates
+a profile in the off-chain PostgreSQL identity database. In the framework
+design, registration also enrolls the user with the Fabric CA, issuing an
+X.509 certificate under the organization's
+MSP~\cite{fabricCADoc,fabricMSP}; per-user enrollment is not implemented
+in the prototype (Table~\ref{tab:framework_vs_prototype}). In the framework
 design, each user also generates two keypairs in the browser at
 registration: an ECIES-style P-256 keypair ($sk_{ecies}$, $pk_{ecies}$)
 for document key wrapping and an ECDSA~P-256 keypair ($sk_{sign}$,
@@ -977,7 +984,9 @@ transaction submission uses server-managed MSP credentials
     \workflowfigure{user_registration_flow.pdf}
     \caption{User registration workflow: browser-side P-256 keypair
     generation, PBKDF2-wrapped key storage in \texttt{localStorage},
-    public-key registration, and Fabric CA enrollment.}
+    public-key registration, and (in the framework design) Fabric CA
+    enrollment; per-user enrollment is not implemented in the
+    prototype.}
     \label{fig:user_registration}
 \end{figure*}
 
@@ -1003,9 +1012,14 @@ identifier. Because $\mathcal{H}_C$ hashes $IV \| D_{enc}$, any later
 attempt to swap the IPFS ciphertext invalidates the signature.
 
 After IPFS returns the CID, the server invokes the \texttt{RegisterDocument}
-chaincode with $\mathcal{H}_D$, the CID, metadata, and $\sigma$. The
-prototype signature does not bind upload timestamp or owner metadata;
-that binding is a production hardening item~\cite{fips1865}.
+chaincode with $\mathcal{H}_D$, the CID, and metadata. In the prototype,
+$\sigma$ is submitted and verified in a dedicated signing action
+(\texttt{POST /api/signatures/\{docId\}/sign}): the server verifies it
+over $\mathcal{H}_D \| \mathcal{H}_C \| \texttt{UTF-8}(id_D)$ and
+anchors the verified outcome on the ledger as an audit event; carrying
+$\sigma$ inside the registration transaction itself is the framework
+design. The prototype signature does not bind upload timestamp or owner
+metadata; that binding is a production hardening item~\cite{fips1865}.
 Transaction-level attribution remains custodial
 (Section~\ref{sec:prototype_scope}).
 
@@ -1013,7 +1027,7 @@ Transaction-level attribution remains custodial
 \begin{figure*}[!t]
     \centering
     \workflowfigure{document_upload_flow.pdf}
-    \caption{Document upload and on-chain registration, showing browser-side $k_{enc}$ generation, plaintext hashing before encryption, sign-then-store ordering, IPFS upload, and CID anchoring.}
+    \caption{Document upload and on-chain registration, showing browser-side $k_{enc}$ generation, plaintext hashing before encryption, sign-then-store ordering, IPFS upload, and CID anchoring. The in-figure signature verification at upload depicts the framework design; the prototype verifies $\sigma$ in a dedicated signing action anchored as a ledger audit event (Section~\ref{sec:workflows}).}
     \label{fig:document_upload}
 \end{figure*}
 
@@ -1024,12 +1038,17 @@ before the method body executes. Fig.~\ref{fig:document_retrieval}
 shows Layer~2: the \texttt{CheckAccess} chaincode evaluates the on-chain
 ACL at query time. Only if both layers authorize the request does the
 server retrieve the ciphertext from IPFS and the ECIES-wrapped key token
-from ledger storage. The client unwraps $k_{enc}$ using $sk_{ecies}$ and
-decrypts locally.
+from the requester's own access entry in the operational store (each
+grant also anchors the token on-chain). The client unwraps $k_{enc}$
+using $sk_{ecies}$ and decrypts locally.
 
 On the evaluated document-download path, Fabric unavailability causes
 HTTP~503 denial and no database ACL fallback. The service records a \texttt{FABRIC\_OUTAGE\_ACCESS\_DENIED}
-event in the operational \mbox{PostgreSQL} audit log. Because Fabric is unavailable at the time of denial, these outage events are not
+event in the operational \mbox{PostgreSQL} audit log. In the released
+artifact this strict mode is the default; a deployment flag
+(\texttt{material-db-fallback-enabled}, default off) can opt in to an
+availability-first database-ACL fallback for the release path, which is
+audited separately and exercised by no measurement in this paper. Because Fabric is unavailable at the time of denial, these outage events are not
 synchronously committed to the ledger and therefore inherit
 operational-log trust limits rather than ledger-verifiability guarantees.
 During Fabric unavailability, no new documents are released through
@@ -1051,8 +1070,9 @@ bypassed~\cite{RBACSandhu,androulaki2018hyperledger}.
     \workflowfigure{document_retrieval_flow.pdf}
     \caption{Layer 2 access control and document retrieval: \texttt{CheckAccess}
 chaincode evaluates the on-chain ACL at query time. The client decrypts
-locally; the server handles only ciphertext and ECIES-wrapped key tokens
-stored as encrypted ledger/world-state values.}
+locally; the server handles only ciphertext and ECIES-wrapped key tokens,
+anchored on-chain at grant time and served from the requester's own
+operational access entry.}
     \label{fig:document_retrieval}
 \end{figure*}
 
@@ -1140,8 +1160,10 @@ Algorithm~\ref{alg:doc_registration} formalizes the registration
 process using the sign-then-store pattern: in the prototype, $\sigma$ is
 computed over $\mathcal{H}_D \| \mathcal{H}_C \| \texttt{UTF-8}(id_D)$
 before the IPFS upload, avoiding the circular dependency of signing a
-value not yet known. The CID is submitted alongside $\sigma$ in the Fabric
-transaction; any party verifying non-repudiation verifies $\sigma$ over
+value not yet known. The CID is submitted in the Fabric registration
+transaction, and $\sigma$ is anchored through the signing action's
+ledger audit event (Section~\ref{sec:workflows}); any party verifying
+non-repudiation verifies $\sigma$ over
 $\mathcal{H}_D \| \mathcal{H}_C \| \texttt{UTF-8}(id_D)$. With 96-bit IVs generated via a
 CSPRNG and a fresh AES-256-GCM key per document (Algorithm~1,
 lines~1--2), the birthday-bound IV collision probability for any
@@ -1298,7 +1320,10 @@ Listing~\ref{lst:ecdsa} (Appendix~\ref{app:listings}) shows the server-side veri
 The key lifecycle spans five phases, shown in
 Figs.~\ref{fig:key_gen_and_storage}--\ref{fig:key_rotation_and_recovery}.
 Figs.~\ref{fig:key_gen_and_storage}--\ref{fig:access_and_decryption}
-depict mechanisms implemented in the prototype; Fig.~\ref{fig:key_rotation_and_recovery}
+depict mechanisms implemented in the prototype, except the Phase-3
+signed-proposal validation shown in
+Fig.~\ref{fig:access_grant_key_distribution}, which is framework design
+(see the caption); Fig.~\ref{fig:key_rotation_and_recovery}
 (Phase~5, key-escrow recovery) depicts the framework design only and is not
 implemented in the current prototype (see Section~\ref{sec:key_recovery_escrow}
 and Table~\ref{tab:framework_vs_prototype}).
@@ -1356,14 +1381,14 @@ Table~\ref{tab:framework_vs_prototype}~\cite{fabricCADoc,fips1403,nist800634,w3c
 \begin{figure}[!t]
     \centering
     \includegraphics[width=\columnwidth]{document_encryption.pdf}
-    \caption{Phase~2 browser-side document encryption and registration with plaintext hashing before encryption, IV-prepended ciphertext, and ECDSA sign-then-store ordering.}
+    \caption{Phase~2 browser-side document encryption and registration with plaintext hashing before encryption, IV-prepended ciphertext, and ECDSA sign-then-store ordering. The $\sigma$ shown in the registration step depicts the framework design; the prototype anchors $\sigma$ through the dedicated signing action (Section~\ref{sec:workflows}).}
     \label{fig:document_encryption_registration}
 \end{figure}
 
 \begin{figure}[!t]
     \centering
     \includegraphics[width=\columnwidth]{access_grant.pdf}
-    \caption{Phase~3 ECIES-style P-256 key wrapping, showing owner-wrapped $k_{enc}$, on-chain \texttt{GrantAccess} storage, and ECIES/RSA-OAEP token-size comparison.}
+    \caption{Phase~3 ECIES-style P-256 key wrapping, showing owner-wrapped $k_{enc}$, on-chain \texttt{GrantAccess} storage, and the wrapped-token size comparison. Two in-figure labels predate the final design: the 256-byte comparison baseline is RSA-OAEP-2048 (not ECIES), and the depicted signed-proposal validation is framework design; the prototype submits grants without a proposal signature.}
     \label{fig:access_grant_key_distribution}
 \end{figure}
 
@@ -1701,8 +1726,8 @@ Full write access to PostgreSQL; can modify application tables;
 cannot access Fabric peers or IPFS directly &
 Integrity of access control records and audit log &
 Under normal operation, access control is evaluated by chaincode
-(Layer~2). During Fabric unavailability, the system fails closed 
-(returning HTTP 503). The \texttt{audit\_log} row-level
+(Layer~2). During Fabric unavailability, the document-release path
+fails closed (returning HTTP 503). The \texttt{audit\_log} row-level
 and statement-level triggers block accidental or application-layer
 modification and TRUNCATE attempts (Listing~\ref{lst:audittrigger}) &
 Triggers provide operational integrity only, not cryptographic
@@ -2103,8 +2128,10 @@ P~=~partial; N~=~not yet implemented. Production path column
 identifies the engineering step required to close each gap.
 \textsuperscript{$\dagger$}The ECDSA signing/verification mechanism is
 implemented and binds the signing key to $\mathcal{H}_D$, $\mathcal{H}_C$,
-and $id_D$; binding upload timestamp and owner metadata is a production
-hardening item. Fabric transaction-level attribution remains custodial
+and $id_D$; in the prototype, verification occurs in a dedicated signing
+action anchored as a ledger audit event rather than inline in the
+registration transaction, and binding upload timestamp and owner metadata
+is a production hardening item. Fabric transaction-level attribution remains custodial
 because the prototype submits Fabric transactions through
 server-managed MSP credentials (Section~\ref{sec:prototype_scope}).}
 \label{tab:framework_vs_prototype}\\
@@ -3419,7 +3446,7 @@ hardening item (Section~\ref{sec:future_work}).
 
 The prototype does not enforce an explicit timeout on IPFS \texttt{GetFile} calls in the document download path. Under normal operation, the Fabric \texttt{CheckAccess} invocation completes before the IPFS retrieval begins. However, if the IPFS swarm experiences a node failure, disk fault, or network partition \emph{after} chaincode authorization succeeds, the Spring Boot HTTP thread handling the request may block indefinitely waiting for the ciphertext. Under sustained load, this could exhaust the application server's thread pool, causing a cascading failure that degrades or disables endpoints unrelated to IPFS. The production mitigation is a circuit-breaker pattern with a hard timeout (e.g., 5\,s) on all IPFS retrieval calls, returning HTTP~504 to the caller and logging an \texttt{IPFS\_RETRIEVAL\_TIMEOUT} audit event. This ensures IPFS unavailability degrades gracefully rather than propagating to a full service outage.
 
-Experiment~\hyperref[sec:exp_failclosed]{9} validates fail-closed behavior only for the document download path (\texttt{downloadCiphertext()}); the fail-closed behavior of the upload, grant, revoke, and audit-query paths is asserted by design (all paths invoke the same \texttt{FabricGatewayService} pattern and return \texttt{HTTP~503} on any \texttt{ServiceUnavailableException}) but was not independently validated empirically and is deferred to future work.
+Experiment~\hyperref[sec:exp_failclosed]{9} validates fail-closed behavior only for the document download path (\texttt{downloadCiphertext()}). The write paths are \emph{not} fail-closed in the prototype: upload, grant, revocation, and the signing action's audit anchoring each catch Fabric submission failures, log a warning, and complete the operational write, prioritizing availability. During a ledger outage this can produce operational-versus-ledger divergence; the sharpest case is a revocation recorded in PostgreSQL while the stale on-chain grant remains chaincode-authorized until the revocation is re-anchored. Making the write paths fail-closed, or adding durable queued re-anchoring with divergence detection, is a production hardening item.
 
 \subsubsection{GDPR and Regulatory Compliance}
 \label{sec:gdpr}
@@ -3647,8 +3674,8 @@ outage-anchoring limitation noted under RQ1.
 
 Normal operation resumed automatically after an approximately 20-second
 recovery lag (circuit-breaker open-state completion plus gRPC
-reconnection). The remaining Fabric-gateway paths share the same
-fail-closed design (Section~\ref{sec:limitations}).
+reconnection). The write paths remain availability-first in the
+prototype (Section~\ref{sec:limitations}).
 
 The evaluation also shows that the cryptographic layer is not the dominant
 performance cost. Using Node.js WebCrypto as a same-API fallback,

@@ -126,6 +126,66 @@ then:
   full-width figures land one page later than before — accepted trade
   for legibility); key-lifecycle stack d=5.
 
+---
+
+## Addendum 2026-07-19 (later) — diagram/code audit findings T1–T6 addressed
+
+An independent diagram-vs-code audit (separate session, findings
+forwarded by the corresponding author) reported six top-priority
+contradictions. **Each was re-verified against the backend/chaincode
+before any edit; all six confirmed.** Actions:
+
+- **T1 (artifact defaulted to fail-open).** `material-db-fallback-enabled`
+  defaulted to `true`, so the released artifact under default config
+  falls back to the PostgreSQL ACL during a Fabric outage — the opposite
+  of the published Exp 9 behavior (Exp 9 ran 2026-06-08; the flag was
+  introduced 2026-06-09 and postdates the measurement). **Fixed on
+  `prototype-fixes` (fc50593): strict fail-closed is now the default**
+  (config-line + matching javadoc/yml comments; no measured path
+  altered), and the manuscript now discloses the flag in §3.2.3
+  ("default off … exercised by no measurement in this paper").
+- **T2 (write paths are fail-open; the paper claimed fail-closed "by
+  design").** Verified: upload, grant, revocation, and the signing
+  action's anchoring all catch FabricException and continue with the
+  operational write. Six manuscript sites corrected: Introduction,
+  Limitations (now states the divergence risk incl. the
+  revoked-in-DB/active-on-chain case), arch-comparison table row,
+  Discussion, scenario clawback sentence, threat-table cell. The paper
+  no longer claims any write-path fail-closed behavior.
+- **T3 (signature verification is not on the upload path).** Verified:
+  `RegisterDocument` carries no σ; verification lives in the dedicated
+  `POST /api/signatures/{docId}/sign` flow (P1363, matching eq. (1)),
+  anchored via LogAuditEvent. Five sites corrected (upload prose, crypto
+  section, framework-table dagger note, two figure captions) to state
+  the dedicated-signing-action reality, with in-transaction σ marked as
+  framework design.
+- **T4 (Phase-3 diagram depicts a nonexistent signed-proposal protocol
+  and mislabels the 256-byte baseline as ECIES).** Verified in the
+  figure text layer. Caption now corrects both labels explicitly;
+  §3.3.4's "Phases 1–4 implemented" claim carries the exception. Redraw
+  blocked (no diagram source).
+- **T5 (registration prose/caption claimed Fabric-CA enrollment that
+  doesn't exist).** Verified (no enrollment code). Prose and caption now
+  mark CA enrollment as framework design, consistent with the
+  framework-vs-prototype table's "N".
+- **T6 (wrapped key served "from ledger storage").** Verified: served
+  from the requester's own PostgreSQL access entry after the Fabric
+  check; the token is also anchored on-chain at grant time. Prose and
+  caption now say "anchored on-chain, served from the operational
+  store".
+
+Not acted on (flagged for authors): the audit's redundancy suggestions
+(cut/merge fig:access_control, fig:document_retrieval,
+fig:integrity_check, one of the two upload diagrams) — author-taste
+cuts with a revert precedent (N1); and the UI-screenshot issues
+(six-peer "6/6" badge vs the evaluated 3-org network, "Cloudinary OCR"
+sidebar item inviting a cloud-vs-client-side-plaintext question,
+informal test identities, "legalchannel"/"FirmaOrgMSP" labels) — needs
+a retake against the current 3-org network or a cut (N3 territory).
+
+Build after fixes: 103 pages, 0 errors, 0 undefined refs, 0 "??",
+16 cosmetic overfulls, 0 em dashes.
+
 Every change made to `bra_submission/` in this pass, grouped by type, so each
 edit can be reviewed and reverted individually. Baseline = the authors' local
 copy of 2026-07-17 (verified byte-identical in source content to branch
