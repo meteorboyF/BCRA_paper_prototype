@@ -1,167 +1,162 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.7.17)  18 JUL 2026 22:56
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.7.12)  18 JUL 2026 19:59
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**./main.tex
-(main.tex
-LaTeX2e <2025-11-01>
-L3 programming layer <2025-12-24>
-
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/elsarticle\elsarticle.cl
-s
+**main.tex
+(./main.tex
+LaTeX2e <2026-06-01>
+L3 programming layer <2026-06-18>
+(/usr/local/texlive/2026/texmf-dist/tex/latex/elsarticle/elsarticle.cls
 Document Class: elsarticle 2026/01/09, 3.5: Elsevier Ltd
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/base\fontenc.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/base/fontenc.sty
 Package: fontenc 2025/07/18 v2.1d Standard LaTeX package
 )
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/l3kernel\expl3.sty
-Package: expl3 2025-12-24 L3 programming layer (loader) 
+(/usr/local/texlive/2026/texmf-dist/tex/latex/l3kernel/expl3.sty
+Package: expl3 2026-06-18 L3 programming layer (loader) 
 
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backend-pdft
-ex.def
-File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count275
+(/usr/local/texlive/2026/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
+File: l3backend-pdftex.def 2026-02-18 L3 backend support: PDF output (pdfTeX)
+\l__color_backend_stack_int=\count276
 ))
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/l3packages/xparse\xparse
-.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/l3packages/xparse/xparse.sty
 Package: xparse 2025-10-09 L3 Experimental document command parser
 )
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/etoolbox\etoolbox.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/etoolbox/etoolbox.sty
 Package: etoolbox 2025/10/02 v2.5m e-TeX tools for LaTeX (JAW)
-\etb@tempcnta=\count276
+\etb@tempcnta=\count277
 )
-\@bls=\dimen148
+\@bls=\dimen150
 
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/base\article.cls
+(/usr/local/texlive/2026/texmf-dist/tex/latex/base/article.cls
 Document Class: article 2025/01/22 v1.4n Standard LaTeX document class
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/base\size12.clo
+(/usr/local/texlive/2026/texmf-dist/tex/latex/base/size12.clo
 File: size12.clo 2025/01/22 v1.4n Standard LaTeX file (size option)
 )
-\c@part=\count277
-\c@section=\count278
-\c@subsection=\count279
-\c@subsubsection=\count280
-\c@paragraph=\count281
-\c@subparagraph=\count282
-\c@figure=\count283
-\c@table=\count284
+\c@part=\count278
+\c@section=\count279
+\c@subsection=\count280
+\c@subsubsection=\count281
+\c@paragraph=\count282
+\c@subparagraph=\count283
+\c@figure=\count284
+\c@table=\count285
 \abovecaptionskip=\skip49
 \belowcaptionskip=\skip50
-\bibindent=\dimen149
+\bibindent=\dimen151
 )
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphicx.sty
-Package: graphicx 2024/12/31 v1.2e Enhanced LaTeX Graphics (DPC,SPQR)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/graphics/graphicx.sty
+Package: graphicx 2026-05-17 v1.2e Enhanced LaTeX Graphics (DPC,SPQR)
 
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/graphics\keyval.sty
-Package: keyval 2022/05/29 v1.15 key=value parser (DPC)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2026-05-17 v1.15 key=value parser (DPC)
 \KV@toks@=\toks17
 )
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphics.sty
-Package: graphics 2024/08/06 v1.4g Standard LaTeX Graphics (DPC,SPQR)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/graphics/graphics.sty
+Package: graphics 2026-05-17 v1.4h Standard LaTeX Graphics (DPC,SPQR)
 
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/graphics\trig.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/graphics/trig.sty
 Package: trig 2023/12/02 v1.11 sin cos tan (DPC)
 )
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\graphics.cf
-g
+(/usr/local/texlive/2026/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
 File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
 )
 Package graphics Info: Driver file: pdftex.def on input line 106.
 
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/graphics-def\pdftex.def
+(/usr/local/texlive/2026/texmf-dist/tex/latex/graphics-def/pdftex.def
 File: pdftex.def 2025/09/29 v1.2d Graphics/color driver for pdftex
 ))
-\Gin@req@height=\dimen150
-\Gin@req@width=\dimen151
+\Gin@req@height=\dimen152
+\Gin@req@width=\dimen153
 )
-\c@tnote=\count285
-\c@fnote=\count286
-\c@cnote=\count287
-\c@ead=\count288
-\c@elsarticle@author=\count289
+\c@tnote=\count286
+\c@fnote=\count287
+\c@cnote=\count288
+\c@ead=\count289
+\c@elsarticle@author=\count290
 \@eadauthor=\toks18
-\c@affn=\count290
+\c@affn=\count291
 \absbox=\box53
 \elsarticlehighlightsbox=\box54
 \elsarticlegrabsbox=\box55
 \keybox=\box56
-\Columnwidth=\dimen152
-\space@left=\dimen153
+\Columnwidth=\dimen154
+\space@left=\dimen155
 \els@boxa=\box57
 \els@boxb=\box58
-\leftMargin=\dimen154
+\leftMargin=\dimen156
 \@enLab=\toks19
 \@sep=\skip51
 \@@sep=\skip52
- (main.spl)
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/natbib\natbib.sty
+
+(./main.spl) (/usr/local/texlive/2026/texmf-dist/tex/latex/natbib/natbib.sty
 Package: natbib 2010/09/13 8.31b (PWD, AO)
 \bibhang=\skip53
 \bibsep=\skip54
 LaTeX Info: Redefining \cite on input line 694.
-\c@NAT@ctr=\count291
+\c@NAT@ctr=\count292
 )
 \splwrite=\write3
 \openout3 = `main.spl'.
 
-\appnamewidth=\dimen155
+\appnamewidth=\dimen157
 )
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/silence\silence.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/silence/silence.sty
 Package: silence 2012/07/02 v1.5b Selective filtering of warnings and error mes
 sages
-\sl@Save=\count292
-\sl@StateNumber=\count293
-\sl@MessageCount=\count294
-\sl@Casualties=\count295
+\sl@Save=\count293
+\sl@StateNumber=\count294
+\sl@MessageCount=\count295
+\sl@Casualties=\count296
 \sl@Filter=\toks20
 \sl@Message=\toks21
 \sl@UnexpandedMessage=\toks22
 \sl@Mess@ge=\toks23
-\sl@WarningCount=\count296
-\sl@WarningNumber=\count297
-\sl@WarningCasualties=\count298
+\sl@WarningCount=\count297
+\sl@WarningNumber=\count298
+\sl@WarningCasualties=\count299
 \sl@TempBOW=\toks24
 \sl@BankOfWarnings=\toks25
 LaTeX Info: Redefining \GenericWarning on input line 433.
-\sl@ErrorCount=\count299
-\sl@ErrorNumber=\count300
-\sl@ErrorCasualties=\count301
+\sl@ErrorCount=\count300
+\sl@ErrorNumber=\count301
+\sl@ErrorCasualties=\count302
 \sl@TempBOE=\toks26
 \sl@BankOfErrors=\toks27
 LaTeX Info: Redefining \GenericError on input line 601.
 )
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/base\inputenc.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/base/inputenc.sty
 Package: inputenc 2024/02/08 v1.3d Input encoding file
 \inpenc@prehook=\toks28
 \inpenc@posthook=\toks29
 )
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsmath.sty
-Package: amsmath 2025/07/09 v2.17z AMS math features
+(/usr/local/texlive/2026/texmf-dist/tex/latex/amsmath/amsmath.sty
+Package: amsmath 2026/05/19 v2.18d AMS math features
 \@mathmargin=\skip55
 
 For additional information on amsmath, use the `?' option.
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amstext.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/amsmath/amstext.sty
 Package: amstext 2024/11/17 v2.01 AMS text
 
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsgen.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/amsmath/amsgen.sty
 File: amsgen.sty 1999/11/30 v2.0 generic functions
 \@emptytoks=\toks30
-\ex@=\dimen156
+\ex@=\dimen158
 ))
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsbsy.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/amsmath/amsbsy.sty
 Package: amsbsy 1999/11/29 v1.2d Bold Symbols
-\pmbraise@=\dimen157
+\pmbraise@=\dimen159
 )
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsopn.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/amsmath/amsopn.sty
 Package: amsopn 2022/04/08 v2.04 operator names
 )
-\inf@bad=\count302
+\inf@bad=\count303
 LaTeX Info: Redefining \frac on input line 233.
-\uproot@=\count303
-\leftroot@=\count304
+\uproot@=\count304
+\leftroot@=\count305
 LaTeX Info: Redefining \overline on input line 398.
 LaTeX Info: Redefining \colon on input line 409.
-\classnum@=\count305
-\DOTSCASE@=\count306
+\classnum@=\count306
+\DOTSCASE@=\count307
 LaTeX Info: Redefining \ldots on input line 495.
 LaTeX Info: Redefining \dots on input line 498.
 LaTeX Info: Redefining \cdots on input line 619.
@@ -171,41 +166,41 @@ LaTeX Info: Redefining \big on input line 721.
 LaTeX Info: Redefining \Big on input line 722.
 LaTeX Info: Redefining \bigg on input line 723.
 LaTeX Info: Redefining \Bigg on input line 724.
-\big@size=\dimen158
+\big@size=\dimen160
 LaTeX Font Info:    Redeclaring font encoding OML on input line 742.
 LaTeX Font Info:    Redeclaring font encoding OMS on input line 743.
-\macc@depth=\count307
+\macc@depth=\count308
 LaTeX Info: Redefining \bmod on input line 904.
 LaTeX Info: Redefining \pmod on input line 909.
 LaTeX Info: Redefining \smash on input line 939.
 LaTeX Info: Redefining \relbar on input line 969.
 LaTeX Info: Redefining \Relbar on input line 970.
-\c@MaxMatrixCols=\count308
+\c@MaxMatrixCols=\count309
 \dotsspace@=\muskip17
-\c@parentequation=\count309
-\dspbrk@lvl=\count310
+\c@parentequation=\count310
+\dspbrk@lvl=\count311
 \tag@help=\toks31
-\row@=\count311
-\column@=\count312
-\maxfields@=\count313
+\row@=\count312
+\column@=\count313
+\maxfields@=\count314
 \andhelp@=\toks32
-\eqnshift@=\dimen159
-\alignsep@=\dimen160
-\tagshift@=\dimen161
-\tagwidth@=\dimen162
-\totwidth@=\dimen163
-\lineht@=\dimen164
+\eqnshift@=\dimen161
+\alignsep@=\dimen162
+\tagshift@=\dimen163
+\tagwidth@=\dimen164
+\totwidth@=\dimen165
+\lineht@=\dimen166
 \@envbody=\toks33
 \multlinegap=\skip56
 \multlinetaggap=\skip57
 \mathdisplay@stack=\toks34
-LaTeX Info: Redefining \[ on input line 2950.
-LaTeX Info: Redefining \] on input line 2951.
+LaTeX Info: Redefining \[ on input line 2965.
+LaTeX Info: Redefining \] on input line 2966.
 )
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\amssymb.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/amsfonts/amssymb.sty
 Package: amssymb 2013/01/14 v3.01 AMS font symbols
 
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\amsfonts.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/amsfonts/amsfonts.sty
 Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
 \symAMSa=\mathgroup4
 \symAMSb=\mathgroup5
@@ -213,101 +208,102 @@ LaTeX Font Info:    Redeclaring math symbol \hbar on input line 98.
 LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
 (Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
 ))
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/algorithms\algorithm.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/algorithms/algorithm.sty
 Package: algorithm 2009/08/24 v0.1 Document Style `algorithm' - floating enviro
 nment
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/float\float.sty
+
+(/usr/local/texlive/2026/texmf-dist/tex/latex/float/float.sty
 Package: float 2001/11/08 v1.3d Float enhancements (AL)
-\c@float@type=\count314
+\c@float@type=\count315
 \float@exts=\toks35
 \float@box=\box61
 \@float@everytoks=\toks36
 \@floatcapt=\box62
 )
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/base\ifthen.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/base/ifthen.sty
 Package: ifthen 2024/03/16 v1.1e Standard LaTeX ifthen package (DPC)
 )
 \@float@every@algorithm=\toks37
-\c@algorithm=\count315
+\c@algorithm=\count316
 )
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/algorithms\algorithmic.s
-ty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/algorithms/algorithmic.sty
 Package: algorithmic 2009/08/24 v0.1 Document Style `algorithmic'
-\c@ALC@unique=\count316
-\c@ALC@line=\count317
-\c@ALC@rem=\count318
-\c@ALC@depth=\count319
+\c@ALC@unique=\count317
+\c@ALC@line=\count318
+\c@ALC@rem=\count319
+\c@ALC@depth=\count320
 \ALC@tlm=\skip58
 \algorithmicindent=\skip59
-) (C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/base\textcomp.sty
+)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/base/textcomp.sty
 Package: textcomp 2024/04/24 v2.1b Standard LaTeX package
 )
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/tools\array.sty
-Package: array 2025/09/25 v2.6n Tabular extension package (FMi)
-\col@sep=\dimen165
+(/usr/local/texlive/2026/texmf-dist/tex/latex/tools/array.sty
+Package: array 2026/02/24 v2.7b Tabular extension package (FMi)
+\col@sep=\dimen167
 \ar@mcellbox=\box63
-\extrarowheight=\dimen166
+\extrarowheight=\dimen168
 \NC@list=\toks38
 \extratabsurround=\skip60
 \backup@length=\skip61
 \ar@cellbox=\box64
 )
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/tools\tabularx.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/tools/tabularx.sty
 Package: tabularx 2023/12/11 v2.12a `tabularx' package (DPC)
-\TX@col@width=\dimen167
-\TX@old@table=\dimen168
-\TX@old@col=\dimen169
-\TX@target=\dimen170
-\TX@delta=\dimen171
-\TX@cols=\count320
+\TX@col@width=\dimen169
+\TX@old@table=\dimen170
+\TX@old@col=\dimen171
+\TX@target=\dimen172
+\TX@delta=\dimen173
+\TX@cols=\count321
 \TX@ftn=\toks39
 )
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/xltabular\xltabular.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/xltabular/xltabular.sty
 Package: xltabular 2025/02/28 v0.2i `xltabular' package (hv,RN)
 
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/ltablex\ltablex.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/ltablex/ltablex.sty
 Package: ltablex 2014/08/13 v1.1 Modified tabularx
 
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/tools\longtable.sty
-Package: longtable 2025-10-13 v4.24 Multi-page Table package (DPC)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/tools/longtable.sty
+Package: longtable 2026-01-28 v4.27 Multi-page Table package (DPC)
 \LTleft=\skip62
 \LTright=\skip63
 \LTpre=\skip64
 \LTpost=\skip65
-\LTchunksize=\count321
-\LTcapwidth=\dimen172
+\LTchunksize=\count322
+\LTcapwidth=\dimen174
 \LT@head=\box65
 \LT@firsthead=\box66
 \LT@foot=\box67
 \LT@lastfoot=\box68
 \LT@gbox=\box69
-\LT@cols=\count322
-\LT@rows=\count323
-\c@LT@tables=\count324
-\c@LT@chunks=\count325
+\LT@cols=\count323
+\LT@rows=\count324
+\c@LT@tables=\count325
+\c@LT@chunks=\count326
 \LT@p@ftn=\toks40
 )))
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/booktabs\booktabs.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/booktabs/booktabs.sty
 Package: booktabs 2020/01/12 v1.61803398 Publication quality tables
-\heavyrulewidth=\dimen173
-\lightrulewidth=\dimen174
-\cmidrulewidth=\dimen175
-\belowrulesep=\dimen176
-\belowbottomsep=\dimen177
-\aboverulesep=\dimen178
-\abovetopsep=\dimen179
-\cmidrulesep=\dimen180
-\cmidrulekern=\dimen181
-\defaultaddspace=\dimen182
-\@cmidla=\count326
-\@cmidlb=\count327
-\@aboverulesep=\dimen183
-\@belowrulesep=\dimen184
-\@thisruleclass=\count328
-\@lastruleclass=\count329
-\@thisrulewidth=\dimen185
+\heavyrulewidth=\dimen175
+\lightrulewidth=\dimen176
+\cmidrulewidth=\dimen177
+\belowrulesep=\dimen178
+\belowbottomsep=\dimen179
+\aboverulesep=\dimen180
+\abovetopsep=\dimen181
+\cmidrulesep=\dimen182
+\cmidrulekern=\dimen183
+\defaultaddspace=\dimen184
+\@cmidla=\count327
+\@cmidlb=\count328
+\@aboverulesep=\dimen185
+\@belowrulesep=\dimen186
+\@thisruleclass=\count329
+\@lastruleclass=\count330
+\@thisrulewidth=\dimen187
 )
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/ragged2e\ragged2e.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/ragged2e/ragged2e.sty
 Package: ragged2e 2023/06/22 v3.6 ragged2e Package
 \CenteringLeftskip=\skip66
 \RaggedLeftLeftskip=\skip67
@@ -324,14 +320,14 @@ Package: ragged2e 2023/06/22 v3.6 ragged2e Package
 \RaggedRightParindent=\skip78
 \JustifyingParindent=\skip79
 )
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/comment\comment.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/comment/comment.sty
 \CommentStream=\write4
 
 Excluding comment 'comment')
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/dblfloatfix\dblfloatfix.
-sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/dblfloatfix/dblfloatfix.sty
 Package: dblfloatfix 2012/12/31 v1.0a (JAW)
- (C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/base\fixltx2e.sty
+
+(/usr/local/texlive/2026/texmf-dist/tex/latex/base/fixltx2e.sty
 Package: fixltx2e 2016/12/29 v2.1a fixes to LaTeX (obsolete)
 Applying: [2015/01/01] Old fixltx2e package on input line 46.
 
@@ -342,59 +338,56 @@ Package fixltx2e Warning: fixltx2e is not required with releases after 2015
 
 Already applied: [0000/00/00] Old fixltx2e package on input line 53.
 )
-\@dblbotnum=\count330
-\c@dblbotnumber=\count331
-) (C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/subfig\subfig.sty
+\@dblbotnum=\count331
+\c@dblbotnumber=\count332
+) (/usr/local/texlive/2026/texmf-dist/tex/latex/subfig/subfig.sty
 Package: subfig 2005/06/28 ver: 1.3 subfig package
 
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/caption\caption3.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/caption/caption3.sty
 Package: caption3 2023/07/31 v2.4d caption3 kernel (AR)
-\caption@tempdima=\dimen186
-\captionmargin=\dimen187
-\caption@leftmargin=\dimen188
-\caption@rightmargin=\dimen189
-\caption@width=\dimen190
-\caption@indent=\dimen191
-\caption@parindent=\dimen192
-\caption@hangindent=\dimen193
+\caption@tempdima=\dimen188
+\captionmargin=\dimen189
+\caption@leftmargin=\dimen190
+\caption@rightmargin=\dimen191
+\caption@width=\dimen192
+\caption@indent=\dimen193
+\caption@parindent=\dimen194
+\caption@hangindent=\dimen195
 Package caption Info: elsarticle document class detected.
 
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/caption\caption-elsartic
-le.sto
+(/usr/local/texlive/2026/texmf-dist/tex/latex/caption/caption-elsarticle.sto
 File: caption-elsarticle.sto 2020/08/22 v2.0 Adaption of the caption package to
  the elsarticle document class (AR)
 ))
-\c@KVtest=\count332
+\c@KVtest=\count333
 \sf@farskip=\skip80
-\sf@captopadj=\dimen194
+\sf@captopadj=\dimen196
 \sf@capskip=\skip81
 \sf@nearskip=\skip82
-\c@subfigure=\count333
-\c@subfigure@save=\count334
-\c@lofdepth=\count335
-\c@subtable=\count336
-\c@subtable@save=\count337
-\c@lotdepth=\count338
+\c@subfigure=\count334
+\c@subfigure@save=\count335
+\c@lofdepth=\count336
+\c@subtable=\count337
+\c@subtable@save=\count338
+\c@lotdepth=\count339
 \sf@top=\skip83
 \sf@bottom=\skip84
-)
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/microtype\microtype.sty
+) (/usr/local/texlive/2026/texmf-dist/tex/latex/microtype/microtype.sty
 Package: microtype 2026/03/01 v3.2d Micro-typographical refinements (RS)
 \MT@toks=\toks41
 \MT@tempbox=\box70
-\MT@count=\count339
+\MT@count=\count340
 LaTeX Info: Redefining \noprotrusionifhmode on input line 1084.
 LaTeX Info: Redefining \leftprotrusion on input line 1085.
 \MT@prot@toks=\toks42
 LaTeX Info: Redefining \rightprotrusion on input line 1104.
 LaTeX Info: Redefining \textls on input line 1449.
-\MT@outer@kern=\dimen195
+\MT@outer@kern=\dimen197
 LaTeX Info: Redefining \microtypecontext on input line 2053.
 LaTeX Info: Redefining \textmicrotypecontext on input line 2070.
-\MT@listname@count=\count340
+\MT@listname@count=\count341
 
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/microtype\microtype-pdft
-ex.def
+(/usr/local/texlive/2026/texmf-dist/tex/latex/microtype/microtype-pdftex.def
 File: microtype-pdftex.def 2026/03/01 v3.2d Definitions specific to pdftex (RS)
 
 LaTeX Info: Redefining \lsstyle on input line 944.
@@ -403,60 +396,55 @@ LaTeX Info: Redefining \lslig on input line 944.
 )
 Package microtype Info: Loading configuration file microtype.cfg.
 
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/microtype\microtype.cfg
+(/usr/local/texlive/2026/texmf-dist/tex/latex/microtype/microtype.cfg
 File: microtype.cfg 2026/03/01 v3.2d microtype main configuration file (RS)
 )
 LaTeX Info: Redefining \microtypesetup on input line 3065.
-) (C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/xurl\xurl.sty
+)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/xurl/xurl.sty
 Package: xurl 2022/01/09 v 0.10 modify URL breaks
 
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/url\url.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/url/url.sty
 \Urlmuskip=\muskip18
 Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 ))
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/listings\listings.sty
-\lst@mode=\count341
+(/usr/local/texlive/2026/texmf-dist/tex/latex/listings/listings.sty
+\lst@mode=\count342
 \lst@gtempboxa=\box71
 \lst@token=\toks43
-\lst@length=\count342
-\lst@currlwidth=\dimen196
-\lst@column=\count343
-\lst@pos=\count344
-\lst@lostspace=\dimen197
-\lst@width=\dimen198
-\lst@newlines=\count345
-\lst@lineno=\count346
-\lst@maxwidth=\dimen199
+\lst@length=\count343
+\lst@currlwidth=\dimen198
+\lst@column=\count344
+\lst@pos=\count345
+\lst@lostspace=\dimen199
+\lst@width=\dimen256
+\lst@newlines=\count346
+\lst@lineno=\count347
+\lst@maxwidth=\dimen257
 
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstpatch.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstpatch.sty
 File: lstpatch.sty 2025/11/14 1.11b (Carsten Heinz)
 )
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstmisc.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstmisc.sty
 File: lstmisc.sty 2025/11/14 1.11b (Carsten Heinz)
-\c@lstnumber=\count347
-\lst@skipnumbers=\count348
+\c@lstnumber=\count348
+\lst@skipnumbers=\count349
 \lst@framebox=\box72
 )
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/listings\listings.cfg
+(/usr/local/texlive/2026/texmf-dist/tex/latex/listings/listings.cfg
 File: listings.cfg 2025/11/14 1.11b listings configuration
 ))
 Package: listings 2025/11/14 1.11b (Carsten Heinz)
 
-==> First Aid for listings.sty no longer applied!
-    Expected:
-        2024/09/23 1.10c (Carsten Heinz)
-    but found:
-        2025/11/14 1.11b (Carsten Heinz)
-    so I'm assuming it got fixed.
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/xcolor\xcolor.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/xcolor/xcolor.sty
 Package: xcolor 2024/09/29 v3.02 LaTeX color extensions (UK)
 
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\color.cfg
+(/usr/local/texlive/2026/texmf-dist/tex/latex/graphics-cfg/color.cfg
 File: color.cfg 2016/01/02 v1.6 sample color configuration
 )
 Package xcolor Info: Driver file: pdftex.def on input line 274.
 
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/graphics\mathcolor.ltx)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/graphics/mathcolor.ltx)
 Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1349.
 Package xcolor Info: Model `hsb' substituted by `rgb' on input line 1353.
 Package xcolor Info: Model `RGB' extended on input line 1365.
@@ -466,135 +454,132 @@ Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1369.
 Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1370.
 Package xcolor Info: Model `Gray' substituted by `gray' on input line 1371.
 Package xcolor Info: Model `wave' substituted by `hsb' on input line 1372.
-) (C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/needspace\needspace.st
-y
+)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/needspace/needspace.sty
 Package: needspace 2025/03/13 v1.3e reserve vertical space
-) (C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/placeins\placeins.sty
+)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/placeins/placeins.sty
 Package: placeins 2005/04/18  v 2.2
-) (C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hyperref.sty
-Package: hyperref 2025-07-12 v7.01o Hypertext links for LaTeX
+)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/hyperref/hyperref.sty
+Package: hyperref 2026-06-17 v7.01r Hypertext links for LaTeX
 
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/generic/iftex\iftex.sty
+(/usr/local/texlive/2026/texmf-dist/tex/generic/iftex/iftex.sty
 Package: iftex 2024/12/12 v1.0g TeX engine tests
 )
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/kvsetkeys\kvsetkeys.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty
 Package: kvsetkeys 2022-10-05 v1.19 Key value parser (HO)
 )
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/generic/kvdefinekeys\kvdefinek
-eys.sty
+(/usr/local/texlive/2026/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty
 Package: kvdefinekeys 2019-12-19 v1.6 Define keys (HO)
 )
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/generic/pdfescape\pdfescape.st
-y
+(/usr/local/texlive/2026/texmf-dist/tex/generic/pdfescape/pdfescape.sty
 Package: pdfescape 2019/12/09 v1.15 Implements pdfTeX's escape features (HO)
- (C:\Users\User\AppData\Local\Programs\MiKTeX\tex/generic/ltxcmds\ltxcmds.sty
+
+(/usr/local/texlive/2026/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty
 Package: ltxcmds 2023-12-04 v1.26 LaTeX kernel commands for general use (HO)
 )
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/generic/pdftexcmds\pdftexcmds.
-sty
+(/usr/local/texlive/2026/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
 Package: pdftexcmds 2020-06-27 v0.33 Utility functions of pdfTeX for LuaTeX (HO
 )
 
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/generic/infwarerr\infwarerr.st
-y
+(/usr/local/texlive/2026/texmf-dist/tex/generic/infwarerr/infwarerr.sty
 Package: infwarerr 2019/12/03 v1.5 Providing info/warning/error messages (HO)
 )
 Package pdftexcmds Info: \pdf@primitive is available.
 Package pdftexcmds Info: \pdf@ifprimitive is available.
 Package pdftexcmds Info: \pdfdraftmode found.
-)) (C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/hycolor\hycolor.sty
+))
+(/usr/local/texlive/2026/texmf-dist/tex/latex/hycolor/hycolor.sty
 Package: hycolor 2020-01-27 v1.10 Color options for hyperref/bookmark (HO)
-) (C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\nameref.sty
-Package: nameref 2025-06-21 v2.57 Cross-referencing by name of section
+)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/hyperref/nameref.sty
+Package: nameref 2026-01-29 v2.58 Cross-referencing by name of section
 
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/refcount\refcount.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/refcount/refcount.sty
 Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
 )
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/generic/gettitlestring\gettitl
-estring.sty
+(/usr/local/texlive/2026/texmf-dist/tex/generic/gettitlestring/gettitlestring.s
+ty
 Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
-
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/kvoptions\kvoptions.sty
+ (/usr/local/texlive/2026/texmf-dist/tex/latex/kvoptions/kvoptions.sty
 Package: kvoptions 2022-06-15 v3.15 Key value format for package options (HO)
 ))
-\c@section@level=\count349
+\c@section@level=\count350
 )
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/generic/stringenc\stringenc.st
-y
+(/usr/local/texlive/2026/texmf-dist/tex/generic/stringenc/stringenc.sty
 Package: stringenc 2019/11/29 v1.12 Convert strings between diff. encodings (HO
 )
 )
-\@linkdim=\dimen256
-\Hy@linkcounter=\count350
-\Hy@pagecounter=\count351
- (C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\pd1enc.def
-File: pd1enc.def 2025-07-12 v7.01o Hyperref: PDFDocEncoding definition (HO)
+\@linkdim=\dimen258
+\Hy@linkcounter=\count351
+\Hy@pagecounter=\count352
+
+(/usr/local/texlive/2026/texmf-dist/tex/latex/hyperref/pd1enc.def
+File: pd1enc.def 2026-06-17 v7.01r Hyperref: PDFDocEncoding definition (HO)
 Now handling font encoding PD1 ...
 ... no UTF-8 mapping file for font encoding PD1
 )
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/generic/intcalc\intcalc.sty
+(/usr/local/texlive/2026/texmf-dist/tex/generic/intcalc/intcalc.sty
 Package: intcalc 2019/12/15 v1.3 Expandable calculations with integers (HO)
 )
-\Hy@SavedSpaceFactor=\count352
+\Hy@SavedSpaceFactor=\count353
 
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\puenc.def
-File: puenc.def 2025-07-12 v7.01o Hyperref: PDF Unicode definition (HO)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/hyperref/puenc.def
+File: puenc.def 2026-06-17 v7.01r Hyperref: PDF Unicode definition (HO)
 Now handling font encoding PU ...
 ... no UTF-8 mapping file for font encoding PU
 )
-Package hyperref Info: Hyper figures OFF on input line 4195.
-Package hyperref Info: Link nesting OFF on input line 4200.
-Package hyperref Info: Hyper index ON on input line 4203.
-Package hyperref Info: Plain pages OFF on input line 4210.
-Package hyperref Info: Backreferencing OFF on input line 4215.
+Package hyperref Info: Hyper figures OFF on input line 4199.
+Package hyperref Info: Link nesting OFF on input line 4204.
+Package hyperref Info: Hyper index ON on input line 4207.
+Package hyperref Info: Plain pages OFF on input line 4214.
+Package hyperref Info: Backreferencing OFF on input line 4219.
 Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
-Package hyperref Info: Bookmarks ON on input line 4462.
-\c@Hy@tempcnt=\count353
-LaTeX Info: Redefining \url on input line 4801.
-\XeTeXLinkMargin=\dimen257
+Package hyperref Info: Bookmarks ON on input line 4466.
+\c@Hy@tempcnt=\count354
+LaTeX Info: Redefining \url on input line 4805.
+\XeTeXLinkMargin=\dimen259
 
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/generic/bitset\bitset.sty
+(/usr/local/texlive/2026/texmf-dist/tex/generic/bitset/bitset.sty
 Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
 
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/generic/bigintcalc\bigintcalc.
-sty
+(/usr/local/texlive/2026/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty
 Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO
 )
 ))
-\Fld@menulength=\count354
-\Field@Width=\dimen258
-\Fld@charsize=\dimen259
-Package hyperref Info: Hyper figures OFF on input line 6078.
-Package hyperref Info: Link nesting OFF on input line 6083.
-Package hyperref Info: Hyper index ON on input line 6086.
-Package hyperref Info: backreferencing OFF on input line 6093.
-Package hyperref Info: Link coloring OFF on input line 6098.
-Package hyperref Info: Link coloring with OCG OFF on input line 6103.
-Package hyperref Info: PDF/A mode OFF on input line 6108.
-\Hy@abspage=\count355
-\c@Item=\count356
-\c@Hfootnote=\count357
+\Fld@menulength=\count355
+\Field@Width=\dimen260
+\Fld@charsize=\dimen261
+Package hyperref Info: Hyper figures OFF on input line 6091.
+Package hyperref Info: Link nesting OFF on input line 6096.
+Package hyperref Info: Hyper index ON on input line 6099.
+Package hyperref Info: backreferencing OFF on input line 6106.
+Package hyperref Info: Link coloring OFF on input line 6111.
+Package hyperref Info: Link coloring with OCG OFF on input line 6116.
+Package hyperref Info: PDF/A mode OFF on input line 6121.
+\Hy@abspage=\count356
+\c@Item=\count357
+\c@Hfootnote=\count358
 )
 Package hyperref Info: Driver (autodetected): hpdftex.
 
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hpdftex.def
-File: hpdftex.def 2025-07-12 v7.01o Hyperref driver for pdfTeX
-\Fld@listcount=\count358
-\c@bookmark@seq@number=\count359
+(/usr/local/texlive/2026/texmf-dist/tex/latex/hyperref/hpdftex.def
+File: hpdftex.def 2026-06-17 v7.01r Hyperref driver for pdfTeX
+\Fld@listcount=\count359
+\c@bookmark@seq@number=\count360
 
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/rerunfilecheck\rerunfile
-check.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
 Package: rerunfilecheck 2025-06-21 v1.11 Rerun checks for auxiliary files (HO)
 
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/generic/uniquecounter\uniqueco
-unter.sty
+(/usr/local/texlive/2026/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty
 Package: uniquecounter 2019/12/15 v1.4 Provide unlimited unique counter (HO)
 )
 Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
 84.
 )
 \Hy@SectionHShift=\skip86
-) (main.aux)
+) (./main.aux)
 \openout1 = `main.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 137.
@@ -616,30 +601,27 @@ LaTeX Font Info:    ... okay on input line 137.
 LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 137.
 LaTeX Font Info:    ... okay on input line 137.
 
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pdf.mki
-i
+(/usr/local/texlive/2026/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count360
-\scratchdimen=\dimen260
+\scratchcounter=\count361
+\scratchdimen=\dimen262
 \scratchbox=\box73
-\nofMPsegments=\count361
-\nofMParguments=\count362
+\nofMPsegments=\count362
+\nofMParguments=\count363
 \everyMPshowfont=\toks44
-\MPscratchCnt=\count363
-\MPscratchDim=\dimen261
-\MPnumerator=\count364
-\makeMPintoPDFobject=\count365
+\MPscratchCnt=\count364
+\MPscratchDim=\dimen263
+\MPnumerator=\count365
+\makeMPintoPDFobject=\count366
 \everyMPtoPDFconversion=\toks45
-)
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/epstopdf-pkg\epstopdf-ba
-se.sty
+) (/usr/local/texlive/2026/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 85.
 
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/00miktex\epstopdf-sys.cf
-g
-File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
+(/usr/local/texlive/2026/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
+File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
+e
 ))
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: subfig package v1.3 is loaded.
@@ -661,32 +643,32 @@ Package microtype Info: Patching command `\showhyphens'.
 Package microtype Info: No adjustment of tracking.
 Package microtype Info: No adjustment of interword spacing.
 Package microtype Info: No adjustment of character kerning.
- (C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/microtype\mt-cmr.cfg
+
+(/usr/local/texlive/2026/texmf-dist/tex/latex/microtype/mt-cmr.cfg
 File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman 
 (RS)
 )
-\c@lstlisting=\count366
+\c@lstlisting=\count367
 Package hyperref Info: Link coloring OFF on input line 137.
- (main.out) (main.out)
+ (./main.out) (./main.out)
 \@outlinefile=\write5
 \openout5 = `main.out'.
 
 LaTeX Font Info:    Trying to load font information for U+msa on input line 168
 .
-
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd
+ (/usr/local/texlive/2026/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/microtype\mt-msa.cfg
+(/usr/local/texlive/2026/texmf-dist/tex/latex/microtype/mt-msa.cfg
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
 LaTeX Font Info:    Trying to load font information for U+msb on input line 168
 .
 
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
+(/usr/local/texlive/2026/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/microtype\mt-msb.cfg
+(/usr/local/texlive/2026/texmf-dist/tex/latex/microtype/mt-msb.cfg
 File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 )
 Package microtype Info: Loading generic protrusion settings for font family
@@ -713,91 +695,100 @@ Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 [1
 
 
-{C:/Users/User/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/User/
-AppData/Local/Programs/MiKTeX/fonts/enc/dvips/cm-super/cm-super-t1.enc}]
+{/usr/local/texlive/2026/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/usr/loc
+al/texlive/2026/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc}]
+LaTeX Font Info:    Calculating math sizes for size <> on input line 168.
 
-pdfTeX warning: pdflatex.exe (file ./figures/Hierarchy.pdf): PDF inclusion: fou
-nd PDF version <1.7>, but at most version <1.5> allowed
-<figures/Hierarchy.pdf, id=325, 210.7875pt x 117.3183pt>
+
+LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <> not available
+(Font)              size <5> substituted on input line 168.
+
+
+LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <0.7> not available
+(Font)              size <5> substituted on input line 168.
+
+
+LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <0.5> not available
+(Font)              size <5> substituted on input line 168.
+
+
+LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <> not available
+(Font)              size <5> substituted on input line 168.
+
+
+LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <0.7> not available
+(Font)              size <5> substituted on input line 168.
+
+
+LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <0.5> not available
+(Font)              size <5> substituted on input line 168.
+
+
+LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <> not available
+(Font)              size <5> substituted on input line 168.
+
+
+LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <0.7> not available
+(Font)              size <5> substituted on input line 168.
+
+
+LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <0.5> not available
+(Font)              size <5> substituted on input line 168.
+
+<figures/Hierarchy.pdf, id=327, 210.7875pt x 117.3183pt>
 File: figures/Hierarchy.pdf Graphic file (type pdf)
 <use figures/Hierarchy.pdf>
 Package pdftex.def Info: figures/Hierarchy.pdf  used on input line 206.
 (pdftex.def)             Requested size: 390.0pt x 217.06767pt.
-[2] [3 <./figures/Hierarchy.pdf>] [4{C:/Users/User/AppData/Local/Programs/MiKTe
-X/fonts/enc/dvips/cm-super/cm-super-ts1.enc}] [5] [6]
-ignored error: Infinite glue shrinkage found in box being split [7]
-ignored error: Infinite glue shrinkage found in box being split [8]
-ignored error: Infinite glue shrinkage found in box being split [9] [10]
-[11] [12] [13]
-ignored error: Infinite glue shrinkage found in box being split [14] [15]
-[16] [17]
-
-pdfTeX warning: pdflatex.exe (file ./figures/user_registration_flow.pdf): PDF i
-nclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<figures/user_registration_flow.pdf, id=680, 952.51855pt x 367.3725pt>
+[2] [3 <./figures/Hierarchy.pdf>] [4{/usr/local/texlive/2026/texmf-dist/fonts/e
+nc/dvips/cm-super/cm-super-ts1.enc}] [5] [6] [7] [8] [9] [10] [11] [12]
+[13] [14] [15] [16] [17]
+<figures/user_registration_flow.pdf, id=684, 952.51855pt x 367.3725pt>
 File: figures/user_registration_flow.pdf Graphic file (type pdf)
 <use figures/user_registration_flow.pdf>
 Package pdftex.def Info: figures/user_registration_flow.pdf  used on input line
  984.
 (pdftex.def)             Requested size: 389.99736pt x 150.41628pt.
-[18]
+ [18]
 Overfull \hbox (26.76988pt too wide) in paragraph at lines 1014--1025
 \T1/cmr/m/n/12 (-20) and ver-i-fied in a ded-i-cated sign-ing ac-tion (\T1/cmtt
 /m/n/12 POST /api/signatures/{docId}/sign\T1/cmr/m/n/12 (-20) ):
  []
 
 [19 <./figures/user_registration_flow.pdf>]
-
-pdfTeX warning: pdflatex.exe (file ./figures/document_upload_flow.pdf): PDF inc
-lusion: found PDF version <1.7>, but at most version <1.5> allowed
-<figures/document_upload_flow.pdf, id=728, 2133.9725pt x 1850.36754pt>
+<figures/document_upload_flow.pdf, id=732, 2133.9725pt x 1850.36754pt>
 File: figures/document_upload_flow.pdf Graphic file (type pdf)
 <use figures/document_upload_flow.pdf>
 Package pdftex.def Info: figures/document_upload_flow.pdf  used on input line 1
 029.
 (pdftex.def)             Requested size: 265.67137pt x 230.36365pt.
-[20 <./figures/document_upload_flow.pdf>]
-
-pdfTeX warning: pdflatex.exe (file ./figures/access_control_flow.pdf): PDF incl
-usion: found PDF version <1.7>, but at most version <1.5> allowed
-<figures/access_control_flow.pdf, id=1760, 1802.735pt x 1033.31505pt>
+ [20 <./figures/document_upload_flow.pdf>]
+<figures/access_control_flow.pdf, id=1770, 1802.735pt x 1033.31505pt>
 File: figures/access_control_flow.pdf Graphic file (type pdf)
 <use figures/access_control_flow.pdf>
 Package pdftex.def Info: figures/access_control_flow.pdf  used on input line 10
 61.
 (pdftex.def)             Requested size: 390.00113pt x 223.54591pt.
-
-
-pdfTeX warning: pdflatex.exe (file ./figures/document_retrieval_flow.pdf): PDF 
-inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<figures/document_retrieval_flow.pdf, id=1761, 616.22218pt x 324.25137pt>
+<figures/document_retrieval_flow.pdf, id=1771, 616.22218pt x 324.25137pt>
 File: figures/document_retrieval_flow.pdf Graphic file (type pdf)
 <use figures/document_retrieval_flow.pdf>
 Package pdftex.def Info: figures/document_retrieval_flow.pdf  used on input lin
 e 1070.
 (pdftex.def)             Requested size: 389.99915pt x 205.21455pt.
-
-
-pdfTeX warning: pdflatex.exe (file ./figures/audit_trail_flow.pdf): PDF inclusi
-on: found PDF version <1.7>, but at most version <1.5> allowed
-<figures/audit_trail_flow.pdf, id=1764, 884.34387pt x 323.28778pt>
+<figures/audit_trail_flow.pdf, id=1774, 884.34387pt x 323.28778pt>
 File: figures/audit_trail_flow.pdf Graphic file (type pdf)
 <use figures/audit_trail_flow.pdf>
 Package pdftex.def Info: figures/audit_trail_flow.pdf  used on input line 1094.
 
 (pdftex.def)             Requested size: 390.0031pt x 142.57263pt.
-
-
-pdfTeX warning: pdflatex.exe (file ./figures/integrity_check_flow.pdf): PDF inc
-lusion: found PDF version <1.7>, but at most version <1.5> allowed
-<figures/integrity_check_flow.pdf, id=1765, 1385.175pt x 984.67876pt>
+<figures/integrity_check_flow.pdf, id=1775, 1385.175pt x 984.67876pt>
 File: figures/integrity_check_flow.pdf Graphic file (type pdf)
 <use figures/integrity_check_flow.pdf>
 Package pdftex.def Info: figures/integrity_check_flow.pdf  used on input line 1
 104.
 (pdftex.def)             Requested size: 390.0pt x 277.2407pt.
-[21 <./figures/access_control_flow.pdf>] [22 <./figures/document_retrieval_flow
-.pdf> <./figures/audit_trail_flow.pdf>]
+ [21 <./figures/access_control_flow.pdf>] [22 <./figures/document_retrieval_flo
+w.pdf> <./figures/audit_trail_flow.pdf>]
 Overfull \hbox (6.10643pt too wide) in paragraph at lines 1156--1156
 []|$\OML/cmm/m/it/12 sk[];  pk[]$| 
  []
@@ -835,87 +826,62 @@ Overfull \hbox (1.15056pt too wide) in paragraph at lines 1341--1347
 256-byte RSA-OAEP 2048 wrapped-
  []
 
-
-
-pdfTeX warning: pdflatex.exe (file ./figures/key_gen_and_storage.pdf): PDF incl
-usion: found PDF version <1.7>, but at most version <1.5> allowed
-<figures/key_gen_and_storage.pdf, id=2974, 1882.03125pt x 1421.31pt>
+<figures/key_gen_and_storage.pdf, id=2990, 1882.03125pt x 1421.31pt>
 File: figures/key_gen_and_storage.pdf Graphic file (type pdf)
 <use figures/key_gen_and_storage.pdf>
 Package pdftex.def Info: figures/key_gen_and_storage.pdf  used on input line 13
 76.
 (pdftex.def)             Requested size: 390.0pt x 294.5151pt.
-
-
-pdfTeX warning: pdflatex.exe (file ./figures/document_encryption.pdf): PDF incl
-usion: found PDF version <1.7>, but at most version <1.5> allowed
-<figures/document_encryption.pdf, id=2975, 2429.075pt x 2469.225pt>
+<figures/document_encryption.pdf, id=2991, 2429.075pt x 2469.225pt>
 File: figures/document_encryption.pdf Graphic file (type pdf)
 <use figures/document_encryption.pdf>
 Package pdftex.def Info: figures/document_encryption.pdf  used on input line 13
 83.
 (pdftex.def)             Requested size: 390.0pt x 396.44046pt.
-
-
-pdfTeX warning: pdflatex.exe (file ./figures/access_grant.pdf): PDF inclusion: 
-found PDF version <1.7>, but at most version <1.5> allowed
-<figures/access_grant.pdf, id=2978, 2543.5025pt x 1927.2pt>
+<figures/access_grant.pdf, id=2994, 2543.5025pt x 1927.2pt>
 File: figures/access_grant.pdf Graphic file (type pdf)
 <use figures/access_grant.pdf>
 Package pdftex.def Info: figures/access_grant.pdf  used on input line 1390.
 (pdftex.def)             Requested size: 390.0pt x 295.47818pt.
-
-
-pdfTeX warning: pdflatex.exe (file ./figures/access_and_decryption.pdf): PDF in
-clusion: found PDF version <1.7>, but at most version <1.5> allowed
-<figures/access_and_decryption.pdf, id=2979, 2304.61pt x 3023.84245pt>
+<figures/access_and_decryption.pdf, id=2995, 2304.61pt x 3023.84245pt>
 File: figures/access_and_decryption.pdf Graphic file (type pdf)
 <use figures/access_and_decryption.pdf>
 Package pdftex.def Info: figures/access_and_decryption.pdf  used on input line 
 1397.
 (pdftex.def)             Requested size: 229.91185pt x 301.66371pt.
-
-
-pdfTeX warning: pdflatex.exe (file ./figures/key_rotation_and_recovery.pdf): PD
-F inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<figures/key_rotation_and_recovery.pdf, id=2980, 588.27782pt x 427.5975pt>
+<figures/key_rotation_and_recovery.pdf, id=2996, 588.27782pt x 427.5975pt>
 File: figures/key_rotation_and_recovery.pdf Graphic file (type pdf)
 <use figures/key_rotation_and_recovery.pdf>
 Package pdftex.def Info: figures/key_rotation_and_recovery.pdf  used on input l
 ine 1406.
 (pdftex.def)             Requested size: 390.0pt x 283.48752pt.
 [28] [29 <./figures/key_gen_and_storage.pdf>] [30 <./figures/document_encryptio
-n.pdf>]
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
+n.pdf>] (/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2025/11/14 1.11b listings language file
 )
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang2.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstlang2.sty
 File: lstlang2.sty 2025/11/14 1.11b listings language file
 )
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang3.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstlang3.sty
 File: lstlang3.sty 2025/11/14 1.11b listings language file
 )
 Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on i
 nput line 1449.
-
-[31 <./figures/access_grant.pdf>] [32 <./figures/access_and_decryption.pdf>]
+ [31 <./figures/access_grant.pdf>] [32 <./figures/access_and_decryption.pdf>]
 LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <8> not available
 (Font)              Font shape `T1/cmtt/m/n' tried instead on input line 1451.
-
-[33 <./figures/key_rotation_and_recovery.pdf>]
-
-pdfTeX warning: pdflatex.exe (file ./figures/rbac_acl_pipeline.pdf): PDF inclus
-ion: found PDF version <1.7>, but at most version <1.5> allowed
-<figures/rbac_acl_pipeline.pdf, id=5412, 2962.06625pt x 1777.91534pt>
+ [33 <./figures/key_rotation_and_recovery.pdf>]
+<figures/rbac_acl_pipeline.pdf, id=5441, 2962.06625pt x 1777.91534pt>
 File: figures/rbac_acl_pipeline.pdf Graphic file (type pdf)
 <use figures/rbac_acl_pipeline.pdf>
 Package pdftex.def Info: figures/rbac_acl_pipeline.pdf  used on input line 1526
 .
 (pdftex.def)             Requested size: 390.0pt x 234.06702pt.
-[34] [35 <./figures/rbac_acl_pipeline.pdf>]
+ [34] [35 <./figures/rbac_acl_pipeline.pdf>]
 LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <12> not available
 (Font)              Font shape `T1/cmtt/m/n' tried instead on input line 1567.
- [36] [37]
+
+[36] [37]
 Underfull \hbox (badness 10000) in paragraph at lines 1822--1822
 []|\T1/cmr/bx/n/8 (+20) Property
  []
@@ -2056,11 +2022,9 @@ Underfull \hbox (badness 10000) in paragraph at lines 1822--1822
 \T1/cmr/m/n/8 (+20) re-duce leak-age
  []
 
-ignored error: Infinite glue shrinkage found in box being split [38]
-ignored error: Infinite glue shrinkage found in box being split [39]
-ignored error: Infinite glue shrinkage found in box being split [40]
+[38] [39] [40]
 Overfull \hbox (17.6207pt too wide) in paragraph at lines 1824--1843
-[]$[]$ 
+[][] 
  []
 
 [41] [42] [43] [44] [45] [46]
@@ -2435,12 +2399,9 @@ Underfull \hbox (badness 1742) in paragraph at lines 2233--2233
 \T1/cmr/m/n/10.95 (+20) doc-u-ment and re-cip-
  []
 
-[47]
-ignored error: Infinite glue shrinkage found in box being split [48]
-ignored error: Infinite glue shrinkage found in box being split [49]
-ignored error: Infinite glue shrinkage found in box being split [50]
+[47] [48] [49] [50]
 Overfull \hbox (17.6207pt too wide) in paragraph at lines 2235--2248
-[]$[]$ 
+[][] 
  []
 
 [51]
@@ -2449,89 +2410,80 @@ Overfull \hbox (20.67429pt too wide) in paragraph at lines 2282--2300
  for a larger six-peer-organization
  []
 
-
-
-pdfTeX warning: pdflatex.exe (file ./figures/fabric_topology4.pdf): PDF inclusi
-on: found PDF version <1.7>, but at most version <1.5> allowed
-<figures/fabric_topology4.pdf, id=6431, 935.41469pt x 519.86218pt>
+<figures/fabric_topology4.pdf, id=6466, 935.41469pt x 519.86218pt>
 File: figures/fabric_topology4.pdf Graphic file (type pdf)
 <use figures/fabric_topology4.pdf>
 Package pdftex.def Info: figures/fabric_topology4.pdf  used on input line 2310.
 
 (pdftex.def)             Requested size: 390.0pt x 216.73827pt.
 [52] [53 <./figures/fabric_topology4.pdf>]
-<figures/ui_ledger_explorer.png, id=6472, 1028.34187pt x 578.16pt>
+<figures/ui_ledger_explorer.png, id=6507, 2376.88pt x 1722.435pt>
 File: figures/ui_ledger_explorer.png Graphic file (type png)
 <use figures/ui_ledger_explorer.png>
 Package pdftex.def Info: figures/ui_ledger_explorer.png  used on input line 236
 1.
-(pdftex.def)             Requested size: 187.19833pt x 105.24644pt.
-<figures/ui_audit_log.png, id=6474, 1028.34187pt x 578.16pt>
+(pdftex.def)             Requested size: 187.19833pt x 135.64247pt.
+<figures/ui_audit_log.png, id=6508, 2376.88pt x 1722.435pt>
 File: figures/ui_audit_log.png Graphic file (type png)
 <use figures/ui_audit_log.png>
 Package pdftex.def Info: figures/ui_audit_log.png  used on input line 2364.
-(pdftex.def)             Requested size: 187.19833pt x 105.24644pt.
- [54 <./figures/ui_ledger_explorer.png> <./figures/ui_audit_log.png>] [55] [56]
-<figures/fig1_scalability.pdf, id=6525, 722.7pt x 346.89601pt>
+(pdftex.def)             Requested size: 187.19833pt x 135.64247pt.
+ [54 <./figures/ui_ledger_explorer.png (PNG copy)> <./figures/ui_audit_log.png 
+(PNG copy)>] [55] [56]
+<figures/fig1_scalability.pdf, id=6557, 722.7pt x 346.89601pt>
 File: figures/fig1_scalability.pdf Graphic file (type pdf)
 <use figures/fig1_scalability.pdf>
 Package pdftex.def Info: figures/fig1_scalability.pdf  used on input line 2525.
 
 (pdftex.def)             Requested size: 390.0pt x 187.19931pt.
+ [57]
+Underfull \vbox (badness 3271) has occurred while \output is active []
 
-Underfull \vbox (badness 1675) has occurred while \output is active []
-
- [57 <./figures/fig1_scalability.pdf>] [58]
-<figures/fig2_latency.pdf, id=6609, 722.7pt x 346.89601pt>
+ [58 <./figures/fig1_scalability.pdf>]
+<figures/fig2_latency.pdf, id=6642, 722.7pt x 346.89601pt>
 File: figures/fig2_latency.pdf Graphic file (type pdf)
 <use figures/fig2_latency.pdf>
 Package pdftex.def Info: figures/fig2_latency.pdf  used on input line 2632.
 (pdftex.def)             Requested size: 390.0pt x 187.19931pt.
  [59]
-<figures/fig3_filesize.pdf, id=6616, 722.7pt x 346.89601pt>
+<figures/fig3_filesize.pdf, id=6649, 722.7pt x 346.89601pt>
 File: figures/fig3_filesize.pdf Graphic file (type pdf)
 <use figures/fig3_filesize.pdf>
 Package pdftex.def Info: figures/fig3_filesize.pdf  used on input line 2656.
 (pdftex.def)             Requested size: 390.0pt x 187.19931pt.
-
+ [60 <./figures/fig2_latency.pdf>]
 Overfull \hbox (0.7102pt too wide) in paragraph at lines 2673--2674
 \T1/cmr/m/n/12 (-20) events. Au-to-mated query time was mea-sured via \T1/cmtt/
 m/n/12 GET /api/audit?size=1000
  []
 
-[60 <./figures/fig2_latency.pdf>]
-Underfull \vbox (badness 1755) has occurred while \output is active []
-
- [61 <./figures/fig3_filesize.pdf>]
-<figures/fig4_audit.pdf, id=6737, 722.7pt x 346.89601pt>
+[61 <./figures/fig3_filesize.pdf>]
+<figures/fig4_audit.pdf, id=6770, 722.7pt x 346.89601pt>
 File: figures/fig4_audit.pdf Graphic file (type pdf)
 <use figures/fig4_audit.pdf>
 Package pdftex.def Info: figures/fig4_audit.pdf  used on input line 2694.
 (pdftex.def)             Requested size: 390.0pt x 187.19931pt.
  [62 <./figures/fig4_audit.pdf>]
-<figures/fig5_wan.pdf, id=6813, 722.7pt x 346.89601pt>
+<figures/fig5_wan.pdf, id=6846, 722.7pt x 346.89601pt>
 File: figures/fig5_wan.pdf Graphic file (type pdf)
 <use figures/fig5_wan.pdf>
 Package pdftex.def Info: figures/fig5_wan.pdf  used on input line 2784.
 (pdftex.def)             Requested size: 390.0pt x 187.19931pt.
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
  [63]
 [64 <./figures/fig5_wan.pdf>]
-<figures/fig6_crypto.pdf, id=6888, 722.7pt x 404.712pt>
+<figures/fig6_crypto.pdf, id=6921, 722.7pt x 404.712pt>
 File: figures/fig6_crypto.pdf Graphic file (type pdf)
 <use figures/fig6_crypto.pdf>
 Package pdftex.def Info: figures/fig6_crypto.pdf  used on input line 2835.
 (pdftex.def)             Requested size: 390.0pt x 218.39919pt.
  [65 <./figures/fig6_crypto.pdf>]
-<figures/fig7_gethistory.pdf, id=6969, 722.7pt x 346.89601pt>
+<figures/fig7_gethistory.pdf, id=7002, 722.7pt x 346.89601pt>
 File: figures/fig7_gethistory.pdf Graphic file (type pdf)
 <use figures/fig7_gethistory.pdf>
 Package pdftex.def Info: figures/fig7_gethistory.pdf  used on input line 2893.
 (pdftex.def)             Requested size: 390.0pt x 187.19931pt.
  [66]
-<figures/fig8_sensitivity.pdf, id=6977, 722.7pt x 346.89601pt>
+<figures/fig8_sensitivity.pdf, id=7010, 722.7pt x 346.89601pt>
 File: figures/fig8_sensitivity.pdf Graphic file (type pdf)
 <use figures/fig8_sensitivity.pdf>
 Package pdftex.def Info: figures/fig8_sensitivity.pdf  used on input line 2943.
@@ -2546,40 +2498,40 @@ Overfull \hbox (4.79622pt too wide) in paragraph at lines 2964--2965
  for the eval-u-ated document-
  []
 
-<figures/fig9_failclosed_outage.pdf, id=7084, 722.7pt x 346.89601pt>
+<figures/fig9_failclosed_outage.pdf, id=7118, 722.7pt x 346.89601pt>
 File: figures/fig9_failclosed_outage.pdf Graphic file (type pdf)
 <use figures/fig9_failclosed_outage.pdf>
 Package pdftex.def Info: figures/fig9_failclosed_outage.pdf  used on input line
  2968.
 (pdftex.def)             Requested size: 390.0pt x 187.19931pt.
 [69 <./figures/fig9_failclosed_outage.pdf>]
-<figures/fig10_ipfs_cost.pdf, id=7137, 794.97pt x 592.61403pt>
+<figures/fig10_ipfs_cost.pdf, id=7171, 794.97pt x 592.61403pt>
 File: figures/fig10_ipfs_cost.pdf Graphic file (type pdf)
 <use figures/fig10_ipfs_cost.pdf>
 Package pdftex.def Info: figures/fig10_ipfs_cost.pdf  used on input line 3017.
 (pdftex.def)             Requested size: 390.0pt x 290.73607pt.
  [70]
-<figures/fig11_caliper.pdf, id=7147, 794.97pt x 332.44202pt>
+<figures/fig11_caliper.pdf, id=7181, 794.97pt x 332.44202pt>
 File: figures/fig11_caliper.pdf Graphic file (type pdf)
 <use figures/fig11_caliper.pdf>
 Package pdftex.def Info: figures/fig11_caliper.pdf  used on input line 3062.
 (pdftex.def)             Requested size: 390.0pt x 163.09584pt.
  [71 <./figures/fig10_ipfs_cost.pdf>]
-<figures/fig12_ledger_growth.pdf, id=7221, 794.97pt x 332.44202pt>
+<figures/fig12_ledger_growth.pdf, id=7255, 794.97pt x 332.44202pt>
 File: figures/fig12_ledger_growth.pdf Graphic file (type pdf)
 <use figures/fig12_ledger_growth.pdf>
 Package pdftex.def Info: figures/fig12_ledger_growth.pdf  used on input line 31
 01.
 (pdftex.def)             Requested size: 390.0pt x 163.09584pt.
  [72 <./figures/fig11_caliper.pdf>]
-<figures/fig13_network_scaling.pdf, id=7295, 794.97pt x 332.44202pt>
+<figures/fig13_network_scaling.pdf, id=7329, 794.97pt x 332.44202pt>
 File: figures/fig13_network_scaling.pdf Graphic file (type pdf)
 <use figures/fig13_network_scaling.pdf>
 Package pdftex.def Info: figures/fig13_network_scaling.pdf  used on input line 
 3142.
 (pdftex.def)             Requested size: 390.0pt x 163.09584pt.
  [73 <./figures/fig12_ledger_growth.pdf>]
-<figures/fig14_baseline.pdf, id=7368, 794.97pt x 332.44202pt>
+<figures/fig14_baseline.pdf, id=7402, 794.97pt x 332.44202pt>
 File: figures/fig14_baseline.pdf Graphic file (type pdf)
 <use figures/fig14_baseline.pdf>
 Package pdftex.def Info: figures/fig14_baseline.pdf  used on input line 3193.
@@ -2613,75 +2565,77 @@ as \T1/cmtt/m/n/12 AND('LawFirmAMSP.peer',
  []
 
 [83] [84] [85]
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2025/11/14 1.11b listings language file
-)
-[86] [87]
+) [86]
+[87]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [88]
-(C:\Users\User\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2025/11/14 1.11b listings language file
-)
-[89] (main.bbl [90] [91] [92] [93] [94] [95] [96] [97] [98] [99] [100] [101]
-[102]) [103] (main.aux)
+) [89]
+(./main.bbl [90] [91] [92] [93] [94] [95] [96] [97] [98] [99] [100] [101]
+[102]) [103] (./main.aux)
  ***********
-LaTeX2e <2025-11-01>
-L3 programming layer <2025-12-24>
+LaTeX2e <2026-06-01>
+L3 programming layer <2026-06-18>
  ***********
+
+
+LaTeX Font Warning: Size substitutions with differences
+(Font)              up to 4.5pt have occurred.
+
 Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: E4D8012F3859EE4127988B2C5789582F;17206.
  ) 
 Here is how much of TeX's memory you used:
- 19218 strings out of 467871
- 306701 string characters out of 5418860
- 1149877 words of memory out of 5000000
- 46829 multiletter control sequences out of 15000+600000
- 669394 words of font info for 321 fonts, out of 8000000 for 9000
+ 19321 strings out of 467168
+ 307309 string characters out of 5409468
+ 1160111 words of memory out of 5000000
+ 47316 multiletter control sequences out of 15000+600000
+ 672172 words of font info for 333 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,15n,79p,1555b,2140s stack positions out of 10000i,1000n,20000p,200000b,200000s
-<C:/Users/User/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/c
-mmi10.pfb><C:/Users/User/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfo
-nts/cm/cmmi12.pfb><C:/Users/User/AppData/Local/Programs/MiKTeX/fonts/type1/publ
-ic/amsfonts/cm/cmmi6.pfb><C:/Users/User/AppData/Local/Programs/MiKTeX/fonts/typ
-e1/public/amsfonts/cm/cmmi7.pfb><C:/Users/User/AppData/Local/Programs/MiKTeX/fo
-nts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/User/AppData/Local/Programs/Mi
-KTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/User/AppData/Local/Prog
-rams/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/User/AppData/Loc
-al/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr7.pfb><C:/Users/User/AppDa
-ta/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr8.pfb><C:/Users/User
-/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Us
-ers/User/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy7.pfb
-><C:/Users/User/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cm
-sy8.pfb><C:/Users/User/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfont
-s/cm/cmti10.pfb><C:/Users/User/AppData/Local/Programs/MiKTeX/fonts/type1/public
-/cm-super/sfbx0800.pfb><C:/Users/User/AppData/Local/Programs/MiKTeX/fonts/type1
-/public/cm-super/sfbx1000.pfb><C:/Users/User/AppData/Local/Programs/MiKTeX/font
-s/type1/public/cm-super/sfbx1095.pfb><C:/Users/User/AppData/Local/Programs/MiKT
-eX/fonts/type1/public/cm-super/sfbx1200.pfb><C:/Users/User/AppData/Local/Progra
-ms/MiKTeX/fonts/type1/public/cm-super/sfcc1200.pfb><C:/Users/User/AppData/Local
-/Programs/MiKTeX/fonts/type1/public/cm-super/sfit0800.pfb><C:/Users/User/AppDat
-a/Local/Programs/MiKTeX/fonts/type1/public/cm-super/sfrm0600.pfb><C:/Users/User
-/AppData/Local/Programs/MiKTeX/fonts/type1/public/cm-super/sfrm0700.pfb><C:/Use
-rs/User/AppData/Local/Programs/MiKTeX/fonts/type1/public/cm-super/sfrm0800.pfb>
-<C:/Users/User/AppData/Local/Programs/MiKTeX/fonts/type1/public/cm-super/sfrm10
-00.pfb><C:/Users/User/AppData/Local/Programs/MiKTeX/fonts/type1/public/cm-super
-/sfrm1095.pfb><C:/Users/User/AppData/Local/Programs/MiKTeX/fonts/type1/public/c
-m-super/sfrm1200.pfb><C:/Users/User/AppData/Local/Programs/MiKTeX/fonts/type1/p
-ublic/cm-super/sfrm1728.pfb><C:/Users/User/AppData/Local/Programs/MiKTeX/fonts/
-type1/public/cm-super/sfti0700.pfb><C:/Users/User/AppData/Local/Programs/MiKTeX
-/fonts/type1/public/cm-super/sfti0800.pfb><C:/Users/User/AppData/Local/Programs
-/MiKTeX/fonts/type1/public/cm-super/sfti1000.pfb><C:/Users/User/AppData/Local/P
-rograms/MiKTeX/fonts/type1/public/cm-super/sfti1095.pfb><C:/Users/User/AppData/
-Local/Programs/MiKTeX/fonts/type1/public/cm-super/sfti1200.pfb><C:/Users/User/A
-ppData/Local/Programs/MiKTeX/fonts/type1/public/cm-super/sftt0800.pfb><C:/Users
-/User/AppData/Local/Programs/MiKTeX/fonts/type1/public/cm-super/sftt1000.pfb><C
-:/Users/User/AppData/Local/Programs/MiKTeX/fonts/type1/public/cm-super/sftt1095
-.pfb><C:/Users/User/AppData/Local/Programs/MiKTeX/fonts/type1/public/cm-super/s
-ftt1200.pfb>
-Output written on main.pdf (103 pages, 9678893 bytes).
+ 74i,14n,79p,1553b,2184s stack positions out of 10000i,1000n,20000p,200000b,200000s
+</usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb
+></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb>
+</usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></
+usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></us
+r/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/
+local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/lo
+cal/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/loca
+l/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/t
+exlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texl
+ive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texli
+ve/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive
+/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/2
+026/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/20
+26/texmf-dist/fonts/type1/public/cm-super/sfbx0800.pfb></usr/local/texlive/2026
+/texmf-dist/fonts/type1/public/cm-super/sfbx1000.pfb></usr/local/texlive/2026/t
+exmf-dist/fonts/type1/public/cm-super/sfbx1095.pfb></usr/local/texlive/2026/tex
+mf-dist/fonts/type1/public/cm-super/sfbx1200.pfb></usr/local/texlive/2026/texmf
+-dist/fonts/type1/public/cm-super/sfcc1200.pfb></usr/local/texlive/2026/texmf-d
+ist/fonts/type1/public/cm-super/sfit0800.pfb></usr/local/texlive/2026/texmf-dis
+t/fonts/type1/public/cm-super/sfrm0600.pfb></usr/local/texlive/2026/texmf-dist/
+fonts/type1/public/cm-super/sfrm0700.pfb></usr/local/texlive/2026/texmf-dist/fo
+nts/type1/public/cm-super/sfrm0800.pfb></usr/local/texlive/2026/texmf-dist/font
+s/type1/public/cm-super/sfrm1000.pfb></usr/local/texlive/2026/texmf-dist/fonts/
+type1/public/cm-super/sfrm1095.pfb></usr/local/texlive/2026/texmf-dist/fonts/ty
+pe1/public/cm-super/sfrm1200.pfb></usr/local/texlive/2026/texmf-dist/fonts/type
+1/public/cm-super/sfrm1728.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/
+public/cm-super/sfti0700.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/pu
+blic/cm-super/sfti0800.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/publ
+ic/cm-super/sfti1000.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public
+/cm-super/sfti1095.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/c
+m-super/sfti1200.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-
+super/sftt0800.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-su
+per/sftt1000.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-supe
+r/sftt1095.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/
+sftt1200.pfb>
+Output written on main.pdf (103 pages, 8285006 bytes).
 PDF statistics:
- 8328 PDF objects out of 8907 (max. 8388607)
+ 8373 PDF objects out of 8907 (max. 8388607)
+ 4647 compressed objects within 47 object streams
  552 named destinations out of 1000 (max. 500000)
- 71911 words of extra memory for PDF output out of 74296 (max. 10000000)
+ 78055 words of extra memory for PDF output out of 89155 (max. 10000000)
 
