@@ -380,3 +380,9 @@ ready pre-proof re-checks. See MANUSCRIPT_TODO.md on bra-submission.
 - Committed + pushed as d59c7b6. Supplementary UI screenshots
   (registration/dashboard/case/details/download) are still the old
   captures — retake only covered the two main-text audit views.
+- Follow-up (bra-submission 52e1602): UI prose precision after
+  screenshot review — "channels" → "the channel" (explorer shows one
+  channel in the header), and added the per-event anchoring clause
+  ("each event linked to its anchoring Fabric transaction identifier")
+  to the audit-log sentence; "expanded" → "expandable" to match the
+  caption. Rebuild unchanged: 103 pages, overfull 16.
