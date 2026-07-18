@@ -52,8 +52,8 @@ run_one(){  # run_one <phase> <trial-idx>
   fi
   local tps p50 p95 err el conc
   tps="$(sed -n 's/.*TPS=\([0-9.]*\).*/\1/p' <<<"$line")"
-  p50="$(sed -n 's/.*P50=\([0-9]*\)ms.*/\1/p' <<<"$line")"
-  p95="$(sed -n 's/.*P95=\([0-9]*\)ms.*/\1/p' <<<"$line")"
+  p50="$(sed -n 's/.*P50=\([0-9]*\).*/\1/p' <<<"$line")"
+  p95="$(sed -n 's/.*P95=\([0-9]*\).*/\1/p' <<<"$line")"
   err="$(sed -n 's/.*errors=\([0-9]*\).*/\1/p' <<<"$line")"
   el="$(sed -n 's/.*elapsed=\([0-9.]*\)s.*/\1/p' <<<"$line")"
   conc="$(sed -n 's/.*concurrency=\([0-9]*\).*/\1/p' <<<"$line")"
