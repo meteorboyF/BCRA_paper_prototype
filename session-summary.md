@@ -358,3 +358,25 @@ ready pre-proof re-checks. See MANUSCRIPT_TODO.md on bra-submission.
   manuscript-side pass.
 - Note: fc50593 carries a Co-Authored-By trailer, violating the repo's
   no-trailer rule; left as-is (pushed; no amending).
+
+## UI-retake manuscript swap (2026-07-19, bra-submission d59c7b6)
+
+- Copied the codename-free UI retakes (`ui_ledger_explorer.png`,
+  `ui_audit_log.png`, from `deliverables_for_manuscript_ui/` on
+  `ui-retake` in the FCDH_linux_validation clone) into
+  `bra_submission/figures/` — same filenames, so no `\includegraphics`
+  edits; §UI prose already matched the block-grouped explorer.
+- First push was rejected: remote `bra-submission` had advanced
+  4be6101 → e490714 (authors' hardening-pass merge: overlay of their
+  newer local copy, CRediT filled, seoBlockchain2024 removed,
+  readability pass, T1–T6 alignment, regenerated figures). Remote still
+  had the OLD UI captures, so the swap remained needed; discarded the
+  local pre-merge commit, redid the swap on e490714.
+- Rebuilt via docker texlive (stale untracked `main.fdb_latexmk` from
+  the pre-merge tree made latexmk report "up-to-date" — deleted it and
+  forced with `-g`). NEW BASELINES after authors' merge: 103 pages,
+  overfull 16 (fdb/fls now committed artifacts on this branch).
+  Rendered p.54 to confirm the retakes are in the PDF.
+- Committed + pushed as d59c7b6. Supplementary UI screenshots
+  (registration/dashboard/case/details/download) are still the old
+  captures — retake only covered the two main-text audit views.
