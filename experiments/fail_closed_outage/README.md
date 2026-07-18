@@ -7,6 +7,21 @@ when Fabric `CheckAccess` is unavailable, document ciphertext must not be served
 wrapped keys must not be served, PostgreSQL ACL fallback must not authorize access,
 and `FABRIC_OUTAGE_ACCESS_DENIED` must be logged.
 
+> **Fallback-flag note (2026-07-19).** The DB-ACL fallback flag
+> (`DOCUMENT_MATERIAL_DB_FALLBACK` / `documents.material-db-fallback-enabled`)
+> did not exist when this experiment was measured: the run is dated
+> 2026-06-08 and the flag was introduced 2026-06-09 (b26f64d), initially
+> defaulting to true; fc50593 (2026-07-18) flipped the released default to
+> **false**, so strict fail-closed — the behavior measured here — is the
+> shipped default and the availability-first fallback (audited as
+> `ACL_FABRIC_FALLBACK`) is opt-in only. Re-verified behaviorally
+> 2026-07-19 on the released defaults: with all three peers stopped, an
+> owner holding an active DB ACL row received HTTP 503 on both the
+> ciphertext and wrapped-key endpoints (audit: FABRIC_OUTAGE_ACCESS_DENIED
+> only, zero ACL_FABRIC_FALLBACK rows), recovering to HTTP 200 after peer
+> restart and the circuit-breaker window.
+
+
 ## Prerequisites
 
 - Docker / Docker Compose.

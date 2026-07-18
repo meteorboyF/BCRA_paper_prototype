@@ -327,3 +327,34 @@ ready pre-proof re-checks. See MANUSCRIPT_TODO.md on bra-submission.
   exercised the fallback branch (bench user is doc owner via Branch 1).
 - NEW PAGE BASELINE: 104 (was 103; two-host paragraph + this pass).
   Overfull stays 23.
+
+## T1 remediation verified + new drift finding (2026-07-19)
+
+- T1 (fail-closed default) VERIFIED RESOLVED: fc50593 (2026-07-18,
+  pushed before this check) already flipped
+  `DOCUMENT_MATERIAL_DB_FALLBACK` / `documents.material-db-fallback-
+  enabled` to default **false** in application.yml + DocumentService.
+  Independent re-verification: flag consumed ONLY by the download/
+  wrapped-key path (allowDbAclFallback); grant/revoke/upload never
+  reference it (their FabricException-swallowing is separate — T2
+  remains open); Exp 14's audit-log-only profile branch precedes the
+  flag check. Behavioral recheck on released defaults: 3-peer outage →
+  owner WITH active DB ACL row got HTTP 503 on ciphertext AND
+  wrapped-key, audit shows FABRIC_OUTAGE_ACCESS_DENIED only (zero
+  ACL_FABRIC_FALLBACK), recovery to 200 after restart + breaker window.
+- Step-4 determination: Exp 9 (run 2026-06-08T12:57Z, commit d66f54b,
+  pre-rewrite and unreachable) was measured on a build that PREDATES
+  the fallback entirely — earliest commit containing the flag is
+  b26f64d (2026-06-09 13:11 UTC, ~24h after the run); no committed
+  runner sets the env var. NOT an "explicitly disabled" case.
+  Flag-note added to experiments/fail_closed_outage/README.md.
+- NEW FINDING (text-vs-code drift bucket, alongside diagram-audit
+  T3/T5/T6): manuscript §7 integration point (a) and the retrieval
+  figures cite `GET /documents/{id}/download`; the implemented route is
+  `GET /documents/{id}/ciphertext` (DocumentController). Found during
+  the UI-retake session (seed script hit 500 on the documented path).
+  Logged here because REVIEWER_LENS_FINDINGS.md lives on bra-submission,
+  which is out of scope this pass — fold into that file on the next
+  manuscript-side pass.
+- Note: fc50593 carries a Co-Authored-By trailer, violating the repo's
+  no-trailer rule; left as-is (pushed; no amending).
