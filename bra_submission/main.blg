@@ -6,45 +6,45 @@ The style file: elsarticle-num.bst
 Reallocating 'name_of_file' (item size: 1) to 11 items.
 Database file #1: references.bib
 Warning--empty pages in macaroons2014
-You've used 97 entries,
+You've used 98 entries,
             2952 wiz_defined-function locations,
-            1285 strings with 27479 characters,
-and the built_in function-call counts, 29758 in all, are:
-= -- 2999
-> -- 931
-< -- 30
-+ -- 375
-- -- 278
-* -- 2053
-:= -- 3987
-add.period$ -- 152
-call.type$ -- 97
-change.case$ -- 135
+            1295 strings with 27774 characters,
+and the built_in function-call counts, 30181 in all, are:
+= -- 3051
+> -- 944
+< -- 31
++ -- 380
+- -- 282
+* -- 2100
+:= -- 4043
+add.period$ -- 157
+call.type$ -- 98
+change.case$ -- 136
 chr.to.int$ -- 0
-cite$ -- 98
-duplicate$ -- 1024
-empty$ -- 3381
-format.name$ -- 334
-if$ -- 7917
+cite$ -- 99
+duplicate$ -- 1034
+empty$ -- 3417
+format.name$ -- 340
+if$ -- 8019
 int.to.chr$ -- 0
-int.to.str$ -- 97
+int.to.str$ -- 98
 missing$ -- 46
-newline$ -- 391
-num.names$ -- 97
-pop$ -- 703
+newline$ -- 398
+num.names$ -- 98
+pop$ -- 704
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 0
-skip$ -- 2039
+skip$ -- 2064
 stack$ -- 0
-substring$ -- 928
-swap$ -- 382
-text.length$ -- 30
+substring$ -- 944
+swap$ -- 392
+text.length$ -- 31
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 0
 warning$ -- 1
-while$ -- 166
-width$ -- 99
-write$ -- 987
+while$ -- 169
+width$ -- 100
+write$ -- 1004
 (There was 1 warning)

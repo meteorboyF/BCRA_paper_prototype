@@ -294,8 +294,11 @@ X.~Qian, W.~Wu, An efficient ciphertext policy attribute-based encryption
 \newline\urlprefix\url{https://docs.ipfs.tech/how-to/kubo-garbage-collection/}
 
 \bibitem{lone2019forensic}
-A.~Lone, Forensic-chain: Ethereum blockchain based digital forensics chain of
-  custody, Scientific and practical cyber security journal 1 (12 2017).
+A.~H. Lone, R.~N. Mir, Forensic-chain: Blockchain based digital forensics chain
+  of custody with {PoC} in {Hyperledger Composer}, Digital Investigation 28
+  (2019) 44--55.
+\newblock \href {https://doi.org/10.1016/j.diin.2019.01.002}
+  {\path{doi:10.1016/j.diin.2019.01.002}}.
 
 \bibitem{cebe2018block}
 M.~Cebe, E.~Erdin, K.~Akkaya, H.~Aksu, S.~Uluagac, Block4forensic: An
@@ -303,6 +306,13 @@ M.~Cebe, E.~Erdin, K.~Akkaya, H.~Aksu, S.~Uluagac, Block4forensic: An
   connected vehicles, IEEE Communications Magazine 56~(10) (2018) 50--57.
 \newblock \href {https://doi.org/10.1109/MCOM.2018.1800137}
   {\path{doi:10.1109/MCOM.2018.1800137}}.
+
+\bibitem{hernando2025wills}
+J.~Hernando-Corrochano, R.~Pastor-Vargas, R.~Hern{\'a}ndez-Berlinches, Trusted
+  wills for digital assets using blockchain: a practical case, Blockchain:
+  Research and Applications 6 (2025) 100289.
+\newblock \href {https://doi.org/10.1016/j.bcra.2025.100289}
+  {\path{doi:10.1016/j.bcra.2025.100289}}.
 
 \bibitem{jlil2024blockchain}
 M.~Jlil, K.~Jouti, C.~Loqman, Blockchain and smart contracts based system for
@@ -312,10 +322,12 @@ M.~Jlil, K.~Jouti, C.~Loqman, Blockchain and smart contracts based system for
   {\path{doi:10.11591/ijeecs.v37.i1.pp365-379}}.
 
 \bibitem{hu2014guide}
-V.~Hu, D.~Ferraiolo, D.~Kuhn, A.~Schnitzer, K.~Sandlin, R.~Miller, K.~Scarfone,
-  Guide to attribute based access control (abac) definition and considerations,
-  National Institute of Standards and Technology Special Publication (2014)
-  162--800.
+V.~C. Hu, D.~Ferraiolo, R.~Kuhn, A.~Schnitzer, K.~Sandlin, R.~Miller,
+  K.~Scarfone, Guide to attribute based access control ({ABAC}) definition and
+  considerations, {NIST} Special Publication 800-162, National Institute of
+  Standards and Technology (2014).
+\newblock \href {https://doi.org/10.6028/NIST.SP.800-162}
+  {\path{doi:10.6028/NIST.SP.800-162}}.
 
 \bibitem{waheed2025dynamicabac}
 U.~Waheed, S.~A. Khan, M.~Masud, H.~Jamshed, T.~A. Jumani, N.~U.~R. Malik,
@@ -627,6 +639,8 @@ J.~Groth, On the size of pairing-based non-interactive arguments, in:
   Proceedings of the 35th Annual International Conference on Advances in
   Cryptology--EUROCRYPT 2016, Part II, Springer-Verlag, Berlin, Heidelberg,
   2016, pp. 305--326.
+\newblock \href {https://doi.org/10.1007/978-3-662-49896-5_11}
+  {\path{doi:10.1007/978-3-662-49896-5_11}}.
 
 \bibitem{lyons2018integration}
 T.~Lyons, L.~Courcelas, K.~Timsit,

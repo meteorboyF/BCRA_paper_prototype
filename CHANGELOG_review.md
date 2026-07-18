@@ -1,5 +1,53 @@
 # CHANGELOG — Hardening pass (branch `hardening-pass`, 2026-07-17)
 
+---
+
+## Addendum 2026-07-18 — author-ruled items A1/A4 and rewrites B5–B11
+
+Author decisions applied this session (build after: 100 pp, 0 errors,
+0 undefined refs, 22 cosmetic overfulls, 1 documented bibtex warning):
+
+- **A1 — CRediT filled** per the corresponding author's role assignment
+  (Fardeen: Conceptualization/Methodology/Software/Investigation/Writing –
+  original draft; Angkon: Methodology/Software/Visualization/Writing –
+  original draft/review \& editing; Anwar: Software/Validation/Formal
+  analysis/Writing – review \& editing; Mizi: Software/Resources/
+  Visualization; Rahman: Resources/Validation; Islam: Supervision/Funding
+  acquisition). TODO comments removed. Roles ordered per CRediT taxonomy
+  within each author.
+- **A4 — `seoBlockchain2024` deleted** from references.bib (uncited;
+  author ruled "if it's no use, remove").
+- **B5** — one sentence added to Prototype Scope: per-user X.509 would add
+  a sub-millisecond client-side signing step (Exp 6) and no extra
+  endorsement/ordering round trips, so custodial submission does not
+  flatter the latency results.
+- **B6** — Introduction (§1.2): half-sentence noting the erasable-off-chain
+  / fixed-size-on-chain decomposition, pointing to §\ref{sec:gdpr}.
+- **B7** — Contributions delta sharpened: "no prior Fabric-and-IPFS document
+  system, **including RBAC-IPFS**, reports measured fail-closed behavior…,
+  **and none** quantifies the end-to-end premium…".
+- **B8** — Scenario: "supplies **precisely** the process record… those rules
+  contemplate" softened to "supplies **a** process record… **of the kind**
+  those rules contemplate".
+- **B9** — Abstract: added "(per-user enforcement is demonstrated for
+  cross-organization access)" to the access-check sentence (closes
+  reviewer-lens synthesis item 6). Abstract ≈220 words, within norms.
+- **B10** — `hernando2025wills` (BRA digital-wills paper) now cited in
+  §2.3.1 as an applied legal-domain integrity/custody deployment.
+- **B11 — reference repairs (all web-verified, nothing invented):**
+  `lone2019forensic` upgraded from a 2017 preliminary-venue entry to the
+  version of record (Lone \& Mir, Digital Investigation 28 (2019) 44–55,
+  DOI 10.1016/j.diin.2019.01.002 — also matches the key's year and the
+  Hyperledger context); `hu2014guide` converted from a garbled @article
+  ("pages 162-800") to a proper NIST SP 800-162 @techreport with DOI
+  10.6028/NIST.SP.800-162; `groth2016` DOI 10.1007/978-3-662-49896-5_11
+  added. Pruning of the remaining ~36 uncited entries deferred to
+  camera-ready (harmless under elsarticle-num).
+
+Still pending (author): A2 data-availability variant (at the very last),
+A3 Experiment-15 retitle verdict, C16 M1 raw data. Linux tasks C12–C15
+handed off via `LINUX_EXPERIMENTS_PROMPT.md` (kept outside the repo).
+
 Every change made to `bra_submission/` in this pass, grouped by type, so each
 edit can be reviewed and reverted individually. Baseline = the authors' local
 copy of 2026-07-17 (verified byte-identical in source content to branch

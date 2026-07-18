@@ -157,7 +157,7 @@ A Hybrid Approach Using Hyperledger Fabric and IPFS}
             country={Bangladesh}}
 
 \begin{abstract}
-Legal document management systems centralize trust in privileged administrators, making it difficult for external parties to verify whether access decisions or audit records have been altered. We present a hybrid legal-data management framework that places Hyperledger Fabric on the active document-release path rather than using it only as a passive audit log: every protected download must pass a chaincode access check before ciphertext or wrapped document keys are released, and if Fabric is unavailable the path fails closed rather than falling back to a database access-control list. The framework combines browser-side encryption, ciphertext-only storage in a private IPFS swarm, and on-chain anchoring of hashes and content identifiers. Across fifteen experiments, the REST-gateway workload sustains up to 193 transactions per second; the ledger access check is statistically indistinguishable from a database-only check (6.51 vs.\ 7.16\,ms median, overlapping 95\,\% confidence intervals) and costs 6.5\,ms end to end over an audit-log-only baseline; outage experiments confirm zero successful downloads during Fabric unavailability with automatic recovery. Prior permissioned-ledger document systems anchor access decisions off the release path or price on-path authorization only for generic file sharing; none reports measured fail-closed behavior under ledger outage or the end-to-end cost of on-path enforcement against the audit-log architecture it replaces.
+Legal document management systems centralize trust in privileged administrators, making it difficult for external parties to verify whether access decisions or audit records have been altered. We present a hybrid legal-data management framework that places Hyperledger Fabric on the active document-release path rather than using it only as a passive audit log: every protected download must pass a chaincode access check before ciphertext or wrapped document keys are released (per-user enforcement is demonstrated for cross-organization access), and if Fabric is unavailable the path fails closed rather than falling back to a database access-control list. The framework combines browser-side encryption, ciphertext-only storage in a private IPFS swarm, and on-chain anchoring of hashes and content identifiers. Across fifteen experiments, the REST-gateway workload sustains up to 193 transactions per second; the ledger access check is statistically indistinguishable from a database-only check (6.51 vs.\ 7.16\,ms median, overlapping 95\,\% confidence intervals) and costs 6.5\,ms end to end over an audit-log-only baseline; outage experiments confirm zero successful downloads during Fabric unavailability with automatic recovery. Prior permissioned-ledger document systems anchor access decisions off the release path or price on-path authorization only for generic file sharing; none reports measured fail-closed behavior under ledger outage or the end-to-end cost of on-path enforcement against the audit-log architecture it replaces.
 \end{abstract}
 
 \begin{keyword}
@@ -263,7 +263,10 @@ this path.
 Encrypted document payloads are stored off-chain in a private two-node
 InterPlanetary File System (IPFS) swarm~\cite{benet2014ipfs}. SHA-256 hashes
 and content identifiers are anchored on-chain, keeping Fabric commit latency
-independent of document size. The ordering service is a 3-node EtcdRaft
+independent of document size. The same decomposition keeps document
+payloads erasable off-chain, with only fixed-size hashes, identifiers, and
+timestamps persisting on the ledger; Section~\ref{sec:gdpr} analyzes the
+resulting erasure and retention position. The ordering service is a 3-node EtcdRaft
 cluster distributed across LawFirmA, LawFirmB, and a regulator organization. This
 provides crash-fault tolerance under Raft assumptions, not Byzantine
 resistance to malicious orderer collusion~\cite{hyperledgerFabricOrderingService_v24,Ongaro2014}.
@@ -329,9 +332,10 @@ empirically confirmed for the download path. Against the closest current
 systems, the delta is measurement scope: RBAC-IPFS~\cite{liu2026rbacipfs}
 prices on-path authorization for generic IPFS file sharing and zero-trust
 delegation~\cite{mukta2026zerotrust} verifies capabilities on-ledger, but
-no prior Fabric-and-IPFS document system reports measured fail-closed
-behavior under ledger outage or quantifies the end-to-end premium of
-on-path enforcement over the audit-log-only architecture it replaces.
+no prior Fabric-and-IPFS document system, including RBAC-IPFS, reports
+measured fail-closed behavior under ledger outage, and none quantifies
+the end-to-end premium of on-path enforcement over the audit-log-only
+architecture it replaces.
 
 Second, a proof-of-concept prototype is implemented and evaluated for a
 three-organization legal consortium using Hyperledger Fabric, a
@@ -580,7 +584,12 @@ Forensic-chain~\cite{lone2019forensic} and Block4Forensic
 \cite{cebe2018block} apply similar ideas to digital-forensics and IoT
 evidence pipelines. These systems demonstrate the value of immutable
 timestamps and hash anchoring, but they generally treat access control
-as an external concern. In other words, the ledger can help prove that
+as an external concern. Applied legal-domain deployments continue this
+line: Hernando-Corrochano et al.~\cite{hernando2025wills} manage
+trusted wills for digital assets as a practical blockchain case, again
+centering instrument integrity and custody rather than
+access-controlled retrieval of confidential documents. In other words,
+the ledger can help prove that
 a record existed at a given time, but it does not necessarily decide
 who may retrieve a confidential document in a multi-party legal
 workflow.
@@ -825,8 +834,8 @@ anchors the plaintext hash and content identifier on the consortium
 ledger. The anchored hash is what later authenticates the production:
 FRE~902(13)--(14) make electronically generated records and
 hash-verified copies self-authenticating by certification rather than
-live testimony, and the ledger supplies precisely the
-process record and ``digital identification'' those rules
+live testimony, and the ledger supplies a process record and ``digital
+identification'' of the kind those rules
 contemplate~\cite{fre902}.
 
 \emph{Time-bounded access.} LawFirmA then issues grants to the named
@@ -2064,7 +2073,11 @@ content ($\mathcal{H}_D$), the exact IPFS storage payload
 ($\mathcal{H}_C$), and the document identifier ($id_D$). Binding upload
 timestamp and owner metadata is a production hardening item, so these
 signatures should not be interpreted as per-user Fabric transaction
-non-repudiation.
+non-repudiation. The custodial arrangement also does not flatter the
+reported latencies: migrating to per-user X.509 submission adds a
+client-side ECDSA P-256 signing operation, measured sub-millisecond in
+Experiment~\hyperref[sec:exp_crypto]{6}, and leaves the endorsement and
+ordering round trips unchanged.
 
 \begingroup
 \small
@@ -3839,18 +3852,15 @@ REVOKE TRUNCATE ON audit_log FROM app_role;
 % =========================================================================
 
 \section*{CRediT authorship contribution statement}
-%% TODO: confirm with authors - assign each author's roles from the 14-role
-%% CRediT taxonomy (Conceptualization; Data curation; Formal analysis;
-%% Funding acquisition; Investigation; Methodology; Project administration;
-%% Resources; Software; Supervision; Validation; Visualization;
-%% Writing - original draft; Writing - review & editing).
-%% Do not submit with the slots empty.
-\textbf{Golam Bari Fardeen:} [roles]. %% TODO
-\textbf{Namare Shakib Angkon:} [roles]. %% TODO
-\textbf{Syed Zayan Anwar:} [roles]. %% TODO
-\textbf{Md.\ Masum Mizi:} [roles]. %% TODO
-\textbf{Shinthia Rahman:} [roles]. %% TODO
-\textbf{Md.\ Motaharul Islam:} [roles]. %% TODO
+\textbf{Golam Bari Fardeen:} Conceptualization, Methodology, Software,
+Investigation, Writing -- original draft.
+\textbf{Namare Shakib Angkon:} Methodology, Software, Visualization,
+Writing -- original draft, Writing -- review \& editing.
+\textbf{Syed Zayan Anwar:} Software, Validation, Formal analysis,
+Writing -- review \& editing.
+\textbf{Md.\ Masum Mizi:} Software, Resources, Visualization.
+\textbf{Shinthia Rahman:} Resources, Validation.
+\textbf{Md.\ Motaharul Islam:} Supervision, Funding acquisition.
 
 \section*{Declaration of competing interest}
 The authors declare that they have no known competing financial interests
