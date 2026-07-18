@@ -19,5 +19,6 @@ public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
     Page<AuditLog> findAllByOrderByTimestampDesc(Pageable pageable);
     Page<AuditLog> findByResourceIdAndEventType(String resourceId, String eventType, Pageable pageable);
     List<AuditLog> findByFabricTxId(String fabricTxId);
+    Page<AuditLog> findByFabricTxIdNotNullOrderByTimestampDesc(Pageable pageable);
     long countByActorId(UUID actorId);
 }

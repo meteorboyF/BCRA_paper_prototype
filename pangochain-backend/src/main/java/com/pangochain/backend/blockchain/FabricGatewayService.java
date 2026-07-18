@@ -61,6 +61,44 @@ public class FabricGatewayService {
         }
     }
 
+    // ─── Ledger metadata via qscc (read-only system chaincode) ───────────────
+
+    @Value("${fabric.channel-name}")
+    private String channelName;
+
+    /** The channel this gateway is bound to (from config; matches the deployed network). */
+    public String channelName() { return channelName; }
+
+    /**
+     * Live chain height via qscc GetChainInfo. Empty when the peer gateway
+     * rejects system-chaincode evaluation or Fabric is unreachable — callers
+     * must render nothing rather than a guess.
+     */
+    public java.util.OptionalLong chainHeight() {
+        try {
+            byte[] raw = fabricNetwork.getContract("qscc")
+                    .evaluateTransaction("GetChainInfo", channelName);
+            return java.util.OptionalLong.of(
+                    org.hyperledger.fabric.protos.common.BlockchainInfo.parseFrom(raw).getHeight());
+        } catch (Exception e) {
+            log.debug("qscc GetChainInfo unavailable: {}", e.getMessage());
+            return java.util.OptionalLong.empty();
+        }
+    }
+
+    /** Block number containing the given transaction, via qscc GetBlockByTxID. */
+    public java.util.OptionalLong blockNumberForTx(String txId) {
+        try {
+            byte[] raw = fabricNetwork.getContract("qscc")
+                    .evaluateTransaction("GetBlockByTxID", channelName, txId);
+            return java.util.OptionalLong.of(
+                    org.hyperledger.fabric.protos.common.Block.parseFrom(raw).getHeader().getNumber());
+        } catch (Exception e) {
+            log.debug("qscc GetBlockByTxID unavailable for {}: {}", txId, e.getMessage());
+            return java.util.OptionalLong.empty();
+        }
+    }
+
     // ─── Submit (invoke) ──────────────────────────────────────────────────────
 
     /**
