@@ -1,4 +1,4 @@
-# Manuscript Handoff — BRA Resubmission (as of 2026-07-17)
+# Manuscript Handoff — BRA Resubmission (as of 2026-07-18)
 
 One-page map of every editing pass applied to `bra_submission/main.tex`
 this week, for co-author review. Detail files are all at this repo root
@@ -18,9 +18,11 @@ on `bra-submission` unless noted. The full chronological campaign log
 - The manuscript reports **fifteen experiments**; all figures are
   regenerated from released raw data with CIs; headline numbers:
   6.51 vs 7.16 ms P50 ACL check (n.s.), +6.5 ms end-to-end enforcement
-  premium, 193 TPS @500 ms batch, 20 s outage recovery.
+  premium, 193 TPS @500 ms batch, 20 s outage recovery — now backed by
+  a cross-host validation showing the co-located throughput numbers
+  were conservative (pass 5 below).
 
-## The four editing passes (newest last)
+## The six passes (newest last)
 
 ### 1. Coherence audit F1–F10 (commit cd37581) — `AUDIT_FINDINGS.md`
 
@@ -86,6 +88,56 @@ in one commit. Headlines:
 
 `REVIEWER_LENS_CHANGES.md` has the complete per-ID before/after record.
 
+### 5. Two-host validation added to the paper (commit 52aa4a5, 2026-07-18)
+
+New measurement, not just editing. All published throughput was
+measured with the load generator co-located on the 8 GB evaluation
+host — a reviewer could argue co-location distorted the numbers. We
+reran both reference configurations with the generator on a second
+physical machine (VivoBook i5-1035G1) over campus Wi-Fi:
+
+| Config | Cross-host [95 % CI] | Published co-located [95 % CI] |
+|---|---|---|
+| 500 ms BatchTimeout, n=10 | **228.0 [222.7, 233.3]** | 193.0 [182.8, 203.2] |
+| 2 s BatchTimeout, n=5 | **70.5 [67.8, 73.2]** | 66.3 [63.7, 68.9] |
+
+Both cross-host means sit **above** the published CIs: co-location
+*depressed* the published numbers, so they stand as conservative. The
+manuscript now states this in the evaluation setup (one paragraph,
+with the Wi-Fi caveat), and Data Availability points to branch
+`linux-validation` for the raw trial data. Full report:
+`experiments/twohost_validation/RESULTS.md` on that branch (includes
+environments, ping-RTT records, and one clearly-labeled aborted run).
+
+### 6. Owner-org fallback precision + timestamp rationale (commit cb35ce5, 2026-07-18)
+
+A reviewer-lens assessment flagged that the paper's intra-organization
+limitation ("any member of LawFirmA can access any document…")
+overstated the exposure **against our own code**. Verified in the
+implementation: the `OwnerOrg` fallback governs only the ledger-side
+authorization decision; the wrapped-key endpoint releases a document
+key solely against the requester's own per-recipient grant entry,
+`k_enc` is never wrapped for ungranted principals, and document
+listings are scoped to explicit grants. So an ungranted colleague can
+obtain at most **ciphertext, metadata, and document existence — never
+a key or plaintext**. Seven sites now state this precisely (ACL
+architecture, threat-model cell, framework-vs-prototype row +
+footnote, limitations bullet, Discussion RQ1 boundary), with severity
+recalibrated to least-privilege violation + harvest-now-decrypt-later
+surface. The ECDSA section also gained a reasoned note on why
+timestamp binding is deferred: a client-signed clock binds only
+*claimed* time; trusted time is the transaction timestamp, which
+cannot be signed pre-submission (same circular dependency as the CID).
+
+**Deliberate decision, on record:** the two candidate *code* changes —
+closing the fallback in chaincode and binding owner/filename into the
+signed payload — were scoped and **deferred to the revision round**.
+Rationale: no experiment ever executed the fallback branch (the bench
+user owns its document, authorizing via the seeded owner grant), so
+changing the chaincode now would buy zero new evidence while breaking
+the "benchmarks the deployed chaincode" provenance of Exps 11–14.
+Both make strong response-to-reviewers artifacts if asked for.
+
 ## Open items for authors
 
 - From the reviewer-lens pass (never ruled, low stakes): N3 (compress
@@ -98,6 +150,12 @@ in one commit. Headlines:
   seoBlockchain2024 cite-or-delete, camera-ready re-check of the three
   pre-proof citations (RBAC-IPFS, Liu & Zheng, Notash) against versions
   of record.
+- Revision-round candidates (scoped, deliberately deferred — see pass
+  6): close the owner-org fallback in chaincode; bind owner/filename
+  into the signed payload. Also: the four flow/topology diagrams
+  (`fabric_topology4` still shows FirmA/FirmB + `lawchain.com` labels)
+  have **no editable source in the repo** — fixing them needs whoever
+  holds the original drawing files.
 
 ## Commit trail (bra-submission)
 
@@ -106,15 +164,6 @@ dfc7e79/ddb4066/ee0aaae/3738c87/2661361 (writing campaign, items
 findings) → cd37581 (F1–F8 + F10 record) → 759ee40 (R1–R8 sweep) →
 0caac55 (V1–V3 + reviewer-lens findings) → 34fca0c (reviewer-lens main
 wave) → 2fc2c01 (hierarchy figure restored) → 2cfc938 (this file) →
-two-host validation paragraph added to the evaluation setup
-(2026-07-18): cross-host generator runs measured 228.0 [222.7, 233.3]
-vs co-located 193.0 @500 ms and 70.5 [67.8, 73.2] vs 66.3 @2 s — both
-above the committed CIs, so co-location depressed the published
-numbers (conservative). Raw data: branch `linux-validation`,
-`experiments/twohost_validation/RESULTS.md`. → owner-org-fallback
-precision pass (2026-07-18, code-verified): seven sites now state the
-fallback authorizes ciphertext release only — wrapped document keys
-are gated by per-recipient grants in all cases — plus a reasoned
-timestamp-deferral note in the ECDSA section (trusted time = tx
-timestamp; client clocks bind claimed time only). Page baseline
-103→104; overfull stays 23.
+52aa4a5 (two-host validation in evaluation setup + data availability)
+→ cb35ce5 (owner-org fallback precision + timestamp rationale; page
+baseline 103→104, overfull 23).
