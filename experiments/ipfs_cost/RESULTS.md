@@ -113,3 +113,36 @@ the Fabric tier.
    safe to delete.
 5. Environment: Linux, kubo 0.27.0, Docker 29.6.1, 18-core host, 7.1 GiB
    RAM (full details in `environment.json`).
+
+---
+
+## Addendum (2026-07-18): replication panel rerun at n=20
+
+The §(b) caveat above flagged the 50 MB "2nd-replica > 3rd-replica"
+crossover as probable noise at n=5 pins/size. Rerun executed on the
+original host (`--phases replication --repl-reps 20`, run
+`results/20260718_045700/`, kubo 0.27.0 ×3, AddrFilters cleared for the
+bench and restored via `--teardown` afterwards):
+
+| Size | 2nd replica P50 (n=5 → n=20) | 3rd replica P50 (n=5 → n=20) |
+|---|---|---|
+| 1 MB | 34 → 25 ms | 45 → 24 ms |
+| 10 MB | 87 → 54 ms | 106 → 54 ms |
+| 25 MB | 158 → 91 ms | 180 → 86 ms |
+| 50 MB | 297 → 161 ms | 226 → 153 ms |
+
+**The crossover disappeared at n=20**: at 50 MB the ordering is again
+2nd ≥ 3rd (161 vs 153 ms), consistent with all other sizes and with the
+"replicas are independent" conclusion. Absolute pin times are lower
+than the 2026-07-15 run across the board (nodes were long-warm and the
+host was otherwise idle); the panel's conclusion rests on the ordering
+and linearity, not the absolute level, and both runs support it.
+
+`fig10_ipfs_cost` in this run's directory was regenerated with the
+experiment's own `plot.py`; panels (a), (c), (d) are rendered from
+byte-identical copies of the 20260715_173114 CSVs (retrieval, storage,
+node_down — carried over unchanged into the run directory for the
+plotter), and the pdftotext text-layer diff against the committed
+figure confirms every number outside panel (b) is identical (the only
+differences are panel (b)'s y-axis tick labels, rescaled to the lower
+n=20 values).

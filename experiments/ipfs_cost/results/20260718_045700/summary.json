@@ -1,0 +1,35 @@
+{
+  "started_utc": "2026-07-18T04:57:08Z",
+  "config": {
+    "phases": "replication",
+    "sizes": [
+      1,
+      10,
+      25,
+      50
+    ],
+    "concurrency": [
+      1,
+      8,
+      24
+    ],
+    "reps": 24,
+    "repl_reps": 20,
+    "nodedown_size": 10,
+    "nodedown_reps": 10,
+    "timeout": 120,
+    "dead_timeout": 10,
+    "api1": "http://localhost:5001",
+    "api2": "http://localhost:5002",
+    "api3": "http://localhost:5003",
+    "node1_container": "pangochain-ipfs",
+    "node2_container": "pangochain-ipfs2"
+  },
+  "replication": {
+    "pins": 160
+  },
+  "phase_seconds": {
+    "replication": 44.2
+  },
+  "finished_utc": "2026-07-18T04:57:52Z"
+}
