@@ -294,3 +294,19 @@ ready pre-proof re-checks. See MANUSCRIPT_TODO.md on bra-submission.
 - HANDOFF.md added (bra-submission 2cfc938): one-page co-author map of
   all four editing passes with pointers; also closes the R1-R8
   documentation gap (previously commit-message-only).
+
+## Two-host validation (2026-07-18, linux-validation branch + manuscript)
+
+- Cross-host generator campaign complete (branch linux-validation @
+  6857eef): Config A 228.0 [222.7,233.3] vs co-located 193.0
+  [182.8,203.2]; Config B 70.5 [67.8,73.2] vs 66.3 [63.7,68.9] — both
+  ABOVE committed CIs; co-location depressed published numbers
+  (conservative). Campus Wi-Fi caveat recorded; aborted first Config B
+  attempt preserved labeled. Full report:
+  experiments/twohost_validation/RESULTS.md (linux-validation).
+- Manuscript updated (bra-submission 52aa4a5): validation paragraph in
+  evaluation setup + data-availability pointer to linux-validation.
+  Compile 103pp/overfull 23 (baselines hold).
+- Same branch also carries: fig1-9 title-free regen
+  (annotation-identical), key-lifecycle composites, Exp10 n=20 rerun
+  (50MB crossover gone), codename-clean deliverables_for_manuscript/.
