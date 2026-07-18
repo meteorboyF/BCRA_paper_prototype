@@ -71,9 +71,11 @@ the co-location effect.
 - Config A's `trials.csv` has empty P50/P95 columns (parse bug, fixed
   in b96420e before Config B); latencies were recovered from the
   committed raw `trial_N.out` files. TPS/error/CPU columns unaffected.
-- A first Config B attempt (`20260718_095843_configB`) was aborted by
-  a client-laptop shutdown after one trial; it remains local-untracked
-  on the client. Nothing from it is used here.
+- A first Config B attempt was aborted by a client-laptop shutdown
+  after one trial; it is preserved, clearly labeled, at
+  `results/20260718_095843_configB_ABORTED/` (its own README inventories
+  what exists) and nothing from it is used here. The completed rerun
+  `20260718_101840_configB/` is the analyzed block.
 - The server ledger was rebuilt fresh for each config (BatchTimeout
   set in `configtx.yaml`, full network + chaincode redeploy, backend
   gateway crypto re-provisioned); bench case/document re-created per
