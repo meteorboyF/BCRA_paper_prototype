@@ -310,3 +310,20 @@ ready pre-proof re-checks. See MANUSCRIPT_TODO.md on bra-submission.
 - Same branch also carries: fig1-9 title-free regen
   (annotation-identical), key-lifecycle composites, Exp10 n=20 rerun
   (50MB crossover gone), codename-clean deliverables_for_manuscript/.
+
+## Owner-org fallback precision pass (2026-07-18, bra-submission cb35ce5)
+
+- Code-verified (DocumentService.getWrappedKey requires requester's own
+  per-recipient grant row; RegisterDocument seeds ACL[ownerID]; k_enc
+  never wrapped for ungranted principals; listings scoped to grants):
+  the OwnerOrg fallback authorizes CIPHERTEXT release only, never keys
+  or plaintext. Seven manuscript sites tightened accordingly; severity
+  recalibrated (least-privilege + harvest-now-decrypt-later, not
+  plaintext disclosure). ECDSA section adds reasoned timestamp deferral
+  (client clock = claimed time; trusted time = tx timestamp, same
+  circular dependency as CID). Decision on record: chaincode changes
+  (close fallback, bind metadata into signature) DEFERRED to revision
+  round to preserve measurement provenance — no experiment ever
+  exercised the fallback branch (bench user is doc owner via Branch 1).
+- NEW PAGE BASELINE: 104 (was 103; two-host paragraph + this pass).
+  Overfull stays 23.
