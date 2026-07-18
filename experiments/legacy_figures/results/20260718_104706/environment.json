@@ -1,0 +1,12 @@
+{
+  "date": "2026-07-18",
+  "host": "original evaluation machine (Intel Core Ultra 5 125H, Ubuntu 22.04, 8 GB RAM)",
+  "branch": "linux-validation",
+  "command": "experiments/.venv/bin/python experiments/legacy_figures/regen_figs.py --out experiments/legacy_figures/results/20260718_104706",
+  "python": "3.12.3",
+  "matplotlib": "3.11.0",
+  "numpy": "2.5.1",
+  "bootstrap": {"resamples": 10000, "seed": 7},
+  "change_vs_20260716_145930": "set_title/suptitle removed for fig1-9; panel sublabels retained; no data/style/CI changes",
+  "verification": "pdftotext text-layer diff vs origin/bra-submission figures: only title lines differ; all numeric annotations identical"
+}

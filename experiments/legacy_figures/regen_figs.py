@@ -115,7 +115,6 @@ ax.axhline(193.0, color=GREEN, linewidth=1.5, linestyle=":",
            label="Exp 8 tuning reference: 193 TPS @500 ms BatchTimeout")
 ax.set_xlabel("Concurrent clients")
 ax.set_ylabel("Gateway throughput (TPS)")
-ax.set_title("Exp 1 — Throughput vs concurrency, mean with 95% CI")
 ax.legend(fontsize=8)
 style(ax)
 save(fig, "fig1_scalability")
@@ -145,8 +144,6 @@ ax.set_xticks(range(len(bars)))
 ax.set_xticklabels([b[0] for b in bars], fontsize=8)
 ax.set_yscale("log")
 ax.set_ylabel("Latency P50 (ms, log scale)")
-ax.set_title("Exp 2 — Function-level latency with audit baselines, "
-             "P50 with bootstrap 95% CI")
 style(ax)
 save(fig, "fig2_latency")
 
@@ -167,7 +164,6 @@ ax.plot(sizes, e2e, color=GREEN, marker="^", markersize=5, linewidth=1.6,
 ax.set_yscale("log")
 ax.set_xlabel("File size (MB)")
 ax.set_ylabel("Latency (ms, log scale)")
-ax.set_title("Exp 3 — Upload-path cost vs file size, P50 with bootstrap 95% CI")
 ax.legend(fontsize=9)
 style(ax)
 save(fig, "fig3_filesize")
@@ -191,7 +187,6 @@ for i, (lbl, vals, color) in enumerate(bars):
 ax.set_xticks(range(len(bars)))
 ax.set_xticklabels([b[0] for b in bars], fontsize=9)
 ax.set_ylabel("Verification latency P50 (ms)")
-ax.set_title("Exp 4 — Audit-trail verification cost (n=10), bootstrap 95% CI")
 style(ax)
 save(fig, "fig4_audit")
 
@@ -217,8 +212,6 @@ axl2.set_title("(b) Latency, median with bootstrap 95% CI", fontsize=10)
 for ax in (axt, axl2):
     ax.legend(fontsize=8)
     style(ax)
-fig.suptitle("Exp 5 — WAN sensitivity (duration60s, conc 200, n=5/point)",
-             fontsize=12)
 save(fig, "fig5_wan")
 
 # ── fig6 — Exp 6 crypto primitives ──────────────────────────────────────────
@@ -254,7 +247,6 @@ ax.set_yticklabels([lbl for _, lbl in ORDER], fontsize=9)
 ax.invert_yaxis()
 ax.set_xscale("log")
 ax.set_xlabel("Latency P50 (ms, log scale)")
-ax.set_title("Exp 6 — Client-side crypto primitives (Node WebCrypto runtime, n=10), bootstrap 95% CI")
 ax.annotate("Wrapped-key token size:\nECIES P-256 125 B vs. RSA-OAEP-2048 256 B\n(51.2% reduction)",
             xy=(0.97, 0.72), xycoords="axes fraction", ha="right",
             fontsize=8, color=INK,
@@ -275,7 +267,6 @@ ax.axhspan(lo, hi, color=AMBER, alpha=0.15, label="bootstrap 95% CI")
 ax.set_xlim(-0.5, 0.5)
 ax.set_xticks([])
 ax.set_ylabel("GetHistoryForKey latency (ms)")
-ax.set_title("Exp 7 — Full-history query at depth 107 (peer CLI)")
 ax.legend(fontsize=9)
 style(ax)
 save(fig, "fig7_gethistory")
@@ -311,7 +302,6 @@ for ax, ylab, t in ((axt, "Sustained throughput (TPS), mean",
     ax.set_ylabel(ylab)
     ax.set_title(t, fontsize=10)
     style(ax)
-fig.suptitle("Exp 8 — BatchTimeout sensitivity (duration60s, conc 50, n=10)", fontsize=12)
 save(fig, "fig8_sensitivity")
 
 # ── fig9 — Exp 9 fail-closed outage (time series, from evidence bundle) ────
@@ -328,7 +318,6 @@ ax.plot(x, ok, color=INK, linewidth=2, label="Successful downloads")
 ax.plot(x, denied, color=AMBER, linewidth=2, label="HTTP 503 fail-closed denials")
 ax.set_xlabel("Time (seconds)")
 ax.set_ylabel("Requests per second")
-ax.set_title("Exp 9 — Fail-closed Fabric outage: document downloads (conc 50)")
 ax.legend(loc="upper right", fontsize=9)
 style(ax)
 save(fig, "fig9_failclosed_outage")
