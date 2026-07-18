@@ -63,3 +63,4 @@ pangochain-backend/config/fabric/crypto/
 # Literature PDFs for 3.5b verification (copyright — do not commit)
 lit-papers/
 lit-papers.zip
+__pycache__/
