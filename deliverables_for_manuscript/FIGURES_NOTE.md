@@ -80,5 +80,6 @@ true size and need no further scaling. Build sources:
   float as one figure at this width — it would have to be split across
   two floats (a+b / c+d) or accepted as a multi-page appendix figure.
 
-Deep "pango" scan (raw bytes + every FlateDecode stream decompressed):
-0 hits across all files in `deliverables_for_manuscript/`.
+Deep scan for the excluded project codename (case-insensitive, raw
+bytes plus every FlateDecode stream decompressed): 0 hits across all
+files in `deliverables_for_manuscript/`.
