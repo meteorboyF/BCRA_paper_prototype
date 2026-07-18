@@ -48,6 +48,45 @@ Still pending (author): A2 data-availability variant (at the very last),
 A3 Experiment-15 retitle verdict, C16 M1 raw data. Linux tasks C12–C15
 handed off via `LINUX_EXPERIMENTS_PROMPT.md` (kept outside the repo).
 
+---
+
+## Addendum 2026-07-18 (later) — merge of the Linux-side work
+
+The Linux sessions completed C12–C15 on `linux-validation` and, beyond
+scope, applied two manuscript passes directly on `bra-submission`
+(52aa4a5 two-host results in evaluation setup + data availability;
+cb35ce5 owner-org fallback precision, code-verified). That line diverged
+from `hardening-pass`; this session merged `bra-submission` into
+`hardening-pass` (main.tex auto-merged; artifact conflicts rebuilt) and
+then:
+
+- **Figures swapped in** from `linux-validation` deliverables: fig1–fig9
+  title-free regenerations (verified annotation-identical by the
+  producing session, spot-checked here: fig1 title gone, fig6 100.59 ms
+  intact) and fig10 with the n=20 replication panel (50 MB crossover
+  resolved).
+- **Em dashes**: the two Linux passes introduced 6 new rendered em
+  dashes; all replaced (comma/colon/parentheses). Grep for `—` and
+  prose ` --- ` in main.tex: 0.
+- **Codename hygiene**: reworded the data-availability WARNING comment
+  to avoid the codename literal; main.tex + references.bib now grep
+  clean (case-insensitive), matching the deliverables discipline.
+- **HANDOFF.md** renumbered to seven passes (hardening = 5, two-host =
+  6, owner-org = 7), current-state block updated (102 pp, 22 overfulls),
+  open-items list refreshed (N3/N5/qualifier/CRediT/seoBlockchain2024
+  resolved; N5 composite route failed legibility — keeping the five
+  separate figures unless authors redraw with larger fonts).
+- **Two-host framing**: session A's paragraph already matches the agreed
+  framing (conservative co-located baseline + Wi-Fi caveat); left as
+  written apart from the em-dash fix. Table 8 footnote judged
+  unnecessary since the client hardware is stated inline.
+- Build after merge: **102 pages, 0 errors, 0 undefined refs,
+  22 cosmetic overfulls, 0 "??", 1 documented bibtex warning.** Float
+  audit: no float further than 2 pages from its first reference except
+  the two intentional Introduction forward-references
+  (tab:framework_vs_prototype, fig:failclosed) and the key-lifecycle
+  stack (d=6, inherent to five stacked figures; N5 resolved as keep).
+
 Every change made to `bra_submission/` in this pass, grouped by type, so each
 edit can be reviewed and reverted individually. Baseline = the authors' local
 copy of 2026-07-17 (verified byte-identical in source content to branch
