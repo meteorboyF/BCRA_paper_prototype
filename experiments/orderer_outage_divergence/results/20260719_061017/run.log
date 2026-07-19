@@ -1,0 +1,32 @@
+[exp16 06:10:17] output dir: /home/angkon/Projects/Blockchain/FCDH_linux_validation/Fardeen_Codex_Dhaka_Meetup_Hackathon/experiments/orderer_outage_divergence/results/20260719_061017
+[exp16 06:10:17] creating fixture (fresh doc + cross-firm grant) via setup.mjs
+[setup] logged in owner a.rahman@lawfirm-a.example
+[setup] case 05497fb2-f900-464d-acb1-0c2a94ec5c2a
+[setup] document 7ce8b612-87f8-4781-9ecb-b5747bb7b938 (fabricTx 342dffe7999631727da86f2cfee03bcc4e0bf44d90b0ee17a1d56224c8ac5d81)
+[setup] granted read on 7ce8b612-87f8-4781-9ecb-b5747bb7b938 to s.chowdhury@lawfirm-b.example (30-day expiry)
+[exp16 06:10:25] fixture doc=7ce8b612-87f8-4781-9ecb-b5747bb7b938 grantee=6afbbf2b-4a8c-4097-bed6-5b1c1fc52f3d (FirmBMSP)
+[exp16 06:10:27] [0] baseline grantee download (healthy): HTTP 200
+[exp16 06:10:27] [1] stopping orderers (peers stay up): orderer1.pangochain.com orderer2.pangochain.com orderer3.pangochain.com
+[exp16 06:10:28] [2] grantee download during outage: HTTP 200
+[exp16 06:10:28] [3] owner revoke during outage (submit->orderer): HTTP 204
+[exp16 06:10:28] [4] grantee download AFTER revoke: HTTP 200 (669 bytes served to revoked user)
+[exp16 06:10:28] [5] grantee wrapped-key AFTER revoke: HTTP 403 (DB-gated; DB revoke landed)
+[exp16 06:10:28] [6] ledger CheckAccess=true  |  DB revoked=t  -> DIVERGENCE
+[exp16 06:10:28] [7] restarting orderers; waiting 25s for Raft + gateway recovery
+[exp16 06:10:54] [7] ledger CheckAccess after recovery (no manual action): true (expect still true = PERMANENT)
+[exp16 06:10:54] [8] manual re-revoke via CLI (majority endorsement) while Fabric reachable
+[34m2026-07-19 06:10:56.705 UTC 0003 INFO[0m [chaincodeCmd] [34;1mClientWait[0m -> txid [3a62b55d777aef6a5d5a9c95eda15278c5a3d716056d8c5cfb1d34c1d77e0023] committed with status (VALID) at peer0.firma.pangochain.com:7051
+[34m2026-07-19 06:10:56.705 UTC 0004 INFO[0m [chaincodeCmd] [34;1mchaincodeInvokeOrQuery[0m -> Chaincode invoke successful. result: status:200 
+[exp16 06:11:00] [8] ledger CheckAccess after manual re-revoke: false (expect false = reconciled)
+[exp16 06:11:00] done. summary:
+    step  description                              result                                                                           
+    0     baseline download (healthy)              HTTP 200                                                                         
+    1     stop orderers (peers up)                 stopped orderer1.pangochain.com orderer2.pangochain.com orderer3.pangochain.com  
+    2     download during outage (evaluate->peer)  HTTP 200                                                                         
+    3     revoke during outage (submit->orderer)   HTTP 204                                                                         
+    4     download after revoke (stale grant)      HTTP 200                                                                          669 bytes
+    5     wrapped-key after revoke (DB-gated)      HTTP 403                                                                         
+    6     ledger vs DB during outage               ledger=true db_revoked=t                                                         
+    7     ledger after orderer recovery            ledger=true                                                                      
+    8     ledger after manual re-revoke            ledger=false                                                                     
+[exp16 06:11:00] raw evidence in /home/angkon/Projects/Blockchain/FCDH_linux_validation/Fardeen_Codex_Dhaka_Meetup_Hackathon/experiments/orderer_outage_divergence/results/20260719_061017

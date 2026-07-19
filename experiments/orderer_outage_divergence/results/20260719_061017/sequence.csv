@@ -1,0 +1,10 @@
+step,description,result
+0,baseline download (healthy),HTTP 200
+1,stop orderers (peers up),stopped orderer1.pangochain.com orderer2.pangochain.com orderer3.pangochain.com
+2,download during outage (evaluate->peer),HTTP 200
+3,revoke during outage (submit->orderer),HTTP 204
+4,download after revoke (stale grant),HTTP 200, 669 bytes
+5,wrapped-key after revoke (DB-gated),HTTP 403
+6,ledger vs DB during outage,ledger=true db_revoked=t
+7,ledger after orderer recovery,ledger=true
+8,ledger after manual re-revoke,ledger=false

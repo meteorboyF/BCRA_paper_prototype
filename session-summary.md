@@ -386,3 +386,45 @@ ready pre-proof re-checks. See MANUSCRIPT_TODO.md on bra-submission.
   ("each event linked to its anchoring Fabric transaction identifier")
   to the audit-log sentence; "expanded" → "expandable" to match the
   caption. Rebuild unchanged: 103 pages, overfull 16.
+
+## Reviewer M2/M3/M4 investigation + Experiment 16 (2026-07-19)
+
+Cold peer-review of the submitted PDF surfaced three findings absent from
+all prior audit docs (AUDIT_FINDINGS, REVIEWER_LENS_FINDINGS/CHANGES,
+MANUSCRIPT_TODO). Scoped against code (backend + chaincode) and the live
+3-org network.
+
+- **M2 (orderer-only outage divergence) — CONFIRMED LIVE, permanent.**
+  Formalized as **Experiment 16** (`experiments/orderer_outage_divergence/`,
+  run `20260719_061017`). Self-contained fixture (fresh case+doc+cross-firm
+  grant via real REST flows). Sequence: baseline download 200; stop
+  orderer1/2/3 (peers up); download during outage 200; owner revoke during
+  outage HTTP 204 "success"; download after revoke 200 (669 bytes to the
+  revoked user); wrapped-key after revoke 403 (DB-gated, DB revoke landed);
+  ledger CheckAccess=true while DB revoked=t (divergence); after orderer
+  restart +25s, ledger STILL true (divergence is PERMANENT — no auto
+  re-anchor); manual CLI re-revoke (majority endorsement) commits VALID →
+  ledger false (the only fix). Mechanism: AccessControlService.revoke()
+  sets DB revoked_at, then catches the FabricException from the revoke
+  submit and completes. Exp 9 (all-peer outage) can't catch this (peers-up
+  is the distinguishing condition). Manuscript §7 (line 3450) already
+  DISCLOSES the divergence but never tests it, says "until re-anchored"
+  (implying auto-recovery that never happens), and S1 overclaims denial
+  without cross-ref.
+- **M3 (client-supplied CheckAccess timestamp) — CONFIRMED in code.**
+  chaincode.go:191 CheckAccess reads GetTxTimestamp(); on an evaluate that
+  timestamp is set in the client/gateway proposal, never ordered/validated.
+  Custodial MSP creds (FabricConfig single identity) mean the
+  compromised-API-operator adversary IS the signer → can backdate to
+  resurrect an expired grant. Threat-model row omits this.
+- **M4 (single-peer evaluate) — CONFIRMED in code.** FabricConfig binds ONE
+  peer-endpoint; checkAccess→contract.evaluateTransaction targets that
+  single peer. The "ledger-verifiable" release decision trusts one peer's
+  query response. Deployed channel uses MAJORITY endorsement for writes
+  (single-peer RevokeAccess → ENDORSEMENT_POLICY_FAILURE), but reads are
+  single-peer.
+- **M7 (Zenodo)**: settled — deposit + activate Variant B2 + fix repo
+  codename leak now non-discretionary for a measurements paper.
+- Manuscript diffs for M2 (S1 + line 3450), M3, M4, M1, M6, plus the
+  "fifteen"→"sixteen experiments" count sweep, drafted for author gate
+  (before/after) — NOT yet committed to bra-submission.

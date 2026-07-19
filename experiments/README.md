@@ -14,9 +14,17 @@ Benchmark and evaluation code for the BRA submission. Manuscript lives on the
 | 14 — Passive-audit-log baseline (+ async-executor bug fix) | 3.5a | [`baseline_auditlog/RESULTS.md`](baseline_auditlog/RESULTS.md) | `baseline_auditlog/results/20260716_122821/` | `fig14_baseline.png/.pdf` |
 | 15 — Consolidated evidence table + 95% CIs | 3.6 | [`consolidated/RESULTS.md`](consolidated/RESULTS.md) | `consolidated/results/20260716_131526/` | `fig15_ci_headline.png/.pdf` |
 | Legacy figure regeneration (fig1–fig9 + CIs) | 3.6 | [`legacy_figures/RESULTS.md`](legacy_figures/RESULTS.md) | `legacy_figures/results/20260716_145930/` | `fig1`–`fig9` `.png/.pdf` |
+| 16 — Orderer-only outage divergence (revoke/release) | reviewer M2 | [`orderer_outage_divergence/RESULTS.md`](orderer_outage_divergence/RESULTS.md) | `orderer_outage_divergence/results/20260719_061017/` | (behavioural sequence; no figure) |
 
 Exp 1–9 raw source data (verified against the published figures) lives in
 repo-root `results/` with `DELTAS.md` as the reconciliation log.
+
+Experiment 16 was added after submission in response to a reviewer finding
+(M2): it isolates the orderer-only outage geometry that Experiment 9
+(all-peer outage) cannot reach, and confirms — with raw HTTP/ledger/DB
+evidence — that a revocation issued during an orderer outage updates
+PostgreSQL but never reaches the ledger, so the release path keeps serving
+the revoked user until a manual re-revoke, permanently.
 
 Item 3.5b: filled at
 [`comparison/COMPARISON_TABLE.md`](comparison/COMPARISON_TABLE.md) — every
