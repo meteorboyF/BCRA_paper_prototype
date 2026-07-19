@@ -157,7 +157,7 @@ A Hybrid Approach Using Hyperledger Fabric and IPFS}
             country={Bangladesh}}
 
 \begin{abstract}
-Legal document management systems centralize trust in privileged administrators, making it difficult for external parties to verify whether access decisions or audit records have been altered. We present a hybrid legal-data management framework that places Hyperledger Fabric on the active document-release path rather than using it only as a passive audit log: every protected download must pass a chaincode access check before ciphertext or wrapped document keys are released (per-user enforcement is demonstrated for cross-organization access), and if Fabric is unavailable the path fails closed rather than falling back to a database access-control list. The framework combines browser-side encryption, ciphertext-only storage in a private IPFS swarm, and on-chain anchoring of hashes and content identifiers. Across fifteen experiments, the REST-gateway workload sustains up to 193 transactions per second; the ledger access check is statistically indistinguishable from a database-only check (6.51 vs.\ 7.16\,ms median, overlapping 95\,\% confidence intervals) and costs 6.5\,ms end to end over an audit-log-only baseline; outage experiments confirm zero successful downloads during Fabric unavailability with automatic recovery. Prior permissioned-ledger document systems anchor access decisions off the release path or price on-path authorization only for generic file sharing; none reports measured fail-closed behavior under ledger outage or the end-to-end cost of on-path enforcement against the audit-log architecture it replaces.
+Legal document management systems centralize trust in privileged administrators, making it difficult for external parties to verify whether access decisions or audit records have been altered. We present a hybrid legal-data management framework that places Hyperledger Fabric on the active document-release path rather than using it only as a passive audit log: every protected download must pass a chaincode access check before ciphertext or wrapped document keys are released (per-user enforcement is demonstrated for cross-organization access), and if Fabric is unavailable the path fails closed rather than falling back to a database access-control list. The framework combines browser-side encryption, ciphertext-only storage in a private IPFS swarm, and on-chain anchoring of hashes and content identifiers. Across sixteen experiments, the REST-gateway workload sustains 66--70 transactions per second at the default batch configuration and up to 193 with a reduced batch timeout, for the evaluated three-organization deployment; the ledger access check is statistically indistinguishable from a database-only check (6.51 vs.\ 7.16\,ms median, overlapping 95\,\% confidence intervals) and costs 6.5\,ms end to end over an audit-log-only baseline; outage experiments confirm zero successful downloads during Fabric unavailability with automatic recovery. Prior permissioned-ledger document systems anchor access decisions off the release path or price on-path authorization only for generic file sharing; none reports measured fail-closed behavior under ledger outage or the end-to-end cost of on-path enforcement against the audit-log architecture it replaces.
 \end{abstract}
 
 \begin{keyword}
@@ -204,9 +204,11 @@ administrator who recorded them.
 \begin{figure}[!htb]
 \centering
 \includegraphics[width=\linewidth]{Hierarchy.pdf}
-\caption{Role hierarchy enforced by the proposed framework, from
-managing partners with full case visibility to paralegals
-restricted to assigned documents only.}
+\caption{Role hierarchy in the proposed framework, from managing partners
+with full case visibility to paralegals restricted to assigned documents
+only. In the prototype this intra-organization hierarchy is enforced at the
+application (JWT/RBAC) layer; ledger-evaluated per-user enforcement is
+demonstrated for cross-organization access (Section~\ref{sec:limitations}).}
 \label{fig:rbac_hierarchy}
 \end{figure}
 
@@ -1755,10 +1757,16 @@ document signatures bind the signing key to $\mathcal{H}_D$, $\mathcal{H}_C$, an
 A fully compromised API operator can bypass application logic, misuse
 custodial MSP credentials, expose plaintext via malicious frontend
 delivery before browser encryption, abuse off-chain access paths, or
-substitute recipient keys before grant creation. Fabric still makes
+substitute recipient keys before grant creation. Because it submits with
+custodial MSP credentials, it also controls the proposal timestamp that
+\texttt{CheckAccess} reads via \texttt{GetTxTimestamp()} on the evaluate
+path, and can backdate a query to satisfy an expired grant's
+\texttt{ExpiresAt}; grant-expiry enforcement therefore assumes an honest
+gateway clock. Fabric still makes
 ledger-mediated state changes auditable; production requires
 browser-only encryption, per-user Fabric identities, ledger-anchored
-public keys, and strict service hardening. \\
+public keys, committing each access decision with its evaluated timestamp,
+and strict service hardening. \\
 \hline
 Compromised browser / XSS attacker &
 Executes malicious JavaScript in the user's browser session; can
@@ -1860,7 +1868,12 @@ request time. \emph{Argument:} the release handler invokes chaincode
 before returning material (Experiment~\hyperref[sec:exp_latency]{2}
 measures this decision at 6.51\,ms P50); the decision reads
 world-state grants committed under A3; expiry is evaluated against
-the deterministic transaction timestamp. \emph{Evidence:}
+the deterministic transaction timestamp. In the prototype the release
+handler evaluates \texttt{CheckAccess} against a single peer (the gateway
+binds one peer endpoint), so P1 additionally assumes that queried peer
+returns honest world state; independence from a single malicious peer on
+the read path would require multi-peer query or endorsement-backed reads
+and is a production hardening item. \emph{Evidence:}
 Experiments~\hyperref[sec:exp_failclosed]{9}
 and~\hyperref[sec:exp_baseline]{14}.
 \item[P2 (Fail-closed under ledger unavailability).] Under A1, if the
@@ -1899,7 +1912,14 @@ passed. The application cannot serve from cached state: P1 places
 \texttt{CheckAccess} on the request itself, and the chaincode
 evaluates grant status and expiry against committed world state at
 the deterministic transaction timestamp. The request is denied and
-audited. \emph{Traces to:} P1 mechanism;
+audited, \emph{provided the revocation has committed to the ledger}.
+This qualification is load-bearing: because the prototype's write paths
+are availability-first, a revocation issued while the ordering service is
+unreachable updates the operational store but not the ledger, and
+\texttt{CheckAccess} continues to authorize from the stale on-chain grant
+until the revocation is re-anchored
+(Experiment~\hyperref[sec:exp_orderer_outage]{16};
+Section~\ref{sec:limitations}). \emph{Traces to:} P1 mechanism;
 Experiment~\hyperref[sec:exp_latency]{2} (decision cost) and chaincode
 unit tests in the released artifact.
 
@@ -2379,11 +2399,14 @@ remaining interface screens are provided as supplementary material.}
 \label{sec:performance}
 
 
-Fifteen experiments evaluate RQ1–RQ3. Experiments~1--9 form the core
+Sixteen experiments evaluate RQ1–RQ3. Experiments~1--9 form the core
 campaign; Experiments~10--15 extend it along axes the core campaign
 leaves open: off-chain storage
 cost, standard-instrument comparability, world-state scale, network
 size, an architectural baseline, and consolidated statistics.
+Experiment~16 isolates the orderer-only outage geometry that
+Experiment~9 (all-peer outage) cannot reach
+(Section~\ref{sec:exp_orderer_outage}).
 Measurements were collected on
 three platforms: a Windows~11 workstation (Ryzen~7~5700X,
 Java~17~Temurin, Node.js~24), an Apple~M1 MacBook under Rosetta~2
@@ -3206,8 +3229,9 @@ ledger anchoring), which the released analysis documents in detail.}
 % -----------------------------------------------------------------
 
 To counter point estimates masking variance, the released dataset
-consolidates 37 headline metrics across all fifteen experiments with
-95\,\% confidence intervals: bootstrap percentile intervals
+consolidates 37 headline metrics across all fifteen measurement
+experiments (Experiments~1--15; Experiment~16 is behavioral and
+contributes no headline metric) with 95\,\% confidence intervals: bootstrap percentile intervals
 (10{,}000 resamples) for medians computed from per-sample data, and
 Student-$t$ intervals for means of trial-level
 throughput.\footnote{Medians in the consolidated dataset and in the
@@ -3295,6 +3319,40 @@ same \\
 \end{tabularx}
 \end{table*}
 
+% -----------------------------------------------------------------
+\subsection{Experiment~16: Divergence Under Orderer-Only Outage}
+\label{sec:exp_orderer_outage}
+% -----------------------------------------------------------------
+
+Experiment~\hyperref[sec:exp_failclosed]{9} stops all peers, so both the
+read and write paths fail and the download path denies. That geometry
+cannot reach the asymmetric failure the architecture is exposed to: an
+outage of the \emph{ordering service} while peers stay reachable.
+\texttt{CheckAccess} is a Fabric evaluate answered by a peer, whereas
+\texttt{RevokeAccess} is a submit ordered by the orderer. This experiment
+isolates that case. Against a fresh cross-organization grant, the three
+orderers were stopped (peers left running), an owner revocation was
+issued, and the release path was re-exercised.
+
+The revocation returned HTTP~204 to the caller yet never reached the
+ledger: the prototype's write paths are availability-first
+(Section~\ref{sec:limitations}), so \texttt{RevokeAccess} caught the
+submit failure, committed the \mbox{PostgreSQL} revocation, and returned
+success. The ledger grant therefore remained \texttt{StatusActive}, and
+\texttt{CheckAccess} (evaluated against the still-reachable peer) continued
+to authorize the revoked user: the ciphertext download returned HTTP~200
+and served the document bytes after the revocation, while the wrapped-key
+endpoint returned HTTP~403 because it is gated by the operational access
+row, which the revocation did update. The exposure under this geometry is
+thus bounded to ciphertext, not the document key; but a prior grantee
+already holds the wrapped key from legitimate access, so the revocation
+fails against exactly the party it targets. Restarting the orderers did not
+reconcile the state: with no automatic re-anchoring, the ledger continued
+to authorize the revoked user until the revocation was manually re-issued
+and committed while Fabric was reachable. This confirms the write-path
+divergence documented in Section~\ref{sec:limitations} as an empirical
+result and delimits its scope; the raw sequence is in the released dataset.
+
 % =========================================================================
 % SECTION VII --- LIMITATIONS AND FUTURE WORK
 % =========================================================================
@@ -3334,7 +3392,12 @@ The \texttt{CheckAccess} chaincode uses the Fabric transaction timestamp
 for grant-expiry evaluation, read via
 \texttt{ctx.GetStub().}\allowbreak\texttt{GetTxTimestamp()},
 ensuring all endorsing peers assess the same proposal-embedded timestamp
-regardless of local clock offset. Exact historical replay of individual
+regardless of local clock offset. This guarantees determinism across peers,
+not trustworthiness of the clock: on an evaluate the timestamp originates
+in the client's proposal, so under the prototype's custodial submission a
+compromised gateway can supply a backdated value to resurrect an expired
+grant (residual-risk row, Table~\ref{tab:threat_model}). Exact historical
+replay of individual
 access decisions would additionally require committing each
 access-decision event on-chain with its evaluated timestamp and result;
 this is identified as a production hardening item and deferred to future
@@ -3447,7 +3510,7 @@ hardening item (Section~\ref{sec:future_work}).
 
 The prototype does not enforce an explicit timeout on IPFS \texttt{GetFile} calls in the document download path. Under normal operation, the Fabric \texttt{CheckAccess} invocation completes before the IPFS retrieval begins. However, if the IPFS swarm experiences a node failure, disk fault, or network partition \emph{after} chaincode authorization succeeds, the Spring Boot HTTP thread handling the request may block indefinitely waiting for the ciphertext. Under sustained load, this could exhaust the application server's thread pool, causing a cascading failure that degrades or disables endpoints unrelated to IPFS. The production mitigation is a circuit-breaker pattern with a hard timeout (e.g., 5\,s) on all IPFS retrieval calls, returning HTTP~504 to the caller and logging an \texttt{IPFS\_RETRIEVAL\_TIMEOUT} audit event. This ensures IPFS unavailability degrades gracefully rather than propagating to a full service outage.
 
-Experiment~\hyperref[sec:exp_failclosed]{9} validates fail-closed behavior only for the document download path (\texttt{downloadCiphertext()}). The write paths are \emph{not} fail-closed in the prototype: upload, grant, revocation, and the signing action's audit anchoring each catch Fabric submission failures, log a warning, and complete the operational write, prioritizing availability. During a ledger outage this can produce operational-versus-ledger divergence; the sharpest case is a revocation recorded in PostgreSQL while the stale on-chain grant remains chaincode-authorized until the revocation is re-anchored. Making the write paths fail-closed, or adding durable queued re-anchoring with divergence detection, is a production hardening item.
+Experiment~\hyperref[sec:exp_failclosed]{9} validates fail-closed behavior only for the document download path (\texttt{downloadCiphertext()}). The write paths are \emph{not} fail-closed in the prototype: upload, grant, revocation, and the signing action's audit anchoring each catch Fabric submission failures, log a warning, and complete the operational write, prioritizing availability. During a ledger outage this can produce operational-versus-ledger divergence; the sharpest case is a revocation recorded in PostgreSQL while the stale on-chain grant remains chaincode-authorized. The prototype performs \emph{no} automatic re-anchoring: the divergence does not self-heal when the ordering service recovers, and the stale grant continues to authorize the revoked user on the release path until a re-revocation is manually issued and commits while Fabric is reachable. Experiment~\hyperref[sec:exp_orderer_outage]{16} reproduces this end to end: the revocation returns HTTP~204 yet the ledger keeps authorizing the revoked user across an orderer restart, with the exposure bounded to ciphertext because the wrapped-key endpoint is gated by the operational access row. Making the write paths fail-closed, or adding durable queued re-anchoring with divergence detection, is a production hardening item.
 
 \subsubsection{GDPR and Regulatory Compliance}
 \label{sec:gdpr}
@@ -3607,7 +3670,10 @@ answer is affirmative, with two boundaries. Access-control \emph{state}, namely
 grants, revocations, and document registrations, is independently
 verifiable by consortium peers. \texttt{CheckAccess} derives each download
 decision from that state at request time, although individual query results
-are not themselves committed as transactions.
+are not themselves committed as transactions. The evaluated decision is
+also answered by a single peer in the prototype; independence from a single
+malicious peer on the read path is a production hardening item, consistent
+with the malicious-peer analysis in Section~\ref{sec:adversary_matrix}.
 
 First, ledger transactions remain
 attributable to the prototype's server-managed MSP identity until per-user
@@ -3715,7 +3781,7 @@ Section~\ref{sec:contributions}: a measured relocation of the enforcement
 boundary to ledger-verifiable access-control state, chaincode-enforced
 time-bounded grants and revocation, a dual-store audit design separating
 low-latency operational queries from ledger-verifiable history, and a
-fifteen-experiment evaluation spanning throughput to fail-closed outage
+sixteen-experiment evaluation spanning throughput to fail-closed outage
 behavior.
 
 Table~\ref{tab:framework_vs_prototype} documents the gaps between framework
@@ -3945,39 +4011,45 @@ This work was supported by the Institute for Advanced Research Publication
 Grant of United International University, under Grant IAR 2025 Pub 093.
 
 \section*{Data availability}
-%% TODO (author decision pending): THREE DRAFTED VARIANTS BELOW -- exactly one
-%% must remain at submission. Variant B2 (archival DOI) is recommended by
-%% the journal's data policy; B1 works if the repository stays public.
+%% Variant B2 (archival DOI) is ACTIVE below, per the journal's data policy.
 %%
-%% WARNING (system-name leak): the linked repository's directory names and
-%% docs use the project codename throughout -- the name this manuscript
-%% deliberately never uses. Linking it as-is leaks that name to reviewers.
-%% Before submission either (a) mirror/rename the repo (and its
-%% codename-prefixed paths) under a neutral name, then keep B1/B2, or
-%% (b) activate Variant B3.
+%% ACTION REQUIRED BEFORE SUBMISSION -- fill the real DOI: the codename-
+%% neutralized replication package (experiments/ + results/, scrubbed of the
+%% project codename and machine-specific identifiers) is built and ready to
+%% deposit; upload it to Zenodo and replace the placeholder
+%% "10.5281/zenodo.XXXXXXX" below with the minted DOI. The deposit derives
+%% from git tags bra-data-v1-experiments (prototype-fixes @ 801824c) and
+%% bra-data-v1-twohost (linux-validation @ 6857eef).
 %%
-%% ---- Variant B1 (GitHub as-is) -- currently ACTIVE: ----
-The raw measurement data for all fifteen experiments (per-sample CSVs
+%% Codename-leak note (RESOLVED for the archival package): the Zenodo
+%% deposit is a curated, neutralized subset, so it does NOT carry the
+%% project codename; the GitHub link below is retained as development
+%% history only, and its repository name is the authors' own (already
+%% disclosed on this single-blind submission).
+%%
+%% ---- Variant B2 (archival DOI) -- ACTIVE: ----
+The raw measurement data for all sixteen experiments (per-sample CSVs
 with per-run environment records), the load generators, topology
 generators, and analysis and plotting scripts that produce every figure
 and table in this paper, together with the measured-versus-manuscript
-reconciliation log, are openly available in the project repository at
+reconciliation log, are archived as a citable replication package at
+\url{https://doi.org/10.5281/zenodo.XXXXXXX} (Zenodo), with the
+development history available at
 \url{https://github.com/meteorboyF/Fardeen_Codex_Dhaka_Meetup_Hackathon}
 (directories \texttt{results/} and \texttt{experiments/}, branch
-\texttt{prototype-fixes}; the post-campaign two-host validation
-dataset, including the client-side trial logs and RTT records, is on
-branch \texttt{linux-validation}).
+\texttt{prototype-fixes}; the post-campaign two-host validation dataset,
+including the client-side trial logs and RTT records, is on branch
+\texttt{linux-validation}).
 %%
-%% ---- Variant B2 (archival DOI) -- SWAP IN once a release is deposited: ----
-%% The raw measurement data for all fifteen experiments (per-sample CSVs
-%% with per-run environment records), the load generators, topology
-%% generators, and analysis and plotting scripts that produce every
-%% figure and table in this paper are archived at
-%% \url{https://doi.org/10.5281/zenodo.XXXXXXX} (Zenodo snapshot of the
-%% project repository), with the development history at
-%% \url{https://github.com/meteorboyF/Fardeen_Codex_Dhaka_Meetup_Hackathon}.
+%% ---- Variant B1 (GitHub as-is) -- alternate, if no archival deposit: ----
+%% The raw measurement data for all sixteen experiments ... are openly
+%% available in the project repository at
+%% \url{https://github.com/meteorboyF/Fardeen_Codex_Dhaka_Meetup_Hackathon}
+%% (directories \texttt{results/} and \texttt{experiments/}, branch
+%% \texttt{prototype-fixes}; two-host validation on branch
+%% \texttt{linux-validation}).
 %%
-%% ---- Variant B3 (no public link; avoids the name leak entirely): ----
+%% ---- Variant B3 (no public link): ----
 %% The raw measurement data, load generators, and analysis scripts that
 %% produce every figure and table in this paper are available from the
 %% corresponding author on reasonable request.
