@@ -231,220 +231,223 @@
 \@writefile{toc}{\contentsline {paragraph}{S2: Induced-outage fallback attack.}{46}{section*.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{S3: Public-key substitution.}{46}{section*.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{S4: Storage-tier content substitution.}{46}{section*.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.5}Out-of-Scope Attacks}{46}{subsubsection.4.1.5}\protected@file@percent }
-\newlabel{sec:out_of_scope}{{4.1.5}{46}{Out-of-Scope Attacks}{subsubsection.4.1.5}{}}
+\@writefile{toc}{\contentsline {paragraph}{S5: Gateway-side backdating of an expired grant.}{47}{section*.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.5}Out-of-Scope Attacks}{47}{subsubsection.4.1.5}\protected@file@percent }
+\newlabel{sec:out_of_scope}{{4.1.5}{47}{Out-of-Scope Attacks}{subsubsection.4.1.5}{}}
 \citation{fabricWhatsNew3x,fabricOrderingServiceLatest,fabricBFTConfigurationDoc,androulaki2018hyperledger}
 \citation{nist80038d}
 \citation{fips1865}
 \citation{ieee1363a2004}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Security Architecture}{47}{subsection.4.2}\protected@file@percent }
-\newlabel{sec:security_arch}{{4.2}{47}{Security Architecture}{subsection.4.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Security Architecture}{48}{subsection.4.2}\protected@file@percent }
+\newlabel{sec:security_arch}{{4.2}{48}{Security Architecture}{subsection.4.2}{}}
 \citation{fips197}
 \citation{w3cWebCrypto}
 \citation{fabricMSP,fips1865}
 \citation{nist800634,nist800-63b}
 \citation{rfc7519jwt}
 \citation{Ongaro2014,hyperledgerFabricOrderingService_v24}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.1}Cryptographic Framework}{48}{subsubsection.4.2.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.2}Identity Management}{48}{subsubsection.4.2.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Consensus Mechanism and Validation}{48}{subsection.4.3}\protected@file@percent }
-\newlabel{sec:consensus}{{4.3}{48}{Consensus Mechanism and Validation}{subsection.4.3}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.1}Cryptographic Framework}{49}{subsubsection.4.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.2}Identity Management}{49}{subsubsection.4.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Consensus Mechanism and Validation}{49}{subsection.4.3}\protected@file@percent }
+\newlabel{sec:consensus}{{4.3}{49}{Consensus Mechanism and Validation}{subsection.4.3}{}}
 \citation{androulaki2018hyperledger,fabricEndorsementDoc}
 \citation{fabricChaincodeLifecycleDoc}
 \citation{fips197,w3cWebCrypto}
 \citation{RBACSandhu}
 \citation{politou2019metadata,finck2019blockchain}
-\@writefile{toc}{\contentsline {section}{\numberline {5}Prototype Implementation}{50}{section.5}\protected@file@percent }
-\newlabel{sec:prototype_implementation}{{5}{50}{Prototype Implementation}{section.5}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Prototype Scope}{50}{subsection.5.1}\protected@file@percent }
-\newlabel{sec:prototype_scope}{{5.1}{50}{Prototype Scope}{subsection.5.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Prototype Implementation}{51}{section.5}\protected@file@percent }
+\newlabel{sec:prototype_implementation}{{5}{51}{Prototype Implementation}{section.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Prototype Scope}{51}{subsection.5.1}\protected@file@percent }
+\newlabel{sec:prototype_scope}{{5.1}{51}{Prototype Scope}{subsection.5.1}{}}
 \gdef \LT@iv {\LT@entry 
     {1}{98.15825pt}\LT@entry 
     {1}{119.80405pt}\LT@entry 
     {1}{52.23367pt}\LT@entry 
     {1}{119.80405pt}}
-\@writefile{lot}{\contentsline {table}{\numberline {7}{Framework Design vs.\ Prototype Implementation. Y~=~implemented; Y*~=~implemented with a known availability or governance caveat (see Production path column); P~=~partial; N~=~not yet implemented. Production path column identifies the engineering step required to close each gap. \textsuperscript  {$\dagger $}The ECDSA signing/verification mechanism is implemented and binds the signing key to $\mathcal  {H}_D$, $\mathcal  {H}_C$, and $id_D$; in the prototype, verification occurs in a dedicated signing action anchored as a ledger audit event rather than inline in the registration transaction, and binding upload timestamp and owner metadata is a production hardening item. Fabric transaction-level attribution remains custodial because the prototype submits Fabric transactions through server-managed MSP credentials (Section~\ref {sec:prototype_scope}).}}{51}{table.7}\protected@file@percent }
-\newlabel{tab:framework_vs_prototype}{{7}{51}{Framework Design vs.\ Prototype Implementation. Y~=~implemented; Y*~=~implemented with a known availability or governance caveat (see Production path column); P~=~partial; N~=~not yet implemented. Production path column identifies the engineering step required to close each gap. \textsuperscript {$\dagger $}The ECDSA signing/verification mechanism is implemented and binds the signing key to $\mathcal {H}_D$, $\mathcal {H}_C$, and $id_D$; in the prototype, verification occurs in a dedicated signing action anchored as a ledger audit event rather than inline in the registration transaction, and binding upload timestamp and owner metadata is a production hardening item. Fabric transaction-level attribution remains custodial because the prototype submits Fabric transactions through server-managed MSP credentials (Section~\ref {sec:prototype_scope})}{table.7}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {7}{Framework Design vs.\ Prototype Implementation. Y~=~implemented; Y*~=~implemented with a known availability or governance caveat (see Production path column); P~=~partial; N~=~not yet implemented. Production path column identifies the engineering step required to close each gap. \textsuperscript  {$\dagger $}The ECDSA signing/verification mechanism is implemented and binds the signing key to $\mathcal  {H}_D$, $\mathcal  {H}_C$, and $id_D$; in the prototype, verification occurs in a dedicated signing action anchored as a ledger audit event rather than inline in the registration transaction, and binding upload timestamp and owner metadata is a production hardening item. Fabric transaction-level attribution remains custodial because the prototype submits Fabric transactions through server-managed MSP credentials (Section~\ref {sec:prototype_scope}).}}{52}{table.7}\protected@file@percent }
+\newlabel{tab:framework_vs_prototype}{{7}{52}{Framework Design vs.\ Prototype Implementation. Y~=~implemented; Y*~=~implemented with a known availability or governance caveat (see Production path column); P~=~partial; N~=~not yet implemented. Production path column identifies the engineering step required to close each gap. \textsuperscript {$\dagger $}The ECDSA signing/verification mechanism is implemented and binds the signing key to $\mathcal {H}_D$, $\mathcal {H}_C$, and $id_D$; in the prototype, verification occurs in a dedicated signing action anchored as a ledger audit event rather than inline in the registration transaction, and binding upload timestamp and owner metadata is a production hardening item. Fabric transaction-level attribution remains custodial because the prototype submits Fabric transactions through server-managed MSP credentials (Section~\ref {sec:prototype_scope})}{table.7}{}}
 \citation{androulaki2018hyperledger}
 \citation{fabricCouchDBStateDB_v24}
 \citation{fabricChaincodeLifecycleDoc}
 \citation{benet2014ipfs}
 \citation{springBoot325}
 \citation{postgresqlTriggers}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Technology Stack}{54}{subsection.5.2}\protected@file@percent }
-\newlabel{sec:stack}{{5.2}{54}{Technology Stack}{subsection.5.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Technology Stack}{55}{subsection.5.2}\protected@file@percent }
+\newlabel{sec:stack}{{5.2}{55}{Technology Stack}{subsection.5.2}{}}
 \citation{hyperledgerFabricOrderingService_v24}
 \citation{lajam2021ipfsPrivate}
 \citation{fabricChaincodeStubDoc}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Blockchain Network Topology}{55}{subsection.5.3}\protected@file@percent }
-\newlabel{sec:topology}{{5.3}{55}{Blockchain Network Topology}{subsection.5.3}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {14}{\ignorespaces Six-peer-organization Fabric reference topology with a consortium-governed three-node EtcdRaft ordering service. The orderer nodes are operated by the regulator, LawFirmA, and LawFirmB under member-controlled orderer identity administration or multi-party CA governance. Raft provides crash-fault tolerance for one orderer failure; Byzantine-fault-tolerant ordering is outside the prototype scope.}}{56}{figure.14}\protected@file@percent }
-\newlabel{fig:fabric_topology}{{14}{56}{Six-peer-organization Fabric reference topology with a consortium-governed three-node EtcdRaft ordering service. The orderer nodes are operated by the regulator, LawFirmA, and LawFirmB under member-controlled orderer identity administration or multi-party CA governance. Raft provides crash-fault tolerance for one orderer failure; Byzantine-fault-tolerant ordering is outside the prototype scope}{figure.14}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Chaincode Design and Functionality}{56}{subsection.5.4}\protected@file@percent }
-\newlabel{sec:chaincode}{{5.4}{56}{Chaincode Design and Functionality}{subsection.5.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}User Interface and Functional Showcase}{56}{subsection.5.5}\protected@file@percent }
-\newlabel{sec:ui}{{5.5}{56}{User Interface and Functional Showcase}{subsection.5.5}{}}
-\newlabel{fig:ui_ledger_explorer}{{15a}{57}{Subfigure 15a}{subfigure.15.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Blockchain Network Topology}{56}{subsection.5.3}\protected@file@percent }
+\newlabel{sec:topology}{{5.3}{56}{Blockchain Network Topology}{subsection.5.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {14}{\ignorespaces Six-peer-organization Fabric reference topology with a consortium-governed three-node EtcdRaft ordering service. The orderer nodes are operated by the regulator, LawFirmA, and LawFirmB under member-controlled orderer identity administration or multi-party CA governance. Raft provides crash-fault tolerance for one orderer failure; Byzantine-fault-tolerant ordering is outside the prototype scope.}}{57}{figure.14}\protected@file@percent }
+\newlabel{fig:fabric_topology}{{14}{57}{Six-peer-organization Fabric reference topology with a consortium-governed three-node EtcdRaft ordering service. The orderer nodes are operated by the regulator, LawFirmA, and LawFirmB under member-controlled orderer identity administration or multi-party CA governance. Raft provides crash-fault tolerance for one orderer failure; Byzantine-fault-tolerant ordering is outside the prototype scope}{figure.14}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Chaincode Design and Functionality}{57}{subsection.5.4}\protected@file@percent }
+\newlabel{sec:chaincode}{{5.4}{57}{Chaincode Design and Functionality}{subsection.5.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}User Interface and Functional Showcase}{57}{subsection.5.5}\protected@file@percent }
+\newlabel{sec:ui}{{5.5}{57}{User Interface and Functional Showcase}{subsection.5.5}{}}
+\newlabel{fig:ui_ledger_explorer}{{15a}{58}{Subfigure 15a}{subfigure.15.1}{}}
 \newlabel{sub@fig:ui_ledger_explorer}{{(a)}{a}{Subfigure 15a\relax }{subfigure.15.1}{}}
-\newlabel{fig:ui_audit_log}{{15b}{57}{Subfigure 15b}{subfigure.15.2}{}}
+\newlabel{fig:ui_audit_log}{{15b}{58}{Subfigure 15b}{subfigure.15.2}{}}
 \newlabel{sub@fig:ui_audit_log}{{(b)}{b}{Subfigure 15b\relax }{subfigure.15.2}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {15}{\ignorespaces Audit and transparency views of the prototype interface: (a) the ledger explorer groups committed entries by block and shows transaction identifiers, channel, timestamp, transaction type, and document references; (b) the operational audit-log view lists application events with timestamps and expandable metadata. The remaining interface screens are provided as supplementary material.}}{57}{figure.15}\protected@file@percent }
-\newlabel{fig:ui_audit_views}{{15}{57}{Audit and transparency views of the prototype interface: (a) the ledger explorer groups committed entries by block and shows transaction identifiers, channel, timestamp, transaction type, and document references; (b) the operational audit-log view lists application events with timestamps and expandable metadata. The remaining interface screens are provided as supplementary material}{figure.15}{}}
-\@writefile{lof}{\contentsline {subfigure}{\numberline{(a)}{\ignorespaces {Ledger explorer}}}{57}{subfigure.15.1}\protected@file@percent }
-\@writefile{lof}{\contentsline {subfigure}{\numberline{(b)}{\ignorespaces {Audit log}}}{57}{subfigure.15.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {6}Performance Evaluation}{57}{section.6}\protected@file@percent }
-\newlabel{sec:performance}{{6}{57}{Performance Evaluation}{section.6}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {15}{\ignorespaces Audit and transparency views of the prototype interface: (a) the ledger explorer groups committed entries by block and shows transaction identifiers, channel, timestamp, transaction type, and document references; (b) the operational audit-log view lists application events with timestamps and expandable metadata. The remaining interface screens are provided as supplementary material.}}{58}{figure.15}\protected@file@percent }
+\newlabel{fig:ui_audit_views}{{15}{58}{Audit and transparency views of the prototype interface: (a) the ledger explorer groups committed entries by block and shows transaction identifiers, channel, timestamp, transaction type, and document references; (b) the operational audit-log view lists application events with timestamps and expandable metadata. The remaining interface screens are provided as supplementary material}{figure.15}{}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(a)}{\ignorespaces {Ledger explorer}}}{58}{subfigure.15.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(b)}{\ignorespaces {Audit log}}}{58}{subfigure.15.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6}Performance Evaluation}{58}{section.6}\protected@file@percent }
+\newlabel{sec:performance}{{6}{58}{Performance Evaluation}{section.6}{}}
 \citation{hyperledgerFabricOrderingService_v24}
 \citation{caliper2021,woznica2022}
 \citation{liu2024blockchain,twoLevelBlockchain,onyeashie2025fabricEvidence,verma2021nyaya,hanafi2021ipfschain,chen2022filewallet,peelam2026decentralized}
 \citation{thakur2024}
 \citation{liu2026rbacipfs,mukta2026zerotrust}
 \citation{aba2023,ilta2023}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Experiment~1: Scalability Under Concurrent Load}{59}{subsection.6.1}\protected@file@percent }
-\newlabel{sec:exp_scalability}{{6.1}{59}{Experiment~1: Scalability Under Concurrent Load}{subsection.6.1}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {8}{\ignorespaces Experimental Hardware Configurations}}{59}{table.8}\protected@file@percent }
-\newlabel{tab:hardware}{{8}{59}{Experimental Hardware Configurations}{table.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Experiment~1: Scalability Under Concurrent Load}{60}{subsection.6.1}\protected@file@percent }
+\newlabel{sec:exp_scalability}{{6.1}{60}{Experiment~1: Scalability Under Concurrent Load}{subsection.6.1}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {8}{\ignorespaces Experimental Hardware Configurations}}{60}{table.8}\protected@file@percent }
+\newlabel{tab:hardware}{{8}{60}{Experimental Hardware Configurations}{table.8}{}}
 \citation{hyperledgerFabricOrderingService_v24}
 \citation{benson2010network}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Experiment~2: Function-Level Operation Latency}{60}{subsection.6.2}\protected@file@percent }
-\newlabel{sec:exp_latency}{{6.2}{60}{Experiment~2: Function-Level Operation Latency}{subsection.6.2}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {16}{\ignorespaces Experiment~1 scalability under concurrent load on Linux~\texttt  {x86\_64} (computed from the released raw data; mean with 95\,\% $t$ confidence intervals, $n{=}5$ per point): Fabric REST-gateway throughput compared with the PostgreSQL-only baseline restricted to its harness-valid region (conc $\leq $ 100); the shaded region marks PostgreSQL-mode client-side load-generator saturation (self-flagged invalid rows, excluded from analysis), and the dotted line is the Experiment~\hyperref  [sec:exp_sensitivity]{8} \texttt  {BatchTimeout} tuning reference (193\,TPS at 500\,ms).}}{61}{figure.16}\protected@file@percent }
-\newlabel{fig:scalability}{{16}{61}{Experiment~1 scalability under concurrent load on Linux~\texttt {x86\_64} (computed from the released raw data; mean with 95\,\% $t$ confidence intervals, $n{=}5$ per point): Fabric REST-gateway throughput compared with the PostgreSQL-only baseline restricted to its harness-valid region (conc $\leq $ 100); the shaded region marks PostgreSQL-mode client-side load-generator saturation (self-flagged invalid rows, excluded from analysis), and the dotted line is the Experiment~\hyperref [sec:exp_sensitivity]{8} \texttt {BatchTimeout} tuning reference (193\,TPS at 500\,ms)}{figure.16}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {9}{\ignorespaces Read-path latency distribution: \texttt  {CheckAccess} via Fabric gateway vs.\ DB-only ACL lookup, warmed runs ($n = 100$ each, Linux x86\_64).}}{62}{table.9}\protected@file@percent }
-\newlabel{tab:exp2dist}{{9}{62}{Read-path latency distribution: \texttt {CheckAccess} via Fabric gateway vs.\ DB-only ACL lookup, warmed runs ($n = 100$ each, Linux x86\_64)}{table.9}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}Experiment~3: File-Size Independence of Ledger Latency}{62}{subsection.6.3}\protected@file@percent }
-\newlabel{sec:exp_filesize}{{6.3}{62}{Experiment~3: File-Size Independence of Ledger Latency}{subsection.6.3}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {17}{\ignorespaces Experiment~2 function-level latency (P50, log scale; Linux, JVM-warmed; bootstrap 95\,\% confidence intervals): \texttt  {CheckAccess} in both modes ($n{=}100$ each, overlapping CIs), \texttt  {RegisterDocument} ($n{=}100$), and the Experiment~4 audit trust/latency baselines ($n{=}10$ each).}}{63}{figure.17}\protected@file@percent }
-\newlabel{fig:latency}{{17}{63}{Experiment~2 function-level latency (P50, log scale; Linux, JVM-warmed; bootstrap 95\,\% confidence intervals): \texttt {CheckAccess} in both modes ($n{=}100$ each, overlapping CIs), \texttt {RegisterDocument} ($n{=}100$), and the Experiment~4 audit trust/latency baselines ($n{=}10$ each)}{figure.17}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.4}Experiment~4: Audit Verification Efficiency}{63}{subsection.6.4}\protected@file@percent }
-\newlabel{sec:exp_audit}{{6.4}{63}{Experiment~4: Audit Verification Efficiency}{subsection.6.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Experiment~2: Function-Level Operation Latency}{61}{subsection.6.2}\protected@file@percent }
+\newlabel{sec:exp_latency}{{6.2}{61}{Experiment~2: Function-Level Operation Latency}{subsection.6.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {16}{\ignorespaces Experiment~1 scalability under concurrent load on Linux~\texttt  {x86\_64} (computed from the released raw data; mean with 95\,\% $t$ confidence intervals, $n{=}5$ per point): Fabric REST-gateway throughput compared with the PostgreSQL-only baseline restricted to its harness-valid region (conc $\leq $ 100); the shaded region marks PostgreSQL-mode client-side load-generator saturation (self-flagged invalid rows, excluded from analysis), and the dotted line is the Experiment~\hyperref  [sec:exp_sensitivity]{8} \texttt  {BatchTimeout} tuning reference (193\,TPS at 500\,ms).}}{62}{figure.16}\protected@file@percent }
+\newlabel{fig:scalability}{{16}{62}{Experiment~1 scalability under concurrent load on Linux~\texttt {x86\_64} (computed from the released raw data; mean with 95\,\% $t$ confidence intervals, $n{=}5$ per point): Fabric REST-gateway throughput compared with the PostgreSQL-only baseline restricted to its harness-valid region (conc $\leq $ 100); the shaded region marks PostgreSQL-mode client-side load-generator saturation (self-flagged invalid rows, excluded from analysis), and the dotted line is the Experiment~\hyperref [sec:exp_sensitivity]{8} \texttt {BatchTimeout} tuning reference (193\,TPS at 500\,ms)}{figure.16}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {9}{\ignorespaces Read-path latency distribution: \texttt  {CheckAccess} via Fabric gateway vs.\ DB-only ACL lookup, warmed runs ($n = 100$ each, Linux x86\_64).}}{63}{table.9}\protected@file@percent }
+\newlabel{tab:exp2dist}{{9}{63}{Read-path latency distribution: \texttt {CheckAccess} via Fabric gateway vs.\ DB-only ACL lookup, warmed runs ($n = 100$ each, Linux x86\_64)}{table.9}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}Experiment~3: File-Size Independence of Ledger Latency}{63}{subsection.6.3}\protected@file@percent }
+\newlabel{sec:exp_filesize}{{6.3}{63}{Experiment~3: File-Size Independence of Ledger Latency}{subsection.6.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {17}{\ignorespaces Experiment~2 function-level latency (P50, log scale; Linux, JVM-warmed; bootstrap 95\,\% confidence intervals): \texttt  {CheckAccess} in both modes ($n{=}100$ each, overlapping CIs), \texttt  {RegisterDocument} ($n{=}100$), and the Experiment~4 audit trust/latency baselines ($n{=}10$ each).}}{64}{figure.17}\protected@file@percent }
+\newlabel{fig:latency}{{17}{64}{Experiment~2 function-level latency (P50, log scale; Linux, JVM-warmed; bootstrap 95\,\% confidence intervals): \texttt {CheckAccess} in both modes ($n{=}100$ each, overlapping CIs), \texttt {RegisterDocument} ($n{=}100$), and the Experiment~4 audit trust/latency baselines ($n{=}10$ each)}{figure.17}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.4}Experiment~4: Audit Verification Efficiency}{64}{subsection.6.4}\protected@file@percent }
+\newlabel{sec:exp_audit}{{6.4}{64}{Experiment~4: Audit Verification Efficiency}{subsection.6.4}{}}
 \citation{androulaki2018hyperledger,hyperledgerFabricOrderingService_v24}
-\@writefile{lof}{\contentsline {figure}{\numberline {18}{\ignorespaces Experiment~3 file-size independence of ledger latency (Linux, direct Kubo API; bootstrap 95\,\% CIs, $n{=}10$ per size): IPFS upload P50 (10--95\,ms across 1--50\,MB), the constant Fabric commit latency (2{,}132\,ms band), and the derived end-to-end upload cost (commit $+$ IPFS P50), matching the 2{,}142--2{,}226\,ms range reported in the text.}}{64}{figure.18}\protected@file@percent }
-\newlabel{fig:filesize}{{18}{64}{Experiment~3 file-size independence of ledger latency (Linux, direct Kubo API; bootstrap 95\,\% CIs, $n{=}10$ per size): IPFS upload P50 (10--95\,ms across 1--50\,MB), the constant Fabric commit latency (2{,}132\,ms band), and the derived end-to-end upload cost (commit $+$ IPFS P50), matching the 2{,}142--2{,}226\,ms range reported in the text}{figure.18}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {19}{\ignorespaces Experiment~4 audit verification efficiency (P50 with bootstrap 95\,\% CIs, $n{=}10$ each): PostgreSQL indexed queries, manual CSV\,+\,SHA-256 chain verification, and Fabric \texttt  {GetHistoryForKey} ledger-verifiable history (depth 107, from Experiment~\hyperref  [sec:exp_gethistory]{7}).}}{65}{figure.19}\protected@file@percent }
-\newlabel{fig:audit}{{19}{65}{Experiment~4 audit verification efficiency (P50 with bootstrap 95\,\% CIs, $n{=}10$ each): PostgreSQL indexed queries, manual CSV\,+\,SHA-256 chain verification, and Fabric \texttt {GetHistoryForKey} ledger-verifiable history (depth 107, from Experiment~\hyperref [sec:exp_gethistory]{7})}{figure.19}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.5}Experiment~5: Resilience Under WAN Latency}{65}{subsection.6.5}\protected@file@percent }
-\newlabel{sec:exp_wan}{{6.5}{65}{Experiment~5: Resilience Under WAN Latency}{subsection.6.5}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {18}{\ignorespaces Experiment~3 file-size independence of ledger latency (Linux, direct Kubo API; bootstrap 95\,\% CIs, $n{=}10$ per size): IPFS upload P50 (10--95\,ms across 1--50\,MB), the constant Fabric commit latency (2{,}132\,ms band), and the derived end-to-end upload cost (commit $+$ IPFS P50), matching the 2{,}142--2{,}226\,ms range reported in the text.}}{65}{figure.18}\protected@file@percent }
+\newlabel{fig:filesize}{{18}{65}{Experiment~3 file-size independence of ledger latency (Linux, direct Kubo API; bootstrap 95\,\% CIs, $n{=}10$ per size): IPFS upload P50 (10--95\,ms across 1--50\,MB), the constant Fabric commit latency (2{,}132\,ms band), and the derived end-to-end upload cost (commit $+$ IPFS P50), matching the 2{,}142--2{,}226\,ms range reported in the text}{figure.18}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {19}{\ignorespaces Experiment~4 audit verification efficiency (P50 with bootstrap 95\,\% CIs, $n{=}10$ each): PostgreSQL indexed queries, manual CSV\,+\,SHA-256 chain verification, and Fabric \texttt  {GetHistoryForKey} ledger-verifiable history (depth 107, from Experiment~\hyperref  [sec:exp_gethistory]{7}).}}{66}{figure.19}\protected@file@percent }
+\newlabel{fig:audit}{{19}{66}{Experiment~4 audit verification efficiency (P50 with bootstrap 95\,\% CIs, $n{=}10$ each): PostgreSQL indexed queries, manual CSV\,+\,SHA-256 chain verification, and Fabric \texttt {GetHistoryForKey} ledger-verifiable history (depth 107, from Experiment~\hyperref [sec:exp_gethistory]{7})}{figure.19}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.5}Experiment~5: Resilience Under WAN Latency}{66}{subsection.6.5}\protected@file@percent }
+\newlabel{sec:exp_wan}{{6.5}{66}{Experiment~5: Resilience Under WAN Latency}{subsection.6.5}{}}
 \citation{hyperledgerFabricOrderingService_v24,thakkar2018performance}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.6}Experiment~6: Cryptographic Primitive Benchmark}{66}{subsection.6.6}\protected@file@percent }
-\newlabel{sec:exp_crypto}{{6.6}{66}{Experiment~6: Cryptographic Primitive Benchmark}{subsection.6.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.6}Experiment~6: Cryptographic Primitive Benchmark}{67}{subsection.6.6}\protected@file@percent }
+\newlabel{sec:exp_crypto}{{6.6}{67}{Experiment~6: Cryptographic Primitive Benchmark}{subsection.6.6}{}}
 \citation{nielsen1993usability,nist800132}
-\@writefile{lot}{\contentsline {table}{\numberline {10}{\ignorespaces Experiment~\hyperref  [sec:exp_wan]{5} WAN Resilience: bridge-only delay vs.\ bridge plus per-orderer-container \texttt  {veth} delay (200 clients, 5 trials per RTT level).}}{67}{table.10}\protected@file@percent }
-\newlabel{tab:wan_comparison}{{10}{67}{Experiment~\hyperref [sec:exp_wan]{5} WAN Resilience: bridge-only delay vs.\^^Mbridge plus per-orderer-container \texttt {veth} delay (200 clients, 5 trials per RTT level)}{table.10}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {20}{\ignorespaces Experiment~5 WAN resilience (\texttt  {tc netem}, Linux~\texttt  {x86\_64}, 200 clients; full 8-point sweep, $n{=}5$ per point): (a) throughput (mean, $t$ 95\,\% CI) and (b) request latency (P50, bootstrap 95\,\% CI) for bridge-only vs.\ bridge\,+\,\texttt  {veth} delay injection.}}{67}{figure.20}\protected@file@percent }
-\newlabel{fig:wan}{{20}{67}{Experiment~5 WAN resilience (\texttt {tc netem}, Linux~\texttt {x86\_64}, 200 clients; full 8-point sweep, $n{=}5$ per point): (a) throughput (mean, $t$ 95\,\% CI) and (b) request latency (P50, bootstrap 95\,\% CI) for bridge-only vs.\^^Mbridge\,+\,\texttt {veth} delay injection}{figure.20}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {21}{\ignorespaces Experiment~6 cryptographic primitive benchmark using Node.js WebCrypto fallback (Linux; P50 with bootstrap 95\,\% CIs, $n{=}10$, log scale): PBKDF2-SHA256, ECDH/ECDSA operations, ECIES and RSA-OAEP key wrapping, AES-GCM, and SHA-256, with the wrapped-key token-size comparison (ECIES 125\,B vs.\ RSA-OAEP-2048 256\,B) annotated.}}{68}{figure.21}\protected@file@percent }
-\newlabel{fig:crypto}{{21}{68}{Experiment~6 cryptographic primitive benchmark using Node.js WebCrypto fallback (Linux; P50 with bootstrap 95\,\% CIs, $n{=}10$, log scale): PBKDF2-SHA256, ECDH/ECDSA operations, ECIES and RSA-OAEP key wrapping, AES-GCM, and SHA-256, with the wrapped-key token-size comparison (ECIES 125\,B vs.\ RSA-OAEP-2048 256\,B) annotated}{figure.21}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.7}Experiment~7: Blockchain Audit Trail Query Depth}{68}{subsection.6.7}\protected@file@percent }
-\newlabel{sec:exp_gethistory}{{6.7}{68}{Experiment~7: Blockchain Audit Trail Query Depth}{subsection.6.7}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {10}{\ignorespaces Experiment~\hyperref  [sec:exp_wan]{5} WAN Resilience: bridge-only delay vs.\ bridge plus per-orderer-container \texttt  {veth} delay (200 clients, 5 trials per RTT level).}}{68}{table.10}\protected@file@percent }
+\newlabel{tab:wan_comparison}{{10}{68}{Experiment~\hyperref [sec:exp_wan]{5} WAN Resilience: bridge-only delay vs.\^^Mbridge plus per-orderer-container \texttt {veth} delay (200 clients, 5 trials per RTT level)}{table.10}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {20}{\ignorespaces Experiment~5 WAN resilience (\texttt  {tc netem}, Linux~\texttt  {x86\_64}, 200 clients; full 8-point sweep, $n{=}5$ per point): (a) throughput (mean, $t$ 95\,\% CI) and (b) request latency (P50, bootstrap 95\,\% CI) for bridge-only vs.\ bridge\,+\,\texttt  {veth} delay injection.}}{68}{figure.20}\protected@file@percent }
+\newlabel{fig:wan}{{20}{68}{Experiment~5 WAN resilience (\texttt {tc netem}, Linux~\texttt {x86\_64}, 200 clients; full 8-point sweep, $n{=}5$ per point): (a) throughput (mean, $t$ 95\,\% CI) and (b) request latency (P50, bootstrap 95\,\% CI) for bridge-only vs.\^^Mbridge\,+\,\texttt {veth} delay injection}{figure.20}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {21}{\ignorespaces Experiment~6 cryptographic primitive benchmark using Node.js WebCrypto fallback (Linux; P50 with bootstrap 95\,\% CIs, $n{=}10$, log scale): PBKDF2-SHA256, ECDH/ECDSA operations, ECIES and RSA-OAEP key wrapping, AES-GCM, and SHA-256, with the wrapped-key token-size comparison (ECIES 125\,B vs.\ RSA-OAEP-2048 256\,B) annotated.}}{69}{figure.21}\protected@file@percent }
+\newlabel{fig:crypto}{{21}{69}{Experiment~6 cryptographic primitive benchmark using Node.js WebCrypto fallback (Linux; P50 with bootstrap 95\,\% CIs, $n{=}10$, log scale): PBKDF2-SHA256, ECDH/ECDSA operations, ECIES and RSA-OAEP key wrapping, AES-GCM, and SHA-256, with the wrapped-key token-size comparison (ECIES 125\,B vs.\ RSA-OAEP-2048 256\,B) annotated}{figure.21}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.7}Experiment~7: Blockchain Audit Trail Query Depth}{69}{subsection.6.7}\protected@file@percent }
+\newlabel{sec:exp_gethistory}{{6.7}{69}{Experiment~7: Blockchain Audit Trail Query Depth}{subsection.6.7}{}}
 \citation{nistir8202,fabricChaincodeStubDoc}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.8}Experiment~8: BatchTimeout Sensitivity}{69}{subsection.6.8}\protected@file@percent }
-\newlabel{sec:exp_sensitivity}{{6.8}{69}{Experiment~8: BatchTimeout Sensitivity}{subsection.6.8}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {22}{\ignorespaces Experiment~7 Fabric \texttt  {GetHistoryForKey} latency at the measured 107-entry history depth: all ten individual trials ($n{=}10$) with the median (135.5\,ms) and its bootstrap 95\,\% confidence interval. Only measured data are shown; no extrapolation to deeper histories is plotted. Multi-depth validation is future work.}}{70}{figure.22}\protected@file@percent }
-\newlabel{fig:gethistory}{{22}{70}{Experiment~7 Fabric \texttt {GetHistoryForKey} latency at the measured 107-entry history depth: all ten individual trials ($n{=}10$) with the median (135.5\,ms) and its bootstrap 95\,\% confidence interval. Only measured data are shown; no extrapolation to deeper histories is plotted. Multi-depth validation is future work}{figure.22}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {23}{\ignorespaces Experiment~8 \texttt  {BatchTimeout} sensitivity (Linux~\texttt  {x86\_64}, 50 clients; $n{=}10$ per setting, zero-error runs): (a) sustained throughput (mean, $t$ 95\,\% CI) and (b) request latency (P50, bootstrap 95\,\% CI) at 2\,s, 500\,ms, and 250\,ms, showing the reproducible 500\,ms optimum.}}{71}{figure.23}\protected@file@percent }
-\newlabel{fig:sensitivity}{{23}{71}{Experiment~8 \texttt {BatchTimeout} sensitivity (Linux~\texttt {x86\_64}, 50 clients; $n{=}10$ per setting, zero-error runs): (a) sustained throughput (mean, $t$ 95\,\% CI) and (b) request latency (P50, bootstrap 95\,\% CI) at 2\,s, 500\,ms, and 250\,ms, showing the reproducible 500\,ms optimum}{figure.23}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.9}Experiment~9: Fail-Closed Security Under Fabric Peer Outage}{71}{subsection.6.9}\protected@file@percent }
-\newlabel{sec:exp_failclosed}{{6.9}{71}{Experiment~9: Fail-Closed Security Under Fabric Peer Outage}{subsection.6.9}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {24}{\ignorespaces Experiment~9 fail-closed Fabric peer outage (computed from the released raw data): zero successful downloads during the 45\,s outage window; 1{,}340 HTTP~503 denial responses and 2{,}013 \mbox  {PostgreSQL} audit rows (the difference reflects additional system-level audit events per denial). Denials visibly persist $\approx $20\,s past peer restart ($t=75$--$95$\,s): the access-path circuit breaker completes its 30\,s open-state window before half-open probes readmit Fabric calls, after which normal operation resumes without intervention.}}{72}{figure.24}\protected@file@percent }
-\newlabel{fig:failclosed}{{24}{72}{Experiment~9 fail-closed Fabric peer outage (computed from the released raw data): zero successful downloads during the 45\,s outage window; 1{,}340 HTTP~503 denial responses and 2{,}013 \mbox {PostgreSQL} audit rows (the difference reflects additional system-level audit events per denial). Denials visibly persist $\approx $20\,s past peer restart ($t=75$--$95$\,s): the access-path circuit breaker completes its 30\,s open-state window before half-open probes readmit Fabric calls, after which normal operation resumes without intervention}{figure.24}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.10}Experiment~10: IPFS Storage and Retrieval Cost}{72}{subsection.6.10}\protected@file@percent }
-\newlabel{sec:exp_ipfscost}{{6.10}{72}{Experiment~10: IPFS Storage and Retrieval Cost}{subsection.6.10}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.8}Experiment~8: BatchTimeout Sensitivity}{70}{subsection.6.8}\protected@file@percent }
+\newlabel{sec:exp_sensitivity}{{6.8}{70}{Experiment~8: BatchTimeout Sensitivity}{subsection.6.8}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {22}{\ignorespaces Experiment~7 Fabric \texttt  {GetHistoryForKey} latency at the measured 107-entry history depth: all ten individual trials ($n{=}10$) with the median (135.5\,ms) and its bootstrap 95\,\% confidence interval. Only measured data are shown; no extrapolation to deeper histories is plotted. Multi-depth validation is future work.}}{71}{figure.22}\protected@file@percent }
+\newlabel{fig:gethistory}{{22}{71}{Experiment~7 Fabric \texttt {GetHistoryForKey} latency at the measured 107-entry history depth: all ten individual trials ($n{=}10$) with the median (135.5\,ms) and its bootstrap 95\,\% confidence interval. Only measured data are shown; no extrapolation to deeper histories is plotted. Multi-depth validation is future work}{figure.22}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {23}{\ignorespaces Experiment~8 \texttt  {BatchTimeout} sensitivity (Linux~\texttt  {x86\_64}, 50 clients; $n{=}10$ per setting, zero-error runs): (a) sustained throughput (mean, $t$ 95\,\% CI) and (b) request latency (P50, bootstrap 95\,\% CI) at 2\,s, 500\,ms, and 250\,ms, showing the reproducible 500\,ms optimum.}}{72}{figure.23}\protected@file@percent }
+\newlabel{fig:sensitivity}{{23}{72}{Experiment~8 \texttt {BatchTimeout} sensitivity (Linux~\texttt {x86\_64}, 50 clients; $n{=}10$ per setting, zero-error runs): (a) sustained throughput (mean, $t$ 95\,\% CI) and (b) request latency (P50, bootstrap 95\,\% CI) at 2\,s, 500\,ms, and 250\,ms, showing the reproducible 500\,ms optimum}{figure.23}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.9}Experiment~9: Fail-Closed Security Under Fabric Peer Outage}{72}{subsection.6.9}\protected@file@percent }
+\newlabel{sec:exp_failclosed}{{6.9}{72}{Experiment~9: Fail-Closed Security Under Fabric Peer Outage}{subsection.6.9}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {24}{\ignorespaces Experiment~9 fail-closed Fabric peer outage (computed from the released raw data): zero successful downloads during the 45\,s outage window; 1{,}340 HTTP~503 denial responses and 2{,}013 \mbox  {PostgreSQL} audit rows (the difference reflects additional system-level audit events per denial). Denials visibly persist $\approx $20\,s past peer restart ($t=75$--$95$\,s): the access-path circuit breaker completes its 30\,s open-state window before half-open probes readmit Fabric calls, after which normal operation resumes without intervention.}}{73}{figure.24}\protected@file@percent }
+\newlabel{fig:failclosed}{{24}{73}{Experiment~9 fail-closed Fabric peer outage (computed from the released raw data): zero successful downloads during the 45\,s outage window; 1{,}340 HTTP~503 denial responses and 2{,}013 \mbox {PostgreSQL} audit rows (the difference reflects additional system-level audit events per denial). Denials visibly persist $\approx $20\,s past peer restart ($t=75$--$95$\,s): the access-path circuit breaker completes its 30\,s open-state window before half-open probes readmit Fabric calls, after which normal operation resumes without intervention}{figure.24}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.10}Experiment~10: IPFS Storage and Retrieval Cost}{73}{subsection.6.10}\protected@file@percent }
+\newlabel{sec:exp_ipfscost}{{6.10}{73}{Experiment~10: IPFS Storage and Retrieval Cost}{subsection.6.10}{}}
 \citation{caliper2021}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.11}Experiment~11: Standard-Instrument Benchmark (Hyperledger Caliper)}{73}{subsection.6.11}\protected@file@percent }
-\newlabel{sec:exp_caliper}{{6.11}{73}{Experiment~11: Standard-Instrument Benchmark (Hyperledger Caliper)}{subsection.6.11}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {25}{\ignorespaces Experiment~10 IPFS storage/retrieval cost: (a) retrieval latency vs.\ file size and concurrency (local vs.\ cross-node); (b) replication cost per added replica; (c) constant 0.024\,\% UnixFS DAG overhead; (d) retrieval under node failure with a document pinned on 2 of 3 nodes.}}{74}{figure.25}\protected@file@percent }
-\newlabel{fig:ipfscost}{{25}{74}{Experiment~10 IPFS storage/retrieval cost: (a) retrieval latency vs.\ file size and concurrency (local vs.\ cross-node); (b) replication cost per added replica; (c) constant 0.024\,\% UnixFS DAG overhead; (d) retrieval under node failure with a document pinned on 2 of 3 nodes}{figure.25}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.12}Experiment~12: Document-Volume and Ledger-Growth Scaling}{74}{subsection.6.12}\protected@file@percent }
-\newlabel{sec:exp_ledgergrowth}{{6.12}{74}{Experiment~12: Document-Volume and Ledger-Growth Scaling}{subsection.6.12}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {26}{\ignorespaces Experiment~11 Hyperledger Caliper benchmark of the deployed chaincode via the peer-gateway API: (a) throughput and (b) latency vs.\ offered fixed load for \texttt  {CheckAccess} (evaluate) and \texttt  {RegisterDocument} (submit). Caliper reports average/min/max latency, the convention used by comparable published systems.}}{75}{figure.26}\protected@file@percent }
-\newlabel{fig:caliper}{{26}{75}{Experiment~11 Hyperledger Caliper benchmark of the deployed chaincode via the peer-gateway API: (a) throughput and (b) latency vs.\ offered fixed load for \texttt {CheckAccess} (evaluate) and \texttt {RegisterDocument} (submit). Caliper reports average/min/max latency, the convention used by comparable published systems}{figure.26}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.13}Experiment~13: Scaling with Network Size and Endorsement Policy}{75}{subsection.6.13}\protected@file@percent }
-\newlabel{sec:exp_netscale}{{6.13}{75}{Experiment~13: Scaling with Network Size and Endorsement Policy}{subsection.6.13}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {27}{\ignorespaces Experiment~12 ledger-growth scaling from $10^3$ to $10^6$ registered documents: (a) release-path query latency vs.\ world-state size (P50, caps P95); (b) linear per-peer storage growth ($\approx $7\,KB/document across block store and CouchDB).}}{76}{figure.27}\protected@file@percent }
-\newlabel{fig:ledgergrowth}{{27}{76}{Experiment~12 ledger-growth scaling from $10^3$ to $10^6$ registered documents: (a) release-path query latency vs.\^^Mworld-state size (P50, caps P95); (b) linear per-peer storage growth ($\approx $7\,KB/document across block store and CouchDB)}{figure.27}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.14}Experiment~14: Price of On-Path Enforcement vs.\ a Passive-Audit-Log Baseline}{76}{subsection.6.14}\protected@file@percent }
-\newlabel{sec:exp_baseline}{{6.14}{76}{Experiment~14: Price of On-Path Enforcement vs.\ a Passive-Audit-Log Baseline}{subsection.6.14}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {28}{\ignorespaces Experiment~13 network-size scaling across 2--7 organizations and endorsement policies: (a) write throughput; (b) write and read latency (log scale). Single-host deployment; inter-point ratios, not absolute TPS, are the meaningful result.}}{77}{figure.28}\protected@file@percent }
-\newlabel{fig:netscale}{{28}{77}{Experiment~13 network-size scaling across 2--7 organizations and endorsement policies: (a) write throughput; (b) write and read latency (log scale). Single-host deployment; inter-point ratios, not absolute TPS, are the meaningful result}{figure.28}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {29}{\ignorespaces Experiment~14 on-path enforcement vs.\ the audit-log-only baseline on the identical download workload: (a) gateway throughput; (b) request latency (P50, caps P95). The architectural premium of on-path enforcement is single-digit milliseconds.}}{78}{figure.29}\protected@file@percent }
-\newlabel{fig:baseline}{{29}{78}{Experiment~14 on-path enforcement vs.\ the audit-log-only baseline on the identical download workload: (a) gateway throughput; (b) request latency (P50, caps P95). The architectural premium of on-path enforcement is single-digit milliseconds}{figure.29}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.15}Experiment~15: Consolidated Evidence and Positioning Against Reported Numbers}{78}{subsection.6.15}\protected@file@percent }
-\newlabel{sec:exp_consolidated}{{6.15}{78}{Experiment~15: Consolidated Evidence and Positioning Against Reported Numbers}{subsection.6.15}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.11}Experiment~11: Standard-Instrument Benchmark (Hyperledger Caliper)}{74}{subsection.6.11}\protected@file@percent }
+\newlabel{sec:exp_caliper}{{6.11}{74}{Experiment~11: Standard-Instrument Benchmark (Hyperledger Caliper)}{subsection.6.11}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {25}{\ignorespaces Experiment~10 IPFS storage/retrieval cost: (a) retrieval latency vs.\ file size and concurrency (local vs.\ cross-node); (b) replication cost per added replica; (c) constant 0.024\,\% UnixFS DAG overhead; (d) retrieval under node failure with a document pinned on 2 of 3 nodes.}}{75}{figure.25}\protected@file@percent }
+\newlabel{fig:ipfscost}{{25}{75}{Experiment~10 IPFS storage/retrieval cost: (a) retrieval latency vs.\ file size and concurrency (local vs.\ cross-node); (b) replication cost per added replica; (c) constant 0.024\,\% UnixFS DAG overhead; (d) retrieval under node failure with a document pinned on 2 of 3 nodes}{figure.25}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.12}Experiment~12: Document-Volume and Ledger-Growth Scaling}{75}{subsection.6.12}\protected@file@percent }
+\newlabel{sec:exp_ledgergrowth}{{6.12}{75}{Experiment~12: Document-Volume and Ledger-Growth Scaling}{subsection.6.12}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {26}{\ignorespaces Experiment~11 Hyperledger Caliper benchmark of the deployed chaincode via the peer-gateway API: (a) throughput and (b) latency vs.\ offered fixed load for \texttt  {CheckAccess} (evaluate) and \texttt  {RegisterDocument} (submit). Caliper reports average/min/max latency, the convention used by comparable published systems.}}{76}{figure.26}\protected@file@percent }
+\newlabel{fig:caliper}{{26}{76}{Experiment~11 Hyperledger Caliper benchmark of the deployed chaincode via the peer-gateway API: (a) throughput and (b) latency vs.\ offered fixed load for \texttt {CheckAccess} (evaluate) and \texttt {RegisterDocument} (submit). Caliper reports average/min/max latency, the convention used by comparable published systems}{figure.26}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.13}Experiment~13: Scaling with Network Size and Endorsement Policy}{76}{subsection.6.13}\protected@file@percent }
+\newlabel{sec:exp_netscale}{{6.13}{76}{Experiment~13: Scaling with Network Size and Endorsement Policy}{subsection.6.13}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {27}{\ignorespaces Experiment~12 ledger-growth scaling from $10^3$ to $10^6$ registered documents: (a) release-path query latency vs.\ world-state size (P50, caps P95); (b) linear per-peer storage growth ($\approx $7\,KB/document across block store and CouchDB).}}{77}{figure.27}\protected@file@percent }
+\newlabel{fig:ledgergrowth}{{27}{77}{Experiment~12 ledger-growth scaling from $10^3$ to $10^6$ registered documents: (a) release-path query latency vs.\^^Mworld-state size (P50, caps P95); (b) linear per-peer storage growth ($\approx $7\,KB/document across block store and CouchDB)}{figure.27}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.14}Experiment~14: Price of On-Path Enforcement vs.\ a Passive-Audit-Log Baseline}{77}{subsection.6.14}\protected@file@percent }
+\newlabel{sec:exp_baseline}{{6.14}{77}{Experiment~14: Price of On-Path Enforcement vs.\ a Passive-Audit-Log Baseline}{subsection.6.14}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {28}{\ignorespaces Experiment~13 network-size scaling across 2--7 organizations and endorsement policies: (a) write throughput; (b) write and read latency (log scale). Single-host deployment; inter-point ratios, not absolute TPS, are the meaningful result.}}{78}{figure.28}\protected@file@percent }
+\newlabel{fig:netscale}{{28}{78}{Experiment~13 network-size scaling across 2--7 organizations and endorsement policies: (a) write throughput; (b) write and read latency (log scale). Single-host deployment; inter-point ratios, not absolute TPS, are the meaningful result}{figure.28}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {29}{\ignorespaces Experiment~14 on-path enforcement vs.\ the audit-log-only baseline on the identical download workload: (a) gateway throughput; (b) request latency (P50, caps P95). The architectural premium of on-path enforcement is single-digit milliseconds.}}{79}{figure.29}\protected@file@percent }
+\newlabel{fig:baseline}{{29}{79}{Experiment~14 on-path enforcement vs.\ the audit-log-only baseline on the identical download workload: (a) gateway throughput; (b) request latency (P50, caps P95). The architectural premium of on-path enforcement is single-digit milliseconds}{figure.29}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.15}Experiment~15: Consolidated Evidence and Positioning Against Reported Numbers}{79}{subsection.6.15}\protected@file@percent }
+\newlabel{sec:exp_consolidated}{{6.15}{79}{Experiment~15: Consolidated Evidence and Positioning Against Reported Numbers}{subsection.6.15}{}}
 \citation{liu2026rbacipfs,notash2026adaptive}
 \citation{liu2026rbacipfs,notash2026adaptive}
 \citation{liu2026rbacipfs}
 \citation{mukta2026zerotrust}
 \citation{liu2024blockchain}
 \citation{peelam2026decentralized}
-\@writefile{lot}{\contentsline {table}{\numberline {11}{\ignorespaces Reported performance of the closest published systems versus this work. Values are each paper's own published figures on its own testbed (no hardware normalization); statistic conventions differ as noted. Pre-proof values for~\cite  {liu2026rbacipfs,notash2026adaptive} are subject to change in the versions of record.}}{79}{table.11}\protected@file@percent }
-\newlabel{tab:numbers_comparison}{{11}{79}{Reported performance of the closest published systems versus this work. Values are each paper's own published figures on its own testbed (no hardware normalization); statistic conventions differ as noted. Pre-proof values for~\cite {liu2026rbacipfs,notash2026adaptive} are subject to change in the versions of record}{table.11}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.16}Experiment~16: Divergence Under Orderer-Only Outage}{79}{subsection.6.16}\protected@file@percent }
-\newlabel{sec:exp_orderer_outage}{{6.16}{79}{Experiment~16: Divergence Under Orderer-Only Outage}{subsection.6.16}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.17}Experiment~16b: Bounded Reconciliation After Durable Re-Anchoring}{80}{subsection.6.17}\protected@file@percent }
-\newlabel{sec:exp_orderer_reconcile}{{6.17}{80}{Experiment~16b: Bounded Reconciliation After Durable Re-Anchoring}{subsection.6.17}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {7}Limitations and Future Work}{81}{section.7}\protected@file@percent }
-\newlabel{sec:limitations}{{7}{81}{Limitations and Future Work}{section.7}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Limitations}{81}{subsection.7.1}\protected@file@percent }
-\newlabel{sec:limitations_detail}{{7.1}{81}{Limitations}{subsection.7.1}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {11}{\ignorespaces Reported performance of the closest published systems versus this work. Values are each paper's own published figures on its own testbed (no hardware normalization); statistic conventions differ as noted. Pre-proof values for~\cite  {liu2026rbacipfs,notash2026adaptive} are subject to change in the versions of record.}}{80}{table.11}\protected@file@percent }
+\newlabel{tab:numbers_comparison}{{11}{80}{Reported performance of the closest published systems versus this work. Values are each paper's own published figures on its own testbed (no hardware normalization); statistic conventions differ as noted. Pre-proof values for~\cite {liu2026rbacipfs,notash2026adaptive} are subject to change in the versions of record}{table.11}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.16}Experiment~16: Divergence Under Orderer-Only Outage}{80}{subsection.6.16}\protected@file@percent }
+\newlabel{sec:exp_orderer_outage}{{6.16}{80}{Experiment~16: Divergence Under Orderer-Only Outage}{subsection.6.16}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.17}Experiment~16b: Bounded Reconciliation After Durable Re-Anchoring}{81}{subsection.6.17}\protected@file@percent }
+\newlabel{sec:exp_orderer_reconcile}{{6.17}{81}{Experiment~16b: Bounded Reconciliation After Durable Re-Anchoring}{subsection.6.17}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.18}Experiment~17: Cost of Bounding Clock Trust on the Evaluate Path}{82}{subsection.6.18}\protected@file@percent }
+\newlabel{sec:exp_timeanchor}{{6.18}{82}{Experiment~17: Cost of Bounding Clock Trust on the Evaluate Path}{subsection.6.18}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Limitations and Future Work}{84}{section.7}\protected@file@percent }
+\newlabel{sec:limitations}{{7}{84}{Limitations and Future Work}{section.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Limitations}{84}{subsection.7.1}\protected@file@percent }
+\newlabel{sec:limitations_detail}{{7.1}{84}{Limitations}{subsection.7.1}{}}
 \citation{hyperledgerFabricOrderingService_v24,woznica2022}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.1}Geographic Distribution and WAN Latency}{82}{subsubsection.7.1.1}\protected@file@percent }
 \citation{fabricWhatsNew3x,fabricOrderingServiceLatest,fabricBFTConfigurationDoc}
 \citation{ateniese2017redactable,nist80057,nist80053}
 \citation{w3cWebCrypto}
 \citation{nist800634,w3cWebAuthnL3,nist800131a,fips1403}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.2}Crash-Fault Tolerance vs.\ Byzantine Fault Tolerance}{83}{subsubsection.7.1.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.3}Key Management and Browser Dependency}{83}{subsubsection.7.1.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.4}On-Chain Metadata Privacy}{83}{subsubsection.7.1.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.1}Geographic Distribution and WAN Latency}{85}{subsubsection.7.1.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.2}Crash-Fault Tolerance vs.\ Byzantine Fault Tolerance}{85}{subsubsection.7.1.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.3}Key Management and Browser Dependency}{85}{subsubsection.7.1.3}\protected@file@percent }
 \citation{fabricPDCDoc,fabricChannelsDoc}
 \citation{politou2019metadata}
 \citation{groth2016}
 \citation{nist800634}
 \citation{rfc7519jwt}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.5}Authentication Assurance Level}{84}{subsubsection.7.1.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.6}Identity Database Public Key Integrity}{84}{subsubsection.7.1.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.7}IPFS Retrieval Timeout and Thread Management}{84}{subsubsection.7.1.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.4}On-Chain Metadata Privacy}{86}{subsubsection.7.1.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.5}Authentication Assurance Level}{86}{subsubsection.7.1.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.6}Identity Database Public Key Integrity}{87}{subsubsection.7.1.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.7}IPFS Retrieval Timeout and Thread Management}{87}{subsubsection.7.1.7}\protected@file@percent }
 \citation{gdpr2016}
 \citation{ipfsDocsQuickstartPin2025,ipfsDocsKuboGarbageCollection}
 \citation{gdpr2016}
 \citation{finck2019blockchain,politou2019metadata}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.8}GDPR and Regulatory Compliance}{88}{subsubsection.7.1.8}\protected@file@percent }
+\newlabel{sec:gdpr}{{7.1.8}{88}{GDPR and Regulatory Compliance}{subsubsection.7.1.8}{}}
 \citation{ateniese2017redactable,lyons2018integration}
 \citation{EDPB2025Pseudonymisation,Finck2020}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.8}GDPR and Regulatory Compliance}{86}{subsubsection.7.1.8}\protected@file@percent }
-\newlabel{sec:gdpr}{{7.1.8}{86}{GDPR and Regulatory Compliance}{subsubsection.7.1.8}{}}
 \citation{springBoot325}
 \citation{fabricCADoc,rfc7519jwt}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.9}Integration with Legacy Legal Systems}{89}{subsubsection.7.1.9}\protected@file@percent }
 \citation{nist80053}
 \citation{fabricChaincodeLifecycleDoc,nist80053}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.9}Integration with Legacy Legal Systems}{87}{subsubsection.7.1.9}\protected@file@percent }
 \citation{fips1403,fabricCADoc,w3cWebAuthnL3}
 \citation{permenev2020verx}
 \citation{groth2016,fabricPDCDoc}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Future Work}{90}{subsection.7.2}\protected@file@percent }
+\newlabel{sec:future_work}{{7.2}{90}{Future Work}{subsection.7.2}{}}
+\newlabel{sec:key_recovery_escrow}{{7.2}{90}{Future Work}{subsection.7.2}{}}
+\newlabel{sec:regulator_interfaces}{{7.2}{90}{Future Work}{subsection.7.2}{}}
 \citation{siddamsetti2024anomaly}
 \citation{sporny2023did}
 \citation{sporny2022vc}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Future Work}{88}{subsection.7.2}\protected@file@percent }
-\newlabel{sec:future_work}{{7.2}{88}{Future Work}{subsection.7.2}{}}
-\newlabel{sec:key_recovery_escrow}{{7.2}{88}{Future Work}{subsection.7.2}{}}
-\newlabel{sec:regulator_interfaces}{{7.2}{88}{Future Work}{subsection.7.2}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {8}Discussion}{89}{section.8}\protected@file@percent }
-\newlabel{sec:discussion}{{8}{89}{Discussion}{section.8}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {8}Discussion}{91}{section.8}\protected@file@percent }
+\newlabel{sec:discussion}{{8}{91}{Discussion}{section.8}{}}
 \citation{liu2026rbacipfs}
-\@writefile{toc}{\contentsline {section}{\numberline {9}Conclusion}{91}{section.9}\protected@file@percent }
-\newlabel{sec:conclusion}{{9}{91}{Conclusion}{section.9}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {9}Conclusion}{94}{section.9}\protected@file@percent }
+\newlabel{sec:conclusion}{{9}{94}{Conclusion}{section.9}{}}
 \@writefile{toc}{\let\numberline\tmptocnumberline}
-\@writefile{toc}{\contentsline {section}{\numberline {Appendix~A}Implementation listings}{92}{appendix.A}\protected@file@percent }
-\newlabel{app:listings}{{Appendix~A}{92}{Implementation listings}{appendix.A}{}}
-\newlabel{lst:encrypt}{{2}{92}{Browser AES-256-GCM document encryption. Fresh 256-bit key and 96-bit IV generated per document via \texttt {window.crypto.getRandomValues}. SHA-256 hash computed of plaintext \emph {before} encryption. Server receives only IV-prepended ciphertext}{lstlisting.2}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {2}Browser AES-256-GCM document encryption. Fresh 256-bit key and 96-bit IV generated per document via \texttt  {window.crypto.getRandomValues}. SHA-256 hash computed of plaintext \emph  {before} encryption. Server receives only IV-prepended ciphertext.}{92}{lstlisting.2}\protected@file@percent }
-\newlabel{lst:pbkdf2}{{3}{93}{PBKDF2-SHA256 key derivation at 600,000 iterations (OWASP password-storage guidance; exceeds the NIST SP~800-132 minimum work factor). Derives the AES-256-GCM wrapping key protecting both ECIES and ECDSA private keys in \texttt {localStorage}}{lstlisting.3}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {3}PBKDF2-SHA256 key derivation at 600,000 iterations (OWASP password-storage guidance; exceeds the NIST SP~800-132 minimum work factor). Derives the AES-256-GCM wrapping key protecting both ECIES and ECDSA private keys in \texttt  {localStorage}.}{93}{lstlisting.3}\protected@file@percent }
-\newlabel{lst:ecdsa}{{4}{93}{Server-side ECDSA P-256 verification. \texttt {SHA256withECDSAinP1363Format} natively consumes WebCrypto's raw $r \| s$ output without format conversion}{lstlisting.4}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {4}Server-side ECDSA P-256 verification. \texttt  {SHA256withECDSAinP1363Format} natively consumes WebCrypto's raw $r \| s$ output without format conversion.}{93}{lstlisting.4}\protected@file@percent }
-\newlabel{lst:download}{{5}{94}{Strict fail-closed ACL in the document download path. Layer 1: Spring Security \texttt {@PreAuthorize}. Layer 2: \texttt {CheckAccess} chaincode. If Fabric is unreachable, the system strictly denies access and logs \texttt {FABRIC\_OUTAGE\_ACCESS\_DENIED}}{lstlisting.5}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {5}Strict fail-closed ACL in the document download path. Layer 1: Spring Security \texttt  {@PreAuthorize}. Layer 2: \texttt  {CheckAccess} chaincode. If Fabric is unreachable, the system strictly denies access and logs \texttt  {FABRIC\_OUTAGE\_ACCESS\_DENIED}.}{94}{lstlisting.5}\protected@file@percent }
-\newlabel{lst:audittrigger}{{6}{94}{INSERT-only enforcement on \texttt {audit\_log}. Row-level triggers block UPDATE and DELETE; a statement-level trigger blocks TRUNCATE (which bypasses row-level triggers in PostgreSQL). TRUNCATE privilege is also revoked from application roles}{lstlisting.6}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {6}INSERT-only enforcement on \texttt  {audit\_log}. Row-level triggers block UPDATE and DELETE; a statement-level trigger blocks TRUNCATE (which bypasses row-level triggers in PostgreSQL). TRUNCATE privilege is also revoked from application roles.}{94}{lstlisting.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {Appendix~A}Implementation listings}{95}{appendix.A}\protected@file@percent }
+\newlabel{app:listings}{{Appendix~A}{95}{Implementation listings}{appendix.A}{}}
+\newlabel{lst:encrypt}{{2}{95}{Browser AES-256-GCM document encryption. Fresh 256-bit key and 96-bit IV generated per document via \texttt {window.crypto.getRandomValues}. SHA-256 hash computed of plaintext \emph {before} encryption. Server receives only IV-prepended ciphertext}{lstlisting.2}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {2}Browser AES-256-GCM document encryption. Fresh 256-bit key and 96-bit IV generated per document via \texttt  {window.crypto.getRandomValues}. SHA-256 hash computed of plaintext \emph  {before} encryption. Server receives only IV-prepended ciphertext.}{95}{lstlisting.2}\protected@file@percent }
+\newlabel{lst:pbkdf2}{{3}{96}{PBKDF2-SHA256 key derivation at 600,000 iterations (OWASP password-storage guidance; exceeds the NIST SP~800-132 minimum work factor). Derives the AES-256-GCM wrapping key protecting both ECIES and ECDSA private keys in \texttt {localStorage}}{lstlisting.3}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {3}PBKDF2-SHA256 key derivation at 600,000 iterations (OWASP password-storage guidance; exceeds the NIST SP~800-132 minimum work factor). Derives the AES-256-GCM wrapping key protecting both ECIES and ECDSA private keys in \texttt  {localStorage}.}{96}{lstlisting.3}\protected@file@percent }
+\newlabel{lst:ecdsa}{{4}{96}{Server-side ECDSA P-256 verification. \texttt {SHA256withECDSAinP1363Format} natively consumes WebCrypto's raw $r \| s$ output without format conversion}{lstlisting.4}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {4}Server-side ECDSA P-256 verification. \texttt  {SHA256withECDSAinP1363Format} natively consumes WebCrypto's raw $r \| s$ output without format conversion.}{96}{lstlisting.4}\protected@file@percent }
+\newlabel{lst:download}{{5}{97}{Strict fail-closed ACL in the document download path. Layer 1: Spring Security \texttt {@PreAuthorize}. Layer 2: \texttt {CheckAccess} chaincode. If Fabric is unreachable, the system strictly denies access and logs \texttt {FABRIC\_OUTAGE\_ACCESS\_DENIED}}{lstlisting.5}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {5}Strict fail-closed ACL in the document download path. Layer 1: Spring Security \texttt  {@PreAuthorize}. Layer 2: \texttt  {CheckAccess} chaincode. If Fabric is unreachable, the system strictly denies access and logs \texttt  {FABRIC\_OUTAGE\_ACCESS\_DENIED}.}{97}{lstlisting.5}\protected@file@percent }
+\newlabel{lst:audittrigger}{{6}{97}{INSERT-only enforcement on \texttt {audit\_log}. Row-level triggers block UPDATE and DELETE; a statement-level trigger blocks TRUNCATE (which bypasses row-level triggers in PostgreSQL). TRUNCATE privilege is also revoked from application roles}{lstlisting.6}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {6}INSERT-only enforcement on \texttt  {audit\_log}. Row-level triggers block UPDATE and DELETE; a statement-level trigger blocks TRUNCATE (which bypasses row-level triggers in PostgreSQL). TRUNCATE privilege is also revoked from application roles.}{97}{lstlisting.6}\protected@file@percent }
 \bibstyle{elsarticle-num}
 \bibdata{references}
 \bibcite{aba2023}{{1}{}{{}}{{}}}
@@ -546,4 +549,4 @@
 \bibcite{sporny2023did}{{97}{}{{}}{{}}}
 \bibcite{sporny2022vc}{{98}{}{{}}{{}}}
 \providecommand\NAT@force@numbers{}\NAT@force@numbers
-\gdef \@abspage@last{108}
+\gdef \@abspage@last{111}

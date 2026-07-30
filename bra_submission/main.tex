@@ -1679,6 +1679,24 @@ ledger-anchoring key registrations.
 while keys are unlocked and plaintext is present. Endpoint
 compromise is analyzed as out of scope
 (Section~\ref{sec:out_of_scope}).
+\item[A7 (Bounded clock manipulation on the evaluate path).] Grant
+expiry is evaluated inside \texttt{CheckAccess} against
+\texttt{GetTxTimestamp()}, which on an \emph{evaluate} returns the
+timestamp the calling client placed in its proposal. Under custodial
+submission that client is the application gateway, so expiry
+enforcement does not rest on a clock independent of the gateway.
+The time-anchor mechanism
+(Section~\ref{sec:exp_timeanchor}) constrains rather than removes this:
+an endorsed anchor cannot be moved backwards by the gateway, and a
+proposal more than a fixed tolerance behind that anchor is refused, so
+backdating is bounded by how stale the anchor is allowed to become.
+What remains assumed is that the anchor is refreshed --- a gateway that
+withholds heartbeats widens the reachable window, and closing that
+requires the staleness ceiling whose availability cost is measured in
+Experiment~\hyperref[sec:exp_timeanchor]{17}. This is the assumption most
+specific to custodial deployment, and per-user enrolment does not
+discharge it, because evaluates are never ordered and therefore carry no
+ordering-service timestamp to substitute.
 \end{description}
 
 \subsubsection{Adversary Capability Matrix}
@@ -1770,9 +1788,13 @@ delivery before browser encryption, abuse off-chain access paths, or
 substitute recipient keys before grant creation. Because it submits with
 custodial MSP credentials, it also controls the proposal timestamp that
 \texttt{CheckAccess} reads via \texttt{GetTxTimestamp()} on the evaluate
-path, and can backdate a query to satisfy an expired grant's
-\texttt{ExpiresAt}; grant-expiry enforcement therefore assumes an honest
-gateway clock. Fabric still makes
+path, and could otherwise backdate a query to satisfy an expired grant's
+\texttt{ExpiresAt} (Scenario~S5). The endorsed time anchor of
+Experiment~\hyperref[sec:exp_timeanchor]{17} bounds this rather than
+eliminating it: the gateway cannot rewind the anchor, but withholding
+heartbeats widens the reachable window unless the staleness ceiling is
+enabled, so grant-expiry enforcement assumes bounded rather than honest
+gateway clocks (Assumption~A7). Fabric still makes
 ledger-mediated state changes auditable; production requires
 browser-only encryption, per-user Fabric identities, ledger-anchored
 public keys, committing each access decision with its evaluated timestamp,
@@ -1871,14 +1893,20 @@ verification has a target.
 
 \begin{description}
 \item[P1 (No release without a ledger-evaluated grant).] Under
-A1--A3, A5, and A6, no protected ciphertext or wrapped document key is
+A1--A3 and A5--A7, no protected ciphertext or wrapped document key is
 returned on the evaluated download path unless a \texttt{CheckAccess}
 evaluation against committed ledger state authorizes the requester at
 request time. \emph{Argument:} the release handler invokes chaincode
 before returning material (Experiment~\hyperref[sec:exp_latency]{2}
 measures this decision at 6.51\,ms P50); the decision reads
-world-state grants committed under A3; expiry is evaluated against
-the deterministic transaction timestamp. In the prototype the release
+world-state grants committed under A3. Expiry is evaluated against the
+transaction timestamp, which is deterministic across endorsers but, on
+an evaluate, originates in the caller's proposal: the grant
+\emph{membership} test is ledger-evaluated in the full sense, whereas the
+\emph{expiry} test is ledger-evaluated only up to the clock the caller
+supplies. The time anchor bounds that gap rather than closing it, so P1
+is stated under A7 and its expiry component is correspondingly weaker
+than its membership component. In the prototype the release
 handler evaluates \texttt{CheckAccess} against a single peer (the gateway
 binds one peer endpoint), so P1 additionally assumes that queried peer
 returns honest world state; independence from a single malicious peer on
@@ -1972,6 +2000,39 @@ nodes collude. The attack degrades into denial of availability,
 which A4 and the replication measurements of
 Experiment~\hyperref[sec:exp_ipfscost]{10} address (single-replica
 loss: no measurable penalty; total loss: clean timeout).
+
+\paragraph{S5: Gateway-side backdating of an expired grant.} A
+compromised application gateway holds a document whose grant has
+expired. Rather than editing any stored state, it constructs a
+\texttt{CheckAccess} proposal carrying a timestamp from before the
+expiry instant. Because \texttt{CheckAccess} is an evaluate, the
+timestamp the chaincode reads is the one in that proposal, so the
+comparison against \texttt{ExpiresAt} succeeds and the release path
+authorizes a grant that has lapsed. Nothing in the ledger record is
+falsified; the adversary supplies the clock rather than the policy,
+which is why signature checks and endorsement do not detect it, and why
+per-user enrolment does not help --- an evaluate is never ordered and so
+never receives an ordering-service timestamp.
+
+The time anchor constrains this. \texttt{UpdateTimeAnchor} is a submit,
+so each endorsing peer independently checks the heartbeat's timestamp
+against its own clock before endorsing, and a backdated anchor cannot be
+committed without a colluding endorsement quorum (which is A3, already
+assumed). \texttt{CheckAccess} then refuses any proposal more than a
+fixed tolerance behind the committed anchor, so the reachable backdating
+window is bounded by the anchor's staleness rather than unbounded.
+
+Two limits are worth stating plainly. First, the gateway is also what
+submits heartbeats: it cannot rewind the anchor, but it can stop
+advancing it, and the window then grows with the suppression interval
+unless the staleness ceiling of
+Experiment~\hyperref[sec:exp_timeanchor]{17} is enabled --- which costs
+availability during an ordering outage, one second of outage tolerance
+per second of backdating tolerance. Second, this scenario is analyzed
+and its defence is measured for enforcement cost, but no backdated
+proposal was constructed against the deployment: the reported evidence
+covers the refusal logic and the staleness ceiling, not a demonstrated
+attack. \emph{Traces to:} A7; residual risk is heartbeat suppression.
 
 \subsubsection{Out-of-Scope Attacks}
 \label{sec:out_of_scope}
@@ -3240,7 +3301,7 @@ ledger anchoring), which the released analysis documents in detail.}
 
 To counter point estimates masking variance, the released dataset
 consolidates 37 headline metrics across all fifteen measurement
-experiments (Experiments~1--15; Experiments~16 and~16b are behavioral and
+experiments (Experiments~1--15; Experiments~16, 16b, and~17 are behavioral and
 contribute no headline metric) with 95\,\% confidence intervals: bootstrap percentile intervals
 (10{,}000 resamples) for medians computed from per-sample data, and
 Student-$t$ intervals for means of trial-level
@@ -3406,6 +3467,79 @@ to a revoked holder of a previously distributed wrapped key---is unchanged from
 Experiment~\hyperref[sec:exp_orderer_outage]{16}, and the retry schedule is not
 exercised near its bound here, since no run required more than one retry.
 
+% -----------------------------------------------------------------
+\subsection{Experiment~17: Cost of Bounding Clock Trust on the Evaluate Path}
+\label{sec:exp_timeanchor}
+% -----------------------------------------------------------------
+
+Grant expiry is evaluated inside \texttt{CheckAccess} against
+\texttt{GetTxTimestamp()}. On an evaluate that value originates in the caller's
+proposal, and under custodial submission the caller is the gateway
+(Assumption~A7, Scenario~S5). This experiment prices the mechanism that bounds
+the resulting exposure: a \emph{time anchor}, refreshed by a periodic
+\texttt{UpdateTimeAnchor} submit. Because the heartbeat is a submit, each
+endorsing peer independently validates its timestamp against that peer's own
+clock before endorsing, so the committed anchor is a reference the gateway
+cannot rewind; \texttt{CheckAccess} then refuses any proposal more than a fixed
+tolerance behind it. Only the accept-or-reject decision consults an endorser's
+local clock --- the value written to state is the proposal timestamp, identical
+across endorsers --- so the read-write set stays deterministic and endorsement
+is unaffected.
+
+\emph{Latency cost.} The check adds one world-state read to every access
+decision, on the path carrying this paper's headline enforcement-cost claim, so
+it was measured rather than assumed. Two chaincode deployments differing only in
+whether that read executes were compared back to back on the same fixture and
+harness. The added read costs \textbf{0.78\,ms at the median} (7.25 to
+8.04\,ms; means 7.34 and 8.37\,ms; $n = 150$ per arm), a difference that is
+statistically clear (Mann-Whitney, $p < 10^{-15}$) and, unlike the comparison in
+Experiment~\hyperref[sec:exp_latency]{2}, should be read as a real cost rather
+than an equivalence. It remains far inside the 50\,ms interactivity threshold of
+RQ2. These absolute figures come from a different endpoint than
+Experiment~\hyperref[sec:exp_latency]{2} and are not directly comparable to its
+6.51\,ms; only the paired difference transfers.
+
+\emph{Security-availability trade-off.} The bound is only as good as the
+anchor's freshness, and the gateway is also what refreshes it. It cannot move
+the anchor backwards --- non-advancing heartbeats are refused --- but it can stop
+advancing it, after which the reachable backdating window grows with the
+suppression interval. A staleness ceiling caps that window by refusing decisions
+taken against an anchor that has stopped advancing, at the cost of refusing
+honest decisions during a genuine ordering outage. Sweeping the ceiling and
+measuring when refusal begins gives:
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Ceiling} & \textbf{Availability window} & \textbf{Backdating bound} \\
+\midrule
+30\,s  & 31\,s  & 151\,s \\
+60\,s  & 59\,s  & 179\,s \\
+120\,s & 121\,s & 241\,s \\
+0 (disabled) & no refusal within 200\,s & bounded only by anchor staleness \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Enforcement tracks the configured ceiling to within the 3\,s polling
+granularity. The more useful observation is that the two columns are the same
+quantity read from opposite ends: every second of backdating tolerance
+purchased is a second of outage tolerance surrendered. The trade-off is a
+straight line of unit slope, and no setting improves both. The prototype ships
+with the ceiling disabled, preferring availability and accepting the weaker
+bound.
+
+\emph{What this does and does not establish.} The enforcement of the ceiling and
+the cost of the check are measured; the refusal logic is additionally covered by
+chaincode unit tests. The load-bearing claim --- that a compromised gateway
+cannot commit a \emph{backdated anchor} --- is argued from endorsement rather than
+demonstrated: it depends on multiple peers independently validating the
+heartbeat, which the single-stub unit tests cannot exercise, and no backdated
+proposal was constructed against the deployment, since neither the peer CLI nor
+the gateway SDK exposes the proposal timestamp. Establishing it empirically
+requires a client that assembles and signs proposals directly, and is left to
+future work.
+
 % =========================================================================
 % SECTION VII --- LIMITATIONS AND FUTURE WORK
 % =========================================================================
@@ -3567,7 +3701,7 @@ Experiment~\hyperref[sec:exp_failclosed]{9} validates fail-closed behavior only 
 
 Revocation is the one write path where this divergence is now bounded rather than open-ended. \texttt{RevokeAccess} writes the operational revocation and a durable outbox row in a single database transaction; a background worker re-submits the queued anchor with capped exponential backoff until it commits, and the API returns HTTP~202 with an explicit pending status---rather than an unqualified success---while the anchor is outstanding. Experiment~\hyperref[sec:exp_orderer_reconcile]{16b} measures the result against the identical outage geometry: the ledger reconverges automatically, with no operator action, in a median of 15.9\,s ($n=5$, all runs committing on the first retry), after which the release path correctly denies the revoked user. This addresses the permanence of the divergence, not the divergence itself: the window decomposes into outage duration plus reconciliation lag, and only the second term is under the system's control. For the duration of the outage the exposure measured in Experiment~\hyperref[sec:exp_orderer_outage]{16} is unchanged---ciphertext is still released to the revoked user, bounded to ciphertext because the wrapped-key endpoint is gated by the operational access row.
 
-Two limitations remain. First, the outbox covers revocation only; grants issued during an outage are still anchored on a best-effort basis. Second, making reads fail closed under an orderer-only outage would convert every ordering outage into a total read outage, which is not a favorable trade; the principled alternative is a staleness bound that refuses to authorize from world state older than a threshold relative to an ordered time reference. That mechanism is the same one required to make grant expiry clock-trustworthy on the evaluate path (Section~\ref{sec:limitations}), and pricing it---including the resulting security-versus-availability trade-off---is left to future work.
+Two limitations remain. First, the outbox covers revocation only; grants issued during an outage are still anchored on a best-effort basis. Second, making reads fail closed under an orderer-only outage would convert every ordering outage into a total read outage, which is not a favorable trade. The principled alternative---refusing to authorize from world state older than a threshold relative to an ordered time reference---is implemented as the staleness ceiling of Experiment~\hyperref[sec:exp_timeanchor]{17}, which is the same mechanism that bounds clock trust for grant expiry. Its cost is now measured rather than conjectured, and it is not free: the ceiling trades one second of outage tolerance for each second of exposure it removes, which is why the prototype ships with it disabled. Choosing a non-zero ceiling is a deployment decision about which failure is less acceptable, not a strict improvement.
 
 \subsubsection{GDPR and Regulatory Compliance}
 \label{sec:gdpr}
@@ -3741,6 +3875,23 @@ by organization membership at the ledger layer (an exposure bounded
 to ciphertext release, since document keys are issued only against
 per-recipient grants), and removing that fallback is the primary
 production hardening step.
+
+Third, and specific to time-bounded access, the answer is affirmative for
+which grants exist but qualified for when they lapse. \texttt{CheckAccess}
+evaluates expiry against a timestamp that, on an evaluate, originates in the
+caller's proposal, and under custodial submission the caller is the gateway
+this architecture otherwise removes from the authorization path. Expiry is
+therefore deterministic across endorsers without being independent of the
+gateway's clock. The time anchor of
+Experiment~\hyperref[sec:exp_timeanchor]{17} bounds the resulting exposure
+by committing an endorsed time reference the gateway cannot rewind, at a
+measured cost of 0.78\,ms on the release path; enforcing a tighter bound in
+the face of a gateway that simply withholds heartbeats additionally requires
+a staleness ceiling, which trades one second of outage tolerance for each
+second of backdating tolerance. Expiry enforcement is thus bounded rather
+than removed from application trust, and that distinction is a property of
+custodial submission, not of the prototype's maturity: an evaluate is never
+ordered, so no ordering-service timestamp exists to substitute.
 
 The dual-store audit design separates operational speed from independent
 verifiability. PostgreSQL provides low-latency operational audit queries
