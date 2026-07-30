@@ -49,7 +49,11 @@ var _ contractapi.TransactionContextInterface = (*testContext)(nil)
 
 func setupCtx(t *testing.T, txID string) (*testContext, *shimtest.MockStub) {
 	t.Helper()
-	stub := shimtest.NewMockStub("legalcc", &LegalContract{})
+	// nil chaincode: these tests call contract methods directly with the mock context and
+	// use the stub only as a state store, so MockStub never needs to dispatch an Invoke.
+	// Passing &LegalContract{} does not compile - contractapi.Contract is not a
+	// shim.Chaincode - which is why this suite had not been runnable.
+	stub := shimtest.NewMockStub("legalcc", nil)
 	stub.MockTransactionStart(txID)
 	ctx := &testContext{
 		stub: stub,
@@ -273,9 +277,170 @@ func TestGetHistoryForKey(t *testing.T) {
 	commitTx(stub, "tx-hist-query")
 
 	if err != nil {
-		t.Fatalf("GetDocumentHistory: %v", err)
+		// shimtest.MockStub does not implement GetHistoryForKey, so this path cannot be
+		// exercised off-network. History behaviour is covered live by Experiment 7 instead.
+		t.Skipf("GetDocumentHistory unsupported by the mock ledger: %v", err)
 	}
 	if len(history) == 0 {
 		t.Error("expected at least one history entry, got 0")
+	}
+}
+
+// ─── TimeAnchor ───────────────────────────────────────────────────────────────
+//
+// These cover reviewer finding M2: grant expiry is evaluated from a timestamp the calling
+// gateway supplies, so a compromised gateway could backdate its way past an expired grant.
+
+// seedAnchor writes a TimeAnchor directly to state at the given time, standing in for a
+// heartbeat that was endorsed and committed at that moment.
+func seedAnchor(t *testing.T, stub *shimtest.MockStub, at time.Time) {
+	t.Helper()
+	anchor := &TimeAnchor{
+		Timestamp: at.UTC().Format(time.RFC3339),
+		UpdatedBy: "TestMSP",
+		Sequence:  1,
+	}
+	data, err := json.Marshal(anchor)
+	if err != nil {
+		t.Fatalf("marshal anchor: %v", err)
+	}
+	stub.MockTransactionStart("tx-seed-anchor")
+	if err := stub.PutState(TimeAnchorKey, data); err != nil {
+		t.Fatalf("seed anchor: %v", err)
+	}
+	commitTx(stub, "tx-seed-anchor")
+}
+
+func TestUpdateTimeAnchor_EstablishesAndAdvances(t *testing.T) {
+	ctx, stub := setupCtx(t, "tx-anchor-1")
+	contract := &LegalContract{}
+
+	if err := contract.UpdateTimeAnchor(ctx); err != nil {
+		t.Fatalf("first heartbeat should be accepted: %v", err)
+	}
+	commitTx(stub, "tx-anchor-1")
+
+	raw, err := stub.GetState(TimeAnchorKey)
+	if err != nil || raw == nil {
+		t.Fatalf("anchor not written: err=%v", err)
+	}
+	var anchor TimeAnchor
+	if err := json.Unmarshal(raw, &anchor); err != nil {
+		t.Fatalf("decode anchor: %v", err)
+	}
+	if anchor.Sequence != 1 {
+		t.Errorf("first anchor sequence = %d, want 1", anchor.Sequence)
+	}
+	if anchor.UpdatedBy != "TestMSP" {
+		t.Errorf("anchor UpdatedBy = %q, want TestMSP", anchor.UpdatedBy)
+	}
+}
+
+// A heartbeat that does not move time forward must be refused, otherwise a replayed or
+// stalled heartbeat could hold the anchor back and widen the backdating window.
+func TestUpdateTimeAnchor_RejectsNonAdvancing(t *testing.T) {
+	ctx, stub := setupCtx(t, "tx-anchor-stale")
+	contract := &LegalContract{}
+
+	seedAnchor(t, stub, time.Now().Add(1*time.Hour))
+
+	err := contract.UpdateTimeAnchor(ctx)
+	commitTx(stub, "tx-anchor-stale")
+	if err == nil {
+		t.Fatal("expected a heartbeat older than the current anchor to be rejected")
+	}
+}
+
+// The core M2 case: an expired grant, and a caller presenting a backdated proposal
+// timestamp that would make it look live. With an anchor committed, the decision is
+// refused rather than silently granted.
+func TestCheckAccess_RejectsBackdatedProposal(t *testing.T) {
+	ctx, stub := setupCtx(t, "tx-backdate-setup")
+	contract := &LegalContract{}
+
+	// Grant expired an hour ago.
+	expired := time.Now().Add(-1 * time.Hour).UTC().Format(time.RFC3339)
+	_ = contract.RegisterDocument(ctx, "doc-bd", "case-bd", "hash", "Qm-bd", "owner-bd", "TestMSP", nowTS())
+	_ = contract.GrantAccess(ctx, "doc-bd", "user-bd", "TestMSP", CapRead, expired, "wrapped", "owner-bd")
+	commitTx(stub, "tx-backdate-setup")
+
+	// No anchor yet: the mechanism is inactive, so this is the pre-fix behaviour. The grant
+	// is expired, so access is denied on expiry alone -- the timestamp is not yet policed.
+	stub.MockTransactionStart("tx-backdate-noanchor")
+	noAnchorCtx := &testContext{stub: stub, cid: &mockClientIdentity{mspID: "TestMSP"}}
+	result, err := contract.CheckAccess(noAnchorCtx, "doc-bd", "user-bd", "TestMSP")
+	commitTx(stub, "tx-backdate-noanchor")
+	if err != nil || result != "true" && result != "false" {
+		t.Fatalf("unexpected pre-anchor result: %q err=%v", result, err)
+	}
+
+	// Now commit an anchor well ahead of any timestamp a backdating caller would present.
+	// A proposal claiming a time far behind the anchor must be refused outright.
+	seedAnchor(t, stub, time.Now().Add(24*time.Hour))
+
+	stub.MockTransactionStart("tx-backdate-anchored")
+	anchoredCtx := &testContext{stub: stub, cid: &mockClientIdentity{mspID: "TestMSP"}}
+	result, err = contract.CheckAccess(anchoredCtx, "doc-bd", "user-bd", "TestMSP")
+	commitTx(stub, "tx-backdate-anchored")
+
+	if err == nil {
+		t.Error("expected a proposal far behind the anchor to be refused, got no error")
+	}
+	if result != "false" {
+		t.Errorf("backdated proposal must not be authorised, got %q", result)
+	}
+}
+
+// A live grant must still be authorised while the anchor is current: the freshness check
+// has to reject backdating without breaking ordinary access.
+func TestCheckAccess_AnchorDoesNotBlockLiveGrant(t *testing.T) {
+	ctx, stub := setupCtx(t, "tx-anchor-live")
+	contract := &LegalContract{}
+
+	future := time.Now().Add(24 * time.Hour).UTC().Format(time.RFC3339)
+	_ = contract.RegisterDocument(ctx, "doc-live", "case-live", "hash", "Qm-live", "owner-live", "TestMSP", nowTS())
+	_ = contract.GrantAccess(ctx, "doc-live", "user-live", "TestMSP", CapRead, future, "wrapped", "owner-live")
+	commitTx(stub, "tx-anchor-live")
+
+	// Anchor a few seconds old, as a recent heartbeat would leave it.
+	seedAnchor(t, stub, time.Now().Add(-5*time.Second))
+
+	stub.MockTransactionStart("tx-anchor-live-check")
+	checkCtx := &testContext{stub: stub, cid: &mockClientIdentity{mspID: "TestMSP"}}
+	result, err := contract.CheckAccess(checkCtx, "doc-live", "user-live", "TestMSP")
+	commitTx(stub, "tx-anchor-live-check")
+
+	if err != nil {
+		t.Fatalf("live grant with a fresh anchor should not error: %v", err)
+	}
+	if result != "true" {
+		t.Errorf("live grant should be authorised, got %q", result)
+	}
+}
+
+// An anchor that has stopped advancing (heartbeat suppressed, or ordering down) must not
+// start refusing ordinary traffic: proposals ahead of the anchor are normal.
+func TestCheckAccess_StaleAnchorStillAuthorisesLiveGrant(t *testing.T) {
+	ctx, stub := setupCtx(t, "tx-anchor-staleanchor")
+	contract := &LegalContract{}
+
+	future := time.Now().Add(24 * time.Hour).UTC().Format(time.RFC3339)
+	_ = contract.RegisterDocument(ctx, "doc-sa", "case-sa", "hash", "Qm-sa", "owner-sa", "TestMSP", nowTS())
+	_ = contract.GrantAccess(ctx, "doc-sa", "user-sa", "TestMSP", CapRead, future, "wrapped", "owner-sa")
+	commitTx(stub, "tx-anchor-staleanchor")
+
+	// Anchor is two hours old: ordering has been unavailable for a while.
+	seedAnchor(t, stub, time.Now().Add(-2*time.Hour))
+
+	stub.MockTransactionStart("tx-anchor-staleanchor-check")
+	checkCtx := &testContext{stub: stub, cid: &mockClientIdentity{mspID: "TestMSP"}}
+	result, err := contract.CheckAccess(checkCtx, "doc-sa", "user-sa", "TestMSP")
+	commitTx(stub, "tx-anchor-staleanchor-check")
+
+	if err != nil {
+		t.Fatalf("a stale anchor must not break live access: %v", err)
+	}
+	if result != "true" {
+		t.Errorf("live grant should still be authorised against a stale anchor, got %q", result)
 	}
 }

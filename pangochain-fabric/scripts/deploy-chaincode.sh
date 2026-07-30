@@ -10,8 +10,15 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 NETWORK_DIR="$(dirname "$SCRIPT_DIR")"
 CHAINCODE_DIR="${NETWORK_DIR}/../pangochain-chaincode/legalcc"
 CC_NAME="legalcc"
-CC_VERSION="1.0"
-CC_SEQUENCE=1
+# Version and sequence are overridable so the chaincode can be *upgraded* on a running
+# network, not just installed once. Fabric's lifecycle requires a strictly increasing
+# sequence per commit, so re-running this script with the defaults against an already
+# committed chaincode fails by design. To upgrade:
+#   CC_VERSION=1.1 CC_SEQUENCE=2 bash scripts/deploy-chaincode.sh
+# Check what is currently committed with:
+#   docker exec fabric-cli peer lifecycle chaincode querycommitted -C legal-channel -n legalcc
+CC_VERSION="${CC_VERSION:-1.0}"
+CC_SEQUENCE="${CC_SEQUENCE:-1}"
 CHANNEL="legal-channel"
 CC_LABEL="${CC_NAME}_${CC_VERSION}"
 NETWORK_NAME="fabric_test"

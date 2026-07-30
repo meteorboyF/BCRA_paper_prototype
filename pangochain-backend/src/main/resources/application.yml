@@ -78,6 +78,14 @@ fabric:
   tls-cert-path: ${FABRIC_TLS_CERT_PATH:config/fabric/crypto/tls-ca-cert.pem}
   channel-name: ${FABRIC_CHANNEL:legal-channel}
   chaincode-name: ${FABRIC_CHAINCODE:legalcc}
+  # Periodic UpdateTimeAnchor submit. CheckAccess evaluates grant expiry from the caller's
+  # proposal timestamp, and on an evaluate the caller is this gateway; the anchor gives the
+  # chaincode an endorsed time reference the gateway cannot rewind, bounding backdating
+  # (reviewer M2, Experiment 17). Cost is one submit per interval, off the release path.
+  time-anchor:
+    enabled: ${FABRIC_TIME_ANCHOR_ENABLED:true}
+    interval-ms: ${FABRIC_TIME_ANCHOR_INTERVAL_MS:60000}
+    initial-delay-ms: ${FABRIC_TIME_ANCHOR_INITIAL_DELAY_MS:15000}
 
 documents:
   # Fabric CheckAccess gates every protected-material release. STRICT FAIL-CLOSED is the

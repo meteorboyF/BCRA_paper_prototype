@@ -1,0 +1,24 @@
+[sweep 19:36:34] === ceiling 30s (chaincode seq 5) ===
+126:	MaxAnchorStalenessSeconds = 30
+[sweep 19:37:02]   anchor committed; polling CheckAccess every 3s (give up at 200s)
+[sweep 19:37:33]   REFUSED after 31s (staleness ceiling enforced)
+[sweep 19:37:33] === ceiling 60s (chaincode seq 6) ===
+126:	MaxAnchorStalenessSeconds = 60
+[sweep 19:37:58]   anchor committed; polling CheckAccess every 3s (give up at 200s)
+[sweep 19:38:57]   REFUSED after 59s (staleness ceiling enforced)
+[sweep 19:38:57] === ceiling 120s (chaincode seq 7) ===
+126:	MaxAnchorStalenessSeconds = 120
+[sweep 19:39:24]   anchor committed; polling CheckAccess every 3s (give up at 200s)
+[sweep 19:41:25]   REFUSED after 121s (staleness ceiling enforced)
+[sweep 19:41:25] === ceiling 0s (chaincode seq 8) ===
+126:	MaxAnchorStalenessSeconds = 0
+[sweep 19:41:43]   anchor committed; polling CheckAccess every 3s (give up at 200s)
+[sweep 19:45:05]   still authorising after 200s - no ceiling enforced
+[sweep 19:45:05] sweep complete. results:
+    ceiling_seconds  availability_window_seconds  backdating_bound_seconds  outcome
+    30               31                           151                       refused
+    60               59                           179                       refused
+    120              121                          241                       refused
+    0                                                                       no_refusal_within_200s
+[sweep 19:45:05] source left at MaxAnchorStalenessSeconds = 0
+[sweep 19:45:05] raw evidence in /home/angkon/Projects/Blockchain/FCDH_linux_validation/Fardeen_Codex_Dhaka_Meetup_Hackathon/experiments/timeanchor_expiry_trust/results/sweep_20260730_193634

@@ -168,6 +168,79 @@ func (c *LegalContract) RevokeAccess(
 		fmt.Sprintf(`{"revokedSubject":"%s","revokedAt":"%s"}`, targetSubject, now))
 }
 
+// ─── TimeAnchor ──────────────────────────────────────────────────────────────
+
+// UpdateTimeAnchor advances the ledger's wall-clock reference point. It is a SUBMIT, so
+// every endorsing peer sees the proposal and independently validates its timestamp against
+// its own clock before endorsing; a backdated heartbeat therefore cannot be committed
+// without collecting endorsements from peers whose clocks disagree with it.
+//
+// Determinism note: the local clock is used only to accept or reject. The value written to
+// world state is the proposal timestamp, which is identical across endorsers, so the
+// read-write set stays deterministic and endorsement still matches. Comparing local clocks
+// would be fine here in a way that writing time.Now() would not.
+func (c *LegalContract) UpdateTimeAnchor(ctx contractapi.TransactionContextInterface) error {
+	txTimestamp, err := ctx.GetStub().GetTxTimestamp()
+	if err != nil {
+		return fmt.Errorf("failed to get tx timestamp: %w", err)
+	}
+	proposed := time.Unix(txTimestamp.Seconds, 0).UTC()
+
+	// Endorser-local plausibility check (accept/reject only - never written to state).
+	skew := time.Since(proposed)
+	if skew < 0 {
+		skew = -skew
+	}
+	if skew > MaxHeartbeatSkewSeconds*time.Second {
+		return fmt.Errorf(
+			"heartbeat timestamp %s is %.0fs from this endorser's clock, exceeding the %ds tolerance",
+			proposed.Format(time.RFC3339), skew.Seconds(), MaxHeartbeatSkewSeconds)
+	}
+
+	mspID, err := callerMSP(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to resolve caller MSP: %w", err)
+	}
+
+	current, err := getTimeAnchor(ctx)
+	if err != nil {
+		return err
+	}
+
+	// Refuse to move the anchor backwards: a stale or replayed heartbeat must not widen the
+	// backdating window that CheckAccess derives from it.
+	if current != nil {
+		prev, parseErr := time.Parse(time.RFC3339, current.Timestamp)
+		if parseErr == nil && !proposed.After(prev) {
+			return fmt.Errorf(
+				"heartbeat timestamp %s does not advance the current anchor %s",
+				proposed.Format(time.RFC3339), current.Timestamp)
+		}
+	}
+
+	next := &TimeAnchor{
+		Timestamp: proposed.Format(time.RFC3339),
+		UpdatedBy: mspID,
+		Sequence:  1,
+	}
+	if current != nil {
+		next.Sequence = current.Sequence + 1
+	}
+	return putAsset(ctx, TimeAnchorKey, next)
+}
+
+// GetTimeAnchor returns the current anchor as JSON, for operators and experiments.
+func (c *LegalContract) GetTimeAnchor(ctx contractapi.TransactionContextInterface) (string, error) {
+	anchor, err := getTimeAnchor(ctx)
+	if err != nil {
+		return "", err
+	}
+	if anchor == nil {
+		return "", fmt.Errorf("no time anchor has been established")
+	}
+	return string(mustJSON(anchor)), nil
+}
+
 // ─── CheckAccess ─────────────────────────────────────────────────────────────
 
 // CheckAccess evaluates whether a user has an active, non-expired capability
@@ -194,6 +267,16 @@ func (c *LegalContract) CheckAccess(
 	}
 	now := time.Unix(txTimestamp.Seconds, 0).UTC()
 
+	// On an evaluate this timestamp originates in the caller's proposal, and the caller is
+	// the custodial gateway. Refuse to decide from a clock that sits implausibly far behind
+	// the last endorsed TimeAnchor, which is what a gateway backdating its way past an
+	// expired grant would have to do. See the TimeAnchor type for the full argument.
+	if !disableFreshnessCheckForMeasurement {
+		if err := assertProposalTimeIsFresh(ctx, now); err != nil {
+			return "false", err
+		}
+	}
+
 	// Check user-level grant first
 	if grant, ok := doc.ACL[userID]; ok && grant.Status == StatusActive {
 		if grant.ExpiresAt == "" {
@@ -203,9 +286,10 @@ func (c *LegalContract) CheckAccess(
 		if err == nil && now.Before(exp) {
 			return "true", nil
 		}
-		// Expired — mark it
-		grant.Status = StatusExpired
-		_ = putAsset(ctx, docKey(docID), doc)
+		// Expired. Deliberately no write here: CheckAccess is only ever called as an
+		// evaluate, and writes in an evaluate are discarded rather than ordered, so a
+		// PutState would silently never persist. Marking the grant EXPIRED on the ledger
+		// requires a submit and is handled outside the release path.
 		return "false", nil
 	}
 
@@ -435,6 +519,62 @@ func putAsset(ctx contractapi.TransactionContextInterface, key string, obj inter
 		return err
 	}
 	return ctx.GetStub().PutState(key, data)
+}
+
+// getTimeAnchor returns the committed anchor, or (nil, nil) when none has been established.
+func getTimeAnchor(ctx contractapi.TransactionContextInterface) (*TimeAnchor, error) {
+	data, err := ctx.GetStub().GetState(TimeAnchorKey)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read time anchor: %w", err)
+	}
+	if data == nil {
+		return nil, nil
+	}
+	var anchor TimeAnchor
+	if err := json.Unmarshal(data, &anchor); err != nil {
+		return nil, fmt.Errorf("failed to decode time anchor: %w", err)
+	}
+	return &anchor, nil
+}
+
+// assertProposalTimeIsFresh refuses a proposal timestamp that sits more than
+// MaxClockSkewSeconds behind the committed anchor, and - when MaxAnchorStalenessSeconds is
+// enabled - refuses decisions taken against an anchor that has stopped advancing.
+//
+// Backdating is the attack: a timestamp *ahead* of the anchor is expected during normal
+// operation, since the anchor only moves on a heartbeat, and post-dating cannot revive an
+// expired grant - it can only expire a live one early, which is fail-safe.
+//
+// When no anchor exists the check is skipped rather than failing closed, so that a
+// deployment which has not enabled the heartbeat keeps its previous behaviour instead of
+// having every access decision denied by an upgrade. That fallback is deliberate but it is
+// also the mechanism's floor: with no anchor there is no bound.
+func assertProposalTimeIsFresh(ctx contractapi.TransactionContextInterface, proposed time.Time) error {
+	anchor, err := getTimeAnchor(ctx)
+	if err != nil {
+		return err
+	}
+	if anchor == nil {
+		return nil
+	}
+	anchored, err := time.Parse(time.RFC3339, anchor.Timestamp)
+	if err != nil {
+		return fmt.Errorf("time anchor holds an unparseable timestamp %q: %w", anchor.Timestamp, err)
+	}
+	if behind := anchored.Sub(proposed); behind > MaxClockSkewSeconds*time.Second {
+		return fmt.Errorf(
+			"proposal timestamp %s is %.0fs behind the endorsed time anchor %s, exceeding the %ds tolerance",
+			proposed.Format(time.RFC3339), behind.Seconds(), anchor.Timestamp, MaxClockSkewSeconds)
+	}
+	if MaxAnchorStalenessSeconds > 0 {
+		if stale := proposed.Sub(anchored); stale > MaxAnchorStalenessSeconds*time.Second {
+			return fmt.Errorf(
+				"time anchor %s is %.0fs stale relative to this proposal, exceeding the %ds ceiling; "+
+					"refusing to decide from state whose freshness cannot be established",
+				anchor.Timestamp, stale.Seconds(), MaxAnchorStalenessSeconds)
+		}
+	}
+	return nil
 }
 
 func callerMSP(ctx contractapi.TransactionContextInterface) (string, error) {
