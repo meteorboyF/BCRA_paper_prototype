@@ -1,13 +1,13 @@
 # Fdb version 4
-["bibtex main"] 1784442803.47435 "main.aux" "main.bbl" "main" 1784442806.51629 0
+["bibtex main"] 1784577979.97468 "main.aux" "main.bbl" "main" 1784577982.97436 0
   "./elsarticle-num.bst" 1784406060.49784 29462 d2b5b1799e10c2334c188d78937e1ac9 ""
   "./references.bib" 1784406060.58684 54818 cec776927f39458032b858cc70f73728 ""
-  "main.aux" 1784442806.2507 61574 2b5adab9bfea67d24d11c65d35d075e9 "pdflatex"
+  "main.aux" 1784577982.71171 60626 4add28270651833dda33c5feeaf1873a "pdflatex"
   (generated)
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1784442803.54501 "main.tex" "main.pdf" "main" 1784442806.51649 0
+["pdflatex"] 1784577980.0299 "main.tex" "main.pdf" "main" 1784577982.97456 0
   "/usr/local/texlive/2026/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc" 1136849721 2971 def0b6c1f0b107b3b936def894055589 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1136849721 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -191,12 +191,12 @@
   "figures/Hierarchy.pdf" 1784406060.49784 24752 c49137a2aebbe9e20b375fbb8dead299 ""
   "figures/access_and_decryption.pdf" 1784406060.49884 560538 681d2edfdbd19bdc5b8ed25bbd154586 ""
   "figures/access_control_flow.pdf" 1784406060.50084 448355 93d7cf8846669a37a888c6e8ad02662e ""
-  "figures/access_grant.pdf" 1784406060.50184 458338 b2bd73b97f6ff48986b3f40334c204d1 ""
+  "figures/access_grant.pdf" 1784577382.78266 420044 d9f75cfa24b516c2bf6b19366be04bd0 ""
   "figures/audit_trail_flow.pdf" 1784406060.50384 433781 4c98b803a17f6e345b0839f0b09b1467 ""
-  "figures/document_encryption.pdf" 1784406060.50484 500377 3d48a18bd30fee49a6705b63ef370993 ""
-  "figures/document_retrieval_flow.pdf" 1784406060.50584 349772 27235e5d6cbdb969cbc16a009125413d ""
-  "figures/document_upload_flow.pdf" 1784406060.50784 708020 ad1e8ac5ad082e71c771e06c9c197308 ""
-  "figures/fabric_topology4.pdf" 1784406060.50984 423973 7a175e03e755b0d7267395746d23be9e ""
+  "figures/document_encryption.pdf" 1784577370.93963 439514 d3859802ea67e8de48a9ceb367d03340 ""
+  "figures/document_retrieval_flow.pdf" 1784577382.05865 350141 d49477acbfd42d5082e50a3af672780e ""
+  "figures/document_upload_flow.pdf" 1784577389.42867 607165 a861d8abecdbf88166c03c75ef8d6845 ""
+  "figures/fabric_topology4.pdf" 1784577375.58064 423587 b65e4fff78d6f371d9ab1bfc13db14e8 ""
   "figures/fig10_ipfs_cost.pdf" 1784406060.50984 26329 5a1c9fcb77cdec7583126abbc015349b ""
   "figures/fig11_caliper.pdf" 1784406060.50984 23293 ff13ee37f240f08330cfc1cd1dafb44b ""
   "figures/fig12_ledger_growth.pdf" 1784406060.50984 23131 a90918e480337d59cfb8728ca09c97a5 ""
@@ -214,15 +214,15 @@
   "figures/integrity_check_flow.pdf" 1784406060.51184 354005 045663a1b7cb93ab6c74e956625d7a76 ""
   "figures/key_gen_and_storage.pdf" 1784406060.51384 473742 aa49be35e1fd40d3e3b6efcce3eb9fdf ""
   "figures/key_rotation_and_recovery.pdf" 1784406060.51384 47674 51012e4cc21733fbceef6b03efe30a4b ""
-  "figures/rbac_acl_pipeline.pdf" 1784406060.53984 597915 0235bdf82b9d709410d41b7030804667 ""
+  "figures/rbac_acl_pipeline.pdf" 1784577361.73861 680218 dd33ca91ab5366c1e4db28afb4e98485 ""
   "figures/ui_audit_log.png" 1784406060.54484 1032730 9a3a70ebdeda248d0e5a208cddfb5898 ""
   "figures/ui_ledger_explorer.png" 1784406060.55284 1302706 bcccb73d86dab2fb430792e6f3616639 ""
   "figures/user_registration_flow.pdf" 1784406060.55684 196832 648b1b7ab27cbb17b735144aef6eb3f9 ""
-  "main.aux" 1784442806.2507 61574 2b5adab9bfea67d24d11c65d35d075e9 "pdflatex"
-  "main.bbl" 1784442803.53868 33971 4aec6e00854ef3efee25ab5677e0a7d0 "bibtex main"
-  "main.out" 1784442806.2517 17535 9b8ec2d5a650080ae8f60c029c8ae964 "pdflatex"
-  "main.spl" 1784442803.67069 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
-  "main.tex" 1784442778.92257 215658 76473ef81e8aaf44c52846bbf62f4170 ""
+  "main.aux" 1784577982.71171 60626 4add28270651833dda33c5feeaf1873a "pdflatex"
+  "main.bbl" 1784577980.0237 33971 4aec6e00854ef3efee25ab5677e0a7d0 "bibtex main"
+  "main.out" 1784577982.71371 17535 9b8ec2d5a650080ae8f60c029c8ae964 "pdflatex"
+  "main.spl" 1784577980.1587 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
+  "main.tex" 1784577951.68664 215187 1d54795e0410129a670e765c3832eefb ""
   (generated)
   "main.aux"
   "main.log"

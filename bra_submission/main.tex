@@ -157,7 +157,7 @@ A Hybrid Approach Using Hyperledger Fabric and IPFS}
             country={Bangladesh}}
 
 \begin{abstract}
-Legal document management systems centralize trust in privileged administrators, making it difficult for external parties to verify whether access decisions or audit records have been altered. We present a hybrid legal-data management framework that places Hyperledger Fabric on the active document-release path rather than using it only as a passive audit log: every protected download must pass a chaincode access check before ciphertext or wrapped document keys are released (per-user enforcement is demonstrated for cross-organization access), and if Fabric is unavailable the path fails closed rather than falling back to a database access-control list. The framework combines browser-side encryption, ciphertext-only storage in a private IPFS swarm, and on-chain anchoring of hashes and content identifiers. Across sixteen experiments, the REST-gateway workload sustains 66--70 transactions per second at the default batch configuration and up to 193 with a reduced batch timeout, for the evaluated three-organization deployment; the ledger access check is statistically indistinguishable from a database-only check (6.51 vs.\ 7.16\,ms median, overlapping 95\,\% confidence intervals) and costs 6.5\,ms end to end over an audit-log-only baseline; outage experiments confirm zero successful downloads during Fabric unavailability with automatic recovery. Prior permissioned-ledger document systems anchor access decisions off the release path or price on-path authorization only for generic file sharing; none reports measured fail-closed behavior under ledger outage or the end-to-end cost of on-path enforcement against the audit-log architecture it replaces.
+Legal document management systems centralize trust in privileged administrators, making it difficult for external parties to verify whether access decisions or audit records have been altered. We present a hybrid legal-data management framework that places Hyperledger Fabric on the active document-release path rather than using it only as a passive audit log: every protected download must pass a chaincode access check before ciphertext or wrapped document keys are released (per-user enforcement is demonstrated for cross-organization access), and if Fabric is unavailable the path fails closed rather than falling back to a database access-control list. The framework combines browser-side encryption, ciphertext-only storage in a private IPFS swarm, and on-chain anchoring of hashes and content identifiers. Across sixteen experiments, the REST-gateway workload sustains 66--70 transactions per second at the default batch configuration and up to 193 with a reduced batch timeout, for the evaluated three-organization deployment; the ledger access check is statistically indistinguishable from a database-only check (6.51 vs.\ 7.16\,ms median, overlapping 95\,\% confidence intervals) and costs 6.5\,ms end to end over an audit-log-only baseline; outage experiments confirm zero successful downloads during Fabric unavailability with automatic recovery. Reads fail closed, but writes are availability-first: durable re-anchoring bounds the divergence from a revocation issued during an ordering-service outage to the outage itself, reconverging automatically in a median of 15.9\,s. Prior permissioned-ledger document systems anchor access decisions off the release path or price on-path authorization only for generic file sharing; none reports measured fail-closed behavior under ledger outage or the end-to-end cost of on-path enforcement against the audit-log architecture it replaces.
 \end{abstract}
 
 \begin{keyword}
@@ -520,7 +520,7 @@ Proposed framework and prototype &
 Ledger-verifiable legal document authorization with encrypted off-chain storage. &
 Fabric + IPFS &
 Y & P & Y &
-Strict access uses Fabric fail-closed; prototype limits include custodial Fabric identities, custodial transaction attribution for user-level signatures, and a 2-node application IPFS swarm (3-node storage-tier behavior measured separately in Experiment~10). \\
+Strict access uses Fabric fail-closed on reads; revocation is anchored durably, so an ordering-service outage delays rather than loses it (Experiment~16b), but the release path still authorizes from last-committed state for the outage's duration. Prototype limits include custodial Fabric identities, custodial transaction attribution for user-level signatures, and a 2-node application IPFS swarm (3-node storage-tier behavior measured separately in Experiment~10). \\
 
 \end{xltabular}
 \endgroup
@@ -857,9 +857,19 @@ produced privileged document, the FRCP~26(b)(5)(B) clawback procedure
 maps to \texttt{RevokeAccess}: the revocation is committed as a ledger
 transaction both parties can see, and subsequent download attempts are
 denied and audited (Scenario~S1, Section~\ref{sec:attack_scenarios}).
-If the ledger is unreachable at revocation time, the prototype records
-the revocation operationally and logs the failed anchoring; the
-divergence window this opens is a disclosed limitation
+If the ordering service is unreachable at revocation time, the
+revocation is recorded operationally and its ledger anchor is queued
+for durable re-submission, so the operational and ledger views
+reconverge automatically once ordering recovers, with no operator
+action (Experiment~\hyperref[sec:exp_orderer_reconcile]{16b}: median
+15.9\,s from revocation to convergence for a short outage, $n=5$).
+Clawback is therefore \emph{eventually} ledger-verifiable rather than
+immediate. For the duration of the outage the release path continues
+to authorize from last-committed state, so a recipient who already
+holds the wrapped document key can still retrieve ciphertext---and
+that recipient is precisely the party clawback targets. The queued
+re-anchoring bounds this exposure to the outage rather than leaving it
+open indefinitely, but it does not eliminate it
 (Section~\ref{sec:limitations}).
 
 \emph{Audit.} When the regulator examines the production, or when
@@ -1029,7 +1039,7 @@ Transaction-level attribution remains custodial
 \begin{figure*}[!t]
     \centering
     \workflowfigure{document_upload_flow.pdf}
-    \caption{Document upload and on-chain registration, showing browser-side $k_{enc}$ generation, plaintext hashing before encryption, sign-then-store ordering, IPFS upload, and CID anchoring. The in-figure signature verification at upload depicts the framework design; the prototype verifies $\sigma$ in a dedicated signing action anchored as a ledger audit event (Section~\ref{sec:workflows}).}
+    \caption{Document upload and on-chain registration, showing browser-side $k_{enc}$ generation, plaintext hashing before encryption, IPFS upload, and CID anchoring. In the prototype, document signing is a separate verified action (Section~\ref{sec:workflows}) and is not part of this path.}
     \label{fig:document_upload}
 \end{figure*}
 
@@ -1383,14 +1393,14 @@ Table~\ref{tab:framework_vs_prototype}~\cite{fabricCADoc,fips1403,nist800634,w3c
 \begin{figure}[!t]
     \centering
     \includegraphics[width=\columnwidth]{document_encryption.pdf}
-    \caption{Phase~2 browser-side document encryption and registration with plaintext hashing before encryption, IV-prepended ciphertext, and ECDSA sign-then-store ordering. The $\sigma$ shown in the registration step depicts the framework design; the prototype anchors $\sigma$ through the dedicated signing action (Section~\ref{sec:workflows}).}
+    \caption{Phase~2 browser-side document encryption and registration with plaintext hashing before encryption and IV-prepended ciphertext. In the prototype, document signing is a separate action (Section~\ref{sec:workflows}) and is not shown here.}
     \label{fig:document_encryption_registration}
 \end{figure}
 
 \begin{figure}[!t]
     \centering
     \includegraphics[width=\columnwidth]{access_grant.pdf}
-    \caption{Phase~3 ECIES-style P-256 key wrapping, showing owner-wrapped $k_{enc}$, on-chain \texttt{GrantAccess} storage, and the wrapped-token size comparison. Two in-figure labels predate the final design: the 256-byte comparison baseline is RSA-OAEP-2048 (not ECIES), and the depicted signed-proposal validation is framework design; the prototype submits grants without a proposal signature.}
+    \caption{Phase~3 ECIES-style P-256 key wrapping, showing owner-wrapped $k_{enc}$ and on-chain \texttt{GrantAccess} storage.}
     \label{fig:access_grant_key_distribution}
 \end{figure}
 
@@ -3230,8 +3240,8 @@ ledger anchoring), which the released analysis documents in detail.}
 
 To counter point estimates masking variance, the released dataset
 consolidates 37 headline metrics across all fifteen measurement
-experiments (Experiments~1--15; Experiment~16 is behavioral and
-contributes no headline metric) with 95\,\% confidence intervals: bootstrap percentile intervals
+experiments (Experiments~1--15; Experiments~16 and~16b are behavioral and
+contribute no headline metric) with 95\,\% confidence intervals: bootstrap percentile intervals
 (10{,}000 resamples) for medians computed from per-sample data, and
 Student-$t$ intervals for means of trial-level
 throughput.\footnote{Medians in the consolidated dataset and in the
@@ -3352,6 +3362,49 @@ to authorize the revoked user until the revocation was manually re-issued
 and committed while Fabric was reachable. This confirms the write-path
 divergence documented in Section~\ref{sec:limitations} as an empirical
 result and delimits its scope; the raw sequence is in the released dataset.
+The permanence of that divergence---the property that distinguishes a
+recovery lag from an indefinite failure---motivated the durable
+re-anchoring evaluated next.
+
+% -----------------------------------------------------------------
+\subsection{Experiment~16b: Bounded Reconciliation After Durable Re-Anchoring}
+\label{sec:exp_orderer_reconcile}
+% -----------------------------------------------------------------
+
+Experiment~\hyperref[sec:exp_orderer_outage]{16} shows that the divergence it
+measures is permanent rather than window-bounded. This experiment re-runs the
+identical geometry---same fixture generator, same three-orderer outage with
+peers left running, same fresh cross-organization grant---against a revocation
+path modified to anchor durably. \texttt{RevokeAccess} now writes the
+operational revocation and an outbox row in one database transaction, a
+scheduled worker re-submits queued anchors with capped exponential backoff, and
+the endpoint returns HTTP~202 with an explicit pending ledger-sync status while
+an anchor is outstanding, reserving HTTP~204 for anchors that have committed.
+The procedural difference is in the recovery step: rather than re-issuing the
+revocation manually, the run restarts the orderers and then waits, taking no
+further action, until both the chaincode decision and the outbox row indicate
+convergence.
+
+Five runs were executed. In every run the revocation returned HTTP~202 with a
+pending status during the outage; the ledger, database, and outbox were
+observed to disagree as expected mid-outage; and after the orderers were
+restarted the ledger reconverged with no operator action, after which the
+release path denied the revoked user (HTTP~403, where
+Experiment~\hyperref[sec:exp_orderer_outage]{16} remained at HTTP~200
+indefinitely). Measured from the outbox row's own timestamps, convergence took
+a median of 15.9\,s (mean 15.85\,s, SD 0.69\,s, range 14.86--16.51\,s,
+$n=5$), with every run committing on its first retry.
+
+This figure should be read as a recovery lag, not as an exposure bound. The
+divergence window is the sum of the outage duration and the reconciliation lag,
+and only the latter is under the system's control; because these runs restart
+the orderers within seconds, the reported median is dominated by Raft leader
+re-election. A longer outage yields a proportionally longer window. What the
+result establishes is narrower and more specific: the divergence no longer
+outlives the outage. The exposure \emph{during} the outage---ciphertext release
+to a revoked holder of a previously distributed wrapped key---is unchanged from
+Experiment~\hyperref[sec:exp_orderer_outage]{16}, and the retry schedule is not
+exercised near its bound here, since no run required more than one retry.
 
 % =========================================================================
 % SECTION VII --- LIMITATIONS AND FUTURE WORK
@@ -3510,7 +3563,11 @@ hardening item (Section~\ref{sec:future_work}).
 
 The prototype does not enforce an explicit timeout on IPFS \texttt{GetFile} calls in the document download path. Under normal operation, the Fabric \texttt{CheckAccess} invocation completes before the IPFS retrieval begins. However, if the IPFS swarm experiences a node failure, disk fault, or network partition \emph{after} chaincode authorization succeeds, the Spring Boot HTTP thread handling the request may block indefinitely waiting for the ciphertext. Under sustained load, this could exhaust the application server's thread pool, causing a cascading failure that degrades or disables endpoints unrelated to IPFS. The production mitigation is a circuit-breaker pattern with a hard timeout (e.g., 5\,s) on all IPFS retrieval calls, returning HTTP~504 to the caller and logging an \texttt{IPFS\_RETRIEVAL\_TIMEOUT} audit event. This ensures IPFS unavailability degrades gracefully rather than propagating to a full service outage.
 
-Experiment~\hyperref[sec:exp_failclosed]{9} validates fail-closed behavior only for the document download path (\texttt{downloadCiphertext()}). The write paths are \emph{not} fail-closed in the prototype: upload, grant, revocation, and the signing action's audit anchoring each catch Fabric submission failures, log a warning, and complete the operational write, prioritizing availability. During a ledger outage this can produce operational-versus-ledger divergence; the sharpest case is a revocation recorded in PostgreSQL while the stale on-chain grant remains chaincode-authorized. The prototype performs \emph{no} automatic re-anchoring: the divergence does not self-heal when the ordering service recovers, and the stale grant continues to authorize the revoked user on the release path until a re-revocation is manually issued and commits while Fabric is reachable. Experiment~\hyperref[sec:exp_orderer_outage]{16} reproduces this end to end: the revocation returns HTTP~204 yet the ledger keeps authorizing the revoked user across an orderer restart, with the exposure bounded to ciphertext because the wrapped-key endpoint is gated by the operational access row. Making the write paths fail-closed, or adding durable queued re-anchoring with divergence detection, is a production hardening item.
+Experiment~\hyperref[sec:exp_failclosed]{9} validates fail-closed behavior only for the document download path (\texttt{downloadCiphertext()}). The write paths are \emph{not} fail-closed: upload, grant, and the signing action's audit anchoring each catch Fabric submission failures, log a warning, and complete the operational write, prioritizing availability. During a ledger outage this produces operational-versus-ledger divergence, and the sharpest case is revocation---a revocation recorded in PostgreSQL while the stale on-chain grant remains chaincode-authorized continues to authorize the revoked user on the release path.
+
+Revocation is the one write path where this divergence is now bounded rather than open-ended. \texttt{RevokeAccess} writes the operational revocation and a durable outbox row in a single database transaction; a background worker re-submits the queued anchor with capped exponential backoff until it commits, and the API returns HTTP~202 with an explicit pending status---rather than an unqualified success---while the anchor is outstanding. Experiment~\hyperref[sec:exp_orderer_reconcile]{16b} measures the result against the identical outage geometry: the ledger reconverges automatically, with no operator action, in a median of 15.9\,s ($n=5$, all runs committing on the first retry), after which the release path correctly denies the revoked user. This addresses the permanence of the divergence, not the divergence itself: the window decomposes into outage duration plus reconciliation lag, and only the second term is under the system's control. For the duration of the outage the exposure measured in Experiment~\hyperref[sec:exp_orderer_outage]{16} is unchanged---ciphertext is still released to the revoked user, bounded to ciphertext because the wrapped-key endpoint is gated by the operational access row.
+
+Two limitations remain. First, the outbox covers revocation only; grants issued during an outage are still anchored on a best-effort basis. Second, making reads fail closed under an orderer-only outage would convert every ordering outage into a total read outage, which is not a favorable trade; the principled alternative is a staleness bound that refuses to authorize from world state older than a threshold relative to an ordered time reference. That mechanism is the same one required to make grant expiry clock-trustworthy on the evaluate path (Section~\ref{sec:limitations}), and pricing it---including the resulting security-versus-availability trade-off---is left to future work.
 
 \subsubsection{GDPR and Regulatory Compliance}
 \label{sec:gdpr}
