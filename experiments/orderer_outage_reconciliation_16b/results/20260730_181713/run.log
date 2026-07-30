@@ -1,0 +1,30 @@
+[exp16b 18:17:13] output dir: /home/angkon/Projects/Blockchain/FCDH_linux_validation/Fardeen_Codex_Dhaka_Meetup_Hackathon/experiments/orderer_outage_reconciliation_16b/results/20260730_181713
+[exp16b 18:17:13] creating fixture (fresh doc + cross-firm grant) via ../orderer_outage_divergence/setup.mjs
+[setup] logged in owner a.rahman@lawfirm-a.example
+[setup] case ee7bd92a-5690-4718-b9d5-da44947f4ac8
+[setup] document aa11f2d6-5c7e-407e-be67-751385955981 (fabricTx b02a877ae0f2deb1518fc54ef0dfa224f0dd1deccaf3193ecbe7791bfbaf4574)
+[setup] granted read on aa11f2d6-5c7e-407e-be67-751385955981 to s.chowdhury@lawfirm-b.example (30-day expiry)
+[exp16b 18:17:21] fixture doc=aa11f2d6-5c7e-407e-be67-751385955981 grantee=6afbbf2b-4a8c-4097-bed6-5b1c1fc52f3d (FirmBMSP)
+[exp16b 18:17:23] [0] baseline grantee download (healthy): HTTP 200
+[exp16b 18:17:23] [1] stopping orderers (peers stay up): orderer1.pangochain.com orderer2.pangochain.com orderer3.pangochain.com
+[exp16b 18:17:24] [2] grantee download during outage: HTTP 200
+[exp16b 18:17:24] [3] owner revoke during outage (submit->orderer): HTTP 202 body={"ledgerSyncStatus":"pending","pendingAnchorId":"6f5b7424-5e0c-4203-b3cf-70f9d31d7a1e"}
+[exp16b 18:17:24] [4] grantee download AFTER revoke (still outage): HTTP 200 (expect 200 — same bounded exposure as Exp 16)
+[exp16b 18:17:24] [5] grantee wrapped-key AFTER revoke: HTTP 403 (DB-gated; unchanged by this fix)
+[exp16b 18:17:24] [6] ledger CheckAccess=true | DB revoked=t | pending_anchor.status=PENDING
+[exp16b 18:17:24] [7] restarting orderers; polling every 2s (timeout 300s) for automatic reconciliation — no manual action
+[exp16b 18:17:40] [7] RECONCILED automatically after 16s (wall clock from revoke request to ledger=false + anchor=COMMITTED). No manual action taken.
+[exp16b 18:17:40] [7] pending_anchor (attempts, precise_divergence_seconds) = 1|15.511740
+[exp16b 18:17:40] [8] grantee download after reconciliation: HTTP 403 (expect 403 — fixed; Exp 16 pre-fix was permanently 200)
+[exp16b 18:17:40] done. summary:
+    step  description                                   result                                                                             
+    0     "baseline download (healthy)"                 "HTTP 200"                                                                         
+    1     "stop orderers (peers up)"                    "stopped orderer1.pangochain.com orderer2.pangochain.com orderer3.pangochain.com"  
+    2     "download during outage (evaluate->peer)"     "HTTP 200"                                                                         
+    3     "revoke during outage (durable outbox)"       "HTTP 202 {""ledgerSyncStatus"":""pending""                                        ""pendingAnchorId"":""6f5b7424-5e0c-4203-b3cf-70f9d31d7a1e""}"
+    4     "download after revoke (still outage)"        "HTTP 200"                                                                         
+    5     "wrapped-key after revoke (DB-gated)"         "HTTP 403"                                                                         
+    6     "ledger/DB/outbox during outage"              "ledger=true db_revoked=t anchor=PENDING"                                          
+    7     "auto-reconciliation after orderer recovery"  "reconciled=true divergence_window_s=16"                                           
+    8     "download after reconciliation"               "HTTP 403"                                                                         
+[exp16b 18:17:40] raw evidence in /home/angkon/Projects/Blockchain/FCDH_linux_validation/Fardeen_Codex_Dhaka_Meetup_Hackathon/experiments/orderer_outage_reconciliation_16b/results/20260730_181713

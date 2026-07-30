@@ -35,6 +35,10 @@ public class AccessControlService {
     private FabricGatewayService fabricGatewayService;
     private final AuditService auditService;
     private final ObjectMapper objectMapper;
+    private final PendingAnchorRepository pendingAnchorRepository;
+
+    /** Result of {@link #revoke}: whether the ledger anchor committed inline or was queued. */
+    public record RevokeResult(boolean ledgerCommitted, String fabricTxId, UUID pendingAnchorId) {}
 
     /**
      * Phase 4: Grant access — ECIES-wrapped key arrives from the browser.
@@ -116,9 +120,16 @@ public class AccessControlService {
 
     /**
      * Phase 4: Revoke access. Also triggers key rotation notification.
+     *
+     * The ledger write is durable: it is attempted inline for the common case (returns
+     * committed immediately), but a failure — e.g. an orderer outage — leaves a PENDING
+     * {@link PendingAnchor} row in the same DB transaction instead of being dropped. See
+     * {@link AnchorReconciliationWorker}. Fixes bcra_peer_review.md M1 / Experiment 16, where
+     * a failed Fabric submit was only logged and the revoke still returned success, leaving
+     * the on-chain grant ACTIVE forever with no reconciliation.
      */
     @Transactional
-    public void revoke(String docIdStr, String targetUserIdStr, User revoker) {
+    public RevokeResult revoke(String docIdStr, String targetUserIdStr, User revoker) {
         UUID docId = UUID.fromString(docIdStr);
         UUID targetUserId = UUID.fromString(targetUserIdStr);
 
@@ -129,13 +140,33 @@ public class AccessControlService {
         access.setRevokedBy(revoker.getId());
         accessRepository.save(access);
 
+        PendingAnchor anchor = PendingAnchor.builder()
+                .chaincodeFunction("RevokeAccess")
+                .docId(docId)
+                .targetUserId(targetUserId)
+                .revokerId(revoker.getId())
+                .status(PendingAnchor.Status.PENDING)
+                .attempts(0)
+                .nextAttemptAt(Instant.now())
+                .build();
+
         String fabricTxId = null;
+        boolean ledgerCommitted = false;
         try {
             if (fabricGatewayService == null) throw new FabricException("Fabric not enabled");
             fabricTxId = fabricGatewayService.revokeAccess(docIdStr, targetUserIdStr, revoker.getId().toString());
+            ledgerCommitted = true;
         } catch (FabricException e) {
-            log.warn("Fabric RevokeAccess failed: {}", e.getMessage());
+            log.warn("Fabric RevokeAccess failed, queuing durable retry: {}", e.getMessage());
+            anchor.setLastError(e.getMessage());
         }
+
+        if (ledgerCommitted) {
+            anchor.setStatus(PendingAnchor.Status.COMMITTED);
+            anchor.setFabricTxId(fabricTxId);
+            anchor.setCommittedAt(Instant.now());
+        }
+        anchor = pendingAnchorRepository.save(anchor);
 
         // Mark all non-owner tokens on this document as OBSOLETE — they may have been
         // exposed to the revoked user and must not be trusted after key rotation.
@@ -165,9 +196,15 @@ public class AccessControlService {
 
         auditService.log("ACCESS_REVOKED", revoker.getId(), "DOCUMENT",
                 docIdStr, fabricTxId,
-                toJson(Map.of("targetUser", targetUserIdStr, "tokensMarkedObsolete", nonOwnerTokens.size())));
+                toJson(Map.of(
+                        "targetUser", targetUserIdStr,
+                        "tokensMarkedObsolete", nonOwnerTokens.size(),
+                        "ledgerSyncStatus", ledgerCommitted ? "committed" : "pending",
+                        "pendingAnchorId", anchor.getId().toString())));
 
         log.info("KEY_ROTATION_REQUIRED: doc={} revokedUser={} obsoleteTokens={}", docIdStr, targetUserIdStr, nonOwnerTokens.size());
+
+        return new RevokeResult(ledgerCommitted, fabricTxId, anchor.getId());
     }
 
     public List<AccessDto> listForDoc(UUID docId, User requester) {

@@ -1,0 +1,10 @@
+{
+  "experiment": "16b - orderer-only outage, post-fix reconciliation",
+  "timestamp_utc": "2026-07-30T18:17:13Z",
+  "host": "Linux 7.0.11-76070011-generic x86_64",
+  "docker": "Docker version 29.6.1, build 8900f1d",
+  "channel": "legal-channel", "chaincode": "legalcc",
+  "orderers": "orderer1.pangochain.com orderer2.pangochain.com orderer3.pangochain.com",
+  "poll_interval_s": 2, "poll_timeout_s": 300,
+  "reference_run": "experiments/orderer_outage_divergence (pre-fix, permanent divergence)"
+}

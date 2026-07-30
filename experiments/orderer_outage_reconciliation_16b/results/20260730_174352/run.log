@@ -1,0 +1,13 @@
+[exp16b 17:43:52] output dir: /home/angkon/Projects/Blockchain/FCDH_linux_validation/Fardeen_Codex_Dhaka_Meetup_Hackathon/experiments/orderer_outage_reconciliation_16b/results/20260730_174352
+[exp16b 17:43:52] creating fixture (fresh doc + cross-firm grant) via ../orderer_outage_divergence/setup.mjs
+[setup] logged in owner a.rahman@lawfirm-a.example
+[setup] case ca25c1fa-0785-42e9-bb9d-cfd19e1aab56
+[setup] document 9f0359d8-4a1e-4b8a-93f3-7b9d8859c944 (fabricTx none)
+[setup] granted read on 9f0359d8-4a1e-4b8a-93f3-7b9d8859c944 to s.chowdhury@lawfirm-b.example (30-day expiry)
+[exp16b 17:43:54] fixture doc=9f0359d8-4a1e-4b8a-93f3-7b9d8859c944 grantee=6afbbf2b-4a8c-4097-bed6-5b1c1fc52f3d (FirmBMSP)
+[exp16b 17:43:57] [0] baseline grantee download (healthy): HTTP 200
+[exp16b 17:43:57] [1] stopping orderers (peers stay up): orderer1.pangochain.com orderer2.pangochain.com orderer3.pangochain.com
+[exp16b 17:43:57] [2] grantee download during outage: HTTP 200
+[exp16b 17:43:57] [3] owner revoke during outage (submit->orderer): HTTP 202 body={"ledgerSyncStatus":"pending","pendingAnchorId":"cd2c2e32-80b0-4d12-a3e8-d8ca4e6d5935"}
+[exp16b 17:43:57] [4] grantee download AFTER revoke (still outage): HTTP 503 (expect 200 — same bounded exposure as Exp 16)
+[exp16b 17:43:57] [5] grantee wrapped-key AFTER revoke: HTTP 503 (DB-gated; unchanged by this fix)

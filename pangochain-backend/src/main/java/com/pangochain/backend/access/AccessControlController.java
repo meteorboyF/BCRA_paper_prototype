@@ -5,6 +5,7 @@ import com.pangochain.backend.user.UserRepository;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -62,16 +63,27 @@ public class AccessControlController {
         return ResponseEntity.ok(accessControlService.grant(req, granter));
     }
 
-    /** DELETE /api/access/{docId}/user/{userId} */
+    /**
+     * DELETE /api/access/{docId}/user/{userId}
+     *
+     * Returns 204 only once the revoke has actually committed to the ledger. If Fabric is
+     * unreachable (e.g. an orderer outage) the DB-side revoke still lands, but the ledger
+     * anchor is queued for durable retry and the response is 202 with the pending anchor id
+     * instead of a bare 204 — see AccessControlService#revoke and AnchorReconciliationWorker.
+     */
     @PreAuthorize("hasAnyRole('MANAGING_PARTNER','PARTNER_SENIOR','PARTNER_JUNIOR','ASSOCIATE_SENIOR','ASSOCIATE_JUNIOR','PARALEGAL')")
     @DeleteMapping("/{docId}/user/{userId}")
-    public ResponseEntity<Void> revoke(
+    public ResponseEntity<RevokeResponseDto> revoke(
             @PathVariable String docId,
             @PathVariable String userId,
             @AuthenticationPrincipal UserDetails principal) {
         User revoker = resolveUser(principal);
-        accessControlService.revoke(docId, userId, revoker);
-        return ResponseEntity.noContent().build();
+        AccessControlService.RevokeResult result = accessControlService.revoke(docId, userId, revoker);
+        if (result.ledgerCommitted()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.status(HttpStatus.ACCEPTED)
+                .body(new RevokeResponseDto("pending", result.pendingAnchorId()));
     }
 
     /** GET /api/access/{docId} — returns current ACL for a document */

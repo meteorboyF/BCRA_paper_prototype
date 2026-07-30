@@ -88,6 +88,15 @@ documents:
   # measurement in the paper exercises that mode.
   material-db-fallback-enabled: ${DOCUMENT_MATERIAL_DB_FALLBACK:false}
 
+access:
+  # Durable re-anchoring of revocations that could not reach the ledger (see
+  # AnchorReconciliationWorker, Experiment 16b). The divergence window is outage duration
+  # plus this reconciliation lag; the cap is deliberately short so a revoked user is not
+  # left ledger-authorized for minutes after Fabric is healthy again.
+  anchor-retry:
+    base-backoff-seconds: ${ANCHOR_RETRY_BASE_BACKOFF:5}
+    max-backoff-seconds: ${ANCHOR_RETRY_MAX_BACKOFF:60}
+
 ipfs:
   api:
     host: ${IPFS_API_HOST:http://localhost}
