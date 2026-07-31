@@ -426,6 +426,14 @@ INPUT ./figures/fig14_baseline.pdf
 INPUT ./figures/fig14_baseline.pdf
 INPUT ./figures/fig14_baseline.pdf
 INPUT ./figures/fig14_baseline.pdf
+INPUT ./figures/fig14b_durable_baseline.pdf
+INPUT ./figures/fig14b_durable_baseline.pdf
+INPUT ./figures/fig14b_durable_baseline.pdf
+INPUT ./figures/fig14b_durable_baseline.pdf
+INPUT ./figures/write_path_reconciliation.pdf
+INPUT ./figures/write_path_reconciliation.pdf
+INPUT ./figures/write_path_reconciliation.pdf
+INPUT ./figures/write_path_reconciliation.pdf
 INPUT /usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstlang1.sty
 INPUT /usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstlang1.sty
 INPUT /usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstlang1.sty

@@ -372,86 +372,90 @@
 \newlabel{fig:baseline}{{29}{79}{Experiment~14 on-path enforcement vs.\ the audit-log-only baseline on the identical download workload: (a) gateway throughput; (b) request latency (P50, caps P95). The architectural premium of on-path enforcement is single-digit milliseconds}{figure.29}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {6.15}Experiment~14b: Against a Baseline That Keeps Its Audit Promise}{79}{subsection.6.15}\protected@file@percent }
 \newlabel{sec:exp_durable_baseline}{{6.15}{79}{Experiment~14b: Against a Baseline That Keeps Its Audit Promise}{subsection.6.15}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {30}{\ignorespaces Experiment~14b: on-path enforcement against both audit-log-only baselines on the identical download workload. (a) gateway throughput; (b) request latency, P50 with P95 cap. Making the baseline durable --- so that it actually retains the audit trail its architecture promises --- reverses the comparison reported in Experiment~\hyperref  [sec:exp_baseline]{14}: the fire-and-forget baseline is competitive with on-path enforcement, while the durable one is roughly a third of its throughput. Axes are ticked only at the two measured concurrency levels; this is a reduced sweep and does not re-validate the saturation behaviour reported at 100--200 clients.}}{81}{figure.30}\protected@file@percent }
+\newlabel{fig:durable_baseline}{{30}{81}{Experiment~14b: on-path enforcement against both audit-log-only baselines on the identical download workload. (a) gateway throughput; (b) request latency, P50 with P95 cap. Making the baseline durable --- so that it actually retains the audit trail its architecture promises --- reverses the comparison reported in Experiment~\hyperref [sec:exp_baseline]{14}: the fire-and-forget baseline is competitive with on-path enforcement, while the durable one is roughly a third of its throughput. Axes are ticked only at the two measured concurrency levels; this is a reduced sweep and does not re-validate the saturation behaviour reported at 100--200 clients}{figure.30}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.16}Experiment~15: Consolidated Evidence and Positioning Against Reported Numbers}{81}{subsection.6.16}\protected@file@percent }
+\newlabel{sec:exp_consolidated}{{6.16}{81}{Experiment~15: Consolidated Evidence and Positioning Against Reported Numbers}{subsection.6.16}{}}
 \citation{liu2026rbacipfs,notash2026adaptive}
 \citation{liu2026rbacipfs,notash2026adaptive}
 \citation{liu2026rbacipfs}
 \citation{mukta2026zerotrust}
 \citation{liu2024blockchain}
 \citation{peelam2026decentralized}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.16}Experiment~15: Consolidated Evidence and Positioning Against Reported Numbers}{81}{subsection.6.16}\protected@file@percent }
-\newlabel{sec:exp_consolidated}{{6.16}{81}{Experiment~15: Consolidated Evidence and Positioning Against Reported Numbers}{subsection.6.16}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.17}Experiment~16: Divergence Under Orderer-Only Outage}{81}{subsection.6.17}\protected@file@percent }
-\newlabel{sec:exp_orderer_outage}{{6.17}{81}{Experiment~16: Divergence Under Orderer-Only Outage}{subsection.6.17}{}}
 \@writefile{lot}{\contentsline {table}{\numberline {11}{\ignorespaces Reported performance of the closest published systems versus this work. Values are each paper's own published figures on its own testbed (no hardware normalization); statistic conventions differ as noted. Pre-proof values for~\cite  {liu2026rbacipfs,notash2026adaptive} are subject to change in the versions of record.}}{82}{table.11}\protected@file@percent }
 \newlabel{tab:numbers_comparison}{{11}{82}{Reported performance of the closest published systems versus this work. Values are each paper's own published figures on its own testbed (no hardware normalization); statistic conventions differ as noted. Pre-proof values for~\cite {liu2026rbacipfs,notash2026adaptive} are subject to change in the versions of record}{table.11}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.17}Experiment~16: Divergence Under Orderer-Only Outage}{83}{subsection.6.17}\protected@file@percent }
+\newlabel{sec:exp_orderer_outage}{{6.17}{83}{Experiment~16: Divergence Under Orderer-Only Outage}{subsection.6.17}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {6.18}Experiment~16b: Bounded Reconciliation After Durable Re-Anchoring}{83}{subsection.6.18}\protected@file@percent }
 \newlabel{sec:exp_orderer_reconcile}{{6.18}{83}{Experiment~16b: Bounded Reconciliation After Durable Re-Anchoring}{subsection.6.18}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {6.19}Experiment~17: Cost of Bounding Clock Trust on the Evaluate Path}{84}{subsection.6.19}\protected@file@percent }
 \newlabel{sec:exp_timeanchor}{{6.19}{84}{Experiment~17: Cost of Bounding Clock Trust on the Evaluate Path}{subsection.6.19}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.20}Experiment~18: Adversarial Database Mutation}{85}{subsection.6.20}\protected@file@percent }
-\newlabel{sec:exp_db_mutation}{{6.20}{85}{Experiment~18: Adversarial Database Mutation}{subsection.6.20}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {7}Limitations and Future Work}{86}{section.7}\protected@file@percent }
-\newlabel{sec:limitations}{{7}{86}{Limitations and Future Work}{section.7}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Limitations}{86}{subsection.7.1}\protected@file@percent }
-\newlabel{sec:limitations_detail}{{7.1}{86}{Limitations}{subsection.7.1}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.1}Geographic Distribution and WAN Latency}{87}{subsubsection.7.1.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.20}Experiment~18: Adversarial Database Mutation}{86}{subsection.6.20}\protected@file@percent }
+\newlabel{sec:exp_db_mutation}{{6.20}{86}{Experiment~18: Adversarial Database Mutation}{subsection.6.20}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {31}{\ignorespaces Durable re-anchoring of a revocation issued during an ordering-service outage. The operational revocation and its outbox row are written in a single database transaction, so the ledger write is deferred rather than lost, and the endpoint reports a pending ledger-sync status instead of unqualified success. A background worker re-submits the queued anchor once ordering recovers, after which the release path denies the revoked user. Note that the release path continues to authorize from last-committed state for the duration of the outage: the mechanism bounds how long the divergence outlives the outage, not the exposure during it.}}{88}{figure.31}\protected@file@percent }
+\newlabel{fig:write_path_reconciliation}{{31}{88}{Durable re-anchoring of a revocation issued during an ordering-service outage. The operational revocation and its outbox row are written in a single database transaction, so the ledger write is deferred rather than lost, and the endpoint reports a pending ledger-sync status instead of unqualified success. A background worker re-submits the queued anchor once ordering recovers, after which the release path denies the revoked user. Note that the release path continues to authorize from last-committed state for the duration of the outage: the mechanism bounds how long the divergence outlives the outage, not the exposure during it}{figure.31}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Limitations and Future Work}{89}{section.7}\protected@file@percent }
+\newlabel{sec:limitations}{{7}{89}{Limitations and Future Work}{section.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Limitations}{89}{subsection.7.1}\protected@file@percent }
+\newlabel{sec:limitations_detail}{{7.1}{89}{Limitations}{subsection.7.1}{}}
 \citation{hyperledgerFabricOrderingService_v24,woznica2022}
 \citation{fabricWhatsNew3x,fabricOrderingServiceLatest,fabricBFTConfigurationDoc}
 \citation{ateniese2017redactable,nist80057,nist80053}
 \citation{w3cWebCrypto}
 \citation{nist800634,w3cWebAuthnL3,nist800131a,fips1403}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.2}Crash-Fault Tolerance vs.\ Byzantine Fault Tolerance}{88}{subsubsection.7.1.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.3}Key Management and Browser Dependency}{88}{subsubsection.7.1.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.1}Geographic Distribution and WAN Latency}{90}{subsubsection.7.1.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.2}Crash-Fault Tolerance vs.\ Byzantine Fault Tolerance}{90}{subsubsection.7.1.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.3}Key Management and Browser Dependency}{90}{subsubsection.7.1.3}\protected@file@percent }
 \citation{fabricPDCDoc,fabricChannelsDoc}
 \citation{politou2019metadata}
 \citation{groth2016}
 \citation{nist800634}
 \citation{rfc7519jwt}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.4}On-Chain Metadata Privacy}{89}{subsubsection.7.1.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.5}Authentication Assurance Level}{89}{subsubsection.7.1.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.6}Identity Database Public Key Integrity}{89}{subsubsection.7.1.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.7}IPFS Retrieval Timeout and Thread Management}{90}{subsubsection.7.1.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.4}On-Chain Metadata Privacy}{91}{subsubsection.7.1.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.5}Authentication Assurance Level}{91}{subsubsection.7.1.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.6}Identity Database Public Key Integrity}{92}{subsubsection.7.1.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.7}IPFS Retrieval Timeout and Thread Management}{92}{subsubsection.7.1.7}\protected@file@percent }
 \citation{gdpr2016}
 \citation{ipfsDocsQuickstartPin2025,ipfsDocsKuboGarbageCollection}
 \citation{gdpr2016}
 \citation{finck2019blockchain,politou2019metadata}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.8}GDPR and Regulatory Compliance}{93}{subsubsection.7.1.8}\protected@file@percent }
+\newlabel{sec:gdpr}{{7.1.8}{93}{GDPR and Regulatory Compliance}{subsubsection.7.1.8}{}}
 \citation{ateniese2017redactable,lyons2018integration}
 \citation{EDPB2025Pseudonymisation,Finck2020}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.8}GDPR and Regulatory Compliance}{91}{subsubsection.7.1.8}\protected@file@percent }
-\newlabel{sec:gdpr}{{7.1.8}{91}{GDPR and Regulatory Compliance}{subsubsection.7.1.8}{}}
 \citation{springBoot325}
 \citation{fabricCADoc,rfc7519jwt}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.9}Integration with Legacy Legal Systems}{92}{subsubsection.7.1.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.9}Integration with Legacy Legal Systems}{94}{subsubsection.7.1.9}\protected@file@percent }
 \citation{nist80053}
 \citation{fabricChaincodeLifecycleDoc,nist80053}
 \citation{fips1403,fabricCADoc,w3cWebAuthnL3}
 \citation{permenev2020verx}
 \citation{groth2016,fabricPDCDoc}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Future Work}{93}{subsection.7.2}\protected@file@percent }
-\newlabel{sec:future_work}{{7.2}{93}{Future Work}{subsection.7.2}{}}
-\newlabel{sec:key_recovery_escrow}{{7.2}{93}{Future Work}{subsection.7.2}{}}
-\newlabel{sec:regulator_interfaces}{{7.2}{93}{Future Work}{subsection.7.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Future Work}{95}{subsection.7.2}\protected@file@percent }
+\newlabel{sec:future_work}{{7.2}{95}{Future Work}{subsection.7.2}{}}
+\newlabel{sec:key_recovery_escrow}{{7.2}{95}{Future Work}{subsection.7.2}{}}
+\newlabel{sec:regulator_interfaces}{{7.2}{95}{Future Work}{subsection.7.2}{}}
 \citation{siddamsetti2024anomaly}
 \citation{sporny2023did}
 \citation{sporny2022vc}
-\@writefile{toc}{\contentsline {section}{\numberline {8}Discussion}{94}{section.8}\protected@file@percent }
-\newlabel{sec:discussion}{{8}{94}{Discussion}{section.8}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {8}Discussion}{96}{section.8}\protected@file@percent }
+\newlabel{sec:discussion}{{8}{96}{Discussion}{section.8}{}}
 \citation{liu2026rbacipfs}
-\@writefile{toc}{\contentsline {section}{\numberline {9}Conclusion}{97}{section.9}\protected@file@percent }
-\newlabel{sec:conclusion}{{9}{97}{Conclusion}{section.9}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {9}Conclusion}{99}{section.9}\protected@file@percent }
+\newlabel{sec:conclusion}{{9}{99}{Conclusion}{section.9}{}}
 \@writefile{toc}{\let\numberline\tmptocnumberline}
-\@writefile{toc}{\contentsline {section}{\numberline {Appendix~A}Implementation listings}{98}{appendix.A}\protected@file@percent }
-\newlabel{app:listings}{{Appendix~A}{98}{Implementation listings}{appendix.A}{}}
-\newlabel{lst:encrypt}{{2}{98}{Browser AES-256-GCM document encryption. Fresh 256-bit key and 96-bit IV generated per document via \texttt {window.crypto.getRandomValues}. SHA-256 hash computed of plaintext \emph {before} encryption. Server receives only IV-prepended ciphertext}{lstlisting.2}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {2}Browser AES-256-GCM document encryption. Fresh 256-bit key and 96-bit IV generated per document via \texttt  {window.crypto.getRandomValues}. SHA-256 hash computed of plaintext \emph  {before} encryption. Server receives only IV-prepended ciphertext.}{98}{lstlisting.2}\protected@file@percent }
-\newlabel{lst:pbkdf2}{{3}{99}{PBKDF2-SHA256 key derivation at 600,000 iterations (OWASP password-storage guidance; exceeds the NIST SP~800-132 minimum work factor). Derives the AES-256-GCM wrapping key protecting both ECIES and ECDSA private keys in \texttt {localStorage}}{lstlisting.3}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {3}PBKDF2-SHA256 key derivation at 600,000 iterations (OWASP password-storage guidance; exceeds the NIST SP~800-132 minimum work factor). Derives the AES-256-GCM wrapping key protecting both ECIES and ECDSA private keys in \texttt  {localStorage}.}{99}{lstlisting.3}\protected@file@percent }
-\newlabel{lst:ecdsa}{{4}{99}{Server-side ECDSA P-256 verification. \texttt {SHA256withECDSAinP1363Format} natively consumes WebCrypto's raw $r \| s$ output without format conversion}{lstlisting.4}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {4}Server-side ECDSA P-256 verification. \texttt  {SHA256withECDSAinP1363Format} natively consumes WebCrypto's raw $r \| s$ output without format conversion.}{99}{lstlisting.4}\protected@file@percent }
-\newlabel{lst:download}{{5}{100}{Strict fail-closed ACL in the document download path. Layer 1: Spring Security \texttt {@PreAuthorize}. Layer 2: \texttt {CheckAccess} chaincode. If Fabric is unreachable, the system strictly denies access and logs \texttt {FABRIC\_OUTAGE\_ACCESS\_DENIED}}{lstlisting.5}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {5}Strict fail-closed ACL in the document download path. Layer 1: Spring Security \texttt  {@PreAuthorize}. Layer 2: \texttt  {CheckAccess} chaincode. If Fabric is unreachable, the system strictly denies access and logs \texttt  {FABRIC\_OUTAGE\_ACCESS\_DENIED}.}{100}{lstlisting.5}\protected@file@percent }
-\newlabel{lst:audittrigger}{{6}{100}{INSERT-only enforcement on \texttt {audit\_log}. Row-level triggers block UPDATE and DELETE; a statement-level trigger blocks TRUNCATE (which bypasses row-level triggers in PostgreSQL). TRUNCATE privilege is also revoked from application roles}{lstlisting.6}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {6}INSERT-only enforcement on \texttt  {audit\_log}. Row-level triggers block UPDATE and DELETE; a statement-level trigger blocks TRUNCATE (which bypasses row-level triggers in PostgreSQL). TRUNCATE privilege is also revoked from application roles.}{100}{lstlisting.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {Appendix~A}Implementation listings}{100}{appendix.A}\protected@file@percent }
+\newlabel{app:listings}{{Appendix~A}{100}{Implementation listings}{appendix.A}{}}
+\newlabel{lst:encrypt}{{2}{100}{Browser AES-256-GCM document encryption. Fresh 256-bit key and 96-bit IV generated per document via \texttt {window.crypto.getRandomValues}. SHA-256 hash computed of plaintext \emph {before} encryption. Server receives only IV-prepended ciphertext}{lstlisting.2}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {2}Browser AES-256-GCM document encryption. Fresh 256-bit key and 96-bit IV generated per document via \texttt  {window.crypto.getRandomValues}. SHA-256 hash computed of plaintext \emph  {before} encryption. Server receives only IV-prepended ciphertext.}{100}{lstlisting.2}\protected@file@percent }
+\newlabel{lst:pbkdf2}{{3}{101}{PBKDF2-SHA256 key derivation at 600,000 iterations (OWASP password-storage guidance; exceeds the NIST SP~800-132 minimum work factor). Derives the AES-256-GCM wrapping key protecting both ECIES and ECDSA private keys in \texttt {localStorage}}{lstlisting.3}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {3}PBKDF2-SHA256 key derivation at 600,000 iterations (OWASP password-storage guidance; exceeds the NIST SP~800-132 minimum work factor). Derives the AES-256-GCM wrapping key protecting both ECIES and ECDSA private keys in \texttt  {localStorage}.}{101}{lstlisting.3}\protected@file@percent }
+\newlabel{lst:ecdsa}{{4}{101}{Server-side ECDSA P-256 verification. \texttt {SHA256withECDSAinP1363Format} natively consumes WebCrypto's raw $r \| s$ output without format conversion}{lstlisting.4}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {4}Server-side ECDSA P-256 verification. \texttt  {SHA256withECDSAinP1363Format} natively consumes WebCrypto's raw $r \| s$ output without format conversion.}{101}{lstlisting.4}\protected@file@percent }
+\newlabel{lst:download}{{5}{102}{Strict fail-closed ACL in the document download path. Layer 1: Spring Security \texttt {@PreAuthorize}. Layer 2: \texttt {CheckAccess} chaincode. If Fabric is unreachable, the system strictly denies access and logs \texttt {FABRIC\_OUTAGE\_ACCESS\_DENIED}}{lstlisting.5}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {5}Strict fail-closed ACL in the document download path. Layer 1: Spring Security \texttt  {@PreAuthorize}. Layer 2: \texttt  {CheckAccess} chaincode. If Fabric is unreachable, the system strictly denies access and logs \texttt  {FABRIC\_OUTAGE\_ACCESS\_DENIED}.}{102}{lstlisting.5}\protected@file@percent }
+\newlabel{lst:audittrigger}{{6}{102}{INSERT-only enforcement on \texttt {audit\_log}. Row-level triggers block UPDATE and DELETE; a statement-level trigger blocks TRUNCATE (which bypasses row-level triggers in PostgreSQL). TRUNCATE privilege is also revoked from application roles}{lstlisting.6}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {6}INSERT-only enforcement on \texttt  {audit\_log}. Row-level triggers block UPDATE and DELETE; a statement-level trigger blocks TRUNCATE (which bypasses row-level triggers in PostgreSQL). TRUNCATE privilege is also revoked from application roles.}{102}{lstlisting.6}\protected@file@percent }
 \bibstyle{elsarticle-num}
 \bibdata{references}
 \bibcite{aba2023}{{1}{}{{}}{{}}}
@@ -553,4 +557,4 @@
 \bibcite{sporny2023did}{{97}{}{{}}{{}}}
 \bibcite{sporny2022vc}{{98}{}{{}}{{}}}
 \providecommand\NAT@force@numbers{}\NAT@force@numbers
-\gdef \@abspage@last{114}
+\gdef \@abspage@last{116}

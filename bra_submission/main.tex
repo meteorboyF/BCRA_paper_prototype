@@ -3339,7 +3339,7 @@ it, since the log is append-only at the database level and relaxing that constra
 to record anchoring status would trade away the very property being protected.
 
 On a reduced sweep (concurrency 10 and 50, 1{,}000 requests per level, zero
-failures in every mode):
+failures in every mode; Fig.~\ref{fig:durable_baseline}):
 
 \begin{center}
 \begin{tabular}{@{}lcccc@{}}
@@ -3379,6 +3379,21 @@ re-validated here. And the on-path mode's own audit events are deliberately
 \emph{not} durably anchored, which is precisely the asymmetry being argued: the
 comparison is between architectures as each must be built to keep its own
 promise, not between identical pipelines.
+
+\begin{figure*}[!t]
+    \centering
+    \includegraphics[width=\textwidth]{fig14b_durable_baseline.pdf}
+    \caption{Experiment~14b: on-path enforcement against both audit-log-only
+    baselines on the identical download workload. (a) gateway throughput;
+    (b) request latency, P50 with P95 cap. Making the baseline durable --- so that
+    it actually retains the audit trail its architecture promises --- reverses the
+    comparison reported in Experiment~\hyperref[sec:exp_baseline]{14}: the
+    fire-and-forget baseline is competitive with on-path enforcement, while the
+    durable one is roughly a third of its throughput. Axes are ticked only at the
+    two measured concurrency levels; this is a reduced sweep and does not
+    re-validate the saturation behaviour reported at 100--200 clients.}
+    \label{fig:durable_baseline}
+\end{figure*}
 
 % -----------------------------------------------------------------
 \subsection{Experiment~15: Consolidated Evidence and Positioning Against Reported Numbers}
@@ -3532,7 +3547,7 @@ revocation manually, the run restarts the orderers and then waits, taking no
 further action, until both the chaincode decision and the outbox row indicate
 convergence.
 
-Five runs were executed. In every run the revocation returned HTTP~202 with a
+Five runs were executed (Fig.~\ref{fig:write_path_reconciliation}). In every run the revocation returned HTTP~202 with a
 pending status during the outage; the ledger, database, and outbox were
 observed to disagree as expected mid-outage; and after the orderers were
 restarted the ledger reconverged with no operator action, after which the
@@ -3552,6 +3567,21 @@ outlives the outage. The exposure \emph{during} the outage---ciphertext release
 to a revoked holder of a previously distributed wrapped key---is unchanged from
 Experiment~\hyperref[sec:exp_orderer_outage]{16}, and the retry schedule is not
 exercised near its bound here, since no run required more than one retry.
+
+\begin{figure}[!t]
+    \centering
+    \includegraphics[width=\columnwidth]{write_path_reconciliation.pdf}
+    \caption{Durable re-anchoring of a revocation issued during an
+    ordering-service outage. The operational revocation and its outbox row are
+    written in a single database transaction, so the ledger write is deferred
+    rather than lost, and the endpoint reports a pending ledger-sync status
+    instead of unqualified success. A background worker re-submits the queued
+    anchor once ordering recovers, after which the release path denies the
+    revoked user. Note that the release path continues to authorize from
+    last-committed state for the duration of the outage: the mechanism bounds
+    how long the divergence outlives the outage, not the exposure during it.}
+    \label{fig:write_path_reconciliation}
+\end{figure}
 
 % -----------------------------------------------------------------
 \subsection{Experiment~17: Cost of Bounding Clock Trust on the Evaluate Path}

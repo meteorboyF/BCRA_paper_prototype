@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.7.12)  31 JUL 2026 15:50
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.7.12)  31 JUL 2026 16:59
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -2698,49 +2698,63 @@ File: figures/fig14_baseline.pdf Graphic file (type pdf)
 <use figures/fig14_baseline.pdf>
 Package pdftex.def Info: figures/fig14_baseline.pdf  used on input line 3308.
 (pdftex.def)             Requested size: 390.0pt x 163.09584pt.
- [79 <./figures/fig14_baseline.pdf>] [80] [81] [82] [83]
-Underfull \vbox (badness 1939) has occurred while \output is active []
+ [79 <./figures/fig14_baseline.pdf>]
+<figures/fig14b_durable_baseline.pdf, id=7226, 787.05621pt x 364.7848pt>
+File: figures/fig14b_durable_baseline.pdf Graphic file (type pdf)
+<use figures/fig14b_durable_baseline.pdf>
+Package pdftex.def Info: figures/fig14b_durable_baseline.pdf  used on input lin
+e 3385.
+(pdftex.def)             Requested size: 390.0pt x 180.76106pt.
+ [80] [81 <./figures/fig14b_durable_baseline.pdf>]
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [84]
-[85] [86] [87]
-Overfull \hbox (4.18654pt too wide) in paragraph at lines 3748--3755
+ [82]
+[83]
+<figures/write_path_reconciliation.pdf, id=7338, 2304.61pt x 2985.69995pt>
+File: figures/write_path_reconciliation.pdf Graphic file (type pdf)
+<use figures/write_path_reconciliation.pdf>
+Package pdftex.def Info: figures/write_path_reconciliation.pdf  used on input l
+ine 3573.
+(pdftex.def)             Requested size: 390.0pt x 505.23883pt.
+
+
+LaTeX Warning: Float too large for page by 64.6828pt on input line 3584.
+
+[84] [85] [86] [87] [88 <./figures/write_path_reconciliation.pdf>] [89
+
+]
+Overfull \hbox (4.18654pt too wide) in paragraph at lines 3778--3785
 \T1/cmr/m/n/12 (-20) been val-i-dated at pro-duc-tion scale. Mit-i-ga-tions in-
 clude re-duc-ing \T1/cmtt/m/n/12 BatchTimeout
  []
 
 
-Overfull \hbox (18.3314pt too wide) in paragraph at lines 3756--3763
+Overfull \hbox (18.3314pt too wide) in paragraph at lines 3786--3793
 \T1/cmr/m/n/12 (-20) failover, multi-peer fail-ure com-bi-na-tions, or re-cov-e
 ry dur-ing con-cur-rent production-
  []
 
-[88]
-Overfull \hbox (1.6613pt too wide) in paragraph at lines 3826--3833
+[90]
+Overfull \hbox (1.6613pt too wide) in paragraph at lines 3856--3863
 []\T1/cmr/m/n/12 (-20) The Post-greSQL iden-tity ta-ble bind-ing users to their
  pub-lic keys (\T1/cmtt/m/n/12 pk_ecies\T1/cmr/m/n/12 (-20) ,
  []
 
-[89] [90] [91] [92] [93]
-Overfull \hbox (26.30418pt too wide) in paragraph at lines 3962--3977
+[91] [92] [93] [94] [95]
+Overfull \hbox (26.30418pt too wide) in paragraph at lines 3992--4007
 \T1/cmr/m/n/12 (-20) au-dit dash-boards and joint en-dorse-ment poli-cies such 
 as \T1/cmtt/m/n/12 AND('LawFirmAMSP.peer',
  []
 
-[94] [95] [96] [97]
+[96] [97] [98] [99]
 (/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2025/11/14 1.11b listings language file
-) [98]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [99]
-(/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstlang1.sty
+) [100]
+[101] (/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2025/11/14 1.11b listings language file
 )
-Underfull \vbox (badness 1655) has occurred while \output is active []
-
- [100]
-[101] (./main.bbl [102] [103] [104] [105] [106] [107] [108] [109] [110]
-[111] [112] [113]) [114] (./main.aux)
+[102] [103] (./main.bbl [104] [105] [106] [107] [108] [109] [110] [111]
+[112] [113] [114] [115]) [116] (./main.aux)
  ***********
 LaTeX2e <2026-06-01>
 L3 programming layer <2026-06-18>
@@ -2754,11 +2768,11 @@ Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: 1E76F3CD588A4C93CB6713DE77C53F16;19038.
  ) 
 Here is how much of TeX's memory you used:
- 19355 strings out of 467168
- 307761 string characters out of 5409468
- 1163112 words of memory out of 5000000
- 47326 multiletter control sequences out of 15000+600000
- 672581 words of font info for 337 fonts, out of 8000000 for 9000
+ 19384 strings out of 467168
+ 308691 string characters out of 5409468
+ 1174125 words of memory out of 5000000
+ 47347 multiletter control sequences out of 15000+600000
+ 672697 words of font info for 339 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  74i,14n,79p,1906b,2329s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb
@@ -2796,10 +2810,10 @@ super/sftt0800.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-su
 per/sftt1000.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-supe
 r/sftt1095.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/
 sftt1200.pfb>
-Output written on main.pdf (114 pages, 8221807 bytes).
+Output written on main.pdf (116 pages, 8904016 bytes).
 PDF statistics:
- 8113 PDF objects out of 8907 (max. 8388607)
- 4557 compressed objects within 46 object streams
- 568 named destinations out of 1000 (max. 500000)
- 78095 words of extra memory for PDF output out of 89155 (max. 10000000)
+ 9147 PDF objects out of 10688 (max. 8388607)
+ 5057 compressed objects within 51 object streams
+ 572 named destinations out of 1000 (max. 500000)
+ 78105 words of extra memory for PDF output out of 89155 (max. 10000000)
 
