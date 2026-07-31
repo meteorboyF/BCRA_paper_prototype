@@ -3277,23 +3277,31 @@ and at most 10\,\% throughput at saturation; at 200 clients the
 on-path P95 is actually \emph{below} the baseline's. The end-to-end
 premium independently corroborates Experiment~%
 \hyperref[sec:exp_latency]{2}'s function-level 6.51\,ms figure on a
-different build five weeks later. This experiment also quantifies the
-baseline's hidden cost: its fire-and-forget anchors drained at only 3--8
-transactions per second against 700+ generated per second at gateway
-saturation, so during the benchmark window just 144 of $\approx$24{,}000
-audit anchors reached the ledger and the backlog was lost at process
-restart. A passive-audit-log deployment therefore needs batched,
-durable anchoring infrastructure merely to keep its audit promise,
-while the on-path design's enforcement guarantee never depends on that
-pipeline.\footnote{Preparing this baseline exposed a resource-management
-defect in the prototype: Spring's \texttt{@Async} audit anchoring had
-silently fallen back to an unbounded thread-per-task executor, capping
-the gateway at $\approx$14 requests/s under sustained download load.
-The defect was fixed (bounded executor) before both modes were
-measured. Experiments~1--9 are unaffected: their workload never
-triggers the pathological path (\texttt{GET /wrapped-key} writes no
-audit event, and upload audits carry a transaction ID that skips
-ledger anchoring), which the released analysis documents in detail.}
+different build five weeks later. These figures characterise the build
+measured at the time; the release path has since acquired the time-anchor
+freshness read (Experiment~\hyperref[sec:exp_timeanchor]{17}), lost the
+organization fallback, and begun anchoring denials, so they should be read
+as belonging to that configuration rather than to the current one.
+
+Preparing this baseline exposed a resource-management defect in the
+prototype, disclosed here rather than in a footnote because it bears on how
+the comparison should be read: Spring's \texttt{@Async} audit anchoring had
+silently fallen back to an unbounded thread-per-task executor, capping the
+gateway at $\approx$14 requests/s under sustained download load. The defect
+was fixed (bounded executor) before either mode was measured.
+Experiments~1--9 are unaffected, because their workload never triggers the
+pathological path: \texttt{GET /wrapped-key} writes no audit event, and
+upload audits carry a transaction identifier that skips ledger anchoring.
+
+The baseline as measured above nonetheless anchors \emph{fire and forget}.
+Its surplus anchors accumulate in an in-memory queue and are lost when the
+process stops, which is a property of that implementation rather than of the
+audit-log-only architecture: any serious deployment of it would use a durable
+queue and batched anchoring. Pricing the architecture against an
+implementation that discards its own audit trail would not be a fair
+comparison, so the baseline was rebuilt with a durable, batched anchor
+pipeline and the workload re-run against all three modes
+(Experiment~\hyperref[sec:exp_durable_baseline]{14b}).
 
 \begin{figure*}[!t]
     \centering
@@ -3307,13 +3315,79 @@ ledger anchoring), which the released analysis documents in detail.}
 \end{figure*}
 
 % -----------------------------------------------------------------
+\subsection{Experiment~14b: Against a Baseline That Keeps Its Audit Promise}
+\label{sec:exp_durable_baseline}
+% -----------------------------------------------------------------
+
+The audit-log-only mode of Experiment~\hyperref[sec:exp_baseline]{14} anchors
+fire and forget, so its audit trail is only as complete as its queue happens to
+drain. Comparing on-path enforcement against that is comparing against an
+implementation that does not deliver what its architecture promises. This
+experiment rebuilds the baseline with a durable, batched anchor pipeline and
+re-runs the same workload against three modes.
+
+Durability here is cheap to obtain and does not require a new store. Audit rows
+are committed to PostgreSQL before any anchoring is attempted, so the backlog is
+already on disk; a checkpoint table records which contiguous range of audit
+records a given ledger transaction covers, and the highest committed range is a
+watermark above which rows are simply not yet anchored. Anchoring is batched --- a
+digest over a batch is anchored in one transaction rather than one transaction
+per event, since per-event anchoring would cap throughput at the commit latency ---
+and tamper evidence is preserved, because altering any record in an anchored batch
+changes the digest. The checkpoint is kept beside the audit log rather than inside
+it, since the log is append-only at the database level and relaxing that constraint
+to record anchoring status would trade away the very property being protected.
+
+On a reduced sweep (concurrency 10 and 50, 1{,}000 requests per level, zero
+failures in every mode):
+
+\begin{center}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+& \multicolumn{2}{c}{\textbf{concurrency 10}} & \multicolumn{2}{c}{\textbf{concurrency 50}} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+\textbf{Mode} & \textbf{TPS} & \textbf{P50} & \textbf{TPS} & \textbf{P50} \\
+\midrule
+On-path enforcement            & 469.5 & 16.6\,ms & 789.6 & 59.2\,ms \\
+Audit-log-only, fire and forget & 393.4 & 15.6\,ms & 557.9 & 57.3\,ms \\
+Audit-log-only, durable batched & 142.3 & 32.8\,ms & 226.9 & 209.3\,ms \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The comparison inverts. Experiment~\hyperref[sec:exp_baseline]{14} found the
+baseline faster than on-path enforcement and framed the difference as a premium
+paid for a stronger guarantee. Against a baseline that actually retains its audit
+trail, on-path enforcement instead delivers $3.3\times$ the throughput and half
+the median latency at concurrency~10, and $3.5\times$ the throughput at
+concurrency~50.
+
+The reason is structural rather than an artefact of tuning. In the audit-log-only
+architecture the anchor \emph{is} the security mechanism: if it does not reach the
+ledger there is no ledger-verifiable record of the decision, so the pipeline must
+be durable and must sustain the request rate. In the on-path design the ledger
+decision is taken before release, so the anchor is telemetry rather than the
+enforcement mechanism and need not be durable for the security property to hold.
+One architecture pays for durability on every decision; the other does not have
+to. Anchor retention follows the same split: after the run the fire-and-forget
+mode left 69 records unanchored and lost them at process exit, while the durable
+mode left 16 in flight, on disk, across 318 committed batches.
+
+Two qualifications. The sweep is reduced, so the saturation behaviour
+Experiment~\hyperref[sec:exp_baseline]{14} reports at 100--200 clients is not
+re-validated here. And the on-path mode's own audit events are deliberately
+\emph{not} durably anchored, which is precisely the asymmetry being argued: the
+comparison is between architectures as each must be built to keep its own
+promise, not between identical pipelines.
+
+% -----------------------------------------------------------------
 \subsection{Experiment~15: Consolidated Evidence and Positioning Against Reported Numbers}
 \label{sec:exp_consolidated}
 % -----------------------------------------------------------------
 
 To counter point estimates masking variance, the released dataset
 consolidates 37 headline metrics across all fifteen measurement
-experiments (Experiments~1--15; Experiments~16, 16b, 17, and~18 are behavioral and
+experiments (Experiments~1--15; Experiments~14b, 16, 16b, 17, and~18 are behavioral and
 contribute no headline metric) with 95\,\% confidence intervals: bootstrap percentile intervals
 (10{,}000 resamples) for medians computed from per-sample data, and
 Student-$t$ intervals for means of trial-level
