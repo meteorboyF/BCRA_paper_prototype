@@ -1762,7 +1762,12 @@ and statement-level triggers block accidental or application-layer
 modification and TRUNCATE attempts (Listing~\ref{lst:audittrigger}) &
 Triggers provide operational integrity only, not cryptographic
 protection from a PostgreSQL superuser. The DB admin cannot directly
-alter Fabric ACL or audit history, and Fabric outages deny access;
+alter Fabric ACL or audit history, and Fabric outages deny access; this
+is measured rather than argued in
+Experiment~\hyperref[sec:exp_db_mutation]{18}, where a grant forged
+directly in \texttt{document\_access} yields no release, and deleting a
+legitimate row likewise fails to revoke ciphertext access, so database
+writes are inert in both directions on the release path;
 however, replacing \texttt{pk\_ecies} can make later grants wrap
 $k_{enc}$ to an attacker key while the ledger records an apparently
 valid grant. A null firm/MSP raises \texttt{AccessDeniedException}
@@ -1913,7 +1918,10 @@ returns honest world state; independence from a single malicious peer on
 the read path would require multi-peer query or endorsement-backed reads
 and is a production hardening item. \emph{Evidence:}
 Experiments~\hyperref[sec:exp_failclosed]{9}
-and~\hyperref[sec:exp_baseline]{14}.
+and~\hyperref[sec:exp_baseline]{14}, and directly
+Experiment~\hyperref[sec:exp_db_mutation]{18}, in which a forged
+database grant inserted by an adversary with write access to the
+operational store does not yield release.
 \item[P2 (Fail-closed under ledger unavailability).] Under A1, if the
 ledger cannot be consulted, the download path denies rather than
 falling back to database state. \emph{Evidence:}
@@ -1950,7 +1958,11 @@ passed. The application cannot serve from cached state: P1 places
 \texttt{CheckAccess} on the request itself, and the chaincode
 evaluates grant status and expiry against committed world state at
 the deterministic transaction timestamp. The request is denied and
-audited, \emph{provided the revocation has committed to the ledger}.
+audited --- the denial is recorded as an \texttt{ACCESS\_DENIED} event and
+anchored to the ledger like any grant, so a refused attempt is
+independently verifiable rather than merely logged locally
+(Experiment~\hyperref[sec:exp_db_mutation]{18}) --- \emph{provided the
+revocation has committed to the ledger}.
 This qualification is load-bearing: because the prototype's write paths
 are availability-first, a revocation issued while the ordering service is
 unreachable updates the operational store but not the ledger, and
@@ -3301,7 +3313,7 @@ ledger anchoring), which the released analysis documents in detail.}
 
 To counter point estimates masking variance, the released dataset
 consolidates 37 headline metrics across all fifteen measurement
-experiments (Experiments~1--15; Experiments~16, 16b, and~17 are behavioral and
+experiments (Experiments~1--15; Experiments~16, 16b, 17, and~18 are behavioral and
 contribute no headline metric) with 95\,\% confidence intervals: bootstrap percentile intervals
 (10{,}000 resamples) for medians computed from per-sample data, and
 Student-$t$ intervals for means of trial-level
@@ -3539,6 +3551,58 @@ proposal was constructed against the deployment, since neither the peer CLI nor
 the gateway SDK exposes the proposal timestamp. Establishing it empirically
 requires a client that assembles and signs proposals directly, and is left to
 future work.
+
+% -----------------------------------------------------------------
+\subsection{Experiment~18: Adversarial Database Mutation}
+\label{sec:exp_db_mutation}
+% -----------------------------------------------------------------
+
+The claim that motivates the whole architecture is that an adversary holding write
+access to the operational database cannot subvert authorization, because release is
+decided from committed ledger state rather than from the PostgreSQL access-control
+list. That claim is argued throughout Section~\ref{sec:threat_model}; this experiment
+measures it. Each mutation is applied directly with \texttt{psql}, never through an
+application code path, and is reverted before the next case.
+
+\emph{A forged grant does not release material.} Inserting a
+\texttt{document\_access} row granting read capability to a user who holds no
+ledger grant left the two stores disagreeing --- the database reported the
+capability, \texttt{CheckAccess} reported \texttt{false} --- and both the ciphertext
+and wrapped-key endpoints denied the request (HTTP~403), exactly as they had before
+the mutation. An attacker with full write access to the operational store gains
+nothing on the release path.
+
+\emph{A deleted grant does not revoke.} The mirror case is the more operationally
+consequential one. Deleting the row of a user who \emph{does} hold a ledger grant did
+not stop ciphertext release: the ledger still authorized, and the download continued
+to succeed. The wrapped-key endpoint returned HTTP~403, because it is gated on the
+operational row rather than on chaincode. Database writes are therefore inert in both
+directions on the ciphertext path, which is the intended property, but the asymmetry
+is worth stating plainly: an operator who deletes a row and observes the wrapped-key
+denial may reasonably but wrongly conclude that access has been revoked. Revocation
+must go through the ledger path
+(Experiments~\hyperref[sec:exp_orderer_outage]{16} and~\hyperref[sec:exp_orderer_reconcile]{16b}).
+
+\emph{The organization fallback is confirmed by measurement.} A member of the owning
+organization holding no grant in either store received the ciphertext (HTTP~200),
+because \texttt{CheckAccess} falls through to an ownership check on the requesting
+organization. The wrapped key was refused, since no per-recipient grant exists. This
+bounds how far the first result generalizes: the ledger path is authoritative, but
+its policy is permissive within the owning organization, and the exposure is real
+rather than hypothetical. It is the same limitation recorded in
+Table~\ref{tab:framework_vs_prototype} and in the answer to RQ1, now evidenced
+end to end rather than inferred from the chaincode.
+
+\emph{Denials are anchored.} Building this experiment surfaced a gap in the audit
+trail: a request refused by chaincode policy produced no audit record at all, so a
+defeated probe left no trace, and only successful reads and outage-driven denials
+were recorded. Policy denials are now emitted as \texttt{ACCESS\_DENIED} events
+carrying the refusal reason and the requester's organization, and anchored to the
+ledger like grants; a document that previously accumulated no denial records across
+this sequence now accumulates three. The property that matters is not the count but
+the anchoring: a refused attempt is independently verifiable by consortium peers
+rather than resting on the honesty of the server that refused it, which is what makes
+the audit claim in Scenario~S1 checkable.
 
 % =========================================================================
 % SECTION VII --- LIMITATIONS AND FUTURE WORK
@@ -3873,7 +3937,10 @@ Second, per-user \texttt{CheckAccess} enforcement was demonstrated for
 cross-organization access. Intra-organization requests still authorize
 by organization membership at the ledger layer (an exposure bounded
 to ciphertext release, since document keys are issued only against
-per-recipient grants), and removing that fallback is the primary
+per-recipient grants, and measured directly in
+Experiment~\hyperref[sec:exp_db_mutation]{18}: an organization member
+with no grant in either store receives ciphertext but is refused the
+wrapped key), and removing that fallback is the primary
 production hardening step.
 
 Third, and specific to time-bounded access, the answer is affirmative for
