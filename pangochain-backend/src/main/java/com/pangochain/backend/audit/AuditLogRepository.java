@@ -20,4 +20,13 @@ public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
     Page<AuditLog> findByResourceIdAndEventType(String resourceId, String eventType, Pageable pageable);
     List<AuditLog> findByFabricTxId(String fabricTxId);
     long countByActorId(UUID actorId);
+
+    /**
+     * Audit rows above the anchoring watermark: the durable backlog awaiting a checkpoint.
+     * The rows are already committed to PostgreSQL, so this backlog survives restart, which
+     * is what the fire-and-forget pipeline of Experiment 14 could not do.
+     */
+    List<AuditLog> findByIdGreaterThanOrderByIdAsc(Long watermark, Pageable pageable);
+
+    long countByIdGreaterThan(Long watermark);
 }

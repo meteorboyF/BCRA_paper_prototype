@@ -96,6 +96,17 @@ documents:
   # measurement in the paper exercises that mode.
   material-db-fallback-enabled: ${DOCUMENT_MATERIAL_DB_FALLBACK:false}
 
+audit:
+  # Batched, durable anchoring of audit events (Experiment 14b, reviewer M3). Off by default:
+  # the on-path design does not need it, because its enforcement guarantee never depends on
+  # the audit pipeline. It exists so the audit-log-only baseline can be measured with a
+  # competent implementation instead of a fire-and-forget one, since the original comparison
+  # reported a naive pipeline's anchor loss as if it were a property of that architecture.
+  anchor-backfill:
+    enabled: ${AUDIT_ANCHOR_BACKFILL:false}
+    batch-size: ${AUDIT_ANCHOR_BATCH_SIZE:200}
+    interval-ms: ${AUDIT_ANCHOR_INTERVAL_MS:2000}
+
 access:
   # Durable re-anchoring of revocations that could not reach the ledger (see
   # AnchorReconciliationWorker, Experiment 16b). The divergence window is outage duration
