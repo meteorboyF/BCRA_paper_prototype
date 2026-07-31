@@ -293,10 +293,17 @@ func (c *LegalContract) CheckAccess(
 		return "false", nil
 	}
 
-	// Check org-level ownership
-	if doc.OwnerOrg == userOrg {
-		return "true", nil
-	}
+	// Deliberately no implicit ownership fallback.
+	//
+	// This previously read `if doc.OwnerOrg == userOrg { return "true" }`, which let any
+	// member of the owning organization retrieve any of that organization's documents given
+	// only a document ID, with no grant issued by anyone. Experiment 18 measured it end to
+	// end. In legal practice that is not a minor over-permission: ethical walls and
+	// matter-level screening are the primary intra-firm access requirement, conflict
+	// screening depends on them, and privileged material carries a confidentiality horizon
+	// measured in decades, so "bounded to ciphertext" is a weak consolation against
+	// harvest-now-decrypt-later. Every principal now needs an explicit grant; the uploader
+	// receives one from RegisterDocument, so upload-then-download still works.
 
 	// Check if any org-level grant exists for userOrg
 	orgKey := "ORG:" + userOrg

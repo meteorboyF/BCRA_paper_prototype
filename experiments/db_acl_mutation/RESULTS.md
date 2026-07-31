@@ -65,13 +65,29 @@ was served (200/200) before any mutation.
    differently, returning 403, because it is gated on the operational row; that asymmetry is
    by design but is easy to misread as "access was revoked."
 
-3. **The organization fallback is confirmed by measurement, not code reading.** A LawFirmA
+3. **The organization fallback was confirmed by measurement, then removed.** A LawFirmA
    member holding no grant in *either* store received the ciphertext (HTTP 200), because
-   `CheckAccess` falls through to `doc.OwnerOrg == userOrg`. This is reviewer finding **M5**
-   reproduced end to end, and it bounds how far finding 1 generalises: the ledger path is
-   authoritative, but its policy is permissive within the owning organization. The exposure
-   is bounded to ciphertext — the wrapped key is refused (403) because no per-recipient
-   grant exists — which matches what the manuscript already claims, now with evidence.
+   `CheckAccess` fell through to `doc.OwnerOrg == userOrg`. This is reviewer finding **M5**
+   reproduced end to end rather than read off the source, and it bounded how far finding 1
+   generalised: the ledger path was authoritative, but its policy was permissive within the
+   owning organization. The exposure was limited to ciphertext — the wrapped key was
+   refused because no per-recipient grant exists — matching what the manuscript claimed.
+
+   The fallback has since been deleted (chaincode v1.19, sequence 9). Re-running this
+   experiment against the fixed chaincode, case 3 becomes
+   `ledger=false ciphertext=403 wrapped_key=403`: a member of the owning organization with
+   no grant is denied outright. No compensating change was needed, because
+   `RegisterDocument` already writes an explicit owner grant into the ACL, so
+   upload-then-download continues to work; the legitimate cross-firm grantee in case 2 is
+   still served (200/200), confirming the removal did not over-reach.
+
+   | | before removal | after removal |
+   |---|---|---|
+   | same-org member, no grant | ledger `true`, ciphertext **200** | ledger `false`, ciphertext **403** |
+   | owner | served | served |
+   | explicitly granted cross-firm user | served | served |
+
+   Evidence: `results/20260731_100639/` (before), `results/20260731_103055/` (after).
 
 4. **Denied access attempts were not audited — found here and fixed.** On the first
    measured run, no audit record of any kind was written when `CheckAccess` returned false:

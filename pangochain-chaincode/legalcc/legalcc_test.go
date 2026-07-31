@@ -444,3 +444,67 @@ func TestCheckAccess_StaleAnchorStillAuthorisesLiveGrant(t *testing.T) {
 		t.Errorf("live grant should still be authorised against a stale anchor, got %q", result)
 	}
 }
+
+// ─── Organization fallback removal (reviewer M5) ──────────────────────────────
+
+// A member of the owning organization who holds no grant must be denied. This pins the
+// removal of the implicit `doc.OwnerOrg == userOrg` fallback: without an explicit grant,
+// sharing an organization with the document owner confers nothing.
+func TestCheckAccess_SameOrgWithoutGrantIsDenied(t *testing.T) {
+	ctx, stub := setupCtx(t, "tx-m5-deny")
+	contract := &LegalContract{}
+
+	_ = contract.RegisterDocument(ctx, "doc-m5", "case-m5", "hash", "Qm-m5", "owner-m5", "FirmAMSP", nowTS())
+	commitTx(stub, "tx-m5-deny")
+
+	stub.MockTransactionStart("tx-m5-check")
+	checkCtx := &testContext{stub: stub, cid: &mockClientIdentity{mspID: "FirmAMSP"}}
+	result, err := contract.CheckAccess(checkCtx, "doc-m5", "colleague-no-grant", "FirmAMSP")
+	commitTx(stub, "tx-m5-check")
+
+	if err != nil {
+		t.Fatalf("CheckAccess: %v", err)
+	}
+	if result != "false" {
+		t.Errorf("same-org user without a grant must be denied, got %q", result)
+	}
+}
+
+// The owner must retain access after the fallback removal, via the explicit self-grant
+// RegisterDocument creates. If this breaks, upload-then-download is broken.
+func TestCheckAccess_OwnerRetainsAccessWithoutFallback(t *testing.T) {
+	ctx, stub := setupCtx(t, "tx-m5-owner")
+	contract := &LegalContract{}
+
+	_ = contract.RegisterDocument(ctx, "doc-m5o", "case-m5o", "hash", "Qm-m5o", "owner-m5o", "FirmAMSP", nowTS())
+	commitTx(stub, "tx-m5-owner")
+
+	stub.MockTransactionStart("tx-m5-owner-check")
+	checkCtx := &testContext{stub: stub, cid: &mockClientIdentity{mspID: "FirmAMSP"}}
+	result, err := contract.CheckAccess(checkCtx, "doc-m5o", "owner-m5o", "FirmAMSP")
+	commitTx(stub, "tx-m5-owner-check")
+
+	if err != nil || result != "true" {
+		t.Errorf("owner must retain access via the explicit self-grant: got %q err=%v", result, err)
+	}
+}
+
+// An explicit grant to a same-org colleague must still work - the removal targets the
+// implicit fallback, not deliberate intra-firm sharing.
+func TestCheckAccess_SameOrgWithExplicitGrantIsAllowed(t *testing.T) {
+	ctx, stub := setupCtx(t, "tx-m5-grant")
+	contract := &LegalContract{}
+
+	_ = contract.RegisterDocument(ctx, "doc-m5g", "case-m5g", "hash", "Qm-m5g", "owner-m5g", "FirmAMSP", nowTS())
+	_ = contract.GrantAccess(ctx, "doc-m5g", "colleague-m5g", "FirmAMSP", CapRead, "", "wrapped", "owner-m5g")
+	commitTx(stub, "tx-m5-grant")
+
+	stub.MockTransactionStart("tx-m5-grant-check")
+	checkCtx := &testContext{stub: stub, cid: &mockClientIdentity{mspID: "FirmAMSP"}}
+	result, err := contract.CheckAccess(checkCtx, "doc-m5g", "colleague-m5g", "FirmAMSP")
+	commitTx(stub, "tx-m5-grant-check")
+
+	if err != nil || result != "true" {
+		t.Errorf("explicitly granted same-org colleague should have access: got %q err=%v", result, err)
+	}
+}
