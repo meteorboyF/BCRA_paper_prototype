@@ -478,7 +478,10 @@ public class DocumentService {
 
         log.info("ACL check: Layer1=PASS Layer2={} doc={} user={}",
                 allowed ? "PASS" : "FAIL", docId, requester.getEmail());
-        if (!allowed) throw new AccessDeniedException("Access denied for document " + docId);
+        if (!allowed) {
+            logPolicyAccessDenied(docId, requester);
+            throw new AccessDeniedException("Access denied for document " + docId);
+        }
     }
 
     private boolean allowDbAclFallback(UUID docId, User requester, FabricException cause) {
@@ -496,6 +499,26 @@ public class DocumentService {
                 )));
         log.warn("DB ACL fallback allowed document material access for doc={} user={}", docId, requester.getEmail());
         return true;
+    }
+
+    /**
+     * Records a chaincode policy denial on the release path.
+     *
+     * Until Experiment 18 this branch threw without auditing, so a rejected access attempt
+     * left no trace anywhere: only outage denials (below) and successful reads were
+     * recorded. That contradicted the manuscript's Scenario S1 claim that download attempts
+     * are "denied and audited", and it meant an attacker probing for documents was defeated
+     * but invisible - the case that matters most for a system whose value is an auditable
+     * record. Denials are the security-relevant half of an access log, so they are anchored
+     * on the same path as grants and reads.
+     */
+    private void logPolicyAccessDenied(UUID docId, User requester) {
+        auditService.log("ACCESS_DENIED", requester.getId(), "DOCUMENT", docId.toString(), null,
+                toJson(Map.of(
+                        "reason", "chaincode CheckAccess returned false",
+                        "mode", "policy_denial",
+                        "subjectOrg", requester.getFirm() != null ? requester.getFirm().getMspId() : "unknown"
+                )));
     }
 
     private void logFabricOutageAccessDenied(UUID docId, User requester, FabricException e) {

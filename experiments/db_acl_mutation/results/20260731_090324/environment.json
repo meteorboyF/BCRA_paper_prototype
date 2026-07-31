@@ -1,0 +1,7 @@
+{
+  "experiment": "18 - adversarial database ACL mutation",
+  "timestamp_utc": "2026-07-31T09:03:24Z",
+  "host": "Linux 7.0.11-76070011-generic x86_64",
+  "channel": "legal-channel", "chaincode": "legalcc",
+  "note": "backend must run with DOCUMENT_MATERIAL_DB_FALLBACK=false (shipped default)"
+}
