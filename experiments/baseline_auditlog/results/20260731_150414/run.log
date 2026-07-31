@@ -1,0 +1,28 @@
+[baseline 15:04:14] output: /home/angkon/Projects/Blockchain/FCDH_linux_validation/Fardeen_Codex_Dhaka_Meetup_Hackathon/experiments/baseline_auditlog/results/20260731_150414
+time="2026-07-31T21:04:15+06:00" level=warning msg="/home/angkon/Projects/Blockchain/FCDH_linux_validation/Fardeen_Codex_Dhaka_Meetup_Hackathon/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+ Container pangochain-ipfs Running 
+ Container pangochain-ipfs2 Running 
+ Container pangochain-postgres Running 
+[baseline 15:04:15] syncing backend Fabric crypto from fabric-cli
+[baseline 15:04:19] starting backend (profile: default, tag: default, extra env: )
+[baseline 15:04:33] creating bench user/case/document
+[baseline 15:04:33] using firm id 27bf6a54-c85f-43f9-aa80-dbf8960cb9fd (FirmAMSP)
+User activated (rows: UPDATE 1)
+[baseline 15:04:39] === mode A: onpath (conc: 10,50, 1000 req/level) ===
+  onpath conc=10: 469.5 req/s P50=16.6ms P95=44.5ms ok=1000/1000
+  onpath conc=50: 789.6 req/s P50=59.2ms P95=104.0ms ok=1000/1000
+[baseline 15:04:47] starting backend (profile: audit-log-only, tag: audit-log-only, extra env: )
+[baseline 15:05:01] === mode B: audit-log-only baseline ===
+  auditlog conc=10: 393.4 req/s P50=15.6ms P95=88.4ms ok=1000/1000
+  auditlog conc=50: 557.9 req/s P50=57.3ms P95=194.5ms ok=1000/1000
+[baseline 15:05:16] audit-log-only decisions recorded: 24 (fabric-anchored: 2651)
+[baseline 15:05:16] unanchored audit backlog after naive mode: 69 (lost on restart under fire-and-forget)
+[baseline 15:05:20] starting backend (profile: audit-log-only, tag: audit-log-only-durable, extra env: AUDIT_ANCHOR_BACKFILL=true)
+[baseline 15:05:38] === mode C: audit-log-only + durable batched anchoring ===
+  auditlog-durable conc=10: 142.3 req/s P50=32.8ms P95=239.3ms ok=1000/1000
+  auditlog-durable conc=50: 226.9 req/s P50=209.3ms P95=481.2ms ok=1000/1000
+[baseline 15:05:51] waiting for the durable pipeline to drain (it does not lose the backlog; it catches up)
+[baseline 15:09:27] unanchored backlog after durable mode: 16 (committed batches: 318)
+[baseline 15:09:31] rendering figure
+matplotlib unavailable: No module named 'matplotlib'
+[baseline 15:09:31] done: /home/angkon/Projects/Blockchain/FCDH_linux_validation/Fardeen_Codex_Dhaka_Meetup_Hackathon/experiments/baseline_auditlog/results/20260731_150414

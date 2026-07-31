@@ -39,18 +39,27 @@ stop_backend(){
 }
 trap stop_backend EXIT
 
-start_backend(){  # $1 = spring profile ("" for default)
+start_backend(){  # $1 = spring profile ("" for default); $2 = log tag; $3.. = extra env
+  local profile="$1"; local tag="${2:-${1:-default}}"; shift 2 || shift 1
   stop_backend
-  log "starting backend (profile: ${1:-default})"
+  log "starting backend (profile: ${profile:-default}, tag: $tag, extra env: $*)"
   # Source the root .env (DB_PASSWORD etc.) — compose loads it for postgres,
   # but a bare mvnw run would otherwise fall back to application.yml defaults
   # and fail DB auth.
   (cd "$ROOT_DIR/pangochain-backend" && \
     set -a && [[ -f "$ROOT_DIR/.env" ]] && source "$ROOT_DIR/.env"; set +a; \
-    FABRIC_ENABLED=true SPRING_PROFILES_ACTIVE="$1" ./mvnw -q spring-boot:run \
-    > "$OUT_DIR/backend_${1:-default}.log" 2>&1 &)
+    env FABRIC_ENABLED=true SPRING_PROFILES_ACTIVE="$profile" "$@" ./mvnw -q spring-boot:run \
+    > "$OUT_DIR/backend_${tag}.log" 2>&1 &)
   for _ in $(seq 1 180); do health_ok && return 0; sleep 1; done
-  log "backend did not become healthy (see backend_${1:-default}.log)"; exit 2
+  log "backend did not become healthy (see backend_${tag}.log)"; exit 2
+}
+
+# Audit rows above the anchoring watermark: the durable backlog. Under the naive pipeline
+# this is everything the fire-and-forget anchoring never reached, and it is lost on restart.
+audit_backlog(){
+  docker exec "$PG" psql -U pangochain -d pangochain -tA -c \
+    "SELECT count(*) FROM audit_log WHERE id > COALESCE((SELECT max(last_audit_id) FROM audit_anchor_batch WHERE status='COMMITTED'),0);" \
+    2>/dev/null | tr -d '[:space:]'
 }
 
 # ─── infrastructure ────────────────────────────────────────────────────────────
@@ -71,7 +80,7 @@ docker exec fabric-cli cat "$CLI_CRYPTO/users/Admin@firma.pangochain.com/msp/key
 chmod 600 "$CRYPTO_DIR/admin-key.pem"
 
 # ─── mode A: on-path enforcement (default profile) ─────────────────────────────
-start_backend ""
+start_backend "" "default"
 log "creating bench user/case/document"
 # Firm UUIDs are database-specific seeds; resolve FirmAMSP's actual id.
 PANGOCHAIN_FIRM_ID="$(docker exec "$PG" psql -U pangochain -d pangochain -tA \
@@ -90,7 +99,7 @@ AUDIT_A="$(pg_count ACL_AUDIT_LOG_ONLY || echo 0)"
 [[ "$((AUDIT_A - AUDIT0))" == "0" ]] || log "WARN: audit-log-only events fired in onpath mode!"
 
 # ─── mode B: audit-log-only baseline profile ───────────────────────────────────
-start_backend "audit-log-only"
+start_backend "audit-log-only" "audit-log-only"
 HTTP="$(curl -s -o /dev/null -w '%{http_code}' -H "Authorization: Bearer $PANGOCHAIN_JWT_TOKEN" "http://localhost:8080/api/documents/$PANGOCHAIN_TEST_DOC_ID/ciphertext")"
 [[ "$HTTP" == "200" ]] || { log "sanity check (auditlog) got HTTP $HTTP"; exit 3; }
 
@@ -101,6 +110,29 @@ AUDIT_B="$(pg_count ACL_AUDIT_LOG_ONLY || echo 0)"
 ANCHORED="$(docker exec "$PG" psql -U pangochain -d pangochain -tA \
   -c "SELECT count(*) FROM audit_log WHERE event_type='ACL_AUDIT_LOG_ONLY' AND fabric_tx_id IS NOT NULL;" | tr -d '[:space:]')"
 log "audit-log-only decisions recorded: $((AUDIT_B - AUDIT_A)) (fabric-anchored: $ANCHORED)"
+BACKLOG_NAIVE="$(audit_backlog)"
+log "unanchored audit backlog after naive mode: $BACKLOG_NAIVE (lost on restart under fire-and-forget)"
+
+# ─── mode C: audit-log-only with durable batched anchoring ─────────────────────
+# Reviewer M3: the naive baseline above anchors fire-and-forget, so its anchor loss is a
+# property of the implementation rather than of the audit-log-only architecture. This mode
+# gives the same architecture a durable, batched anchor pipeline so the comparison against
+# on-path enforcement is against a competent baseline rather than a strawman.
+start_backend "audit-log-only" "audit-log-only-durable" AUDIT_ANCHOR_BACKFILL=true
+HTTP="$(curl -s -o /dev/null -w '%{http_code}' -H "Authorization: Bearer $PANGOCHAIN_JWT_TOKEN" "http://localhost:8080/api/documents/$PANGOCHAIN_TEST_DOC_ID/ciphertext")"
+[[ "$HTTP" == "200" ]] || { log "sanity check (auditlog-durable) got HTTP $HTTP"; exit 3; }
+
+log "=== mode C: audit-log-only + durable batched anchoring ==="
+node "$EXP_DIR/loadgen.js" --mode auditlog-durable --out "$OUT_DIR" --conc "$CONCS" --requests "$REQUESTS"
+log "waiting for the durable pipeline to drain (it does not lose the backlog; it catches up)"
+for _ in $(seq 1 "${PANGOCHAIN_BL_DRAIN_WAIT:-180}"); do
+  [[ "$(audit_backlog)" -le 5 ]] && break
+  sleep 1
+done
+BACKLOG_DURABLE="$(audit_backlog)"
+BATCHES="$(docker exec "$PG" psql -U pangochain -d pangochain -tA \
+  -c "SELECT count(*) FROM audit_anchor_batch WHERE status='COMMITTED';" | tr -d '[:space:]')"
+log "unanchored backlog after durable mode: $BACKLOG_DURABLE (committed batches: $BATCHES)"
 
 stop_backend
 

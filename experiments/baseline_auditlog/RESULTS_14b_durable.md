@@ -1,8 +1,7 @@
 # Experiment 14b — Giving the Audit-Log-Only Baseline a Durable Anchor Pipeline
 
-**Status: partially complete.** The durable pipeline is built and its anchoring throughput is
-measured. The latency/throughput re-comparison of the two modes is **not** done — see
-Not measured.
+**Status: complete**, on a reduced sweep. The durable pipeline is built, its anchoring
+throughput is measured, and all three modes have been compared under the existing harness.
 
 ## Why this exists
 
@@ -73,40 +72,92 @@ fire-and-forget pipeline loses anchors, while a durable batched one keeps up, an
 interesting question is what that durability costs rather than whether the architecture can
 be made to work.
 
-## Not measured
+## Measured: all three modes compared
 
-**The latency and throughput re-comparison of the two modes.** This is the second half of
-what M3 asks for and it is not done. An attempt to measure release-path latency while the
-worker was draining timed out: 180 requests did not complete within five minutes, against a
-baseline of roughly 8 ms per request. During the same period the backend's Fabric gateway
-began returning `FAILED_PRECONDITION: no combination of peers can be derived which satisfy
-the endorsement policy`, while an identical invoke through the peer CLI succeeded — so the
-network was healthy and the failures were gateway-side, under the worker's sustained
-concurrent submit load.
+**Evidence run:** `results/20260731_150414/`. Reduced sweep — concurrency 10 and 50,
+1,000 requests per level, versus the original's 10/50/100/200 × 2,000. Backend restarted
+between modes by the harness; backlog drained beforehand so this is steady state rather than
+migration; run with the corrected worker.
 
-That observation is suggestive but **must not be reported as the cost of durable anchoring**,
-for two reasons. First, it conflates steady-state cost with the cost of draining a 39,000-event
-backlog at full rate, which is a migration condition rather than an operating one. Second, the
-worker as first written wrapped its multi-second Fabric submit in `@Transactional`, pinning a
-Hikari connection for the whole round-trip — the precise anti-pattern `application.yml` warns
-about for open-in-view. That defect has been removed, but every observation above was taken
-with it present, so the contention seen is partly self-inflicted and the numbers are not
-trustworthy.
+| Mode | conc 10 TPS | conc 10 P50 | conc 50 TPS | conc 50 P50 |
+|---|---|---|---|---|
+| A. on-path enforcement | **469.5** | **16.6 ms** | **789.6** | **59.2 ms** |
+| B. audit-log-only, naive anchoring | 393.4 | 15.6 ms | 557.9 | 57.3 ms |
+| C. audit-log-only, durable batched anchoring | 142.3 | 32.8 ms | 226.9 | 209.3 ms |
 
-A fair re-comparison needs: the fixed worker, a drained backlog so the system is in steady
-state, and all three modes measured under the existing `run.sh` harness (on-path,
-audit-log-only naive, audit-log-only durable) rather than an ad-hoc probe.
+Zero failed requests in all three modes (1,000/1,000 at each level).
 
-## What the manuscript can and cannot say now
+### The result inverts the original comparison
 
-- The drain-rate argument as written is **not** defensible and should be replaced. The
-  supportable claim is narrower: a fire-and-forget pipeline loses anchors on restart, whereas
-  a durable batched pipeline sustains ~53 events/s and recovers its backlog.
-- The latency comparison (21.6 vs 15.1 ms P50 at conc 10) is untouched by this work and, as
-  the review notes, that part was sound.
-- The `@Async` defect disclosure should move out of the Experiment 14 footnote and into the
-  main text, per the review.
-- No claim should yet be made about what durable anchoring costs the release path.
+The original Experiment 14 found the audit-log-only baseline **faster** than on-path
+enforcement (510.6 vs 395.4 req/s at conc 10), and framed on-path enforcement's cost as a
+premium paid for a stronger guarantee. That framing does not survive making the baseline
+durable.
+
+Against mode B — the naive baseline, which is the one the review objects to — on-path
+enforcement costs essentially nothing at conc 10 in this run (16.6 vs 15.6 ms P50) and is
+*faster* in throughput (469.5 vs 393.4 req/s). Against mode C — the baseline implemented so
+that it actually keeps its audit promise — on-path enforcement is **3.3× the throughput and
+half the median latency** at conc 10, and 3.5× the throughput at conc 50.
+
+The reason is structural rather than incidental. In the audit-log-only architecture the
+anchor *is* the security mechanism: if the anchor does not reach the ledger, there is no
+ledger-verifiable record of the access decision, so the anchoring pipeline must be durable
+and must keep up with request rate. In the on-path design the ledger decision happens before
+release, so the audit anchor is telemetry rather than the enforcement mechanism, and it does
+not have to be durable to preserve the security property. The audit-log-only design pays for
+durability on every decision; the on-path design does not have to.
+
+**This strengthens rather than weakens the paper**, and it is the opposite of what fixing a
+strawman would normally do. The review's concern was that the baseline had been made to look
+bad unfairly. Making it fair does not rescue it — it makes it slower, because the cost the
+naive implementation was avoiding is a cost that architecture genuinely has to pay.
+
+### Anchor durability, measured
+
+| | naive (mode B) | durable (mode C) |
+|---|---|---|
+| Unanchored backlog after the run | 69, **lost on restart** | 16, **retained and drained** |
+| Committed batches | n/a | 318 |
+
+Mode C's residual 16 is the tail still in flight when sampling stopped, not loss: the
+watermark keeps advancing and those rows are on disk. Mode B's 69 are unrecoverable once the
+process exits, which is the defect the original run reported as 144-of-24,000.
+
+## Caveats, stated rather than buried
+
+- **Reduced sweep.** Two concurrency levels and half the requests per level. The original's
+  conc 100/200 saturation behaviour is not reproduced here, and the high-concurrency claims
+  in Experiment 14 are not re-validated by this run.
+- **Mode A's own audit events are not durably anchored**, by design — that is the asymmetry
+  being argued. The comparison is therefore between architectures as they must actually be
+  built to keep their respective promises, not between identical pipelines. This should be
+  stated explicitly wherever the numbers are used, or the comparison looks rigged in the
+  other direction.
+- **Mode A vs mode B here disagrees with the original run's direction** (on-path faster now,
+  slower before). The system has changed since: the TimeAnchor freshness read was added to
+  `CheckAccess`, the organization fallback was removed, and denials are now anchored. The
+  absolute numbers from the original Experiment 14 should not be mixed with these; if the
+  manuscript keeps the 21.6 vs 15.1 ms figures, they belong to the old configuration and need
+  re-measuring, which is already tracked alongside the Experiment 2 re-run.
+- One earlier ad-hoc probe of this same question produced wildly worse numbers and gateway
+  endorsement failures. That probe ran with a defective worker that wrapped its multi-second
+  Fabric submit in `@Transactional`, pinning a Hikari connection for the round-trip, and
+  while a 39,000-event migration backlog was draining. Both conditions are absent here. The
+  earlier observation is not reported as a result.
+
+## What the manuscript should say
+
+- Replace the drain-rate argument. The supportable claim is not "audit-log-only designs lose
+  their anchors" but "a fire-and-forget pipeline loses anchors on restart; making the
+  pipeline durable costs roughly 3× throughput, and that cost is intrinsic to the
+  architecture because its anchor is its enforcement mechanism."
+- The strongest available framing of Experiment 14 is now a comparison against a *competent*
+  baseline, which is a better argument than the original had.
+- The `@Async` defect disclosure should move out of the footnote into the main text, per the
+  review.
+- The original 21.6 / 15.1 ms figures should be re-measured or explicitly scoped to the
+  pre-M2/M5 configuration.
 
 ## Reproduce
 

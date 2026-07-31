@@ -1,0 +1,7 @@
+{
+  "requests_per_level": 1000,
+  "concurrency_levels": "10,50",
+  "acl_audit_log_only_rows": 24,
+  "acl_audit_log_only_fabric_anchored": 2651,
+  "onpath_mode_leaked_baseline_events": 0
+}
