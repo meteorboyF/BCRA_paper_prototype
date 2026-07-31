@@ -261,3 +261,63 @@ the unfixed `grant()` path (see above) should be stated, not omitted.
   ```
   Note `dev.sh` does not source `.env` into the manual path — sourcing it is
   required or Liquibase fails on the DB password.
+
+---
+
+# Session handoff — 2026-08-01
+
+## Status
+
+| Item | State |
+|---|---|
+| M1 revocation outbox (Exp 16b) | done: code, live n=5, manuscript, figure |
+| M2 TimeAnchor (Exp 17, 17b sweep) | done: code, live, manuscript |
+| M3 durable baseline (Exp 14b) | done: code, live 3-mode, manuscript, figure |
+| M5 organization fallback | done: removed, live-verified, manuscript |
+| M10 adversarial DB mutation (Exp 18) | done: code, live, manuscript |
+| Item 6 TOST | done for the end-to-end comparison only |
+| Everything else (Tiers 2–5) | not started |
+
+Chaincode currently deployed: **legalcc v1.19, sequence 9**.
+
+## Next, in the order I would do it
+
+1. **Re-run Experiment 2 at function level.** Its 6.51 / 7.16 ms headline predates
+   the time-anchor read (+0.78 ms), the M5 removal, and denial anchoring, so it is
+   stale. Use `experiments/measure-latency.sh` (needs `JWT`, `DOC_ID`, `CASE_ID`),
+   then apply `experiments/baseline_auditlog/tost.py` to the new samples. The TOST
+   already committed covers the *end-to-end* comparison only and must not be
+   presented as validating the function-level figures.
+2. **Re-run Experiment 12** (per-document storage, ~7 KB/doc/peer). Removing the
+   organization fallback means every principal needs an explicit grant, so the ACL
+   map and the serialised document grow.
+3. **Check whether Experiments 11 and 13 actually moved** before re-running them.
+   Both are write-side; the M5 change was read-side. A null result is worth
+   reporting; a re-run on principle is not.
+4. **Tier 3 framing (items 15–18)** — restructure the contributions list, cite
+   `steichen2018blockchain` and `stathakopoulou2022smartbft` (both sit uncited in
+   the .bib), rewrite Table 1's ACL column. Cheap, and aimed at the novelty
+   objection the reviewer called the most likely reason to reject.
+5. Tier 4 crypto precision (19–23), Tier 5 hygiene (24–35).
+
+## Loose ends not in git
+
+- **Abstract is 260 words** (was 228). Check against BCRA's cap; ~10 words may
+  need cutting.
+- **`DIAGRAM_REDRAW_INSTRUCTIONS.md` is untracked**, so the Figure 7 spec and the
+  corrected Figure 1 note exist only on this machine.
+- **`~/Projects/Blockchain/Figures Updated/`** holds ten regenerated data charts
+  that added **in-figure titles**, against that file's own house rules ("no title
+  inside the figure", "no em dashes"). Confirmed on figs 1, 2 and 9 by rendering;
+  the other seven are inferred, not verified. Not copied into the repo.
+- `fig14_baseline.pdf`'s caption still asserts the single-digit-millisecond
+  premium; the body text was scoped to the old build but the caption was not.
+- The **backdating client** for Experiment 17 remains unbuilt, so the claim that a
+  compromised gateway cannot commit a backdated anchor is argued, not measured.
+  This is deliberately stated as a gap in both the paper and the results file.
+
+## How to resume
+
+Read `experiments/*/RESULTS.md` in the validation clone — each states what was
+measured, what was not, and what must not be claimed — and `git log` on both
+branches, where the commit messages carry the reasoning rather than just the diff.
