@@ -83,36 +83,86 @@ The database arm independently validates the host: at 6.44 ms it reproduces
 the published 7.16 ms scale (slightly faster), so this host is comparable to
 the one the original campaign ran on. The Fabric arm is the one that moved.
 
-## What is NOT established: why the ledger path is +4.5 ms slower
+## Decomposition: the gap is NOT the freshness read
 
-This run measures the gap. It does **not** decompose it, and the decomposition
-matters, because +4.48 ms is far more than the only change with a known price.
+The gap was decomposed by paired chaincode deployment, the same instrument
+Experiment 17 used: `disableFreshnessCheckForMeasurement` (types.go) removes
+the TimeAnchor read from `CheckAccess` and nothing else. Three chaincode
+sequences were measured back to back on the same quiet host, each with its own
+contemporaneous `db_only` baseline — an A/B/A on the chaincode dimension, so a
+one-off condition cannot masquerade as the treatment effect.
 
-Candidate contributions, none isolated here:
+| Run | Chaincode | Freshness read | Fabric P50 (n = 200) | `db_only` P50 | difference |
+|---|---|---|---|---|---|
+| `20260801_155550` | v1.19 seq 9 | **on** | 10.99 ms [10.71, 11.25] | 6.44 ms | +4.37 ms |
+| `20260801_161244` | v1.20 seq 10 | **off** | 11.30 ms [10.92, 11.74] | 6.83 ms | +4.40 ms |
+| `20260801_161824` | v1.21 seq 11 | **on** | 11.30 ms [10.88, 11.70] | 7.51 ms | +4.00 ms |
 
-1. **The TimeAnchor freshness read** — an extra ledger state read on every
-   CheckAccess, measured at **+0.78 ms** on a quiet host in Experiment 17
-   (v1.2 seq 3 control vs v1.3 seq 4 treatment). That accounts for under a
-   fifth of the observed change.
-2. **World-state growth.** The original figure was taken on a near-empty
-   ledger. This ledger now holds the full campaign history plus the 2,000
-   documents added by Experiment 12b. Experiment 12 independently measured
-   CheckAccess rising ~0.6 ms from 10³ to 10⁶ documents, which does not
-   obviously cover the remainder either.
-3. **Something else not yet identified.** Roughly 3.7 ms is unaccounted for.
+Direct control-vs-treatment on the two temporally adjacent runs (seq 10 off vs
+seq 11 on, n = 200 each):
 
-Stating a +4.48 ms regression with ~3.7 ms unexplained is precisely the shape
-of claim this review objected to — asserted rather than measured. **The
-decomposition should be measured before this goes in the paper.** The
-mechanism to do it already exists and was used once: the chaincode constant
-`disableFreshnessCheckForMeasurement` (types.go) removes the freshness read,
-and Experiment 17 measured the delta by deploying control and treatment as
-successive chaincode sequences. Repeating that on the current build and current
-world state would split the gap cleanly into "freshness read" and "everything
-else".
+- median difference **−0.00 ms**, mean difference **−0.10 ms**
+- 90 % CI **[−0.63, +0.42] ms**
+- Mann-Whitney **p = 0.75** — no detectable difference
 
-Until then, the honest manuscript statement is the measured gap plus an
-explicit note that only +0.78 ms of it is attributed.
+**Removing the freshness read does not make `CheckAccess` measurably faster.**
+The Fabric arm reads 10.99 / 11.30 / 11.30 across the three sequences; the
+freshness-off configuration sits exactly on the two freshness-on values, and the
+spread between the two *identically configured* on-runs (0.31 ms) is larger than
+the on-versus-off difference (0.00 ms).
+
+So the +4 ms is **not** the cost of M2. It is the cost of the on-path ledger
+check itself on this build: a gRPC round trip to the peer plus chaincode
+execution against CouchDB, against a single local PostgreSQL query in the other
+arm. That reframes the finding substantially — this is not a regression
+introduced by the Tier 1 fixes, and the published 6.51 ms is the figure that
+does not reproduce, not a standard the current build fell short of.
+
+### This does not reproduce Experiment 17's +0.78 ms
+
+Experiment 17 measured the freshness read at **+0.78 ms P50** (control 7.25 vs
+treatment 8.04, n = 150 per arm, p < 10⁻¹⁵) on chaincode v1.2 seq 3 vs v1.3
+seq 4. That value lies **outside** this run's 90 % CI of [−0.63, +0.42].
+
+The two are not necessarily in contradiction — they are different chaincode
+generations (v1.2/v1.3 vs v1.20/v1.21), different world state, and different
+host sessions — but they cannot both be quoted as the current cost. The
+defensible statement for the paper is that on the shipped build the freshness
+read's cost is **not detectable, bounded above by roughly 0.6 ms at 90 %
+confidence**. The most likely mechanism for the difference is that `TIMEANCHOR`
+is now a hot key: the heartbeat rewrites it every 60 s and every `CheckAccess`
+reads it, so it stays in CouchDB's cache, whereas in Experiment 17 the heartbeat
+was newly introduced. That mechanism is **plausible but unmeasured** — it is
+offered as a hypothesis, not a finding, and Experiment 17's write-up carries a
+pointer to this result.
+
+### Verification that the flag actually took effect
+
+A silently-unapplied flag would have produced exactly this result — control
+equal to treatment — so the deployment was verified rather than assumed. The
+ccaas package ID is derived from the connection package and its version label,
+**not** from the chaincode binary, so a changing package ID proves nothing. The
+Docker image ID does:
+
+- `disableFreshnessCheckForMeasurement = true` → `sha256:cfbc29bc26da…`
+- `disableFreshnessCheckForMeasurement = false` → `sha256:ad29b61b7a8a…`
+
+Different images from a one-line source change, with `docker inspect legalcc`
+confirming the running container used the corresponding image in each case, and
+`querycommitted` confirming v1.20/seq 10 and v1.21/seq 11 respectively.
+
+## Remaining limitation: the database arm drifts upward
+
+Across the three runs the `db_only` arm rose monotonically: 6.44 → 6.83 →
+7.51 ms over about 25 minutes. Each run appends audit rows and a document, so
+some growth is expected, but the trend is not explained and it is large enough
+to move the reported difference (+4.37 → +4.40 → +4.00 ms). The Fabric arm did
+not drift correspondingly.
+
+This does not threaten the qualitative finding — every Fabric measurement is
+3.5–4.9 ms above every contemporaneous database measurement — but it does mean
+the difference should be quoted as a range of roughly **+4.0 to +4.4 ms**
+rather than to two decimal places from any single run.
 
 ## The drift control: better, still not passing
 

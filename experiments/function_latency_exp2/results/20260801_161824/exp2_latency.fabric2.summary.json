@@ -1,0 +1,39 @@
+{
+  "fabric": {
+    "checkaccess": {
+      "cold": {
+        "n": 100,
+        "mean": 14.461,
+        "p50": 13.526,
+        "min": 8.604,
+        "max": 55.824,
+        "stdev": 5.775
+      },
+      "warmed": {
+        "n": 100,
+        "mean": 12.641,
+        "p50": 11.723,
+        "min": 8.604,
+        "max": 30.639,
+        "stdev": 3.629
+      },
+      "bad": 0
+    }
+  },
+  "_meta": {
+    "fabric": {
+      "timestamp": "2026-08-01T16:19:16+0600",
+      "doc_id": "2bc04c38-9cba-4e31-b900-4903b5c6a29f",
+      "case_id": "2ac35e8f-be42-4e7b-9674-5be0c364917c",
+      "method": "fabric2",
+      "n_warm": 20,
+      "n_meas": 100,
+      "n_total": 120,
+      "host": "Linux-7.0.11-76070011-generic-x86_64-with-glibc2.39",
+      "python": "3.12.3",
+      "chaincode": "Version: 1.21, Sequence: 11",
+      "fabric_enabled": "true",
+      "material_db_fallback": "false"
+    }
+  }
+}

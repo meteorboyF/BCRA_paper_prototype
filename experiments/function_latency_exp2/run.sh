@@ -76,7 +76,10 @@ echo "chaincode: $CC_LABEL"
 bash "$HERE/restart-backend.sh" fabric
 snapshot_host "fabric bracket 1"
 FX=$(login_and_fixture); echo "$FX" > "$OUT/fixture_fabric1.json"
-measure_arm fabric checkaccess,registerdoc "$OUT/fixture_fabric1.json" fabric1
+# RegisterDocument costs ~4 min (120 x one 2 s BatchTimeout) and is insensitive to
+# read-path changes, so it is skippable when only the read comparison is wanted --
+# e.g. the freshness-read decomposition, which varies chaincode, not the write path.
+measure_arm fabric "${EXP2_BRACKET1_OPS:-checkaccess,registerdoc}" "$OUT/fixture_fabric1.json" fabric1
 mv "$OUT/exp2_latency.csv" "$OUT/exp2_latency.fabric1.csv"
 mv "$OUT/exp2_latency.summary.json" "$OUT/exp2_latency.fabric1.summary.json"
 

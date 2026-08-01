@@ -1,0 +1,30 @@
+## fabric bracket 1  2026-08-01T16:18:37+06:00
+ 16:18:37 up 10 days, 22:34,  1 user,  load average: 0.86, 0.66, 0.67
+               total        used        free      shared  buff/cache   available
+Mem:            7296        4725        1201         387        2260        2570
+Swap:          11392        3595        7797
+pgpgin 517605365
+pgpgout 438913276
+pswpin 77024134
+pswpout 95493597
+
+## db_only  2026-08-01T16:18:57+06:00
+ 16:18:57 up 10 days, 22:35,  1 user,  load average: 1.09, 0.72, 0.69
+               total        used        free      shared  buff/cache   available
+Mem:            7296        4607        1316         387        2263        2688
+Swap:          11392        3594        7797
+pgpgin 517609281
+pgpgout 438919068
+pswpin 77024276
+pswpout 95493597
+
+## fabric bracket 2  2026-08-01T16:19:13+06:00
+ 16:19:13 up 10 days, 22:35,  1 user,  load average: 1.45, 0.82, 0.72
+               total        used        free      shared  buff/cache   available
+Mem:            7296        4735        1180         387        2271        2561
+Swap:          11392        3594        7798
+pgpgin 517610473
+pgpgout 438934152
+pswpin 77024310
+pswpout 95493597
+

@@ -1,0 +1,39 @@
+{
+  "db_only": {
+    "checkaccess": {
+      "cold": {
+        "n": 100,
+        "mean": 9.828,
+        "p50": 8.467,
+        "min": 4.522,
+        "max": 61.248,
+        "stdev": 6.219
+      },
+      "warmed": {
+        "n": 100,
+        "mean": 8.03,
+        "p50": 7.513,
+        "min": 4.433,
+        "max": 24.325,
+        "stdev": 2.813
+      },
+      "bad": 0
+    }
+  },
+  "_meta": {
+    "db_only": {
+      "timestamp": "2026-08-01T16:18:59+0600",
+      "doc_id": "2bc04c38-9cba-4e31-b900-4903b5c6a29f",
+      "case_id": "2ac35e8f-be42-4e7b-9674-5be0c364917c",
+      "method": "dbonly",
+      "n_warm": 20,
+      "n_meas": 100,
+      "n_total": 120,
+      "host": "Linux-7.0.11-76070011-generic-x86_64-with-glibc2.39",
+      "python": "3.12.3",
+      "chaincode": "Version: 1.21, Sequence: 11",
+      "fabric_enabled": "false",
+      "material_db_fallback": "true"
+    }
+  }
+}

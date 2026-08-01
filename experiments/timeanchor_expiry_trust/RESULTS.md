@@ -48,6 +48,19 @@ significant rather than equivalent: the extra read genuinely costs something. Th
 question for the paper is whether it costs enough to matter, and at 0.78 ms against RQ2's
 50 ms interactivity threshold it does not.
 
+> **Superseded as a statement about the current build (2026-08-01).** The same
+> paired toggle re-run on chaincode v1.20 seq 10 (control) vs v1.21 seq 11
+> (treatment), n = 200 per arm, found **no detectable cost**: mean difference
+> −0.10 ms, 90 % CI [−0.63, +0.42], Mann-Whitney p = 0.75. The +0.78 ms above
+> lies outside that interval. The two results are not directly contradictory —
+> different chaincode generations, world state, and host session — but they
+> cannot both be quoted as the freshness read's current price. For the shipped
+> build the defensible claim is that the cost is not detectable and is bounded
+> above by roughly 0.6 ms at 90 % confidence. A plausible but **unmeasured**
+> mechanism is that `TIMEANCHOR` is now a hot key, rewritten every 60 s by the
+> heartbeat and read by every `CheckAccess`, so it stays cached. See
+> `experiments/function_latency_exp2/RESULTS.md`.
+
 **These absolute numbers are not comparable to Experiment 2's 6.51 ms.** That figure comes
 from a different harness and endpoint. Only the paired delta is transferable; if the paper
 wants a revised absolute P50 for the release path, Experiment 2 must be re-run under its own
