@@ -3203,6 +3203,30 @@ $10^6$ measurement lands within 0.1\,\% of the linear extrapolation
 from $10^5$), i.e., one million documents occupy roughly 7\,GB per peer,
 commodity-hardware territory for a realistic legal archive.
 
+Document count is not the only axis of growth. The TimeAnchor introduced
+in Experiment~\hyperref[sec:exp_timeanchor]{17} refreshes on a fixed
+schedule, and each refresh is a \emph{submit}, so it occupies a block
+permanently whether or not any document is registered. Re-measuring on the
+current build (chaincode v1.19) confirms the per-document constant is
+unchanged --- 5{,}751\,bytes of block store per document, within 2.4\,\% of
+the figure above --- but with document activity held at zero the ledger
+still grows at 7.84\,MB/day per peer (90.7\,B/s, $R^2 = 1.0000$ over
+20\,min; exactly one block per minute at 5{,}470\,bytes, matching the
+60\,s default refresh interval). Storage therefore scales as
+$a\cdot\text{documents} + b\cdot\text{time}$ rather than in documents
+alone. The time term is not negligible over a retention horizon: at the
+default interval it contributes $\approx$2.9\,GB per peer per year, so a
+decade of custody costs roughly 29\,GB per peer --- about four times what a
+million documents cost --- for an archive that receives nothing further.
+This is the standing cost of a trustworthy clock rather than a defect, since
+an anchor that is never refreshed bounds nothing, and it is directly
+tunable: the interval is a configuration parameter, and lengthening it
+lowers the storage rate proportionally while loosening the backdating bound
+that Experiment~\hyperref[sec:exp_timeanchor]{17} quantifies. We report the
+block store only, which is append-only; the CouchDB state database is
+compacted, so its size is a sawtooth from which no meaningful idle rate can
+be fitted.
+
 \begin{figure*}[!t]
     \centering
     \includegraphics[width=\textwidth]{fig12_ledger_growth.pdf}
