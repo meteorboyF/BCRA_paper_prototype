@@ -1,0 +1,8 @@
+{
+ "jwt": "<redacted: bearer token not committed>",
+ "docId": "049232f0-246a-47d9-93ea-61fbf2559720",
+ "caseId": "2c7d2a78-af55-4428-ae5d-fad17715ca90",
+ "ownerId": "2da33882-524e-479d-acd6-1fa46d0dd600",
+ "ownerEmail": "a.rahman@lawfirm-a.example",
+ "ownerMsp": "FirmAMSP"
+}
