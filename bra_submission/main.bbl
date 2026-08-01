@@ -1,4 +1,4 @@
-\begin{thebibliography}{10}
+\begin{thebibliography}{100}
 \expandafter\ifx\csname url\endcsname\relax
   \def\url#1{\texttt{#1}}\fi
 \expandafter\ifx\csname urlprefix\endcsname\relax\def\urlprefix{URL }\fi
@@ -148,6 +148,15 @@ R.~Mukta, S.~Pal, K.~Chowdhury, M.~Hitchens, H.-y. Paik, S.~S. Kanhere, Zero
   and Applications 7~(1) (2026) 100319.
 \newblock \href {https://doi.org/10.1016/j.bcra.2025.100319}
   {\path{doi:10.1016/j.bcra.2025.100319}}.
+
+\bibitem{steichen2018blockchain}
+M.~Steichen, B.~Fiz, R.~Norvill, W.~Shbair, R.~State, Blockchain-based,
+  decentralized access control for {IPFS}, in: 2018 IEEE International
+  Conference on Internet of Things (iThings) and IEEE Green Computing and
+  Communications (GreenCom) and IEEE Cyber, Physical and Social Computing
+  (CPSCom) and IEEE Smart Data (SmartData), IEEE, 2018, pp. 1499--1506.
+\newblock \href {https://doi.org/10.1109/Cybermatics_2018.2018.00253}
+  {\path{doi:10.1109/Cybermatics_2018.2018.00253}}.
 
 \bibitem{jaoude2019blockchain}
 J.~Abou~Jaoude, R.~G. Saade, Blockchain applications--usage in different
@@ -505,6 +514,13 @@ M.~B. Jones, J.~Bradley, N.~Sakimura, {JSON Web Token (JWT)}, RFC 7519 (May
   2015).
 \newblock \href {https://doi.org/10.17487/RFC7519}
   {\path{doi:10.17487/RFC7519}}.
+
+\bibitem{stathakopoulou2022smartbft}
+A.~Barger, Y.~Manevich, H.~Meir, Y.~Tock, A byzantine fault-tolerant consensus
+  library for hyperledger fabric, in: 2021 IEEE International Conference on
+  Blockchain and Cryptocurrency (ICBC), IEEE, 2021, pp. 1--9.
+\newblock \href {https://doi.org/10.1109/ICBC51069.2021.9461099}
+  {\path{doi:10.1109/ICBC51069.2021.9461099}}.
 
 \bibitem{fabricBFTConfigurationDoc}
 {Hyperledger Fabric Documentation Contributors},

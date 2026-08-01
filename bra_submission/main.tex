@@ -326,41 +326,69 @@ the complete framework design and the current implementation.
 \label{sec:contributions}
 
 
-The primary contributions of this work are fourfold. First, the core
-contribution is the measured relocation of the document-release
-authorization boundary from application-only trust to ledger-verifiable
-access-control state on the normal release path. The framework does not
+The primary contributions of this work are fourfold, and all four are
+measurement results rather than design proposals. The framework does not
 propose a new access-control primitive, a Byzantine-fault-tolerant ordering
-protocol, or a production-ready legal deployment. Fail-closed behavior is
-empirically confirmed for the download path. Against the closest current
-systems, the delta is measurement scope: RBAC-IPFS~\cite{liu2026rbacipfs}
-prices on-path authorization for generic IPFS file sharing and zero-trust
-delegation~\cite{mukta2026zerotrust} verifies capabilities on-ledger, but
-no prior Fabric-and-IPFS document system, including RBAC-IPFS, reports
-measured fail-closed behavior under ledger outage, and none quantifies
-the end-to-end premium of on-path enforcement over the audit-log-only
-architecture it replaces.
+protocol, or a production-ready legal deployment.
 
-Second, a proof-of-concept prototype is implemented and evaluated for a
-three-organization legal consortium using Hyperledger Fabric, a
-private two-node IPFS swarm, PostgreSQL operational storage, and a
-Spring Boot REST gateway. The evaluation uses the REST-gateway
-workload rather than an isolated peer/orderer microbenchmark, so the
-reported throughput reflects the application path exercised by legal
-document registration and retrieval.
+\textbf{First, a measured relocation of the release-path authorization
+boundary}, from application-only trust to ledger-verifiable access-control
+state, \emph{scoped to the read path}. Every protected download is
+authorized by a chaincode evaluate against committed ledger state before
+ciphertext or wrapped keys are released. Write-side authorization remains
+custodial, and we do not claim otherwise.
 
+\textbf{Second, measured asymmetric failure behavior}: reads fail closed
+while writes are availability-first, with the resulting divergence
+quantified rather than argued. Under ledger unavailability successful
+downloads fall to exactly zero (Experiment~\hyperref[sec:exp_failclosed]{9}),
+but a revocation issued during an ordering-service outage does not reach the
+ledger, and the release path continues to authorize from last-committed
+state for the outage's duration
+(Experiment~\hyperref[sec:exp_orderer_outage]{16}). Durable re-anchoring
+bounds that divergence to the outage itself, reconverging without operator
+action in a median of 15.9\,s
+(Experiment~\hyperref[sec:exp_orderer_reconcile]{16b}). To our knowledge no
+prior Fabric-and-IPFS document system reports either half of this behavior
+under measurement.
 
-Third, cryptographic mechanisms are integrated for document
-confidentiality, key distribution, integrity anchoring, and user-level
-signing. The framework uses AES-256-GCM for document encryption,
-ECIES-style P-256 for per-recipient key wrapping, and ECDSA P-256 for
-document signatures. Experiment~\hyperref[sec:exp_crypto]{6} shows that the main measured
-advantage of ECIES in this setting is compact token size: 125 bytes
-per recipient compared with 256 bytes for RSA-OAEP~2048, a
-51.2\,\% reduction. Timing results are reported as Node.js WebCrypto
-fallback measurements rather than browser-performance claims.
+\textbf{Third, a scale characterization of the release path.} The access
+check is effectively flat across three orders of magnitude of world-state
+growth, from $10^3$ to $10^6$ documents
+(Experiment~\hyperref[sec:exp_ledgergrowth]{12}), and across two to seven
+organizations (Experiment~\hyperref[sec:exp_netscale]{13}), with
+per-document storage measured at $\approx$7\,KB per peer. Ledger growth is
+additionally characterized in time as well as in document count, since the
+time anchor accrues storage on a fixed schedule.
 
-Fourth, an evidence-backed performance evaluation is provided. It covers
+\textbf{Fourth, the end-to-end price of on-path enforcement} against a
+\emph{durable} audit-log-only baseline --- the architecture this design
+replaces --- rather than against a fire-and-forget straw man
+(Experiment~\hyperref[sec:exp_durable_baseline]{14b}).
+
+Against the closest current systems the delta is measurement scope:
+RBAC-IPFS~\cite{liu2026rbacipfs} prices on-path authorization for generic
+IPFS file sharing, zero-trust delegation~\cite{mukta2026zerotrust} verifies
+capabilities on-ledger, and Steichen et al.~\cite{steichen2018blockchain}
+gate IPFS retrieval on a smart contract, but none reports measured
+fail-closed behavior under ledger outage, none quantifies the divergence a
+write-side outage induces, and none quantifies the end-to-end premium of
+on-path enforcement over the audit-log architecture it replaces.
+
+The prototype supporting these results is implemented for a
+three-organization legal consortium using Hyperledger Fabric, a private
+two-node IPFS swarm, PostgreSQL operational storage, and a Spring Boot REST
+gateway. Cryptographic mechanisms are standard and are treated as
+engineering rather than contribution: AES-256-GCM for document encryption,
+an ECIES-style P-256 hybrid wrap for per-recipient key distribution, and
+ECDSA P-256 for document signatures, with
+Experiment~\hyperref[sec:exp_crypto]{6} reporting their cost as Node.js
+WebCrypto fallback measurements rather than browser-performance claims.
+
+The supporting evaluation uses the REST-gateway workload rather than an
+isolated peer/orderer microbenchmark, so reported throughput reflects the
+application path exercised by legal document registration and retrieval. It
+covers
 throughput, latency, file-size effects, audit-query cost, synthetic WAN
 latency, \texttt{BatchTimeout} sensitivity, cryptographic operation cost,
 ledger-history depth, and outage behavior. At the canonical batch
@@ -409,16 +437,23 @@ auditor must still trust the system that made the decision.
 \scriptsize
 \renewcommand{\arraystretch}{1.18}
 \setlength{\tabcolsep}{4pt}
+% Column widths are tight: the "Ledger-eval. authz." header is stacked over
+% three short lines so the centred mark columns stay narrow and the trailing
+% X column keeps enough width to set more than one word per line.
 \begin{xltabular}{\textwidth}{@{}
->{\raggedright\arraybackslash}p{2.3cm}
->{\raggedright\arraybackslash}p{3.3cm}
->{\raggedright\arraybackslash}p{2.2cm}
+>{\raggedright\arraybackslash}p{2.1cm}
+>{\raggedright\arraybackslash}p{3.0cm}
+>{\raggedright\arraybackslash}p{1.9cm}
 c c c
 >{\raggedright\arraybackslash}X
 @{}}
 \caption{Comparison with representative blockchain-based legal,
 evidence-management, and access-controlled storage systems.
-ACL = access-control decision evaluated on the normal document-release path;
+Ledger-eval.\ authz.\ = the authorization decision for a specific document
+is evaluated against committed ledger state on the normal document-release
+path, before content or keys are returned. Network-level partitioning
+(for example Fabric channel membership) is ledger-backed but is not a
+per-document decision on that path, and is scored P rather than Y;
 Sig = user-level signature binding actor to document content;
 Rev = ledger-verifiable revocation or expiry.
 Y = supported; N = not supported; P = partial.}
@@ -427,7 +462,7 @@ Y = supported; N = not supported; P = partial.}
 \textbf{System} &
 \textbf{Primary contribution} &
 \textbf{Tools} &
-\textbf{ACL} &
+\shortstack{\textbf{Ledger-}\\\textbf{eval.}\\\textbf{authz.}} &
 \textbf{Sig} &
 \textbf{Rev} &
 \textbf{Main limitation relative to this work} \\
@@ -436,7 +471,7 @@ Y = supported; N = not supported; P = partial.}
 \multicolumn{7}{@{}l}{\textit{Table \thetable\ (continued)}}\\
 \toprule
 \textbf{System} & \textbf{Primary contribution} & \textbf{Tools} &
-\textbf{ACL} & \textbf{Sig} & \textbf{Rev} &
+\shortstack{\textbf{Ledger-}\\\textbf{eval.}\\\textbf{authz.}} & \textbf{Sig} & \textbf{Rev} &
 \textbf{Main limitation relative to this work} \\
 \midrule
 \endhead
@@ -460,8 +495,8 @@ Improves evidence lifecycle organization, but does not provide query-time docume
 Onyeashie et al.~\cite{onyeashie2025fabricEvidence} &
 Multi-party evidence workflow using Fabric channels and IPFS storage. &
 Fabric + IPFS &
-N & N & N &
-Supports workflow separation, but dynamic document ACL evaluation is not placed on every download path. \\
+P & N & N &
+Separates law-enforcement, forensic, and judicial workflows into distinct channels, so authorization is ledger-backed but enforced by channel membership rather than as a per-evidence decision on the retrieval path. \\
 
 Verma et al.~\cite{verma2021nyaya} &
 Tamper-evident judicial record management and timestamped action logging. &
@@ -476,10 +511,16 @@ N & N & N &
 Uses Fabric mainly for audit recording; per-request access enforcement and per-recipient key wrapping are not evaluated. \\
 
 Guo et al.~\cite{guo2024efficient} &
-Secure record storage and event auditing combining IPFS and Fabric. &
+EMR storage and sharing over separate attribution and data channels, with smart-contract identity verification. &
 Fabric + IPFS &
-N & N & N &
-Uses Fabric mainly for audit recording; per-request access enforcement and per-recipient key wrapping are not evaluated. \\
+P & N & N &
+Verifies identity via zero-knowledge proofs in chaincode and partitions records across channels, but the decision is an identity check plus channel scoping rather than a per-record authorization evaluated before release; usage records are written for audit. Per-recipient key wrapping and enforcement cost are not evaluated. \\
+
+Steichen et al.~\cite{steichen2018blockchain} &
+Modified IPFS whose retrieval is gated by an Ethereum smart-contract ACL --- the architectural ancestor of on-path authorization. &
+Ethereum + IPFS &
+Y & N & P &
+Permissionless identities rather than consortium MSPs, no measured behavior when the chain is unavailable, no per-recipient key wrapping (so a distributed key cannot be revoked), and generic file storage rather than a legal workflow. \\
 
 Liu et al.~\cite{liu2026rbacipfs} &
 Role-based access control for IPFS with root-CID smart-contract authorization on the retrieval path. &
@@ -624,7 +665,18 @@ primary contribution remains evidence management and audit recording. To the bes
 \subsubsection{Access-Control-Centric Fabric and IPFS Systems}
 
 A fourth line of work makes the access decision itself the primary
-contribution. FileWallet~\cite{chen2022filewallet} manages personal and
+contribution. The architectural ancestor of this pattern is Steichen et
+al.~\cite{steichen2018blockchain}, who gate IPFS retrieval on a smart
+contract so that a file is served only to an address the contract
+authorizes --- the same structural idea as evaluating authorization on the
+release path. Four differences matter here. Their deployment is
+permissionless Ethereum, so principals are key-pair addresses rather than
+consortium identities with an organizational MSP; there is no measurement of
+behavior when the chain is unavailable; keys are not wrapped per recipient,
+so revocation cannot be expressed against an already-distributed document
+key; and the setting is generic file storage rather than a legal workflow
+with time-bounded grants and a regulator role.
+FileWallet~\cite{chen2022filewallet} manages personal and
 organizational files on Fabric and IPFS with chaincode privilege checks,
 but validates them functionally rather than measuring their cost, and
 provides neither expiry nor per-recipient key distribution. Mukta et
@@ -654,12 +706,18 @@ regulator role).
 The reviewed literature reveals four gaps that motivate the proposed
 framework. First, most blockchain-based evidence systems provide
 tamper-evident storage or timestamping but leave authorization to the
-application layer: Liu and Zheng~\cite{liu2024blockchain}, Hanafi et
-al.~\cite{hanafi2021ipfschain}, and Guo et al.~\cite{guo2024efficient}
+application layer: Liu and Zheng~\cite{liu2024blockchain} and Hanafi et
+al.~\cite{hanafi2021ipfschain}
 anchor or audit access events without evaluating the decision against
 ledger state before release, so a compromised or overly privileged
 application server may still authorize access using state that is not
-independently verifiable at the time of access. RBAC-IPFS
+independently verifiable at the time of access. Where a ledger-backed
+check does exist it is typically coarser than a per-document decision:
+Guo et al.~\cite{guo2024efficient} verify identity in chaincode and
+partition records across channels, and Onyeashie et
+al.~\cite{onyeashie2025fabricEvidence} separate workflows by channel, so
+authorization is scoped by membership rather than evaluated per release.
+RBAC-IPFS
 \cite{liu2026rbacipfs} closes part of this gap for generic file sharing
 by pricing an on-path authorization; its remaining unmeasured aspects
 are those identified at the close of the previous subsection. Second, access-control models are often
@@ -2083,7 +2141,7 @@ configuration is a \emph{prototype constraint} rather than a
 framework recommendation. For deployments in which Byzantine fault
 tolerance is required, the SmartBFT ordering service introduced in
 Hyperledger Fabric~v3.0 is the recommended
-path~\cite{fabricWhatsNew3x,fabricOrderingServiceLatest,fabricBFTConfigurationDoc,androulaki2018hyperledger}. The current
+path~\cite{stathakopoulou2022smartbft,fabricWhatsNew3x,fabricBFTConfigurationDoc}. The current
 prototype uses Fabric~v2.4 Raft; migration to SmartBFT does not
 require changes to chaincode or application logic.
 
@@ -2761,7 +2819,8 @@ grounded, as summarized in Fig.~\ref{fig:latency}.
     \includegraphics[width=\textwidth]{fig2_latency.pdf}
 \caption{Experiment~2 function-level latency (P50, log scale; Linux,
 JVM-warmed; bootstrap 95\,\% confidence intervals):
-\texttt{CheckAccess} in both modes ($n{=}100$ each, overlapping CIs),
+\texttt{CheckAccess} in both modes (Fabric $n{=}200$ pooled across the two
+brackets, PostgreSQL $n{=}100$; \emph{disjoint} CIs),
 \texttt{RegisterDocument} ($n{=}100$), and the Experiment~4 audit
 trust/latency baselines ($n{=}10$ each).}
     \label{fig:latency}
@@ -3362,7 +3421,10 @@ pipeline and the workload re-run against all three modes
     audit-log-only baseline on the identical download workload:
     (a) gateway throughput; (b) request latency (P50, caps P95).
     The architectural premium of on-path enforcement is
-    single-digit milliseconds.}
+    single-digit milliseconds on the build measured here; as with the body
+    text, these values predate the time-anchor freshness read, the removal
+    of the organization fallback, and denial anchoring, and belong to that
+    configuration rather than the current one.}
     \label{fig:baseline}
 \end{figure*}
 
