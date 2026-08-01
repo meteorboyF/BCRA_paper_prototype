@@ -157,7 +157,7 @@ A Hybrid Approach Using Hyperledger Fabric and IPFS}
             country={Bangladesh}}
 
 \begin{abstract}
-Legal document management systems centralize trust in privileged administrators, making it difficult for external parties to verify whether access decisions or audit records have been altered. We present a hybrid legal-data management framework that places Hyperledger Fabric on the active document-release path rather than using it only as a passive audit log: every protected download must pass a chaincode access check before ciphertext or wrapped document keys are released (per-user enforcement is demonstrated for cross-organization access), and if Fabric is unavailable the path fails closed rather than falling back to a database access-control list. The framework combines browser-side encryption, ciphertext-only storage in a private IPFS swarm, and on-chain anchoring of hashes and content identifiers. Across sixteen experiments, the REST-gateway workload sustains 66--70 transactions per second at the default batch configuration and up to 193 with a reduced batch timeout, for the evaluated three-organization deployment; the ledger access check is statistically indistinguishable from a database-only check (6.51 vs.\ 7.16\,ms median, overlapping 95\,\% confidence intervals) and costs 6.5\,ms end to end over an audit-log-only baseline; outage experiments confirm zero successful downloads during Fabric unavailability with automatic recovery. Reads fail closed, but writes are availability-first: durable re-anchoring bounds the divergence from a revocation issued during an ordering-service outage to the outage itself, reconverging automatically in a median of 15.9\,s. Prior permissioned-ledger document systems anchor access decisions off the release path or price on-path authorization only for generic file sharing; none reports measured fail-closed behavior under ledger outage or the end-to-end cost of on-path enforcement against the audit-log architecture it replaces.
+Legal document management systems centralize trust in privileged administrators, making it difficult for external parties to verify whether access decisions or audit records have been altered. We present a hybrid legal-data management framework that places Hyperledger Fabric on the active document-release path rather than using it only as a passive audit log: every protected download must pass a chaincode access check before ciphertext or wrapped document keys are released (per-user enforcement is demonstrated for cross-organization access), and if Fabric is unavailable the path fails closed rather than falling back to a database access-control list. The framework combines browser-side encryption, ciphertext-only storage in a private IPFS swarm, and on-chain anchoring of hashes and content identifiers. Across sixteen experiments, the REST-gateway workload sustains 66--70 transactions per second at the default batch configuration and up to 193 with a reduced batch timeout, for the evaluated three-organization deployment; the ledger access check adds 4.4\,ms over a database-only check (11.0 vs.\ 6.4\,ms median), well inside the 50\,ms budget, and 6.5\,ms end to end over an audit-log-only baseline; outage experiments confirm zero successful downloads during Fabric unavailability with automatic recovery. Reads fail closed, but writes are availability-first: durable re-anchoring bounds the divergence from a revocation issued during an ordering-service outage to the outage itself, reconverging automatically in a median of 15.9\,s. Prior permissioned-ledger document systems anchor access decisions off the release path or price on-path authorization only for generic file sharing; none reports measured fail-closed behavior under ledger outage or the end-to-end cost of on-path enforcement against the audit-log architecture it replaces.
 \end{abstract}
 
 \begin{keyword}
@@ -371,8 +371,9 @@ workload sustains approximately 66--70\,TPS, about 4.0 to 4.2$\times$ above the 
 the highest measured throughput, 193.0\,TPS, for the evaluated
 three-organization deployment.
 
-Fabric \texttt{CheckAccess} latency is statistically indistinguishable from
-the PostgreSQL-only ACL path after warm-up. Experiment~\hyperref[sec:exp_failclosed]{9}
+Fabric \texttt{CheckAccess} latency exceeds the PostgreSQL-only ACL path by
+$\approx$4.4\,ms after warm-up, an order of magnitude inside the 50\,ms
+interactivity budget. Experiment~\hyperref[sec:exp_failclosed]{9}
 (Fig.~\ref{fig:failclosed}) demonstrates strict fail-closed security
 enforcement on the document-download path: successful downloads fall to
 exactly zero for the full 45-second Fabric unavailability window
@@ -848,7 +849,7 @@ LawFirmB reviewers with \texttt{ExpiresAt} set to the protective
 order's review window, wrapping the document key per recipient. Every
 LawFirmB download passes \texttt{CheckAccess} on the release path: the
 decision is evaluated against ledger state at request time
-(Experiment~\hyperref[sec:exp_latency]{2}: 6.51\,ms P50), so neither
+(Experiment~\hyperref[sec:exp_latency]{2}: 10.99\,ms P50), so neither
 firm's application administrators can quietly widen or extend access.
 When the window lapses, expiry is enforced by the chaincode's
 deterministic timestamp comparison: no cleanup job, no trust in
@@ -1903,7 +1904,7 @@ returned on the evaluated download path unless a \texttt{CheckAccess}
 evaluation against committed ledger state authorizes the requester at
 request time. \emph{Argument:} the release handler invokes chaincode
 before returning material (Experiment~\hyperref[sec:exp_latency]{2}
-measures this decision at 6.51\,ms P50); the decision reads
+measures this decision at 10.99\,ms P50); the decision reads
 world-state grants committed under A3. Expiry is evaluated against the
 transaction timestamp, which is deterministic across endorsers but, on
 an evaluate, originates in the caller's proposal: the grant
@@ -2672,16 +2673,35 @@ Experiment~\hyperref[sec:exp_latency]{2} and Experiment~\hyperref[sec:exp_filesi
 harness boundaries, so their values are reported as consistent observations
 rather than additive components.
 
-On native Linux~x86\_64 with JVM warm-up, Fabric access checks are
-operationally indistinguishable from the DB-only path across the full
-latency distribution (Table~\ref{tab:exp2dist}). Inter-quartile ranges
-overlap, P99 differs by only 2.3\,ms, and a two-tailed Mann-Whitney $U$
-test finds no statistically significant difference ($U = 4500.0$,
-$p = 0.22$, $n = 100$ per path). Both paths remain below the 50\,ms
-interactive threshold at all measured percentiles, including P99
-(Fabric 15.5\,ms, DB-only 13.2\,ms). The slightly higher Fabric P99 is
-consistent with occasional gateway scheduling jitter and does not affect
-the threshold conclusion.
+On native Linux~x86\_64 with JVM warm-up, the ledger access check costs a
+measurable amount more than the DB-only path: \texttt{CheckAccess} runs at
+10.99\,ms P50 [10.71, 11.25] against 6.44\,ms [6.21, 6.70] for the
+PostgreSQL ACL lookup, a difference of $+4.37$\,ms (90\,\% CI [3.81, 4.93];
+two-tailed Mann-Whitney $p = 1.0 \times 10^{-31}$), with the full
+distribution in Table~\ref{tab:exp2dist}. Both paths remain far below the
+50\,ms interactive threshold of RQ2 at every measured percentile, and a
+two one-sided test against that pre-specified margin confirms equivalence
+within it ($p < 10^{-15}$). The cost is therefore real but not
+consequential for interactivity, which is the claim RQ2 actually makes.
+
+We report this difference as a cost rather than as equivalence. An earlier
+version of this experiment reported the two paths as statistically
+indistinguishable on the basis of a non-significant Mann-Whitney result;
+that inference was unsound --- failure to reject is not evidence of
+equivalence --- and it does not survive re-measurement on the current build.
+
+The difference is \emph{not} attributable to the TimeAnchor freshness read
+introduced in Experiment~\hyperref[sec:exp_timeanchor]{17}. Deploying
+chaincode with that read removed and restored, around the measurement above
+(sequences 10 and 11, $n = 200$ per configuration), changes
+\texttt{CheckAccess} by $-0.10$\,ms (90\,\% CI $[-0.63, +0.42]$,
+$p = 0.75$) --- no detectable effect, with the spread between two
+identically configured runs exceeding the on-versus-off difference. The
+$\approx$4\,ms is the standing cost of the on-path ledger check itself: a
+gRPC round trip to the peer and chaincode execution against the state
+database, against a single local SQL query in the comparison arm. Measured
+across three chaincode sequences the difference is stable at
+$+4.0$--$4.4$\,ms.
 
 A standalone PostgreSQL-only write baseline was not collected because the
 framework has no write path that bypasses Fabric. Measuring isolated
@@ -2701,25 +2721,27 @@ $\approx$96\,\% of total write latency.
 \caption{Read-path latency distribution:
          \texttt{CheckAccess} via Fabric gateway
          vs.\ DB-only ACL lookup, warmed runs
-         ($n = 100$ each, Linux x86\_64).}
+         (Linux x86\_64). The Fabric arm was measured twice, once on either
+         side of the DB-only arm, so host drift is observed rather than
+         assumed; both brackets are pooled here.}
 \label{tab:exp2dist}
 \renewcommand{\arraystretch}{1.15}
 \begin{tabular}{lcc}
 \hline
 & \textbf{Fabric} & \textbf{DB-only} \\
+& ($n = 200$) & ($n = 100$) \\
 \hline
-Mean (ms)   & 7.293 & 7.548 \\
-Std dev     & 2.352 & 2.092 \\
-P25 (ms)    & 5.698 & 5.895 \\
-P50 (ms)    & 6.510 & 7.162 \\
-P75 (ms)    & 8.458 & 8.753 \\
-P95 (ms)    & 10.871 & 11.283 \\
-P99 (ms)    & 15.498 & 13.232 \\
+Mean (ms)   & 11.651 & 7.284 \\
+Std dev     & 2.846 & 2.746 \\
+P25 (ms)    & 10.04 & 5.83 \\
+P50 (ms)    & 10.99 & 6.44 \\
+P75 (ms)    & 12.46 & 7.70 \\
+P95 (ms)    & 17.30 & 13.38 \\
+P99 (ms)    & 28.84 & 19.22 \\
 \hline
-\multicolumn{3}{l}{Mann-Whitney $U = 4500.0$,
-  $p = 0.22$ (two-tailed); inter-quartile} \\
-\multicolumn{3}{l}{ranges overlap; both
-  paths ${<}$50\,ms at P99.} \\
+\multicolumn{3}{l}{Mann-Whitney $p = 1.0\times10^{-31}$ (two-tailed);} \\
+\multicolumn{3}{l}{difference $+4.37$\,ms, 90\,\% CI [3.81, 4.93];} \\
+\multicolumn{3}{l}{TOST vs.\ $\pm$50\,ms: equivalent ($p < 10^{-15}$).} \\
 \hline
 \end{tabular}
 \end{table}
@@ -3148,7 +3170,7 @@ in-flight transactions for the two release-path functions
 load~600 with a flat 20\,ms average latency and zero failures,
 confirming that the ledger-side access decision is not the release-path
 bottleneck. The 20\,ms Caliper average and Experiment~%
-\hyperref[sec:exp_latency]{2}'s 6.51\,ms P50 measure different regimes
+\hyperref[sec:exp_latency]{2}'s 10.99\,ms P50 measure different regimes
 (600 concurrent in-flight transactions on the direct peer-gateway
 path versus a single sequential client through the REST gateway) and
 are complementary rather than conflicting.
@@ -3194,8 +3216,14 @@ and $10^6$ checkpoints (Fig.~\ref{fig:ledgergrowth}).
 Both queries are effectively flat across three orders of magnitude of
 world-state growth: \texttt{CheckAccess} P50 rises from 7.96\,ms at
 $10^3$ documents to 8.60\,ms at $10^6$ (+8\,\% for a $1000\times$ state
-increase), consistent with Experiment~\hyperref[sec:exp_latency]{2}'s
-6.51\,ms measured on a near-empty ledger, and
+increase). These checkpoints were measured on the build current at the
+time, whose function-level equivalent was Experiment~%
+\hyperref[sec:exp_latency]{2}'s then-reported 6.51\,ms on a near-empty
+ledger; the read path has since been re-measured at 10.99\,ms P50, so the
+flatness result should be read as an elasticity claim about world-state
+size rather than as an absolute that carries to the current build.
+\texttt{GetDocumentHistory} rises from 5.68 to 7.12\,ms over the same
+growth, and
 \texttt{GetDocumentHistory} rises from 5.68 to 7.12\,ms. Storage grows
 linearly at $\approx$5{,}618 bytes of block store plus 1{,}389 bytes of
 CouchDB state per document per peer ($\approx$7\,KB/document; the
@@ -3299,8 +3327,8 @@ On-path enforcement costs $+6.5$ to $+9.1$\,ms P50 per release at
 10--100 concurrent clients (e.g., 21.6 vs.\ 15.1\,ms at concurrency~10)
 and at most 10\,\% throughput at saturation; at 200 clients the
 on-path P95 is actually \emph{below} the baseline's. The end-to-end
-premium independently corroborates Experiment~%
-\hyperref[sec:exp_latency]{2}'s function-level 6.51\,ms figure on a
+premium independently corroborated Experiment~%
+\hyperref[sec:exp_latency]{2}'s then-current function-level figure on a
 different build five weeks later. These figures characterise the build
 measured at the time; the release path has since acquired the time-anchor
 freshness read (Experiment~\hyperref[sec:exp_timeanchor]{17}), lost the
@@ -3441,15 +3469,21 @@ Fig.~\ref{fig:crypto}); the prose uses the run-summary convention
 consistently throughout.}
 Two intervals carry the paper's central claims. First, the
 function-level ACL comparison of Experiment~\hyperref[sec:exp_latency]{2}
-yields \emph{overlapping} intervals (Fabric \texttt{CheckAccess}
-6.51\,ms [6.33, 7.22] vs.\ PostgreSQL 7.16\,ms [6.60, 7.81],
-$n{=}100$ each), so the ``no statistically significant added
-delay'' claim is interval-supported rather than merely asserted. Second,
+yields \emph{disjoint} intervals (Fabric \texttt{CheckAccess}
+10.99\,ms [10.71, 11.25], $n{=}200$, vs.\ PostgreSQL 6.44\,ms
+[6.21, 6.70], $n{=}100$), so the on-path cost is interval-supported
+rather than merely asserted, and so is its containment well inside the
+50\,ms budget. Second,
 Experiment~\hyperref[sec:exp_baseline]{14}'s end-to-end premium is
 significant but small: 21.62\,ms [21.39, 21.84] vs.\ 15.09\,ms
-[14.84, 15.36] at concurrency~10 ($n{=}2{,}000$ each). Across four
-independent setups (Experiments 2, 12, 13, and 14), the ledger access
-decision consistently lands at 4--9\,ms P50.
+[14.84, 15.36] at concurrency~10 ($n{=}2{,}000$ each). Across the
+independent setups of Experiments 12, 13, and 14 the ledger access
+decision lands consistently at 4--9\,ms P50; Experiment~%
+\hyperref[sec:exp_latency]{2}'s re-measurement on the current build sits
+above that band at 11.0\,ms. The three older figures were taken on
+earlier builds, so the spread reflects build and harness differences
+rather than variance within one configuration, and only the paired
+within-run differences should be compared across them.
 
 Table~\ref{tab:numbers_comparison} positions the measured numbers
 against the figures reported by the closest published systems. The
@@ -3503,7 +3537,7 @@ Core i5 (8 GB) and i9 (32 GB) hosts \\
 \midrule
 This work (gateway path) &
 Fabric 2.4 + IPFS, 3 orgs; custom REST loadgen &
-\texttt{CheckAccess} 6.51\,ms P50 [6.33, 7.22], $n{=}100$ &
+\texttt{CheckAccess} 10.99\,ms P50 [10.71, 11.25], $n{=}200$ &
 66--70\,TPS @2\,s batch; 193.0\,TPS [182.8, 203.2] @500\,ms batch &
 Core Ultra 5, 8\,GB \\
 This work (chaincode direct) &
@@ -3632,12 +3666,23 @@ it was measured rather than assumed. Two chaincode deployments differing only in
 whether that read executes were compared back to back on the same fixture and
 harness. The added read costs \textbf{0.78\,ms at the median} (7.25 to
 8.04\,ms; means 7.34 and 8.37\,ms; $n = 150$ per arm), a difference that is
-statistically clear (Mann-Whitney, $p < 10^{-15}$) and, unlike the comparison in
-Experiment~\hyperref[sec:exp_latency]{2}, should be read as a real cost rather
-than an equivalence. It remains far inside the 50\,ms interactivity threshold of
-RQ2. These absolute figures come from a different endpoint than
-Experiment~\hyperref[sec:exp_latency]{2} and are not directly comparable to its
-6.51\,ms; only the paired difference transfers.
+statistically clear (Mann-Whitney, $p < 10^{-15}$) on the build measured here,
+and it remains far inside the 50\,ms interactivity threshold of RQ2. These
+absolute figures come from a different endpoint than
+Experiment~\hyperref[sec:exp_latency]{2} and are not directly comparable to it;
+only the paired difference transfers.
+
+This cost does not reproduce on the current chaincode. Repeating the same
+paired toggle on sequences 10 and 11 ($n{=}200$ per arm) finds no detectable
+difference ($-0.10$\,ms, 90\,\% CI $[-0.63, +0.42]$, $p = 0.75$), placing the
+$+0.78$\,ms above outside the interval. The two runs differ in chaincode
+generation and world state, so they are not strictly contradictory, but only
+the newer figure describes the shipped build, for which the honest statement is
+that the freshness read's cost is undetectable and bounded above by
+$\approx$0.6\,ms. A plausible mechanism, which we did not measure, is that the
+anchor key is now hot: the heartbeat rewrites it every 60\,s and every
+\texttt{CheckAccess} reads it, so it stays resident in the state-database
+cache.
 
 \emph{Security-availability trade-off.} The bound is only as good as the
 anchor's freshness, and the gateway is also what refreshes it. It cannot move
@@ -4106,9 +4151,13 @@ denials on Fabric would require queue-and-replay support.
 
 \textbf{RQ2} asked whether chaincode-based access evaluation adds acceptable
 overhead for interactive legal workflows. The read-path threshold is met.
-Fabric \texttt{CheckAccess} and the PostgreSQL-only ACL baseline are
-statistically indistinguishable (6.51\,ms vs.\ 7.16\,ms P50, Mann-Whitney
-$U{=}4500.0$, $p{=}0.22$, $n{=}100$), and both remain below 15.5\,ms at P99.
+Fabric \texttt{CheckAccess} costs $+4.4$\,ms over the PostgreSQL-only ACL
+baseline (10.99 vs.\ 6.44\,ms P50, Mann-Whitney $p = 1.0\times10^{-31}$), a
+difference that is statistically clear but an order of magnitude inside the
+50\,ms threshold; a two one-sided test against that pre-specified margin
+confirms equivalence within it. The cost is the on-path ledger check itself
+rather than the time-anchor freshness read, which is not detectable on this
+build.
 
 The write-latency \textsc{SLO} is also met in absolute terms:
 \texttt{RegisterDocument} measured 2{,}084\,ms P50 against the 5\,s threshold.
@@ -4172,8 +4221,9 @@ legal deployment.
 
 The results show that this design can provide ledger-verifiable
 access-control state while maintaining practical performance for interactive
-legal workflows. Fabric access checks were statistically indistinguishable
-from the PostgreSQL-only ACL baseline on the evaluated read path, and the
+legal workflows. Fabric access checks cost $\approx$4.4\,ms more than the
+PostgreSQL-only ACL baseline on the evaluated read path --- a measurable
+premium, an order of magnitude inside the interactivity budget --- and the
 REST-gateway Fabric deployment sustained throughput above the estimated
 workload baseline. The fail-closed outage experiment further showed that
 successful downloads fell to zero during Fabric unavailability, confirming
@@ -4197,8 +4247,9 @@ retrieval authorization that RBAC-IPFS reports for generic file sharing
 under an emulated 50\,ms wide-area network~\cite{liu2026rbacipfs}, which
 is complementary to, but not directly comparable with, the LAN-scale
 function-level isolation reported here. The measured read overhead
-(6.51 vs.\ 7.16\,ms P50, $n{=}100$) confirms that this architectural
-choice imposes no practical interactive cost. It also establishes a reproducible baseline
+(10.99 vs.\ 6.44\,ms P50) shows that this architectural choice imposes a
+real but practically negligible interactive cost, roughly an order of
+magnitude inside the interactivity budget. It also establishes a reproducible baseline
 against which future on-path enforcement designs can be evaluated.
 
 Future work will focus on per-user Fabric CA enrollment, HSM/WebAuthn-backed
