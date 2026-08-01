@@ -1,0 +1,58 @@
+{
+  "fabric": {
+    "checkaccess": {
+      "cold": {
+        "n": 100,
+        "mean": 14.027,
+        "p50": 12.306,
+        "min": 7.737,
+        "max": 96.28,
+        "stdev": 9.798
+      },
+      "warmed": {
+        "n": 100,
+        "mean": 12.931,
+        "p50": 11.166,
+        "min": 7.737,
+        "max": 96.28,
+        "stdev": 9.485
+      },
+      "bad": 0
+    },
+    "registerdoc": {
+      "cold": {
+        "n": 100,
+        "mean": 2107.501,
+        "p50": 2095.04,
+        "min": 2079.151,
+        "max": 2631.651,
+        "stdev": 57.047
+      },
+      "warmed": {
+        "n": 100,
+        "mean": 2102.099,
+        "p50": 2094.263,
+        "min": 2079.151,
+        "max": 2244.207,
+        "stdev": 25.061
+      },
+      "bad": 0
+    }
+  },
+  "_meta": {
+    "fabric": {
+      "timestamp": "2026-08-01T13:03:36+0600",
+      "doc_id": "6a491d05-facb-435d-88d6-d484eb3559bc",
+      "case_id": "51d03080-d5cd-4b4a-9500-bbc66d7fcc2d",
+      "method": "gateway",
+      "n_warm": 20,
+      "n_meas": 100,
+      "n_total": 120,
+      "host": "Linux-7.0.11-76070011-generic-x86_64-with-glibc2.39",
+      "python": "3.12.3",
+      "chaincode": "legalcc v1.19 seq 9",
+      "fabric_enabled": "true",
+      "material_db_fallback": "false"
+    }
+  }
+}
