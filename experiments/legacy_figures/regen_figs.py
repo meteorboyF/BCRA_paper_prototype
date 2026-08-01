@@ -36,7 +36,18 @@ ap = argparse.ArgumentParser()
 ap.add_argument("--out", required=True)
 ap.add_argument("--boot", type=int, default=10000)
 ap.add_argument("--seed", type=int, default=7)
+# Experiment 2 was re-measured on the current build (chaincode v1.19 seq 9);
+# the legacy results/exp2_latency.csv describes a build that no longer ships.
+# Point this at the newer per-sample CSV to regenerate fig2 from it. The column
+# layout is identical, so nothing downstream changes.
+ap.add_argument("--exp2-csv", default=None,
+                help="override the Exp 2 per-sample CSV (default: results/exp2_latency.csv)")
+# Regenerating one figure must not silently rewrite the other eight from data
+# that has since been superseded; --only restricts what is written to disk.
+ap.add_argument("--only", default=None,
+                help="comma-separated figure names to write, e.g. fig2_latency")
 A = ap.parse_args()
+ONLY = set(A.only.split(",")) if A.only else None
 OUT = pathlib.Path(A.out)
 OUT.mkdir(parents=True, exist_ok=True)
 rng = random.Random(A.seed)
@@ -72,6 +83,10 @@ def style(ax):
 
 
 def save(fig, name):
+    if ONLY is not None and name not in ONLY:
+        plt.close(fig)
+        print(f"skipped {name} (--only)")
+        return
     fig.tight_layout()
     fig.savefig(OUT / f"{name}.pdf")
     fig.savefig(OUT / f"{name}.png", dpi=180)
@@ -122,16 +137,25 @@ save(fig, "fig1_scalability")
 
 # ── fig2 — Exp 2 function-level latency ─────────────────────────────────────
 e2 = defaultdict(list)
-for r in rows(R / "exp2_latency.csv"):
-    if int(r["sample_idx"]) > 20:
+EXP2_CSV = pathlib.Path(A.exp2_csv) if A.exp2_csv else (R / "exp2_latency.csv")
+for r in rows(EXP2_CSV):
+    # The re-run brackets the Fabric arm on either side of the db_only arm, so
+    # `mode` carries the arm and `method` the bracket; keying on mode pools both
+    # Fabric brackets (n=200) against the single db_only arm (n=100), which is
+    # exactly how the table and prose report them.
+    if int(r["sample_idx"]) > 20 and r.get("http", "200") == "200":
         e2[(r["operation"], r["mode"])].append(float(r["latency_ms"]))
 e4pre = defaultdict(list)
 for r in rows(R / "exp4_audit.csv"):
     e4pre[r["method"]].append(float(r["ms"]))
 fig, ax = plt.subplots(figsize=(10, 4.8))
-bars = [("CheckAccess\nFabric evaluate\n(n=100)", e2[("checkaccess", "fabric")], AMBER),
-        ("CheckAccess\nPostgreSQL ACL\n(n=100)", e2[("checkaccess", "db_only")], BLUE),
-        ("RegisterDocument\nendorse+order+commit\n(n=100)", e2[("registerdoc", "fabric")], AMBER),
+# n is taken from the data rather than hardcoded: the re-run pools two Fabric
+# brackets, so the Fabric arms carry twice the db_only arm's sample count.
+_ca_f, _ca_db = e2[("checkaccess", "fabric")], e2[("checkaccess", "db_only")]
+_rd_f = e2[("registerdoc", "fabric")]
+bars = [(f"CheckAccess\nFabric evaluate\n(n={len(_ca_f)})", _ca_f, AMBER),
+        (f"CheckAccess\nPostgreSQL ACL\n(n={len(_ca_db)})", _ca_db, BLUE),
+        (f"RegisterDocument\nendorse+order+commit\n(n={len(_rd_f)})", _rd_f, AMBER),
         ("Audit query\nPostgreSQL, 1000 ev.\n(n=10)", e4pre["pg_query_1000"], BLUE),
         ("Audit verify\nCSV+SHA-256 chain\n(n=10)", e4pre["csv_sha256_chain_1000"], GREEN)]
 for i, (lbl, vals, color) in enumerate(bars):
