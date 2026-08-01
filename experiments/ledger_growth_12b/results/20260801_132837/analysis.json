@@ -1,0 +1,32 @@
+{
+  "phase_a": {
+    "span_minutes": 20.1,
+    "samples": 21,
+    "blocks_added": 20.0,
+    "blocks_per_min": 0.995,
+    "blocks_r2": 1.0,
+    "blockstore_bytes_per_s": 90.72,
+    "blockstore_mb_per_day": 7.839,
+    "blockstore_r2": 1.0,
+    "couchdb_rate_reportable": false,
+    "couchdb_bytes_per_s": null,
+    "couchdb_mb_per_day": null,
+    "couchdb_r2": 0.04333,
+    "couchdb_note": "series non-monotonic (CouchDB compaction observed mid-run); no idle rate reported",
+    "blockstore_bytes_per_block": 5469.6,
+    "idle_day_in_documents_equivalent": 1363.1
+  },
+  "phase_b": {
+    "window_minutes": 1.93,
+    "blocks_added": 50.0,
+    "documents_committed": 2000,
+    "blockstore_delta_bytes": 11512150.0,
+    "blockstore_background_bytes": 10524,
+    "blockstore_bytes_per_doc": 5750.8,
+    "couchdb_delta_bytes": 4354048.0,
+    "couchdb_background_bytes": 0,
+    "couchdb_bytes_per_doc": 2177.0,
+    "total_kb_per_doc_per_peer": 7.742,
+    "published_kb_per_doc_per_peer": 7.0
+  }
+}
