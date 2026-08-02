@@ -120,8 +120,8 @@ export function TeamAccessPanel({ docId, docName }: Props) {
       const recipientPubKey: JsonWebKey = JSON.parse(pkRes.data.publicKeyJwk)
 
       const { data: myWrappedKeyToken } = await api.get(`/documents/${docId}/wrapped-key`)
-      const docKeyB64 = await eciesUnwrapKey(privateKey, myWrappedKeyToken)
-      const wrappedKeyToken = await eciesWrapKey(recipientPubKey, docKeyB64)
+      const docKeyB64 = await eciesUnwrapKey(privateKey, myWrappedKeyToken, user?.id)
+      const wrappedKeyToken = await eciesWrapKey(recipientPubKey, docKeyB64, recipient.id)
 
       await api.post('/access/grant', {
         docId,

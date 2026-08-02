@@ -132,7 +132,7 @@ export default function DistributeAccess() {
             docKeyCache.set(docId, await demoDocumentKeyB64(docId))
           } else {
             const { data: token } = await api.get(`/documents/${docId}/wrapped-key`)
-            docKeyCache.set(docId, await eciesUnwrapKey(privateKey!, token))
+            docKeyCache.set(docId, await eciesUnwrapKey(privateKey!, token, user?.id))
           }
         }
         // Fetch each grantee's public key once.
@@ -140,7 +140,7 @@ export default function DistributeAccess() {
           const { data } = await api.get(`/users/${memberId}/public-key`)
           pubKeyCache.set(memberId, JSON.parse(data.publicKeyJwk))
         }
-        const wrappedKeyToken = await eciesWrapKey(pubKeyCache.get(memberId)!, docKeyCache.get(docId)!)
+        const wrappedKeyToken = await eciesWrapKey(pubKeyCache.get(memberId)!, docKeyCache.get(docId)!, memberId)
         grants.push({ docId, granteeId: memberId, capability, wrappedKeyToken, expiresAtEpochMs })
       }
 

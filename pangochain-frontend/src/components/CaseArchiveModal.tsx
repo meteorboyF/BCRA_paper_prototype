@@ -67,7 +67,7 @@ export function CaseArchiveModal({ caseId, caseTitle, onClose }: Props) {
         setProgress(`Decrypting ${i + 1}/${documents.length}: ${doc.fileName}`)
         let bytes: ArrayBuffer
         try {
-          bytes = await decryptDocumentToBytes(doc.id, privateKey, doc.documentHashSha256 ?? doc.documentHash)
+          bytes = await decryptDocumentToBytes(doc.id, privateKey, doc.documentHashSha256 ?? doc.documentHash, user?.id)
         } catch (err: any) {
           if (err.message === 'INTEGRITY_FAILED') throw err // tampering → abort the whole archive
           skipped++ // not shared with this user / key mismatch → omit

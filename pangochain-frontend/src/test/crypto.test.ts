@@ -98,6 +98,47 @@ describe('ECIES key wrap/unwrap roundtrip', () => {
     expect(unwrappedKeyB64).toBe(docKeyB64)
   })
 
+  it('AAD binds a wrapped key to its intended recipient', async () => {
+    const password = 'aad-binding-password'
+    const alice = 'user-alice-0001'
+    const mallory = 'user-mallory-9999'
+
+    const { publicKeyJwk, privateKeyEncryptedB64, saltB64, ivB64 } = await generateEciesKeypair(password)
+    const docKey = await subtle.generateKey({ name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt'])
+    const docKeyB64 = bytesToBase64(new Uint8Array(await subtle.exportKey('raw', docKey)))
+    const privateKey = await unwrapPrivateKey(password, saltB64, ivB64, privateKeyEncryptedB64)
+
+    const boundToken = await eciesWrapKey(publicKeyJwk, docKeyB64, alice)
+
+    // The intended recipient recovers the key.
+    expect(await eciesUnwrapKey(privateKey, boundToken, alice)).toBe(docKeyB64)
+
+    // Presented under another identity it must fail rather than decrypt. The
+    // legacy fallback is disabled here; leaving it on would mask the binding,
+    // which is exactly the transitional weakness documented on eciesUnwrapKey.
+    await expect(
+      eciesUnwrapKey(privateKey, boundToken, mallory, false),
+    ).rejects.toThrow()
+
+    // A token carrying no binding still opens, so existing grants keep working.
+    const legacyToken = await eciesWrapKey(publicKeyJwk, docKeyB64)
+    expect(await eciesUnwrapKey(privateKey, legacyToken, alice)).toBe(docKeyB64)
+  })
+
+  it('AAD binding does not change the 125-byte token size', async () => {
+    const password = 'token-size-password'
+    const { publicKeyJwk } = await generateEciesKeypair(password)
+    const docKey = await subtle.generateKey({ name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt'])
+    const docKeyB64 = bytesToBase64(new Uint8Array(await subtle.exportKey('raw', docKey)))
+
+    // AAD is authenticated, not transmitted, so the reported 125-byte token
+    // format is unaffected. The manuscript quotes that number.
+    const bound = await eciesWrapKey(publicKeyJwk, docKeyB64, 'user-alice-0001')
+    const unbound = await eciesWrapKey(publicKeyJwk, docKeyB64)
+    expect(base64ToBytes(bound).byteLength).toBe(125)
+    expect(base64ToBytes(unbound).byteLength).toBe(125)
+  })
+
   it('full roundtrip: encrypt → wrap → unwrap → decrypt → verify', async () => {
     const original = 'End-to-end encrypted legal document'
     const plaintext = new TextEncoder().encode(original).buffer as ArrayBuffer

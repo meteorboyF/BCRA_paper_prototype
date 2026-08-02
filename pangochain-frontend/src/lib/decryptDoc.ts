@@ -11,6 +11,10 @@ export async function decryptDocumentToBytes(
   docId: string,
   privateKey: CryptoKey,
   expectedHash?: string,
+  // The caller's own user id, bound as AAD when the token carries a recipient
+  // binding. Optional so pre-existing callers keep compiling; passing it is what
+  // makes a token minted for someone else fail rather than decrypt.
+  recipientUserId?: string,
 ): Promise<ArrayBuffer> {
   const [ciphertextRes, wrappedKeyRes] = await Promise.all([
     api.get(`/documents/${docId}/ciphertext`, { responseType: 'arraybuffer' }),
@@ -22,7 +26,7 @@ export async function decryptDocumentToBytes(
   const tokenBytes = base64ToBytes(wrappedKeyToken)
   const docKeyB64 = tokenBytes.byteLength === 32
     ? wrappedKeyToken
-    : await eciesUnwrapKey(privateKey, wrappedKeyToken)
+    : await eciesUnwrapKey(privateKey, wrappedKeyToken, recipientUserId)
 
   const fullBytes = new Uint8Array(ciphertextBytes)
   const iv = fullBytes.slice(0, 12)

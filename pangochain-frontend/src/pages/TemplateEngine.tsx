@@ -146,7 +146,7 @@ export default function TemplateEngine() {
       try {
         const pkRes = await api.get(`/users/${user!.id}/public-key`)
         const ownerPubKeyJwk: JsonWebKey = JSON.parse(pkRes.data.publicKeyJwk)
-        wrappedKeyToken = await eciesWrapKey(ownerPubKeyJwk, encrypted.keyB64)
+        wrappedKeyToken = await eciesWrapKey(ownerPubKeyJwk, encrypted.keyB64, user!.id)
       } catch { /* demo mode fallback */ }
 
       // 4. Upload
@@ -232,7 +232,7 @@ export default function TemplateEngine() {
     try {
       const pkRes = await api.get(`/users/${user!.id}/public-key`)
       const ownerPubKeyJwk: JsonWebKey = JSON.parse(pkRes.data.publicKeyJwk)
-      wrappedKeyToken = await eciesWrapKey(ownerPubKeyJwk, encrypted.keyB64)
+      wrappedKeyToken = await eciesWrapKey(ownerPubKeyJwk, encrypted.keyB64, user!.id)
     } catch { /* demo mode fallback */ }
 
     setAiUploadStage('Uploading ciphertext and anchoring hash...')

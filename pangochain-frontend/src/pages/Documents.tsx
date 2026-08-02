@@ -123,7 +123,7 @@ export default function Documents() {
       const password = window.prompt('Enter your account password to decrypt this document for AI analysis')
       if (!password) throw new Error('Password is required to decrypt the document.')
       const privateKey = await unwrapPrivateKey(password, stored.saltB64, stored.ivB64, stored.encryptedB64)
-      const bytes = await decryptDocumentToBytes(doc.id, privateKey, doc.documentHash)
+      const bytes = await decryptDocumentToBytes(doc.id, privateKey, doc.documentHash, user?.id)
       const text = bytesToTextIfPrintable(bytes)
       if (!text) throw new Error('This document is not readable text. Use Markdown/text demo documents for AI analysis.')
       const { data } = await api.post<DocumentAnalysis>('/ai/documents/analyze', {

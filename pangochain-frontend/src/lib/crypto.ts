@@ -142,11 +142,43 @@ export async function decryptDocument(
 // ─── ECIES Key Wrapping (ECDH + AES-GCM) ────────────────────────────────────
 
 /**
+ * AAD binding the wrapped key to its intended recipient.
+ *
+ * Without it the AES-GCM tag authenticates only the wrapped bytes, so a token
+ * is self-contained and carries no statement about who it was produced for.
+ * Binding the recipient's user id means a token minted for one principal fails
+ * authentication if presented under another identity, rather than decrypting
+ * silently.
+ *
+ * The document id is deliberately NOT bound. On the upload path the owner's key
+ * is wrapped before `POST /documents/upload` returns, and the document id is
+ * assigned by the backend, so it does not exist at wrap time. Binding it would
+ * require client-generated document identifiers — a design change, not a local
+ * one. See the manuscript's AAD footnote.
+ */
+function recipientAad(recipientUserId: string): Uint8Array<ArrayBuffer> {
+  // Copied into an explicitly ArrayBuffer-backed view: TextEncoder returns
+  // Uint8Array<ArrayBufferLike>, which does not satisfy WebCrypto's BufferSource.
+  const bytes = new TextEncoder().encode(`pangochain:wrap:v1:recipient=${recipientUserId}`)
+  const out = new Uint8Array(new ArrayBuffer(bytes.length))
+  out.set(bytes)
+  return out
+}
+
+/**
  * Wrap a document key (keyB64) with recipient's P-256 public key.
  * Uses ECDH to derive a shared secret, then AES-GCM to encrypt the key.
  * Output is a single base64 blob: ephemeralPubKey(65) || iv(12) || wrapped(32+16)
+ *
+ * `recipientUserId` is bound as AAD. It is optional only so that callers that
+ * genuinely have no recipient identity keep compiling; omitting it reproduces
+ * the original unbound token.
  */
-export async function eciesWrapKey(recipientPublicKeyJwk: JsonWebKey, keyB64: string): Promise<string> {
+export async function eciesWrapKey(
+  recipientPublicKeyJwk: JsonWebKey,
+  keyB64: string,
+  recipientUserId?: string,
+): Promise<string> {
   const recipientPubKey = await subtle.importKey(
     'jwk', recipientPublicKeyJwk, { name: 'ECDH', namedCurve: 'P-256' }, false, [],
   )
@@ -167,7 +199,13 @@ export async function eciesWrapKey(recipientPublicKeyJwk: JsonWebKey, keyB64: st
 
   const iv = crypto.getRandomValues(new Uint8Array(12))
   const docKeyBytes = base64ToBytes(keyB64)
-  const wrapped = await subtle.encrypt({ name: 'AES-GCM', iv }, wrappingKey, docKeyBytes)
+  const wrapped = await subtle.encrypt(
+    recipientUserId
+      ? { name: 'AES-GCM', iv, additionalData: recipientAad(recipientUserId) }
+      : { name: 'AES-GCM', iv },
+    wrappingKey,
+    docKeyBytes,
+  )
 
   // Export ephemeral public key in raw (uncompressed) form — 65 bytes
   const ephPubRaw = new Uint8Array(await subtle.exportKey('raw', ephemeral.publicKey))
@@ -183,10 +221,24 @@ export async function eciesWrapKey(recipientPublicKeyJwk: JsonWebKey, keyB64: st
 
 /**
  * Unwrap a document key using the recipient's private ECDH key.
+ *
+ * When `recipientUserId` is supplied the recipient-bound AAD is required first.
+ * Tokens minted before AAD binding carry no AAD and cannot be distinguished by
+ * inspection — the format is byte-identical — so unwrapping falls back to the
+ * unbound form rather than breaking every existing grant. Client-side keys mean
+ * legacy tokens cannot be re-wrapped server-side; they are only replaced when a
+ * grant is reissued.
+ *
+ * The fallback is therefore transitional and weakens the guarantee while it
+ * exists: an attacker who can present a legacy-format token still gets the old
+ * behaviour. Removing it requires reissuing outstanding grants, after which
+ * `allowUnboundLegacy` should be set false.
  */
 export async function eciesUnwrapKey(
   recipientPrivateKey: CryptoKey,
   wrappedTokenB64: string,
+  recipientUserId?: string,
+  allowUnboundLegacy = true,
 ): Promise<string> {
   const blob = base64ToBytes(wrappedTokenB64)
 
@@ -205,6 +257,26 @@ export async function eciesUnwrapKey(
     false,
     ['decrypt'],
   )
+
+  if (recipientUserId) {
+    try {
+      const bound = await subtle.decrypt(
+        { name: 'AES-GCM', iv, additionalData: recipientAad(recipientUserId) },
+        wrappingKey,
+        wrapped,
+      )
+      return bytesToBase64(new Uint8Array(bound))
+    } catch {
+      if (!allowUnboundLegacy) {
+        throw new Error('Wrapped key is not bound to this recipient')
+      }
+      // Fall through to the unbound form for pre-AAD tokens.
+      console.warn(
+        '[crypto] wrapped key carries no recipient binding (pre-AAD token); ' +
+        'reissue this grant to bind it',
+      )
+    }
+  }
 
   const rawKey = await subtle.decrypt({ name: 'AES-GCM', iv }, wrappingKey, wrapped)
   return bytesToBase64(new Uint8Array(rawKey))

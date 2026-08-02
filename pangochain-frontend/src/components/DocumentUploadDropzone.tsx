@@ -165,7 +165,7 @@ function DocumentUploadDialog({ caseId, onClose, onUploaded, previousVersionId }
         if (!user?.id) throw new Error('Your session is missing user identity. Please sign in again.')
         const pkRes = await api.get(`/users/${user.id}/public-key`)
         const ownerPubKeyJwk: JsonWebKey = JSON.parse(pkRes.data.publicKeyJwk)
-        wrappedKeyToken = await eciesWrapKey(ownerPubKeyJwk, encrypted.keyB64)
+        wrappedKeyToken = await eciesWrapKey(ownerPubKeyJwk, encrypted.keyB64, user!.id)
       } catch {
         // backend unreachable or key not set — store raw key in demo mode
       }

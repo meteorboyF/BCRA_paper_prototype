@@ -111,7 +111,7 @@ export function SecureDownloadModal({ docId, fileName, expectedHash, onClose }: 
         const tokenBytes = base64ToBytes(wrappedKeyToken)
         docKeyB64 = tokenBytes.byteLength === 32
           ? wrappedKeyToken
-          : await eciesUnwrapKey(privateKey, wrappedKeyToken)
+          : await eciesUnwrapKey(privateKey, wrappedKeyToken, user?.id)
       } catch {
         fail('decrypt', 'unwrapping', 'Could not unwrap the document key — you may not have access, or the key is corrupted.'); return
       }

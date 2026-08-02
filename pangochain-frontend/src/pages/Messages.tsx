@@ -87,7 +87,7 @@ export default function Messages() {
     }
     setDecrypted((d) => ({ ...d, [msg.id]: { text: '', loading: true, error: '' } }))
     try {
-      const docKeyB64 = await eciesUnwrapKey(privateKey, msg.wrappedKeyToken)
+      const docKeyB64 = await eciesUnwrapKey(privateKey, msg.wrappedKeyToken, user?.id)
       const fullBytes = base64ToBytes(msg.encryptedPayload)
       const iv = fullBytes.slice(0, 12)
       const ciphertext = fullBytes.slice(12)
@@ -124,7 +124,7 @@ export default function Messages() {
 
       const pkRes = await api.get(`/users/${recipient.id}/public-key`)
       const recipientPubKey: JsonWebKey = JSON.parse(pkRes.data.publicKeyJwk)
-      const wrappedKeyToken = await eciesWrapKey(recipientPubKey, encrypted.keyB64)
+      const wrappedKeyToken = await eciesWrapKey(recipientPubKey, encrypted.keyB64, recipient.id)
 
       const ivBytes = Array.from(base64ToBytes(encrypted.ivB64))
       const ctBytes = Array.from(base64ToBytes(encrypted.ciphertextB64))

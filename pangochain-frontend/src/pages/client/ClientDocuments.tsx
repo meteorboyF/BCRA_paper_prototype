@@ -130,7 +130,7 @@ export default function ClientDocuments() {
       const pubKey: JsonWebKey = JSON.parse(pkRes.data.publicKeyJwk)
 
       setUploadStage('Wrapping encryption key with ECIES P-256…')
-      const wrappedKeyToken = await eciesWrapKey(pubKey, keyB64)
+      const wrappedKeyToken = await eciesWrapKey(pubKey, keyB64, user.id)
 
       setUploadStage('Uploading encrypted ciphertext…')
       await api.post('/documents/upload', {

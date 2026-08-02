@@ -159,7 +159,7 @@ export default function AiAssistant() {
     if (!password) throw new Error('Enter your account password to unlock your private key before selecting documents.')
 
     const privateKey = await unwrapPrivateKey(password, stored.saltB64, stored.ivB64, stored.encryptedB64)
-    const bytes = await decryptDocumentToBytes(doc.id, privateKey, doc.documentHashSha256 ?? doc.documentHash)
+    const bytes = await decryptDocumentToBytes(doc.id, privateKey, doc.documentHashSha256 ?? doc.documentHash, user?.id)
     const text = bytesToTextIfPrintable(bytes)
     if (!text) throw new Error('This file is not readable text. Use Markdown or text documents for AI chat.')
     return { documentId: doc.id, fileName: doc.fileName, text, isDecrypting: false }

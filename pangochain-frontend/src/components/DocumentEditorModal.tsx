@@ -75,7 +75,7 @@ export function DocumentEditorModal({
       } catch {
         setError('Incorrect password. Your private key could not be unlocked.'); return
       }
-      const bytes = await decryptDocumentToBytes(docId, privateKey, documentHashSha256)
+      const bytes = await decryptDocumentToBytes(docId, privateKey, documentHashSha256, user?.id)
       const extracted = await extractEditableText(bytes, fileName)
       setText(extracted.text)
       setOriginalText(extracted.text)
@@ -108,7 +108,7 @@ export function DocumentEditorModal({
       try {
         const pkRes = await api.get(`/users/${user!.id}/public-key`)
         const ownerPubKeyJwk: JsonWebKey = JSON.parse(pkRes.data.publicKeyJwk)
-        wrappedKeyToken = await eciesWrapKey(ownerPubKeyJwk, encrypted.keyB64)
+        wrappedKeyToken = await eciesWrapKey(ownerPubKeyJwk, encrypted.keyB64, user!.id)
       } catch { /* demo raw-key fallback */ }
 
       await api.post('/documents/upload', {

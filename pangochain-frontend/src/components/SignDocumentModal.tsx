@@ -60,7 +60,7 @@ export function SignDocumentModal({ docId, fileName, onClose, onSigned }: Props)
       if (!storedKey) throw new Error('Private key not found — re-login required')
 
       const privateKey = await unwrapPrivateKey(password, storedKey.saltB64, storedKey.ivB64, storedKey.encryptedB64)
-      const docKeyB64 = await eciesUnwrapKey(privateKey, wrappedKeyRes.data as string)
+      const docKeyB64 = await eciesUnwrapKey(privateKey, wrappedKeyRes.data as string, user?.id)
 
       setStage('decrypting')
       const fullBytes = new Uint8Array(ciphertextRes.data as ArrayBuffer)
