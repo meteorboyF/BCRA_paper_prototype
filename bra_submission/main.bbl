@@ -435,11 +435,11 @@ M.~Dworkin, Recommendation for block cipher modes of operation: Galois/counter
 \newblock \href {https://doi.org/10.6028/NIST.SP.800-38D}
   {\path{doi:10.6028/NIST.SP.800-38D}}.
 
-\bibitem{shoup2001ecies}
-V.~Shoup, \href{https://eprint.iacr.org/2001/112}{A proposal for an iso
-  standard for public key encryption}, Cryptology ePrint Archive 2001/112,
-  International Association for Cryptologic Research (2001).
-\newline\urlprefix\url{https://eprint.iacr.org/2001/112}
+\bibitem{rfc9180}
+R.~Barnes, K.~Bhargavan, B.~Lipp, C.~A. Wood, Hybrid public key encryption,
+  Request for Comments RFC 9180, Internet Engineering Task Force (Feb. 2022).
+\newblock \href {https://doi.org/10.17487/RFC9180}
+  {\path{doi:10.17487/RFC9180}}.
 
 \bibitem{ieee1363a2004}
 {IEEE Standards Association}, {IEEE} standard specifications for public-key

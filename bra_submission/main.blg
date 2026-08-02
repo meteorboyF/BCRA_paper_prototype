@@ -6,37 +6,37 @@ Database file #1: references.bib
 Warning--empty pages in macaroons2014
 You've used 100 entries,
             2952 wiz_defined-function locations,
-            1307 strings with 28458 characters,
-and the built_in function-call counts, 31154 in all, are:
-= -- 3144
-> -- 973
+            1306 strings with 28440 characters,
+and the built_in function-call counts, 31202 in all, are:
+= -- 3147
+> -- 982
 < -- 33
-+ -- 391
-- -- 291
-* -- 2166
-:= -- 4157
-add.period$ -- 161
++ -- 394
+- -- 294
+* -- 2175
+:= -- 4164
+add.period$ -- 162
 call.type$ -- 100
 change.case$ -- 138
 chr.to.int$ -- 0
 cite$ -- 101
-duplicate$ -- 1074
-empty$ -- 3530
-format.name$ -- 351
-if$ -- 8279
+duplicate$ -- 1073
+empty$ -- 3528
+format.name$ -- 355
+if$ -- 8286
 int.to.chr$ -- 0
 int.to.str$ -- 100
 missing$ -- 48
 newline$ -- 406
 num.names$ -- 100
-pop$ -- 726
+pop$ -- 725
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 0
-skip$ -- 2132
+skip$ -- 2136
 stack$ -- 0
 substring$ -- 1000
-swap$ -- 412
+swap$ -- 413
 text.length$ -- 33
 text.prefix$ -- 0
 top$ -- 0
@@ -44,5 +44,5 @@ type$ -- 0
 warning$ -- 1
 while$ -- 177
 width$ -- 103
-write$ -- 1026
+write$ -- 1027
 (There was 1 warning)

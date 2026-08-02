@@ -275,7 +275,7 @@ provides crash-fault tolerance under Raft assumptions, not Byzantine
 resistance to malicious orderer collusion~\cite{hyperledgerFabricOrderingService_v24,Ongaro2014}.
 
 The framework design specifies browser-side AES-256-GCM encryption via the
-WebCrypto API~\cite{fips197,w3cWebCrypto}. It also specifies an ECIES-style
+WebCrypto API~\cite{fips197,w3cWebCrypto}. It also specifies an ECDH-HKDF-AES-GCM
 P-256 hybrid wrapping construction, implemented with the
 WebCrypto-supported ECDH, KDF, and AES-GCM primitives, for
 document-key wrapping. ECDSA P-256 document
@@ -380,7 +380,7 @@ three-organization legal consortium using Hyperledger Fabric, a private
 two-node IPFS swarm, PostgreSQL operational storage, and a Spring Boot REST
 gateway. Cryptographic mechanisms are standard and are treated as
 engineering rather than contribution: AES-256-GCM for document encryption,
-an ECIES-style P-256 hybrid wrap for per-recipient key distribution, and
+a P-256 hybrid wrap for per-recipient key distribution, and
 ECDSA P-256 for document signatures, with
 Experiment~\hyperref[sec:exp_crypto]{6} reporting their cost as Node.js
 WebCrypto fallback measurements rather than browser-performance claims.
@@ -994,7 +994,7 @@ Threat-model Scenario~S1
 Client confidentiality in transmission and storage
 (ABA Model Rule~1.6; Formal Opinion~477R~\cite{aba477r}) &
 AES-256-GCM encryption in the browser before transmission;
-ECIES-style per-recipient key wrapping; ciphertext-only off-chain
+hybrid per-recipient key wrapping; ciphertext-only off-chain
 storage &
 Section~\ref{sec:crypto};
 Experiment~\hyperref[sec:exp_crypto]{6} \\
@@ -1040,7 +1040,7 @@ X.509 certificate under the organization's
 MSP~\cite{fabricCADoc,fabricMSP}; per-user enrollment is not implemented
 in the prototype (Table~\ref{tab:framework_vs_prototype}). In the framework
 design, each user also generates two keypairs in the browser at
-registration: an ECIES-style P-256 keypair ($sk_{ecies}$, $pk_{ecies}$)
+registration: a P-256 hybrid-wrap keypair ($sk_{wrap}$, $pk_{wrap}$)
 for document key wrapping and an ECDSA~P-256 keypair ($sk_{sign}$,
 $pk_{sign}$) for document signing (Section~\ref{sec:crypto}). The
 two keypairs are intentionally distinct so that a key used for
@@ -1108,10 +1108,10 @@ shows Layer~1: Spring Security JWT RBAC validates the caller's role
 before the method body executes. Fig.~\ref{fig:document_retrieval}
 shows Layer~2: the \texttt{CheckAccess} chaincode evaluates the on-chain
 ACL at query time. Only if both layers authorize the request does the
-server retrieve the ciphertext from IPFS and the ECIES-wrapped key token
+server retrieve the ciphertext from IPFS and the hybrid-wrapped key token
 from the requester's own access entry in the operational store (each
 grant also anchors the token on-chain). The client unwraps $k_{enc}$
-using $sk_{ecies}$ and decrypts locally.
+using $sk_{wrap}$ and decrypts locally.
 
 On the evaluated document-download path, Fabric unavailability causes
 HTTP~503 denial and no database ACL fallback. The service records a \texttt{FABRIC\_OUTAGE\_ACCESS\_DENIED}
@@ -1141,7 +1141,7 @@ bypassed~\cite{RBACSandhu,androulaki2018hyperledger}.
     \workflowfigure{document_retrieval_flow.pdf}
     \caption{Layer 2 access control and document retrieval: \texttt{CheckAccess}
 chaincode evaluates the on-chain ACL at query time. The client decrypts
-locally; the server handles only ciphertext and ECIES-wrapped key tokens,
+locally; the server handles only ciphertext and hybrid-wrapped key tokens,
 anchored on-chain at grant time and served from the requester's own
 operational access entry.}
     \label{fig:document_retrieval}
@@ -1182,8 +1182,9 @@ verification workflows.
 
 The framework uses a three-tier hybrid cryptographic design.
 Symmetric encryption (AES-256-GCM) protects document content.
-Asymmetric key wrapping using the Elliptic Curve Integrated Encryption
-Scheme (ECIES) over P-256 distributes document keys to
+Asymmetric key wrapping using an ECDH-HKDF-AES-GCM hybrid wrap over P-256 ---
+a KEM/DEM construction assembled from WebCrypto primitives rather than a
+named scheme --- distributes document keys to
 authorized recipients. Digital signatures (ECDSA~P-256) bind each
 document action to the acting user's identity. Fabric MSP
 infrastructure uses ECDSA~P-256 for transaction signing
@@ -1206,7 +1207,7 @@ Section~\ref{sec:prototype_scope}).
         $D,\,M,\,U$ & Document, Metadata, User \\
         $sk,\,pk$ & Private and public key \\
         $k_{enc}$ & Per-document AES-256-GCM symmetric key \\
-        $sk_{ecies},\,pk_{ecies}$ & ECIES-style P-256 keypair for key wrapping \\
+        $sk_{wrap},\,pk_{wrap}$ & P-256 hybrid-wrap keypair for key wrapping \\
         $sk_{sign},\,pk_{sign}$ & ECDSA P-256 keypair for signing \\
         $\mathcal{H}(\cdot)$ & SHA-256 hash function \\
         $\mathcal{H}_D$ & SHA-256 hash of plaintext
@@ -1245,18 +1246,20 @@ each document uses an independent $k_{enc}$, an IV collision in one
 document has no cryptographic effect on any other document~\cite{nist80038d}.
 Listing~\ref{lst:encrypt} (Appendix~\ref{app:listings}) shows the browser implementation.
 
-\textbf{Protocol composition security.} The ECIES-style key-wrapping construction is
-\emph{intended} to achieve \textsc{IND-CCA2} security under the Gap
-Diffie-Hellman (\textsc{GDH}) assumption following Shoup's formal
-model~\cite{shoup2001ecies,ieee1363a2004}; however, the prototype composes
-\mbox{ECDH}, \mbox{HKDF-SHA-256}, and \mbox{AES-256-GCM} via WebCrypto
-without a named ECIES primitive, and the formal \textsc{IND-CCA2} reduction
-for this specific composition is left as future work.
+\textbf{Protocol composition security.} The prototype composes
+\mbox{ECDH}, \mbox{HKDF-SHA-256}, and \mbox{AES-256-GCM} via WebCrypto. This
+is the standard KEM/DEM shape, and each primitive is used within its own
+standard assumptions, but the composition is not an instantiation of a named,
+analysed scheme and we claim no security theorem for it: no
+\textsc{IND-CCA2} reduction is carried out here, and none is inherited.
+Adopting a named construction with an existing analysis --- \textsc{HPKE}
+(RFC~9180)~\cite{rfc9180} being the obvious candidate --- is a design target for a
+production implementation rather than a property of this prototype.
 Table~\ref{tab:eciestoken} defines the 125-byte token format used in the
 prototype.
 
 \begin{table}[ht]
-\caption{ECIES-Style 125-Byte Wrapped-Key Token Format.\label{tab:eciestoken}}
+\caption{Hybrid-Wrap 125-Byte Wrapped-Key Token Format.\label{tab:eciestoken}}
 \centering
 \small
 \begin{tabular}{llr}
@@ -1272,7 +1275,7 @@ Authentication tag & AES-256-GCM tag & 16 \\
 \hline
 \end{tabular}
 \vspace{2pt}
-\footnotesize\parbox{\columnwidth}{KDF: HKDF-SHA-256 over the ECDH shared secret. AAD: empty in the prototype; binding the recipient public key as AAD is a production hardening item.}
+\footnotesize\parbox{\columnwidth}{KDF: HKDF-SHA-256 over the ECDH shared secret. AAD: the recipient's user identifier is bound as additional authenticated data, so a token minted for one principal fails authentication if presented under another. AAD is authenticated but not transmitted, so the token remains 125 bytes, and the binding costs nothing measurable ($+0.0000$\,ms wrap, $+0.0004$\,ms unwrap; 90\,\% CI within $\pm$0.02\,ms, $n{=}300$ per arm). The document identifier is \emph{not} bound: on the upload path the owner's key is wrapped before the backend assigns the document id, so binding it would require client-generated identifiers. Tokens issued before this change carry no AAD and are byte-indistinguishable from bound ones, so unwrapping falls back to the unbound form until outstanding grants are reissued; that fallback is a transitional weakening of the guarantee.}
 \end{table}
 %
 \textsc{ECDSA}~P-256 achieves \textsc{EUF-CMA} under the elliptic curve discrete logarithm (\textsc{ECDLP}) assumption~\cite{fips1865}. In this setting, an adversary cannot forge a valid signature without the signing key.
@@ -1281,7 +1284,7 @@ The registration workflow uses a sign-then-store ordering. Before the IPFS uploa
 
 Signing $\mathcal{H}_C$ still commits the user to the exact IPFS storage payload, including the prepended IV from which the CID is derived. An attacker therefore cannot swap the stored ciphertext later without invalidating the signature. The resulting construction binds both plaintext and ciphertext hashes, which is stronger than signing only plaintext while preserving the non-repudiation property of plaintext signing~\cite{fips1865,ieee1363a2004}.
 
-ECIES protects $k_{enc}$ in transit~\cite{ieee1363a2004}; AES-GCM protects document content at rest~\cite{fips197}; and ECDSA provides the user-key binding~\cite{fips1865}.
+The hybrid wrap protects $k_{enc}$ in transit; AES-GCM protects document content at rest~\cite{fips197}; and ECDSA provides the user-key binding~\cite{fips1865}. No citation is attached to the first clause because, as noted above, the wrap is a composition rather than an instantiation of a standardized scheme.
 
 \begin{algorithm}[H]
 \caption{Document Registration (Sign-Then-Store Pattern)}
@@ -1289,7 +1292,7 @@ ECIES protects $k_{enc}$ in transit~\cite{ieee1363a2004}; AES-GCM protects docum
 \small
 \begin{algorithmic}[1]
 \REQUIRE Document $D$, User $U$, Metadata $M$, keys $sk_{sign}$,
-         $pk_{ecies}$
+         $pk_{wrap}$
 \ENSURE Registration token $R$ or $\perp$
 \STATE $k_{enc} \leftarrow \texttt{getRandomValues}(32)$
        \COMMENT{Fresh key per document}
@@ -1344,8 +1347,8 @@ WebCrypto fallback result rather than a browser-performance claim.
 \subsubsection{ECDSA Document Signatures}
 \label{sec:ecdsa}
 At registration, the browser generates two separate P-256 keypairs using
-\texttt{window.crypto.subtle.generateKey}. The ECIES keypair is used for
-document key wrapping ($sk_{ecies} \neq sk_{sign}$), while the ECDSA
+\texttt{window.crypto.subtle.generateKey}. The hybrid-wrap keypair is used for
+document key wrapping ($sk_{wrap} \neq sk_{sign}$), while the ECDSA
 keypair is used for signing. This follows key-separation
 practice~\cite{nist800131a}.
 
@@ -1401,7 +1404,7 @@ and Table~\ref{tab:framework_vs_prototype}).
 
 \textbf{Phase~1: key generation and storage.} The browser derives a
 wrapping key from the user's password using PBKDF2. It uses that key to
-encrypt both $sk_{ecies}$ and $sk_{sign}$ before storing them in
+encrypt both $sk_{wrap}$ and $sk_{sign}$ before storing them in
 \texttt{localStorage}. The server never holds either private key in
 plaintext.
 
@@ -1410,14 +1413,14 @@ generates $k_{enc}$, encrypts the document, and submits $\mathcal{H}_D$
 and the CID to the \texttt{RegisterDocument} chaincode.
 
 \textbf{Phase~3: access grant.} When an owner grants access, the browser
-wraps $k_{enc}$ under the recipient's $pk_{ecies}$ using an ECIES-style
+wraps $k_{enc}$ under the recipient's $pk_{wrap}$ using an ECDH-HKDF-AES-GCM
 P-256 hybrid wrapping construction implemented with WebCrypto-supported
 ECDH/KDF/AES-GCM primitives. The resulting 125-byte wrapped token is
 submitted to \texttt{GrantAccess}; it is 51.2\,\% smaller than the
 256-byte RSA-OAEP~2048 wrapped-key token measured in Experiment~\hyperref[sec:exp_crypto]{6}~\cite{rfc8017}.
 
 \textbf{Phase~4: access and decryption.} The recipient unwraps $k_{enc}$
-using $sk_{ecies}$, extracts the IV from the first 12~bytes of the stored
+using $sk_{wrap}$, extracts the IV from the first 12~bytes of the stored
 ciphertext, and decrypts locally.
 
 \textbf{Phase~5: revocation and rotation.} On revocation, the system sets
@@ -1445,7 +1448,7 @@ Table~\ref{tab:framework_vs_prototype}~\cite{fabricCADoc,fips1403,nist800634,w3c
 \begin{figure}[!t]
     \centering
     \includegraphics[width=\columnwidth]{key_gen_and_storage.pdf}
-    \caption{Phase~1: Client-side key generation. ECIES/ECDSA keys wrapped via PBKDF2-derived key and stored in \texttt{localStorage}, per NIST SP~800-131A key-separation practice.}
+    \caption{Phase~1: Client-side key generation. Hybrid-wrap and ECDSA keys wrapped via PBKDF2-derived key and stored in \texttt{localStorage}, per NIST SP~800-131A key-separation practice.}
     \label{fig:key_gen_and_storage}
 \end{figure}
 
@@ -1459,14 +1462,14 @@ Table~\ref{tab:framework_vs_prototype}~\cite{fabricCADoc,fips1403,nist800634,w3c
 \begin{figure}[!t]
     \centering
     \includegraphics[width=\columnwidth]{access_grant.pdf}
-    \caption{Phase~3 ECIES-style P-256 key wrapping, showing owner-wrapped $k_{enc}$ and on-chain \texttt{GrantAccess} storage.}
+    \caption{Phase~3 P-256 hybrid key wrapping, showing owner-wrapped $k_{enc}$ and on-chain \texttt{GrantAccess} storage.}
     \label{fig:access_grant_key_distribution}
 \end{figure}
 
 \begin{figure}[!tp]
     \centering
     \includegraphics[width=0.95\columnwidth,height=0.55\textheight,keepaspectratio]{access_and_decryption.pdf}
-    \caption{Phase~4: Recipient unwraps $k_{enc}$ with $sk_{ecies}$,
+    \caption{Phase~4: Recipient unwraps $k_{enc}$ with $sk_{wrap}$,
     extracts IV from first 12~bytes of stored ciphertext, and decrypts
     locally. Server delivers only ciphertext and wrapped key token.}
     \label{fig:access_and_decryption}
@@ -2057,7 +2060,15 @@ user-to-key binding. \emph{Mitigation path:} anchor key registrations
 via a \texttt{RegisterIdentity} chaincode function at enrollment, so
 any post-registration substitution is detectable by any consortium
 peer; deferred to future work alongside per-user X.509 enrollment
-(Section~\ref{sec:future_work}). \emph{Traces to:} violation of A5;
+(Section~\ref{sec:future_work}).
+
+The recipient-bound AAD described in Table~\ref{tab:eciestoken} does
+\emph{not} mitigate this scenario, and should not be read as doing so. AAD
+binds an identity \emph{claim} to the wrapped key, which defeats re-targeting
+an existing token to a different principal; but an adversary who has already
+substituted the public key holds the matching private key and can supply the
+legitimate recipient's identifier as AAD unchanged. Only a ledger-witnessed
+user-to-key binding closes S3. \emph{Traces to:} violation of A5;
 residual-risk rows of Table~\ref{tab:threat_model}.
 
 \paragraph{S4: Storage-tier content substitution.} A compromised IPFS
@@ -2151,7 +2162,7 @@ provides authenticated encryption under nonce-uniqueness assumptions,
 as specified in NIST SP~800-38D~\cite{nist80038d}; ECDSA~P-256
 provides digital-signature unforgeability under the elliptic curve
 discrete logarithm assumption, per FIPS~186-5~\cite{fips1865}; and
-the ECIES-style ECDH + KDF + AES-GCM construction follows the
+the hybrid ECDH + KDF + AES-GCM construction follows the
 standard hybrid-encryption pattern for wrapping document keys
 \cite{ieee1363a2004}.
 
@@ -2172,9 +2183,10 @@ limitations are cataloged in Section~\ref{sec:prototype_scope}.
 The system employs a three-tier hybrid cryptographic approach. At the
 file encryption layer, documents are encrypted client-side in the
 framework design~\cite{fips197}. For secure key sharing, the AES
-document key is wrapped using ECIES-style P-256 via the browser WebCrypto
+document key is wrapped using P-256 hybrid wrap via the browser WebCrypto
 API~\cite{w3cWebCrypto}, producing a 125-byte token that is 51.2\,\%
-smaller than RSA-OAEP~2048 (256~bytes), as measured in
+smaller than RSA-OAEP~2048 (256~bytes), though not smaller than an
+HPKE~(RFC~9180) token, as measured in
 Experiment~\hyperref[sec:exp_crypto]{6} (Section~\ref{sec:exp_crypto}). At the infrastructure
 layer, Hyperledger Fabric uses ECDSA (NIST~P-256) for transaction
 signing and MSP identity validation~\cite{fabricMSP,fips1865}.
@@ -2318,8 +2330,8 @@ Browser ECDSA P-256 sign; server verifies before Fabric anchoring &
 Y\textsuperscript{$\dagger$} &
 Mechanism implemented and binds $\mathcal{H}_D$, $\mathcal{H}_C$, and $id_D$; Fabric transaction-level non-repudiation requires per-user Fabric identity (Section~\ref{sec:prototype_scope}) \\
 \hline
-ECIES-style P-256 key wrapping &
-125-byte token; browser wraps $k_{enc}$ under recipient $pk_{ecies}$ &
+P-256 hybrid key wrapping &
+125-byte token; browser wraps $k_{enc}$ under recipient $pk_{wrap}$ &
 Y &
 Already implemented \\
 \hline
@@ -2389,7 +2401,7 @@ Replace software certificates with hardware-attested TPM certs \\
 Fabric PDC storage for wrapped-key tokens &
 Wrapped-key tokens may be stored in PDCs to reduce key-token metadata exposure &
 N &
-Prototype stores ECIES-wrapped tokens as encrypted Fabric world-state values indexed by document and recipient; PDC storage is production hardening.
+Prototype stores hybrid-wrapped tokens as encrypted Fabric world-state values indexed by document and recipient, so every channel member can enumerate which principals hold keys to which documents. The litigation-specific consequences, and the tension with external verifiability that makes PDC migration a design trade rather than a pure improvement, are set out in Section~\ref{sec:accessgraph}.
 \\
 \hline
 \end{xltabular}
@@ -2434,7 +2446,7 @@ containerized with Docker and Docker Compose.
 
 Experiment~\hyperref[sec:exp_crypto]{6} used Node.js WebCrypto as a same-API fallback because browser
 automation was unavailable. PBKDF2-SHA256 at 600,000 iterations measured
-100.44\,ms P50 over 10 trials, and ECIES-style P-256 reduced the wrapped-key
+100.44\,ms P50 over 10 trials, and P-256 hybrid wrap reduced the wrapped-key
 token from 256 bytes under RSA-OAEP~2048 to 125 bytes. The production stack
 uses Java~21.
 
@@ -3008,24 +3020,36 @@ latency dominated by the 2\,s \texttt{BatchTimeout}.
 ECDSA~P-256 document signing and verification were sub-millisecond in
 the same Node WebCrypto benchmark: signing measured
 0.183\,ms P50 and verification measured
-0.097\,ms P50. ECIES-style P-256 key wrapping measured
+0.097\,ms P50. P-256 hybrid key wrapping measured
 0.403\,ms P50 and unwrapping measured
-0.603\,ms P50. ECIES is used primarily for compact
+0.603\,ms P50. The hybrid wrap is used primarily for compact
 per-recipient token storage rather than for a speed advantage: both
-ECIES and RSA wrapping costs are sub-millisecond in the Node WebCrypto
-benchmark. The ECIES-style P-256 wrapped-key token occupies
+Hybrid-wrap and RSA wrapping costs are sub-millisecond in the Node WebCrypto
+benchmark. The hybrid-wrap token occupies
 125 bytes, compared with 256 bytes for
-RSA-OAEP~2048, a 51.2\,\% reduction that directly reduces
+RSA-OAEP~2048, a 51.2\,\% reduction that reduces
 ledger and network storage per access-grant event.
+
+That comparison should not be read as a claim of state-of-the-art
+compactness, because RSA-OAEP~2048 is a weak baseline to beat in 2026. An
+HPKE token under \textsc{DHKEM}(X25519, HKDF-SHA-256) with AES-128-GCM
+(RFC~9180)~\cite{rfc9180} would occupy roughly 80 bytes for the same
+payload --- about 36\,\% \emph{smaller} than the construction measured here.
+Most of the difference is encoding rather than cryptography: this prototype
+serialises an uncompressed P-256 point (65~bytes, reducible to 33 compressed)
+and an explicit 12-byte nonce that HPKE derives from the key schedule. The
+defensible statement is therefore that per-recipient token overhead is small
+in absolute terms and materially smaller than the RSA baseline it replaced,
+not that it is minimal.
 
 \begin{figure*}[!tbp]
     \centering
     \includegraphics[width=\textwidth]{fig6_crypto.pdf}
     \caption{Experiment~6 cryptographic primitive benchmark using Node.js
     WebCrypto fallback (Linux; P50 with bootstrap 95\,\% CIs,
-    $n{=}10$, log scale): PBKDF2-SHA256, ECDH/ECDSA operations, ECIES and
+    $n{=}10$, log scale): PBKDF2-SHA256, ECDH/ECDSA operations, hybrid-wrap and
     RSA-OAEP key wrapping, AES-GCM, and SHA-256, with the wrapped-key
-    token-size comparison (ECIES 125\,B vs.\ RSA-OAEP-2048 256\,B)
+    token-size comparison (hybrid wrap 125\,B vs.\ RSA-OAEP-2048 256\,B)
     annotated.}
     \label{fig:crypto}
 \end{figure*}
@@ -3974,6 +3998,44 @@ for the prototype's integrity-verification workflow, but production systems
 should move \(\mathcal{H}_D\) into a Fabric Private Data Collection or
 replace it with a keyed commitment available only to authorized auditors.
 
+\subsubsection{Access-Graph Disclosure to Channel Members}
+\label{sec:accessgraph}
+The preceding discussion applies to metadata generally. One instance of it is
+specific enough to the litigation setting to warrant naming, because it is a
+disclosure that the architecture creates rather than merely fails to prevent.
+
+Wrapped-key tokens and the document ACL are ordinary world-state values on the
+main channel, indexed by document and recipient. Every channel member can
+therefore enumerate, for every document, the exact set of principals holding a
+key to it, together with the time each grant was issued and revoked. Document
+\emph{content} remains encrypted throughout; what is exposed is the
+\emph{access graph}.
+
+In litigation that graph is itself sensitive, and often more immediately
+actionable than the documents. Granting a key to an outside expert discloses
+that the expert has been retained, potentially before any disclosure
+obligation has attached. The number and identity of reviewers on a matter
+signal staffing level, which correlates with a party's own assessment of
+exposure. The volume and timing of grants to an opposing firm reveal
+production scope and its pace. Bursts of grant activity align with case
+events --- a filing deadline, a deposition --- so even pseudonymous
+identifiers leak through timing. Where ethical walls are in force, the grant
+graph reveals precisely which matters a given lawyer has been screened away
+from, which is the opposite of what screening is meant to achieve.
+
+This exposure is in direct tension with the paper's central design choice.
+Authorization is externally verifiable \emph{because} the decision and the
+state it reads are on the ledger, visible to every channel member; the same
+visibility is what discloses the access graph. Moving wrapped-key tokens and
+the ACL into a Fabric Private Data Collection (Table~\ref{tab:framework_vs_prototype})
+would confine them to a member subset, but it narrows verification to that
+same subset --- a regulator outside the collection could no longer
+independently check an access decision --- and it changes the endorsement
+requirements for \texttt{CheckAccess}. We therefore record this as an
+unresolved design tension rather than a straightforward hardening step. It is
+not addressed in the measured prototype, and the sizing implications of PDC
+migration are not evaluated in any experiment reported here.
+
 \subsubsection{Authentication Assurance Level}
 The prototype implements AAL1 under NIST SP~800-63-4~\cite{nist800634}:
 username/password with signed JSON Web Tokens~\cite{rfc7519jwt}.
@@ -4262,11 +4324,12 @@ The evaluation also shows that the cryptographic layer is not the dominant
 performance cost. Using Node.js WebCrypto as a same-API fallback,
 PBKDF2-SHA256 at 600,000 iterations measured 100.44\,ms P50, AES-GCM
 encryption of a 50\,MB document measured 44.42\,ms P50, and AES-GCM
-decryption measured 61.94\,ms P50. ECDSA signing and verification, and ECIES
+decryption measured 61.94\,ms P50. ECDSA signing and verification, and hybrid-wrap
 wrapping and unwrapping, were sub-millisecond in the measured environment.
-ECIES-style P-256 is used primarily for compact per-recipient key
+P-256 hybrid wrap is used primarily for compact per-recipient key
 distribution: its 125-byte wrapped-key token is 51.2\,\% smaller than the
-256-byte RSA-OAEP~2048 token.
+256-byte RSA-OAEP~2048 token it replaced, though larger than the
+$\approx$80-byte HPKE~(RFC~9180) equivalent, mostly for encoding reasons.
 
 \FloatBarrier
 \section{Conclusion}
@@ -4366,7 +4429,7 @@ export async function encryptDocument(
 \begin{lstlisting}[language=TypeScript,
     caption={PBKDF2-SHA256 key derivation at 600,000 iterations (OWASP
     password-storage guidance; exceeds the NIST SP~800-132 minimum work
-    factor). Derives the AES-256-GCM wrapping key protecting both ECIES
+    factor). Derives the AES-256-GCM wrapping key protecting both hybrid-wrap
     and ECDSA private keys in \texttt{localStorage}.},
     label=lst:pbkdf2]
 // frontend/src/lib/crypto.ts
