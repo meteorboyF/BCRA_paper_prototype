@@ -1,1 +1,7 @@
 .claude/
+
+# Figures_New/ is a local staging area for the paper rewrite. Every binary in
+# it is a byte-identical copy of an already-tracked file in bra_submission/figures/,
+# so only the manifest (the validity assessment) is worth versioning.
+Figures_New/*
+!Figures_New/MANIFEST.md
