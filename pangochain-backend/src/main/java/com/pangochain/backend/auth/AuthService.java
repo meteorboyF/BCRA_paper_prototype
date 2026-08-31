@@ -1,6 +1,9 @@
 package com.pangochain.backend.auth;
 
 import com.pangochain.backend.audit.AuditService;
+import com.pangochain.backend.blockchain.FabricException;
+import com.pangochain.backend.blockchain.FabricGatewayService;
+import com.pangochain.backend.crypto.KeyHashing;
 import com.pangochain.backend.auth.dto.AuthResponse;
 import com.pangochain.backend.auth.dto.LoginRequest;
 import com.pangochain.backend.auth.dto.RefreshRequest;
@@ -31,6 +34,9 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final AuditService auditService;
     private final RecoveryCodeService recoveryCodeService;
+
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private FabricGatewayService fabricGatewayService;
 
     private static final GoogleAuthenticator gAuth = new GoogleAuthenticator();
 
@@ -71,7 +77,22 @@ public class AuthService {
 
         userRepository.save(user);
 
-        auditService.log("USER_REGISTERED", user.getId(), "USER", user.getId().toString(), null, null);
+        // S3 closure: anchor the hash of the wrapping key on the ledger at enrollment.
+        // The binding is immutable on-chain, so a later substitution of the key in this
+        // table can no longer be re-anchored, and GrantAccess verifies against it.
+        // Availability-first like other registration side effects: a failure is logged
+        // and the user remains grantable under the migration posture (binding absent).
+        String keyAnchorTx = null;
+        if (fabricGatewayService != null && user.getPublicKeyEcies() != null) {
+            try {
+                keyAnchorTx = fabricGatewayService.registerUserKey(
+                        user.getId().toString(), KeyHashing.sha256Hex(user.getPublicKeyEcies()));
+            } catch (FabricException e) {
+                log.warn("RegisterUserKey failed for {} (user remains unbound): {}", user.getEmail(), e.getMessage());
+            }
+        }
+
+        auditService.log("USER_REGISTERED", user.getId(), "USER", user.getId().toString(), keyAnchorTx, null);
 
         log.info("New user registered: {} ({}), status={}", req.email(), req.role(), initialStatus);
 

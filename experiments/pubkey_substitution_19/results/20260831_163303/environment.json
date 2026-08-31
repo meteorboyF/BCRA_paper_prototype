@@ -1,0 +1,4 @@
+{"experiment":"19 - public-key substitution S3 closure",
+ "timestamp_utc":"2026-08-31T16:33:03Z",
+ "git_commit":"d1d1333be2babf4e8e03ac050d39e2acd2b25159",
+ "chaincode":"legalcc v1.1 seq 2 (RegisterUserKey + GrantAccess binding check)"}

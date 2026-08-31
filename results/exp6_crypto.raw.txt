@@ -1,5 +1,5 @@
 === PangoChain Experiment 6 Crypto Benchmark ===
-Timestamp: 2026-06-05T04:57:12.654Z
+Timestamp: 2026-08-31T16:36:50.698Z
 Runtime: node-webcrypto
 Command: node experiments/run-exp6-crypto-benchmark.mjs
 Trials per operation: 10
@@ -29,23 +29,23 @@ Running ecdsa_p256_verify_signature...
 === Summary ===
 | Operation | n | p50 ms | p95 ms | output bytes |
 |---|---:|---:|---:|---:|
-| pbkdf2_sha256_600k_aes256 | 10 | 100.443698 | 108.41551 | 32 |
-| ecdh_p256_keygen | 10 | 0.254506 | 0.581171 | 0 |
-| ecdsa_p256_keygen | 10 | 0.095333 | 0.341318 | 0 |
-| ecies_p256_wrap_32b_doc_key | 10 | 0.403269 | 1.269749 | 125 |
-| ecies_p256_unwrap_32b_doc_key | 10 | 0.603334 | 0.754629 | 32 |
-| rsa_oaep_2048_wrap_32b_doc_key | 10 | 0.036903 | 0.204815 | 256 |
-| aes_256_gcm_encrypt_1mb | 10 | 0.595617 | 1.083203 | 1048592 |
-| aes_256_gcm_encrypt_10mb | 10 | 4.269856 | 9.355313 | 10485776 |
-| aes_256_gcm_encrypt_50mb | 10 | 44.417514 | 49.620436 | 52428816 |
-| aes_256_gcm_decrypt_1mb | 10 | 0.887038 | 8.962495 | 1048576 |
-| aes_256_gcm_decrypt_10mb | 10 | 7.576633 | 13.35252 | 10485760 |
-| aes_256_gcm_decrypt_50mb | 10 | 61.939254 | 64.939181 | 52428800 |
-| sha256_hash_1mb | 10 | 0.704307 | 8.351246 | 32 |
-| sha256_hash_10mb | 10 | 5.795334 | 8.929673 | 32 |
-| sha256_hash_50mb | 10 | 44.427271 | 46.535369 | 32 |
-| ecdsa_p256_sign_sha256_hash | 10 | 0.182758 | 8.259156 | 64 |
-| ecdsa_p256_verify_signature | 10 | 0.097338 | 0.320387 | 1 |
+| pbkdf2_sha256_600k_aes256 | 10 | 151.825523 | 158.036918 | 32 |
+| ecdh_p256_keygen | 10 | 0.246916 | 0.579211 | 0 |
+| ecdsa_p256_keygen | 10 | 0.140994 | 0.377735 | 0 |
+| ecies_p256_wrap_32b_doc_key | 10 | 0.721991 | 4.466506 | 125 |
+| ecies_p256_unwrap_32b_doc_key | 10 | 0.407965 | 1.308238 | 32 |
+| rsa_oaep_2048_wrap_32b_doc_key | 10 | 0.171673 | 5.577504 | 256 |
+| aes_256_gcm_encrypt_1mb | 10 | 0.708065 | 0.847135 | 1048592 |
+| aes_256_gcm_encrypt_10mb | 10 | 6.210664 | 9.589376 | 10485776 |
+| aes_256_gcm_encrypt_50mb | 10 | 46.51956 | 57.661976 | 52428816 |
+| aes_256_gcm_decrypt_1mb | 10 | 0.891746 | 18.50235 | 1048576 |
+| aes_256_gcm_decrypt_10mb | 10 | 7.795778 | 13.699603 | 10485760 |
+| aes_256_gcm_decrypt_50mb | 10 | 73.148387 | 78.272713 | 52428800 |
+| sha256_hash_1mb | 10 | 1.279038 | 8.68018 | 32 |
+| sha256_hash_10mb | 10 | 11.497428 | 14.800532 | 32 |
+| sha256_hash_50mb | 10 | 79.055612 | 85.079077 | 32 |
+| ecdsa_p256_sign_sha256_hash | 10 | 0.137839 | 7.982357 | 64 |
+| ecdsa_p256_verify_signature | 10 | 0.164289 | 0.503654 | 1 |
 
 ECIES token size: 125 bytes
 RSA-OAEP 2048 token size: 256 bytes

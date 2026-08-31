@@ -129,7 +129,21 @@ log('');
 const documentKey = randomBytes(32);
 
 log('Generating reusable key material...');
-const recipientEcdh = await subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, ['deriveKey']);
+const recipientEcdh = await subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, ['deriveKey', 'deriveBits']);
+
+// HKDF-SHA256 over the ECDH shared secret — mirrors src/lib/crypto.ts deriveWrappingKey (v2).
+// A KDF is interposed rather than using the raw shared-secret x-coordinate directly, per
+// NIST SP 800-56C / RFC 9180. Freshness comes from the ephemeral key, so an empty salt with
+// a fixed domain-separation info label suffices and leaves the token format unchanged.
+const HKDF_INFO = new TextEncoder().encode('pangochain:wrap:hkdf:v2');
+async function deriveWrappingKey(ecdhPublic, ecdhPrivate, usage) {
+  const sharedSecret = await subtle.deriveBits({ name: 'ECDH', public: ecdhPublic }, ecdhPrivate, 256);
+  const hkdfKey = await subtle.importKey('raw', sharedSecret, 'HKDF', false, ['deriveKey']);
+  return subtle.deriveKey(
+    { name: 'HKDF', hash: 'SHA-256', salt: new Uint8Array(0), info: HKDF_INFO },
+    hkdfKey, { name: 'AES-GCM', length: 256 }, false, [usage],
+  );
+}
 const rsaOaep = await subtle.generateKey(
   { name: 'RSA-OAEP', modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: 'SHA-256' },
   true,
@@ -199,14 +213,8 @@ await runOperation(
   32,
   (token) => token.byteLength,
   async () => {
-    const ephemeral = await subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, ['deriveKey']);
-    const wrappingKey = await subtle.deriveKey(
-      { name: 'ECDH', public: recipientEcdh.publicKey },
-      ephemeral.privateKey,
-      { name: 'AES-GCM', length: 256 },
-      false,
-      ['encrypt'],
-    );
+    const ephemeral = await subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, ['deriveKey', 'deriveBits']);
+    const wrappingKey = await deriveWrappingKey(recipientEcdh.publicKey, ephemeral.privateKey, 'encrypt');
     const iv = randomBytes(12);
     const wrapped = new Uint8Array(await subtle.encrypt({ name: 'AES-GCM', iv }, wrappingKey, documentKey));
     const ephPubRaw = new Uint8Array(await subtle.exportKey('raw', ephemeral.publicKey));
@@ -214,7 +222,7 @@ await runOperation(
     wrapTokens.push(token);
     return token;
   },
-  'Token is raw ephemeral public key + IV + AES-GCM ciphertext/tag.',
+  'Token is raw ephemeral public key + IV + AES-GCM ciphertext/tag. ECDH shared secret run through HKDF-SHA256 (v2).',
 );
 
 const unwrapToken = wrapTokens.at(-1);
@@ -233,16 +241,10 @@ await runOperation(
       false,
       [],
     );
-    const wrappingKey = await subtle.deriveKey(
-      { name: 'ECDH', public: ephPublicKey },
-      recipientEcdh.privateKey,
-      { name: 'AES-GCM', length: 256 },
-      false,
-      ['decrypt'],
-    );
+    const wrappingKey = await deriveWrappingKey(ephPublicKey, recipientEcdh.privateKey, 'decrypt');
     return subtle.decrypt({ name: 'AES-GCM', iv: unwrapIv }, wrappingKey, unwrapCiphertext);
   },
-  'Imports raw ephemeral P-256 public key and decrypts AES-GCM wrapped document key.',
+  'Imports raw ephemeral P-256 public key, HKDF-SHA256 over the shared secret, decrypts AES-GCM.',
 );
 
 await runOperation(

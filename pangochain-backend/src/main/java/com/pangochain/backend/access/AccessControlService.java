@@ -3,6 +3,7 @@ package com.pangochain.backend.access;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pangochain.backend.audit.AuditService;
 import com.pangochain.backend.blockchain.FabricException;
+import com.pangochain.backend.crypto.KeyHashing;
 import com.pangochain.backend.blockchain.FabricGatewayService;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.pangochain.backend.document.Document;
@@ -84,8 +85,13 @@ public class AccessControlService {
                 ? Instant.ofEpochMilli(req.getExpiresAtEpochMs()) : null;
 
         // Fabric GrantAccess — durable: failure leaves a PENDING outbox row, not a log line.
+        // The recipient-key attestation (S3 closure) hashes the stored JWK this service
+        // would serve to the granter's browser; the chaincode compares it against the
+        // binding anchored at enrollment and refuses a substituted key.
         String granteeMsp = grantee.getFirm() != null ? grantee.getFirm().getMspId() : "FirmAMSP";
         String expiryStr = expiresAt != null ? expiresAt.toString() : "";
+        String recipientKeyHash = grantee.getPublicKeyEcies() != null
+                ? KeyHashing.sha256Hex(grantee.getPublicKeyEcies()) : "";
         PendingAnchor anchor = PendingAnchor.builder()
                 .chaincodeFunction("GrantAccess")
                 .docId(docId)
@@ -98,7 +104,8 @@ public class AccessControlService {
                         "granteeMsp", granteeMsp,
                         "capability", req.getCapability().toLowerCase(),
                         "expiresAt", expiryStr,
-                        "wrappedKeyRef", req.getWrappedKeyToken())))
+                        "wrappedKeyRef", req.getWrappedKeyToken(),
+                        "recipientKeyHash", recipientKeyHash)))
                 .build();
 
         String fabricTxId = null;
@@ -112,10 +119,26 @@ public class AccessControlService {
                     req.getCapability().toLowerCase(),
                     expiryStr,
                     req.getWrappedKeyToken(),
-                    granter.getId().toString()
+                    granter.getId().toString(),
+                    recipientKeyHash
             );
             ledgerCommitted = true;
         } catch (FabricException e) {
+            // A deterministic endorsement rejection (e.g. an S3 recipient-key mismatch) must
+            // not be queued: replaying it can never succeed and would mask the refusal. Only
+            // transport/ordering failures are durable. The chaincode's own reason travels in
+            // the endorsement detail, which FabricException surfaces in its message.
+            if (e.isDeterministicRejection()) {
+                auditService.log("ACCESS_GRANT_REJECTED_KEY_MISMATCH", granter.getId(), "DOCUMENT",
+                        docId.toString(), null,
+                        toJson(Map.of("grantee", grantee.getEmail(),
+                                "attestedKeyHash", recipientKeyHash,
+                                "reason", String.valueOf(e.getMessage()))));
+                throw new org.springframework.web.server.ResponseStatusException(
+                        org.springframework.http.HttpStatus.FORBIDDEN,
+                        "Grant refused by the ledger: the recipient's current public key does not match "
+                        + "the binding anchored at enrollment (possible key substitution).");
+            }
             log.warn("Fabric GrantAccess failed, queuing durable retry: {}", e.getMessage());
             anchor.setLastError(e.getMessage());
         }

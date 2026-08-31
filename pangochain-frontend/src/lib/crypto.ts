@@ -46,7 +46,7 @@ export async function generateEciesKeypair(password: string): Promise<EciesKeyPa
   const keyPair = await subtle.generateKey(
     { name: 'ECDH', namedCurve: 'P-256' },
     true,   // extractable — we export the private key to wrap it
-    ['deriveKey'],
+    ['deriveKey', 'deriveBits'],
   )
 
   const publicKeyJwk = await subtle.exportKey('jwk', keyPair.publicKey)
@@ -85,7 +85,7 @@ export async function unwrapPrivateKey(
 
   const rawPrivateKey = await subtle.decrypt({ name: 'AES-GCM', iv }, wrappingKey, ciphertext)
 
-  return subtle.importKey('pkcs8', rawPrivateKey, { name: 'ECDH', namedCurve: 'P-256' }, false, ['deriveKey'])
+  return subtle.importKey('pkcs8', rawPrivateKey, { name: 'ECDH', namedCurve: 'P-256' }, false, ['deriveKey', 'deriveBits'])
 }
 
 // ─── AES-256-GCM Document Encryption ─────────────────────────────────────────
@@ -166,8 +166,46 @@ function recipientAad(recipientUserId: string): Uint8Array<ArrayBuffer> {
 }
 
 /**
+ * Domain-separation label for the HKDF step below. Bumping the version here
+ * changes every derived wrapping key, so it doubles as the wrap-scheme version.
+ */
+const HKDF_INFO = new TextEncoder().encode('pangochain:wrap:hkdf:v2')
+
+/**
+ * Derive the AES-256-GCM wrapping key from an ECDH agreement, interposing
+ * HKDF-SHA256 over the raw shared secret rather than using it directly.
+ *
+ * WebCrypto's `deriveKey(ECDH → AES-GCM)` takes the leftmost 256 bits of the
+ * raw shared secret — effectively the x-coordinate of the shared point — as the
+ * key. That coordinate is a structured field element, not a uniform bit string,
+ * and the security arguments for hybrid schemes assume a KDF has produced a
+ * uniform key (NIST SP 800-56C; RFC 9180). We therefore derive the raw secret
+ * with `deriveBits` and run it through HKDF-Extract-then-Expand. The ephemeral
+ * public key travels with the token and supplies per-wrap freshness, so an empty
+ * salt with a fixed domain-separation `info` label is sufficient and keeps the
+ * token format byte-identical.
+ */
+async function deriveWrappingKey(
+  ecdhPublic: CryptoKey,
+  ecdhPrivate: CryptoKey,
+  usage: KeyUsage,
+): Promise<CryptoKey> {
+  const sharedSecret = await subtle.deriveBits(
+    { name: 'ECDH', public: ecdhPublic }, ecdhPrivate, 256,
+  )
+  const hkdfKey = await subtle.importKey('raw', sharedSecret, 'HKDF', false, ['deriveKey'])
+  return subtle.deriveKey(
+    { name: 'HKDF', hash: 'SHA-256', salt: new Uint8Array(0), info: HKDF_INFO },
+    hkdfKey,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    [usage],
+  )
+}
+
+/**
  * Wrap a document key (keyB64) with recipient's P-256 public key.
- * Uses ECDH to derive a shared secret, then AES-GCM to encrypt the key.
+ * Uses ECDH + HKDF-SHA256 to derive a wrapping key, then AES-GCM to encrypt.
  * Output is a single base64 blob: ephemeralPubKey(65) || iv(12) || wrapped(32+16)
  *
  * `recipientUserId` is bound as AAD. It is optional only so that callers that
@@ -185,17 +223,11 @@ export async function eciesWrapKey(
 
   // Generate ephemeral keypair for this wrapping operation
   const ephemeral = await subtle.generateKey(
-    { name: 'ECDH', namedCurve: 'P-256' }, true, ['deriveKey'],
+    { name: 'ECDH', namedCurve: 'P-256' }, true, ['deriveKey', 'deriveBits'],
   )
 
-  // ECDH shared secret → AES-256-GCM wrapping key
-  const wrappingKey = await subtle.deriveKey(
-    { name: 'ECDH', public: recipientPubKey },
-    ephemeral.privateKey,
-    { name: 'AES-GCM', length: 256 },
-    false,
-    ['encrypt'],
-  )
+  // ECDH shared secret → HKDF-SHA256 → AES-256-GCM wrapping key
+  const wrappingKey = await deriveWrappingKey(recipientPubKey, ephemeral.privateKey, 'encrypt')
 
   const iv = crypto.getRandomValues(new Uint8Array(12))
   const docKeyBytes = base64ToBytes(keyB64)
@@ -250,13 +282,7 @@ export async function eciesUnwrapKey(
     'raw', ephPubRaw, { name: 'ECDH', namedCurve: 'P-256' }, false, [],
   )
 
-  const wrappingKey = await subtle.deriveKey(
-    { name: 'ECDH', public: ephPubKey },
-    recipientPrivateKey,
-    { name: 'AES-GCM', length: 256 },
-    false,
-    ['decrypt'],
-  )
+  const wrappingKey = await deriveWrappingKey(ephPubKey, recipientPrivateKey, 'decrypt')
 
   if (recipientUserId) {
     try {

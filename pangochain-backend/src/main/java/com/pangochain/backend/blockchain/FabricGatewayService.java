@@ -81,7 +81,15 @@ public class FabricGatewayService {
             String txId = tx.getTransactionId();
             log.info("Fabric tx committed: fn={} txId={}", functionName, txId);
             return txId;
-        } catch (EndorseException | SubmitException | CommitStatusException | CommitException e) {
+        } catch (EndorseException e) {
+            // Peers evaluated the proposal and refused it — a deterministic policy answer
+            // (e.g. an S3 recipient-key mismatch), not an outage. The chaincode's own error
+            // string travels in the gRPC status details rather than getMessage(), so surface
+            // both and mark the failure non-retryable so callers do not queue it.
+            String detail = endorseDetail(e);
+            log.error("Endorsement rejected for '{}': {}", functionName, detail);
+            throw new FabricException("Chaincode rejected " + functionName + ": " + detail, e, true);
+        } catch (SubmitException | CommitStatusException | CommitException e) {
             log.error("Submit transaction '{}' failed: {}", functionName, e.getMessage());
             throw new FabricException("Blockchain submit failed: " + e.getMessage(), e);
         }
@@ -97,6 +105,25 @@ public class FabricGatewayService {
         log.warn("Fabric submit circuit fallback for '{}': {}", functionName, t.getMessage());
         if (t instanceof FabricException fe) throw fe;
         throw new FabricException("Blockchain unavailable (circuit open): " + t.getMessage(), t);
+    }
+
+    /**
+     * Extracts the chaincode's own error string from an EndorseException. Fabric carries it
+     * in the per-endorser {@code ErrorDetail} list rather than in getMessage(), so a plain
+     * message reads only "failed to endorse transaction". Returns the first endorser detail
+     * message, falling back to getMessage() when none is present.
+     */
+    private static String endorseDetail(org.hyperledger.fabric.client.EndorseException e) {
+        try {
+            for (var d : e.getDetails()) {
+                if (d.getMessage() != null && !d.getMessage().isBlank()) {
+                    return d.getMessage();
+                }
+            }
+        } catch (Throwable ignore) {
+            // fall through to the plain message
+        }
+        return e.getMessage() == null ? "endorsement rejected" : e.getMessage();
     }
 
     /**
@@ -159,8 +186,19 @@ public class FabricGatewayService {
     }
 
     public String grantAccess(String docId, String targetSubject, String subjectOrg,
-            String capability, String expiresAt, String wrappedKeyRef, String grantorId) throws FabricException {
-        return submitTransaction("GrantAccess", docId, targetSubject, subjectOrg, capability, expiresAt, wrappedKeyRef, grantorId);
+            String capability, String expiresAt, String wrappedKeyRef, String grantorId,
+            String recipientKeyHash) throws FabricException {
+        return submitTransaction("GrantAccess", docId, targetSubject, subjectOrg, capability,
+                expiresAt, wrappedKeyRef, grantorId, recipientKeyHash);
+    }
+
+    /**
+     * Anchors the hash of a user's public wrapping key at enrollment (S3 closure).
+     * Immutable on-chain: a later substitution in the operational identity table can
+     * no longer be re-anchored, and GrantAccess verifies against this binding.
+     */
+    public String registerUserKey(String userId, String keyHash) throws FabricException {
+        return submitTransaction("RegisterUserKey", userId, keyHash);
     }
 
     public String revokeAccess(String docId, String targetSubject, String revokerId) throws FabricException {

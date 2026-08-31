@@ -145,7 +145,8 @@ public class AnchorReconciliationWorker {
                     p.get("capability"),
                     p.getOrDefault("expiresAt", ""),
                     p.get("wrappedKeyRef"),
-                    anchor.getRevokerId().toString());
+                    anchor.getRevokerId().toString(),
+                    p.getOrDefault("recipientKeyHash", ""));
         } catch (FabricException e) {
             throw e;
         } catch (Exception e) {

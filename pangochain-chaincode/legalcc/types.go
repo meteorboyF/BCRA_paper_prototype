@@ -73,11 +73,24 @@ type CaseAsset struct {
 	Status    string `json:"status"` // ACTIVE | CLOSED | ARCHIVED
 }
 
+// UserKeyBinding anchors the hash of a user's public wrapping key at enrollment,
+// making key substitution in the operational identity table detectable at grant
+// time (threat-model Scenario S3). The binding is immutable: first write wins,
+// and key rotation requires an explicit consortium-governed re-registration,
+// which is deliberately not implemented here.
+type UserKeyBinding struct {
+	UserID       string `json:"userId"`
+	KeyHash      string `json:"keyHash"` // SHA-256 (hex) over the stored public-key JWK string
+	RegisteredAt string `json:"registeredAt"`
+	RegisteredBy string `json:"registeredBy"` // MSP that submitted the binding
+}
+
 // Composite key prefixes
 const (
-	DocPrefix   = "DOC"
-	CasePrefix  = "CASE"
-	AuditPrefix = "AUDIT"
+	DocPrefix     = "DOC"
+	CasePrefix    = "CASE"
+	AuditPrefix   = "AUDIT"
+	UserKeyPrefix = "USERKEY"
 
 	// TimeAnchorKey is the single world-state key holding the current TimeAnchor.
 	TimeAnchorKey = "TIMEANCHOR"

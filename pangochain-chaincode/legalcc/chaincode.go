@@ -65,13 +65,97 @@ func (c *LegalContract) RegisterDocument(
 
 // GrantAccess adds or updates an access capability for a target subject.
 // Stores the ECIES-wrapped document key reference for that subject.
+// RegisterUserKey anchors the hash of a user's public wrapping key at enrollment
+// (threat-model Scenario S3: public-key substitution). Immutable — a second
+// registration for the same user is refused, so an adversary who later replaces
+// the key in the operational identity table cannot re-anchor the substitute.
+func (c *LegalContract) RegisterUserKey(
+	ctx contractapi.TransactionContextInterface,
+	userID, keyHash string,
+) error {
+	if userID == "" || keyHash == "" {
+		return fmt.Errorf("userID and keyHash are required")
+	}
+	key := fmt.Sprintf("%s:%s", UserKeyPrefix, userID)
+	exists, err := assetExists(ctx, key)
+	if err != nil {
+		return err
+	}
+	if exists {
+		return fmt.Errorf("key binding for user %s already anchored; bindings are immutable", userID)
+	}
+	mspID, err := callerMSP(ctx)
+	if err != nil {
+		return err
+	}
+	txTimestamp, err := ctx.GetStub().GetTxTimestamp()
+	if err != nil {
+		return fmt.Errorf("failed to get tx timestamp: %w", err)
+	}
+	binding := UserKeyBinding{
+		UserID:       userID,
+		KeyHash:      keyHash,
+		RegisteredAt: time.Unix(txTimestamp.Seconds, 0).UTC().Format(time.RFC3339),
+		RegisteredBy: mspID,
+	}
+	if err := putAsset(ctx, key, binding); err != nil {
+		return err
+	}
+	return c.logAuditInternal(ctx, "USER_KEY_ANCHORED", userID, mspID, userID,
+		fmt.Sprintf(`{"keyHash":"%s"}`, keyHash))
+}
+
+// GetUserKeyBinding returns the anchored binding for a user, or an empty string
+// if none has been anchored.
+func (c *LegalContract) GetUserKeyBinding(
+	ctx contractapi.TransactionContextInterface,
+	userID string,
+) (string, error) {
+	data, err := ctx.GetStub().GetState(fmt.Sprintf("%s:%s", UserKeyPrefix, userID))
+	if err != nil {
+		return "", err
+	}
+	if data == nil {
+		return "", nil
+	}
+	return string(data), nil
+}
+
 func (c *LegalContract) GrantAccess(
 	ctx contractapi.TransactionContextInterface,
-	docID, targetSubject, subjectOrg, capability, expiresAt, wrappedKeyRef, grantorID string,
+	docID, targetSubject, subjectOrg, capability, expiresAt, wrappedKeyRef, grantorID,
+	recipientKeyHash string,
 ) error {
 	doc, err := getDocument(ctx, docID)
 	if err != nil {
 		return err
+	}
+
+	// S3 closure: when a key binding is anchored for the recipient, the caller must
+	// attest the hash of the public key the wrap was produced under, and it must
+	// match the enrollment-time anchor. A substituted key in the operational
+	// identity table then fails here, in consortium-visible state, instead of
+	// silently yielding a grant wrapped for the attacker. Absent a binding the
+	// grant proceeds (migration posture for users enrolled before anchoring;
+	// recorded in the audit payload).
+	bindingRaw, err := ctx.GetStub().GetState(fmt.Sprintf("%s:%s", UserKeyPrefix, targetSubject))
+	if err != nil {
+		return fmt.Errorf("failed to read key binding for %s: %w", targetSubject, err)
+	}
+	bindingChecked := "absent"
+	if bindingRaw != nil {
+		var binding UserKeyBinding
+		if err := json.Unmarshal(bindingRaw, &binding); err != nil {
+			return fmt.Errorf("unreadable key binding for %s: %w", targetSubject, err)
+		}
+		if recipientKeyHash == "" {
+			return fmt.Errorf("recipient %s has an anchored key binding; recipientKeyHash attestation is required", targetSubject)
+		}
+		if recipientKeyHash != binding.KeyHash {
+			return fmt.Errorf("recipient key mismatch for %s: attested %s, anchored %s — possible key substitution",
+				targetSubject, recipientKeyHash, binding.KeyHash)
+		}
+		bindingChecked = "verified"
 	}
 
 	mspID, err := callerMSP(ctx)
@@ -114,7 +198,8 @@ func (c *LegalContract) GrantAccess(
 	}))
 
 	return c.logAuditInternal(ctx, "ACCESS_GRANTED", grantorID, mspID, docID,
-		fmt.Sprintf(`{"subject":"%s","capability":"%s","expiresAt":"%s"}`, targetSubject, capability, expiresAt))
+		fmt.Sprintf(`{"subject":"%s","capability":"%s","expiresAt":"%s","keyBinding":"%s"}`,
+			targetSubject, capability, expiresAt, bindingChecked))
 }
 
 // ─── RevokeAccess ────────────────────────────────────────────────────────────
