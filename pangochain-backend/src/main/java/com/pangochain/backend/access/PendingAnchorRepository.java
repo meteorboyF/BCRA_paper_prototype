@@ -11,4 +11,12 @@ public interface PendingAnchorRepository extends JpaRepository<PendingAnchor, UU
 
     List<PendingAnchor> findByStatusAndNextAttemptAtBefore(
             PendingAnchor.Status status, Instant cutoff, Pageable pageable);
+
+    /**
+     * FIFO guard for the reconciliation worker: true if an older PENDING anchor exists for
+     * the same (document, user). Draining strictly in creation order per pair preserves the
+     * caller's intent order — a grant queued before a revoke can never commit after it.
+     */
+    boolean existsByStatusAndDocIdAndTargetUserIdAndCreatedAtBefore(
+            PendingAnchor.Status status, UUID docId, UUID targetUserId, Instant createdAt);
 }

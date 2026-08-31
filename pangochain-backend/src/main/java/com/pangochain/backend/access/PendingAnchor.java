@@ -65,6 +65,15 @@ public class PendingAnchor {
     @Column(name = "last_error", columnDefinition = "TEXT")
     private String lastError;
 
+    /**
+     * JSON arguments needed to replay the chaincode call at drain time, for functions whose
+     * argument set exceeds the fixed columns (GrantAccess: grantee MSP, capability, expiry,
+     * wrapped-key reference). Null for RevokeAccess rows, whose three arguments are covered
+     * by {@code docId}/{@code targetUserId}/{@code revokerId}.
+     */
+    @Column(columnDefinition = "TEXT")
+    private String payload;
+
     @PrePersist
     void prePersist() {
         if (createdAt == null) createdAt = Instant.now();

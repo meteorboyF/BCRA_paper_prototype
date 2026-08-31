@@ -60,7 +60,14 @@ public class AccessControlController {
             @Valid @RequestBody GrantAccessRequest req,
             @AuthenticationPrincipal UserDetails principal) {
         User granter = resolveUser(principal);
-        return ResponseEntity.ok(accessControlService.grant(req, granter));
+        AccessDto dto = accessControlService.grant(req, granter);
+        // 202 while the ledger anchor is queued for durable retry (mirrors revoke): the
+        // operational grant has landed, but the response must not claim a ledger anchor
+        // that has not committed.
+        if ("pending".equals(dto.getLedgerSyncStatus())) {
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(dto);
+        }
+        return ResponseEntity.ok(dto);
     }
 
     /**

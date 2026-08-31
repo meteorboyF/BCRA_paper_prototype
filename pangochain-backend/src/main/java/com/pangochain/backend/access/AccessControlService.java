@@ -41,11 +41,19 @@ public class AccessControlService {
     public record RevokeResult(boolean ledgerCommitted, String fabricTxId, UUID pendingAnchorId) {}
 
     /**
-     * Phase 4: Grant access — ECIES-wrapped key arrives from the browser.
+     * Phase 4: Grant access — wrapped key arrives from the browser.
      * 1. Verify granter has owner/write capability
      * 2. Call GrantAccess chaincode (records on ledger)
      * 3. Persist DocumentAccess row
      * 4. Notify grantee
+     *
+     * The ledger write is durable, mirroring {@link #revoke}: attempted inline for the
+     * common case, and on failure (e.g. an ordering outage) a PENDING {@link PendingAnchor}
+     * row carrying the full replay payload is committed in the same DB transaction. Before
+     * this change grant() was fire-and-forget — a grant issued during an outage updated the
+     * operational ACL and was never anchored, the mirror-image of the revocation defect
+     * fixed in 027. The response carries "pending" rather than unqualified success while
+     * the anchor is outstanding.
      */
     @Transactional
     public AccessDto grant(GrantAccessRequest req, User granter) {
@@ -75,23 +83,49 @@ public class AccessControlService {
         Instant expiresAt = req.getExpiresAtEpochMs() != null
                 ? Instant.ofEpochMilli(req.getExpiresAtEpochMs()) : null;
 
-        // Fabric GrantAccess
+        // Fabric GrantAccess — durable: failure leaves a PENDING outbox row, not a log line.
+        String granteeMsp = grantee.getFirm() != null ? grantee.getFirm().getMspId() : "FirmAMSP";
+        String expiryStr = expiresAt != null ? expiresAt.toString() : "";
+        PendingAnchor anchor = PendingAnchor.builder()
+                .chaincodeFunction("GrantAccess")
+                .docId(docId)
+                .targetUserId(granteeId)
+                .revokerId(granter.getId())
+                .status(PendingAnchor.Status.PENDING)
+                .attempts(0)
+                .nextAttemptAt(Instant.now())
+                .payload(toJson(Map.of(
+                        "granteeMsp", granteeMsp,
+                        "capability", req.getCapability().toLowerCase(),
+                        "expiresAt", expiryStr,
+                        "wrappedKeyRef", req.getWrappedKeyToken())))
+                .build();
+
         String fabricTxId = null;
+        boolean ledgerCommitted = false;
         try {
             if (fabricGatewayService == null) throw new FabricException("Fabric not enabled");
-            String expiryStr = expiresAt != null ? expiresAt.toString() : "";
             fabricTxId = fabricGatewayService.grantAccess(
                     docId.toString(),
                     grantee.getId().toString(),
-                    grantee.getFirm() != null ? grantee.getFirm().getMspId() : "FirmAMSP",
+                    granteeMsp,
                     req.getCapability().toLowerCase(),
                     expiryStr,
                     req.getWrappedKeyToken(),
                     granter.getId().toString()
             );
+            ledgerCommitted = true;
         } catch (FabricException e) {
-            log.warn("Fabric GrantAccess failed: {}", e.getMessage());
+            log.warn("Fabric GrantAccess failed, queuing durable retry: {}", e.getMessage());
+            anchor.setLastError(e.getMessage());
         }
+
+        if (ledgerCommitted) {
+            anchor.setStatus(PendingAnchor.Status.COMMITTED);
+            anchor.setFabricTxId(fabricTxId);
+            anchor.setCommittedAt(Instant.now());
+        }
+        anchor = pendingAnchorRepository.save(anchor);
 
         DocumentAccess.Capability cap = DocumentAccess.Capability.valueOf(req.getCapability().toLowerCase());
         DocumentAccess access = accessRepository.findActiveEntry(docId, granteeId)
@@ -113,9 +147,16 @@ public class AccessControlService {
 
         auditService.log("ACCESS_GRANTED", granter.getId(), "DOCUMENT",
                 docId.toString(), fabricTxId,
-                toJson(Map.of("grantee", grantee.getEmail(), "capability", req.getCapability())));
+                toJson(Map.of(
+                        "grantee", grantee.getEmail(),
+                        "capability", req.getCapability(),
+                        "ledgerSyncStatus", ledgerCommitted ? "committed" : "pending",
+                        "pendingAnchorId", anchor.getId().toString())));
 
-        return toDto(access, grantee.getEmail(), grantee.getFullName(), granter.getEmail());
+        AccessDto dto = toDto(access, grantee.getEmail(), grantee.getFullName(), granter.getEmail());
+        dto.setLedgerSyncStatus(ledgerCommitted ? "committed" : "pending");
+        dto.setPendingAnchorId(ledgerCommitted ? null : anchor.getId());
+        return dto;
     }
 
     /**

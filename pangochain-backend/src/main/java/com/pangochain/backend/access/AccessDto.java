@@ -18,4 +18,8 @@ public class AccessDto {
     private String capability;
     private Instant grantedAt;
     private Instant expiresAt;
+    /** "committed" when the ledger anchor landed inline; "pending" when queued for durable retry. */
+    private String ledgerSyncStatus;
+    /** Outbox row id when {@code ledgerSyncStatus} is "pending"; null otherwise. */
+    private UUID pendingAnchorId;
 }

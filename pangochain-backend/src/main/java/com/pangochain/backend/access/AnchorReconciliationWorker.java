@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,8 +60,24 @@ public class AnchorReconciliationWorker {
     public void drain() {
         if (fabricGatewayService == null) return; // Fabric disabled — nothing to reconcile against
         List<PendingAnchor> due = pendingAnchorRepository.findByStatusAndNextAttemptAtBefore(
-                PendingAnchor.Status.PENDING, Instant.now(), PageRequest.of(0, MAX_BATCH));
+                PendingAnchor.Status.PENDING, Instant.now(),
+                PageRequest.of(0, MAX_BATCH, Sort.by("createdAt")));
         for (PendingAnchor anchor : due) {
+            // FIFO guard: never replay an anchor while an older PENDING sibling exists for the
+            // same (doc, user). A grant queued before a revoke that committed after it would
+            // re-authorize the revoked user; draining in creation order per pair makes the
+            // reconciled ledger history match the caller's intent order. The batch above is
+            // already sorted, so the older sibling is normally attempted first within the same
+            // pass and this check only fires when it failed again moments ago.
+            boolean olderSiblingPending = pendingAnchorRepository
+                    .existsByStatusAndDocIdAndTargetUserIdAndCreatedAtBefore(
+                            PendingAnchor.Status.PENDING, anchor.getDocId(),
+                            anchor.getTargetUserId(), anchor.getCreatedAt());
+            if (olderSiblingPending) {
+                log.debug("Anchor {} deferred: older pending anchor exists for doc={} user={}",
+                        anchor.getId(), anchor.getDocId(), anchor.getTargetUserId());
+                continue;
+            }
             attempt(anchor);
         }
     }
@@ -73,6 +90,7 @@ public class AnchorReconciliationWorker {
                         anchor.getDocId().toString(),
                         anchor.getTargetUserId().toString(),
                         anchor.getRevokerId().toString());
+                case "GrantAccess" -> replayGrant(anchor);
                 default -> throw new FabricException(
                         "No reconciliation handler for chaincode function: " + anchor.getChaincodeFunction());
             };
@@ -88,7 +106,9 @@ public class AnchorReconciliationWorker {
                     anchor.getId(), anchor.getChaincodeFunction(), anchor.getAttempts(),
                     anchor.getAttempts() == 1 ? "y" : "ies", divergenceMs, txId);
 
-            auditService.log("ACCESS_REVOKED_LEDGER_SYNCED", anchor.getRevokerId(), "DOCUMENT",
+            String auditEvent = "GrantAccess".equals(anchor.getChaincodeFunction())
+                    ? "ACCESS_GRANTED_LEDGER_SYNCED" : "ACCESS_REVOKED_LEDGER_SYNCED";
+            auditService.log(auditEvent, anchor.getRevokerId(), "DOCUMENT",
                     anchor.getDocId().toString(), txId,
                     toJson(Map.of(
                             "targetUser", anchor.getTargetUserId().toString(),
@@ -106,6 +126,30 @@ public class AnchorReconciliationWorker {
             log.warn("Anchor {} ({}) retry {} failed, next attempt in {}s: {}",
                     anchor.getId(), anchor.getChaincodeFunction(), anchor.getAttempts(),
                     backoffSeconds, e.getMessage());
+        }
+    }
+
+    /**
+     * Replays a queued GrantAccess from the anchor's JSON payload. GrantAccess overwrites the
+     * document's ACL entry for the target subject, so replay after an already-successful but
+     * unrecorded submit is idempotent.
+     */
+    private String replayGrant(PendingAnchor anchor) throws FabricException {
+        try {
+            Map<String, String> p = objectMapper.readValue(anchor.getPayload(),
+                    objectMapper.getTypeFactory().constructMapType(Map.class, String.class, String.class));
+            return fabricGatewayService.grantAccess(
+                    anchor.getDocId().toString(),
+                    anchor.getTargetUserId().toString(),
+                    p.get("granteeMsp"),
+                    p.get("capability"),
+                    p.getOrDefault("expiresAt", ""),
+                    p.get("wrappedKeyRef"),
+                    anchor.getRevokerId().toString());
+        } catch (FabricException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new FabricException("Unreadable GrantAccess payload for anchor " + anchor.getId(), e);
         }
     }
 
