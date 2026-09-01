@@ -1,0 +1,396 @@
+\begin{thebibliography}{10}
+\expandafter\ifx\csname url\endcsname\relax
+  \def\url#1{\texttt{#1}}\fi
+\expandafter\ifx\csname urlprefix\endcsname\relax\def\urlprefix{URL }\fi
+\expandafter\ifx\csname href\endcsname\relax
+  \def\href#1#2{#2} \def\path#1{#1}\fi
+
+\bibitem{ico2024trends}
+{Information Commissioner's Office},
+  \href{https://ico.org.uk/action-weve-taken/complaints-and-concerns-data-sets/data-security-incident-trends/}{Data
+  security incident trends}, [Online], accessed: Jun. 2026 (2024).
+\newline\urlprefix\url{https://ico.org.uk/action-weve-taken/complaints-and-concerns-data-sets/data-security-incident-trends/}
+
+\bibitem{aba2023}
+{American Bar Association},
+  \href{https://www.americanbar.org/groups/law_practice/resources/tech-report/2023/2023-cybersecurity-techreport/}{2023
+  cybersecurity tech report}, accessed: Dec.\ 14, 2025 (Dec. 2023).
+\newline\urlprefix\url{https://www.americanbar.org/groups/law_practice/resources/tech-report/2023/2023-cybersecurity-techreport/}
+
+\bibitem{nistir8202}
+D.~Yaga, P.~Mell, N.~Roby, K.~Scarfone, Blockchain technology overview, NIST
+  Internal Report 8202, National Institute of Standards and Technology (NIST),
+  Gaithersburg, MD (Oct. 2018).
+\newblock \href {https://doi.org/10.6028/NIST.IR.8202}
+  {\path{doi:10.6028/NIST.IR.8202}}.
+
+\bibitem{nielsen1993usability}
+J.~Nielsen, Usability Engineering, Morgan Kaufmann, San Francisco, CA, USA,
+  1993.
+
+\bibitem{miller1968response}
+R.~B. Miller, \href{https://doi.org/10.1145/1476589.1476628}{Response time in
+  man-computer conversational transactions}, in: Proceedings of the December
+  9-11, 1968, Fall Joint Computer Conference, Part I, AFIPS '68 (Fall, part I),
+  Association for Computing Machinery, New York, NY, USA, 1968, p. 267–277.
+\newblock \href {https://doi.org/10.1145/1476589.1476628}
+  {\path{doi:10.1145/1476589.1476628}}.
+\newline\urlprefix\url{https://doi.org/10.1145/1476589.1476628}
+
+\bibitem{steichen2018blockchain}
+M.~Steichen, B.~Fiz, R.~Norvill, W.~Shbair, R.~State, Blockchain-based,
+  decentralized access control for {IPFS}, in: 2018 IEEE International
+  Conference on Internet of Things (iThings) and IEEE Green Computing and
+  Communications (GreenCom) and IEEE Cyber, Physical and Social Computing
+  (CPSCom) and IEEE Smart Data (SmartData), IEEE, 2018, pp. 1499--1506.
+\newblock \href {https://doi.org/10.1109/Cybermatics_2018.2018.00253}
+  {\path{doi:10.1109/Cybermatics_2018.2018.00253}}.
+
+\bibitem{liu2026rbacipfs}
+N.~Liu, S.~Lu, F.~Guan, W.~Ren, A blockchain-based traceable access control
+  scheme for {IPFS}, Blockchain: Research and ApplicationsIn press, journal
+  pre-proof (2026).
+\newblock \href {https://doi.org/10.1016/j.bcra.2026.100503}
+  {\path{doi:10.1016/j.bcra.2026.100503}}.
+
+\bibitem{androulaki2018hyperledger}
+E.~Androulaki, A.~Barger, V.~Bortnikov, C.~Cachin, K.~Christidis, A.~De~Caro,
+  D.~Enyeart, C.~Ferris, G.~Laventman, Y.~Manevich, S.~Muralidharan, C.~Murthy,
+  B.~Nguyen, M.~Sethi, G.~Singh, K.~Smith, A.~Sorniotti, C.~Stathakopoulou,
+  M.~Vukoli{\'c}, S.~W. Cocco, J.~Yellick, Hyperledger fabric: A distributed
+  operating system for permissioned blockchains, in: Proceedings of the
+  Thirteenth EuroSys Conference (EuroSys '18), ACM, 2018, pp. 1--15.
+\newblock \href {https://doi.org/10.1145/3190508.3190538}
+  {\path{doi:10.1145/3190508.3190538}}.
+
+\bibitem{benet2014ipfs}
+J.~Benet, \href{https://arxiv.org/abs/1407.3561}{{IPFS}: Content addressed,
+  versioned, {P2P} file system}, arXiv preprint arXiv:1407.3561, accessed:
+  Dec.\ 14, 2025 (2014).
+\newline\urlprefix\url{https://arxiv.org/abs/1407.3561}
+
+\bibitem{liu2024blockchain}
+S.~Liu, Q.~Zheng, A study of a blockchain-based judicial evidence preservation
+  scheme, Blockchain: Research and Applications 5~(2) (2024) 100192.
+\newblock \href {https://doi.org/10.1016/j.bcra.2024.100192}
+  {\path{doi:10.1016/j.bcra.2024.100192}}.
+
+\bibitem{twoLevelBlockchain}
+D.~Kim, S.-Y. Ihm, Y.~Son, Two-level blockchain system for digital crime
+  evidence management, Sensors 21~(9) (2021).
+\newblock \href {https://doi.org/10.3390/s21093051}
+  {\path{doi:10.3390/s21093051}}.
+
+\bibitem{verma2021nyaya}
+A.~Verma, P.~Bhattacharya, D.~Saraswat, S.~Tanwar, {NyaYa}: Blockchain-based
+  electronic law record management scheme for judicial investigations, Journal
+  of Information Security and Applications 63 (2021) 103025.
+\newblock \href {https://doi.org/10.1016/j.jisa.2021.103025}
+  {\path{doi:10.1016/j.jisa.2021.103025}}.
+
+\bibitem{hanafi2021ipfschain}
+J.~Hanafi, Y.~Prayudi, A.~Luthfi, {IPFSChain}: Interplanetary file system and
+  hyperledger fabric collaboration for chain of custody and digital evidence
+  management, International Journal of Computer Applications 183 (2021) 24--31.
+\newblock \href {https://doi.org/10.5120/ijca2021921808}
+  {\path{doi:10.5120/ijca2021921808}}.
+
+\bibitem{hernando2025wills}
+J.~Hernando-Corrochano, R.~Pastor-Vargas, R.~Hern{\'a}ndez-Berlinches, Trusted
+  wills for digital assets using blockchain: a practical case, Blockchain:
+  Research and Applications 6 (2025) 100289.
+\newblock \href {https://doi.org/10.1016/j.bcra.2025.100289}
+  {\path{doi:10.1016/j.bcra.2025.100289}}.
+
+\bibitem{jlil2024blockchain}
+M.~Jlil, K.~Jouti, C.~Loqman, Blockchain and smart contracts based system for
+  criminal record management, Indonesian Journal of Electrical Engineering and
+  Computer Science 37~(1) (2025) 365--379.
+\newblock \href {https://doi.org/10.11591/ijeecs.v37.i1.pp365-379}
+  {\path{doi:10.11591/ijeecs.v37.i1.pp365-379}}.
+
+\bibitem{peelam2026decentralized}
+M.~S. Peelam, V.~Chamola, A.~K. Sharma, B.~K. Chaurasia, Decentralized trust:
+  {NFT} and blockchain-enabled evidence system using fog computing, Blockchain:
+  Research and Applications 7~(1) (2026) 100321.
+\newblock \href {https://doi.org/10.1016/j.bcra.2025.100321}
+  {\path{doi:10.1016/j.bcra.2025.100321}}.
+
+\bibitem{onyeashie2025fabricEvidence}
+B.~Onyeashie, M.~Abubakar, P.~Leimich, S.~Mckeown, G.~Russell,
+  Privacy-preserving and scalable digital evidence management: A hyperledger
+  fabric architecture with growth projections for law enforcement, in: 2025
+  International Conference on New Trends in Computing Sciences (ICTCS), 2025,
+  pp. 105--112.
+\newblock \href {https://doi.org/10.1109/ICTCS65341.2025.10989348}
+  {\path{doi:10.1109/ICTCS65341.2025.10989348}}.
+
+\bibitem{guo2024efficient}
+J.~Guo, K.~Zhao, Z.~Liang, K.~Min, Efficient and secure emr storage and sharing
+  scheme based on hyperledger fabric and ipfs, Applied Sciences 14 (2024) 5005.
+\newblock \href {https://doi.org/10.3390/app14125005}
+  {\path{doi:10.3390/app14125005}}.
+
+\bibitem{chen2022filewallet}
+J.~Chen, C.~Zhang, Y.~Yan, Y.~Liu, {FileWallet}: A file management system based
+  on {IPFS} and {Hyperledger Fabric}, Computer Modeling in Engineering \&
+  Sciences 130~(2) (2022) 949--966.
+\newblock \href {https://doi.org/10.32604/cmes.2022.017516}
+  {\path{doi:10.32604/cmes.2022.017516}}.
+
+\bibitem{mukta2026zerotrust}
+R.~Mukta, S.~Pal, K.~Chowdhury, M.~Hitchens, H.-y. Paik, S.~S. Kanhere, Zero
+  trust-driven access control delegation using blockchain, Blockchain: Research
+  and Applications 7~(1) (2026) 100319.
+\newblock \href {https://doi.org/10.1016/j.bcra.2025.100319}
+  {\path{doi:10.1016/j.bcra.2025.100319}}.
+
+\bibitem{notash2026adaptive}
+Z.~Notash, S.~Jamali, R.~Fotohi, An adaptive blockchain-enabled access control
+  framework for secure and privacy-preserving e-health data sharing,
+  Blockchain: Research and ApplicationsIn press, journal pre-proof (2026).
+\newblock \href {https://doi.org/10.1016/j.bcra.2026.100492}
+  {\path{doi:10.1016/j.bcra.2026.100492}}.
+
+\bibitem{macaroons2014}
+A.~Birgisson, J.~G. Politz, {\'U}.~Erlingsson, A.~Taly, M.~Vrable,
+  M.~Lentczner, Macaroons: Cookies with contextual caveats for decentralized
+  authorization in the cloud, in: 21st Annual Network and Distributed System
+  Security Symposium (NDSS 2014), Internet Society, San Diego, CA, 2014, nDSS
+  proceedings are unpaginated.
+\newblock \href {https://doi.org/10.14722/ndss.2014.23212}
+  {\path{doi:10.14722/ndss.2014.23212}}.
+
+\bibitem{zanzibar2019}
+R.~Pang, R.~Caceres, M.~Burrows, Z.~Chen, P.~Dave, N.~Germer, A.~Golynski,
+  K.~Graney, N.~Kang, L.~Kissner, J.~L. Korn, A.~Parmar, C.~D. Richards,
+  M.~Wang, \href{https://research.google/pubs/pub48190.pdf}{Zanzibar:
+  {Google's} consistent, global authorization system}, in: 2019 {USENIX} Annual
+  Technical Conference ({USENIX} {ATC} '19), USENIX Association, Renton, WA,
+  2019, pp. 33--46.
+\newline\urlprefix\url{https://research.google/pubs/pub48190.pdf}
+
+\bibitem{hu2014guide}
+V.~C. Hu, D.~Ferraiolo, R.~Kuhn, A.~Schnitzer, K.~Sandlin, R.~Miller,
+  K.~Scarfone, Guide to attribute based access control ({ABAC}) definition and
+  considerations, {NIST} Special Publication 800-162, National Institute of
+  Standards and Technology (2014).
+\newblock \href {https://doi.org/10.6028/NIST.SP.800-162}
+  {\path{doi:10.6028/NIST.SP.800-162}}.
+
+\bibitem{cai2023timebound}
+Y.~Cai, M.~Feng, A time-bound data access control scheme based on
+  attribute-based encryption, in: Proceedings of the 8th International
+  Conference on Cyber Security and Information Engineering, ICCSIE '23,
+  Association for Computing Machinery, 2023, pp. 52--56.
+\newblock \href {https://doi.org/10.1145/3617184.3617781}
+  {\path{doi:10.1145/3617184.3617781}}.
+
+\bibitem{dolev1983security}
+D.~Dolev, A.~C. Yao, On the security of public key protocols, IEEE Transactions
+  on Information Theory 29~(2) (1983) 198--208.
+\newblock \href {https://doi.org/10.1109/TIT.1983.1056650}
+  {\path{doi:10.1109/TIT.1983.1056650}}.
+
+\bibitem{rescorla2018tls}
+E.~Rescorla, The transport layer security ({TLS}) protocol version 1.3, RFC
+  8446, Internet Engineering Task Force (IETF) (Aug. 2018).
+\newblock \href {https://doi.org/10.17487/RFC8446}
+  {\path{doi:10.17487/RFC8446}}.
+
+\bibitem{castro1999pbft}
+M.~Castro, B.~Liskov, Practical {Byzantine} fault tolerance, in: Proceedings of
+  the Third Symposium on Operating Systems Design and Implementation (OSDI
+  '99), USENIX Association, Berkeley, CA, USA, 1999, pp. 173--186.
+
+\bibitem{stathakopoulou2022smartbft}
+A.~Barger, Y.~Manevich, H.~Meir, Y.~Tock, A byzantine fault-tolerant consensus
+  library for hyperledger fabric, in: 2021 IEEE International Conference on
+  Blockchain and Cryptocurrency (ICBC), IEEE, 2021, pp. 1--9.
+\newblock \href {https://doi.org/10.1109/ICBC51069.2021.9461099}
+  {\path{doi:10.1109/ICBC51069.2021.9461099}}.
+
+\bibitem{fabricBFTConfigurationDoc}
+{Hyperledger Fabric Documentation Contributors},
+  \href{https://hyperledger-fabric.readthedocs.io/en/latest/bft_configuration.html}{Configuring
+  and operating a {BFT} ordering service}, hyperledger Fabric documentation.
+  Accessed: Jun.\ 20, 2026 (2026).
+\newline\urlprefix\url{https://hyperledger-fabric.readthedocs.io/en/latest/bft_configuration.html}
+
+\bibitem{fabricCouchDBStateDB_v24}
+{Hyperledger Fabric Documentation Contributors},
+  \href{https://hyperledger-fabric.readthedocs.io/en/release-2.4/couchdb_as_state_database.html}{{CouchDB}
+  as the state database}, accessed: Dec.\ 26, 2025 (2022).
+\newline\urlprefix\url{https://hyperledger-fabric.readthedocs.io/en/release-2.4/couchdb_as_state_database.html}
+
+\bibitem{fabricChannelsDoc}
+{Hyperledger Fabric Documentation Contributors},
+  \href{https://hyperledger-fabric.readthedocs.io/en/latest/channels.html}{Channels},
+  hyperledger Fabric documentation (latest). Licensed under CC BY 4.0. (2025).
+\newline\urlprefix\url{https://hyperledger-fabric.readthedocs.io/en/latest/channels.html}
+
+\bibitem{Ongaro2014}
+D.~Ongaro, J.~Ousterhout, \href{https://raft.github.io/raft.pdf}{In search of
+  an understandable consensus algorithm}, in: 2014 USENIX Annual Technical
+  Conference (USENIX ATC 14), USENIX Association, Philadelphia, PA, 2014, pp.
+  305--319.
+\newline\urlprefix\url{https://raft.github.io/raft.pdf}
+
+\bibitem{hyperledgerFabricOrderingService_v24}
+{Hyperledger Fabric Documentation Contributors},
+  \href{https://hyperledger-fabric.readthedocs.io/en/release-2.4/orderer/ordering_service.html}{The
+  ordering service}, hyperledger Fabric documentation (release-2.4). Licensed
+  under CC BY 4.0. Revision 2a135189. Accessed: Dec.\ 25, 2025 (2022).
+\newline\urlprefix\url{https://hyperledger-fabric.readthedocs.io/en/release-2.4/orderer/ordering_service.html}
+
+\bibitem{fabricMSP}
+{Hyperledger Fabric Documentation Contributors},
+  \href{https://hyperledger-fabric.readthedocs.io/en/latest/membership/membership.html}{Membership
+  service provider ({MSP})}, hyperledger Fabric documentation (latest).
+  Licensed under CC BY 4.0. (2025).
+\newline\urlprefix\url{https://hyperledger-fabric.readthedocs.io/en/latest/membership/membership.html}
+
+\bibitem{fabricEndorsementDoc}
+{Hyperledger Fabric Documentation Contributors},
+  \href{https://hyperledger-fabric.readthedocs.io/en/release-2.4/endorsement-policies.html}{Endorsement
+  policies}, hyperledger Fabric documentation (release-2.4). Licensed under CC
+  BY 4.0. (2022).
+\newline\urlprefix\url{https://hyperledger-fabric.readthedocs.io/en/release-2.4/endorsement-policies.html}
+
+\bibitem{nist800131a}
+E.~Barker, A.~Roginsky, Transitioning the use of cryptographic algorithms and
+  key lengths, NIST Special Publication 800-131A Revision 2, National Institute
+  of Standards and Technology (NIST), Gaithersburg, MD (Mar. 2019).
+\newblock \href {https://doi.org/10.6028/NIST.SP.800-131Ar2}
+  {\path{doi:10.6028/NIST.SP.800-131Ar2}}.
+
+\bibitem{nist80038d}
+M.~Dworkin, Recommendation for block cipher modes of operation: Galois/counter
+  mode ({GCM}) and {GMAC}, NIST Special Publication 800-38D, National Institute
+  of Standards and Technology (NIST) (Nov. 2007).
+\newblock \href {https://doi.org/10.6028/NIST.SP.800-38D}
+  {\path{doi:10.6028/NIST.SP.800-38D}}.
+
+\bibitem{nist80056c}
+E.~Barker, L.~Chen, R.~Davis, Recommendation for key-derivation methods in
+  key-establishment schemes, NIST Special Publication 800-56C Rev. 2, National
+  Institute of Standards and Technology (2020).
+\newblock \href {https://doi.org/10.6028/NIST.SP.800-56Cr2}
+  {\path{doi:10.6028/NIST.SP.800-56Cr2}}.
+
+\bibitem{rfc9180}
+R.~Barnes, K.~Bhargavan, B.~Lipp, C.~A. Wood, Hybrid public key encryption,
+  Request for Comments RFC 9180, Internet Engineering Task Force (Feb. 2022).
+\newblock \href {https://doi.org/10.17487/RFC9180}
+  {\path{doi:10.17487/RFC9180}}.
+
+\bibitem{owaspPasswordStorage2024}
+{OWASP Foundation}, Password storage cheat sheet,
+  \url{https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html}
+  (2024).
+
+\bibitem{nist800132}
+M.~S{\"o}nmez~Turan, E.~Barker, W.~Burr, L.~Chen, Recommendation for
+  password-based key derivation: Part 1: Storage applications, NIST Special
+  Publication 800-132, National Institute of Standards and Technology (NIST),
+  Gaithersburg, MD (Dec. 2010).
+\newblock \href {https://doi.org/10.6028/NIST.SP.800-132}
+  {\path{doi:10.6028/NIST.SP.800-132}}.
+
+\bibitem{springBoot325}
+P.~Webb, D.~Syer, J.~Long, S.~Nicoll, R.~Winch, A.~Wilkinson, M.~Halbritter,
+  \href{https://docs.spring.io/spring-boot/docs/3.2.5/reference/html/index.html}{Spring
+  boot reference documentation, version 3.2.x}, vMware, Inc. Accessed: Jan.\
+  2026 (2024).
+\newline\urlprefix\url{https://docs.spring.io/spring-boot/docs/3.2.5/reference/html/index.html}
+
+\bibitem{springSecurity}
+{VMware, Inc.},
+  \href{https://docs.spring.io/spring-security/reference/index.html}{Spring
+  security reference documentation}, accessed: Jan.\ 2026 (2024).
+\newline\urlprefix\url{https://docs.spring.io/spring-security/reference/index.html}
+
+\bibitem{postgresqlTriggers}
+{The PostgreSQL Global Development Group},
+  \href{https://www.postgresql.org/docs/16/plpgsql-trigger.html}{{PostgreSQL}
+  16 documentation: Trigger functions}, accessed: Jan.\ 2026 (2024).
+\newline\urlprefix\url{https://www.postgresql.org/docs/16/plpgsql-trigger.html}
+
+\bibitem{fabricChaincodeLifecycleDoc}
+{Hyperledger Fabric Documentation Contributors},
+  \href{https://hyperledger-fabric.readthedocs.io/en/latest/chaincode_lifecycle.html}{Fabric
+  chaincode lifecycle}, accessed: Dec.\ 26, 2025 (2025).
+\newline\urlprefix\url{https://hyperledger-fabric.readthedocs.io/en/latest/chaincode_lifecycle.html}
+
+\bibitem{efron1993bootstrap}
+B.~Efron, R.~J. Tibshirani, An Introduction to the Bootstrap, no.~57 in
+  Monographs on Statistics and Applied Probability, Chapman and Hall/CRC, Boca
+  Raton, FL, 1994.
+\newblock \href {https://doi.org/10.1201/9780429246593}
+  {\path{doi:10.1201/9780429246593}}.
+
+\bibitem{mannwhitney1947}
+H.~B. Mann, D.~R. Whitney, On a test of whether one of two random variables is
+  stochastically larger than the other, The Annals of Mathematical Statistics
+  18~(1) (1947) 50--60.
+\newblock \href {https://doi.org/10.1214/aoms/1177730491}
+  {\path{doi:10.1214/aoms/1177730491}}.
+
+\bibitem{schuirmann1987tost}
+D.~J. Schuirmann, A comparison of the two one-sided tests procedure and the
+  power approach for assessing the equivalence of average bioavailability,
+  Journal of Pharmacokinetics and Biopharmaceutics 15~(6) (1987) 657--680.
+\newblock \href {https://doi.org/10.1007/BF01068419}
+  {\path{doi:10.1007/BF01068419}}.
+
+\bibitem{thakkar2018performance}
+P.~Thakkar, S.~Nathan, B.~Viswanathan, Performance benchmarking and optimizing
+  hyperledger fabric blockchain platform, in: 2018 IEEE 26th International
+  Symposium on Modeling, Analysis, and Simulation of Computer and
+  Telecommunication Systems (MASCOTS), IEEE, 2018, pp. 264--276.
+\newblock \href {https://doi.org/10.1109/MASCOTS.2018.00034}
+  {\path{doi:10.1109/MASCOTS.2018.00034}}.
+
+\bibitem{kuzlu2019performance}
+M.~Kuzlu, M.~Pipattanasomporn, L.~Gurses, S.~Rahman, Performance analysis of a
+  {Hyperledger Fabric} blockchain framework: Throughput, latency and
+  scalability, in: 2019 IEEE International Conference on Blockchain
+  (Blockchain), Atlanta, GA, USA, 2019, pp. 536--540.
+\newblock \href {https://doi.org/10.1109/Blockchain.2019.00003}
+  {\path{doi:10.1109/Blockchain.2019.00003}}.
+
+\bibitem{gdpr2016}
+{European Parliament and Council of the European Union},
+  \href{https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32016R0679}{Regulation
+  ({EU}) 2016/679 of the {European Parliament} and of the {Council} on the
+  protection of natural persons with regard to the processing of personal data
+  and on the free movement of such data ({General Data Protection
+  Regulation})}, Regulation 2016/679, Official Journal of the European Union,
+  oJ L 119, 4 May 2016, pp.\ 1--88. In force since 25 May 2018. Accessed: Jan.\
+  2026 (Apr. 2016).
+\newline\urlprefix\url{https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32016R0679}
+
+\bibitem{lyons2018integration}
+T.~Lyons, L.~Courcelas, K.~Timsit,
+  \href{https://blockchain-observatory.ec.europa.eu/publications/blockchain-and-gdpr_en}{Blockchain
+  and the {GDPR}}, Thematic report, European Union Blockchain Observatory and
+  Forum (Oct. 2018).
+\newline\urlprefix\url{https://blockchain-observatory.ec.europa.eu/publications/blockchain-and-gdpr_en}
+
+\bibitem{Finck2020}
+M.~Finck, F.~Pallas, They who must not be identified--distinguishing personal
+  from non-personal data under the gdpr, International Data Privacy Law 10~(1)
+  (2020) 11--36.
+\newblock \href {https://doi.org/10.1093/idpl/ipz026}
+  {\path{doi:10.1093/idpl/ipz026}}.
+
+\bibitem{EDPB2025Pseudonymisation}
+{European Data Protection Board},
+  \href{https://www.edpb.europa.eu/system/files/2025-01/edpb_guidelines_202501_pseudonymisation_en.pdf}{Guidelines
+  01/2025 on pseudonymisation}, Guidelines 01/2025, European Data Protection
+  Board, guidelines 01/2025. Draft for public consultation adopted 16 January
+  2025; consultation closed 14 March 2025; finalisation pending at time of
+  submission (January 2025).
+\newline\urlprefix\url{https://www.edpb.europa.eu/system/files/2025-01/edpb_guidelines_202501_pseudonymisation_en.pdf}
+
+\end{thebibliography}
