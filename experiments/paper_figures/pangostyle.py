@@ -73,6 +73,7 @@ def apply():
 def figure(width=5.6, height=3.2, **kw):
     """Single-axes bordered figure sized for the single-column BCRA layout."""
     fig, ax = plt.subplots(figsize=(width, height), **kw)
+    fig.subplots_adjust(left=0.14, right=0.97, top=0.9, bottom=0.16)
     return fig, ax
 
 
@@ -80,6 +81,15 @@ def panels(n, width=6.4, height=2.9, **kw):
     """1xN panel figure, shared style."""
     fig, axes = plt.subplots(1, n, figsize=(width, height), **kw)
     return fig, axes
+
+
+def label_bars(ax, bars, fmt="{:.0f}", dy=2.5, size=None):
+    """Direct value labels above each bar (secondary encoding for the palette)."""
+    for b in bars:
+        ax.annotate(fmt.format(b.get_height()),
+                    (b.get_x() + b.get_width() / 2, b.get_height()),
+                    xytext=(0, dy), textcoords="offset points", ha="center",
+                    fontsize=size or (FONT_SIZE - 1.5))
 
 
 def bar_kw(i):

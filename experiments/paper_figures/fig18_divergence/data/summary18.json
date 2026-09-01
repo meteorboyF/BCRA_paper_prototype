@@ -1,0 +1,132 @@
+{
+  "grant_runs": [
+    {
+      "dir": "grant_20260831_160748",
+      "baseline_403": true,
+      "grant_http": "HTTP 202 sync=pending",
+      "mid_outage_download": "HTTP 403",
+      "mid_outage_wrapped_key": "HTTP 403",
+      "tri_state": "ledger=false db=read|t anchors=GrantAccess:PENDING",
+      "converged": true,
+      "post_download": "HTTP 200",
+      "divergence_s": 14.053512
+    },
+    {
+      "dir": "grant_20260831_160828",
+      "baseline_403": true,
+      "grant_http": "HTTP 202 sync=pending",
+      "mid_outage_download": "HTTP 403",
+      "mid_outage_wrapped_key": "HTTP 403",
+      "tri_state": "ledger=false db=read|t anchors=GrantAccess:PENDING",
+      "converged": true,
+      "post_download": "HTTP 200",
+      "divergence_s": 12.139265
+    },
+    {
+      "dir": "grant_20260831_160913",
+      "baseline_403": true,
+      "grant_http": "HTTP 202 sync=pending",
+      "mid_outage_download": "HTTP 403",
+      "mid_outage_wrapped_key": "HTTP 403",
+      "tri_state": "ledger=false db=read|t anchors=GrantAccess:PENDING",
+      "converged": true,
+      "post_download": "HTTP 200",
+      "divergence_s": 13.887042
+    },
+    {
+      "dir": "grant_20260831_160958",
+      "baseline_403": true,
+      "grant_http": "HTTP 202 sync=pending",
+      "mid_outage_download": "HTTP 403",
+      "mid_outage_wrapped_key": "HTTP 403",
+      "tri_state": "ledger=false db=read|t anchors=GrantAccess:PENDING",
+      "converged": true,
+      "post_download": "HTTP 200",
+      "divergence_s": 15.909955
+    },
+    {
+      "dir": "grant_20260831_161045",
+      "baseline_403": true,
+      "grant_http": "HTTP 202 sync=pending",
+      "mid_outage_download": "HTTP 403",
+      "mid_outage_wrapped_key": "HTTP 403",
+      "tri_state": "ledger=false db=read|t anchors=GrantAccess:PENDING",
+      "converged": true,
+      "post_download": "HTTP 200",
+      "divergence_s": 15.654611
+    },
+    {
+      "dir": "grant_20260831_161133",
+      "baseline_403": true,
+      "grant_http": "HTTP 202 sync=pending",
+      "mid_outage_download": "HTTP 403",
+      "mid_outage_wrapped_key": "HTTP 403",
+      "tri_state": "ledger=false db=read|t anchors=GrantAccess:PENDING",
+      "converged": true,
+      "post_download": "HTTP 200",
+      "divergence_s": 14.642999
+    }
+  ],
+  "fifo_runs": [
+    {
+      "dir": "fifo_20260831_161220",
+      "baseline_403": true,
+      "grant_http": "HTTP 202 sync=pending",
+      "mid_outage_download": "HTTP 403",
+      "mid_outage_wrapped_key": "HTTP 403",
+      "tri_state": "ledger=false db=read|f anchors=GrantAccess:PENDING\nRevokeAccess:PENDING",
+      "converged": true,
+      "post_download": "HTTP 403",
+      "divergence_s": 15.200264,
+      "fifo_order_ok": true
+    },
+    {
+      "dir": "fifo_20260831_161311",
+      "baseline_403": true,
+      "grant_http": "HTTP 202 sync=pending",
+      "mid_outage_download": "HTTP 403",
+      "mid_outage_wrapped_key": "HTTP 403",
+      "tri_state": "ledger=false db=read|f anchors=GrantAccess:PENDING\nRevokeAccess:PENDING",
+      "converged": true,
+      "post_download": "HTTP 403",
+      "divergence_s": 13.244486,
+      "fifo_order_ok": true
+    },
+    {
+      "dir": "fifo_20260831_161400",
+      "baseline_403": true,
+      "grant_http": "HTTP 202 sync=pending",
+      "mid_outage_download": "HTTP 403",
+      "mid_outage_wrapped_key": "HTTP 403",
+      "tri_state": "ledger=false db=read|f anchors=GrantAccess:PENDING\nRevokeAccess:PENDING",
+      "converged": true,
+      "post_download": "HTTP 403",
+      "divergence_s": 13.062884,
+      "fifo_order_ok": true
+    }
+  ],
+  "summary": {
+    "n_grant": 6,
+    "n_fifo": 3,
+    "grant_divergence_s": {
+      "median": 14.35,
+      "mean": 14.38,
+      "sd": 1.37,
+      "min": 12.14,
+      "max": 15.91,
+      "boot95_lo": 13.01,
+      "boot95_hi": 15.78
+    },
+    "fifo_divergence_s": [
+      15.2,
+      13.24,
+      13.06
+    ],
+    "all_grants_202_pending": true,
+    "all_mid_outage_denied": true,
+    "all_converged_unattended": true,
+    "all_grant_runs_end_200": true,
+    "all_fifo_runs_end_403": true,
+    "all_fifo_intent_order_preserved": true
+  }
+}
