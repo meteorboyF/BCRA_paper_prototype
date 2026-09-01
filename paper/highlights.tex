@@ -1,0 +1,17 @@
+% Highlights for "Fail-Closed Reads, Availability-First Writes: Measured
+% Failure Behavior of On-Path Ledger Authorization for Legal Document Custody"
+% BCRA requirement: separate editable file, 3-5 bullets, max 85 characters each
+% (including spaces). All bullets are drawn from claims already in the manuscript.
+\documentclass{article}
+\usepackage[margin=1in]{geometry}
+\pagestyle{empty}
+\begin{document}
+\section*{Highlights}
+\begin{itemize}
+\item Forged grant rows and substituted keys are inert: the ledger decides
+\item Reads fail closed: an induced ledger outage released zero protected bytes
+\item Grant and revoke divergence are mirror images, both outbox-bounded
+\item Durable re-anchoring reconverges unattended in a median of 14 to 16 s
+\item Time-anchor heartbeat costs 7.84 MB per peer per day at zero activity
+\end{itemize}
+\end{document}

@@ -90,7 +90,7 @@ Legal document custody
 \label{sec:introduction}
 
 
-\subsection{Administrator-mutable authorization in legal document custody}
+\subsection{Administrator-mutable authorization}
 \label{sec:problem}
 
 A law firm holding privileged material decides, many times a day, who may read
@@ -114,7 +114,7 @@ The difficulty is not that firms keep poor records. It is that the record and
 the decision have the same custodian. Verification therefore terminates at the
 organization being verified.
 
-\subsection{Why anchoring records is not enough}
+\subsection{Limitations of record anchoring}
 \label{sec:anchoring_insufficient}
 
 The established response is to anchor: hash each document and each significant
@@ -628,7 +628,7 @@ across an induced outage, no fallback authorization, and denials recorded with
 their cause. This is a read-path property. Writes are availability-first by
 design and can diverge from the ledger during an ordering outage; that divergence
 is characterized on both access-control paths and bounded by a durable outbox
-(Section~\ref{sec:exp_divergence}), not smoothed over.
+(Section~\ref{sec:exp_divergence}).
 
 \item[P3 Tamper evidence.] Under A1, any change to the stored ciphertext is
 detected before use: the hash anchored at registration cannot be matched by
@@ -843,7 +843,7 @@ exists to release. Section~\ref{sec:exp_db_mutation} measures both directions of
 that split, including the consequence that deleting an operational row does not
 revoke ledger-authorized ciphertext access.
 
-\paragraph{What the ledger decision does not gate}
+\paragraph{Scope of the ledger decision}
 Collaborative features built around a document (annotation, and the
 subscription authorization behind it) use an operational access check rather
 than a ledger round trip, because a chaincode call per annotation event would be
@@ -965,7 +965,7 @@ under Assumption~A1, and with the KDF in place a chosen-ciphertext argument from
 the standard-scheme literature is now within reach, which the earlier omission
 precluded.
 
-\subsection{Recipient binding, and its two limits}
+\subsection{Recipient binding and its limits}
 \label{sec:tokenformat}
 
 The recipient's identifier is bound as additional authenticated data under a
@@ -995,7 +995,7 @@ does \emph{not} mitigate public-key substitution, because an adversary who
 replaced the recipient's published key holds the matching private key and
 supplies the legitimate identifier unchanged.
 
-\subsection{Signatures, key lifecycle, and what is claimed}
+\subsection{Signatures and key lifecycle}
 \label{sec:signatures}
 
 A user signs with ECDSA over P-256 across
@@ -1031,7 +1031,7 @@ already released rather than future requests. Proxy re-encryption is the
 standard remedy and is not implemented, as are consortium-governed escrow and
 recovery, which are framework design and which no measurement here concerns.
 
-\subsubsection{What is claimed, and what is not}
+\subsubsection{Security claims}
 \label{sec:cryptoclaims}
 Claimed: confidentiality of document content under AES-256-GCM with fresh
 per-document keys; detection of stored-payload substitution through anchored
@@ -1062,7 +1062,7 @@ metadata updates, access-list and history retrieval, audit-event anchoring,
 identity-certificate revocation, and the time-anchor pair
 (\texttt{UpdateTimeAnchor}, \texttt{GetTimeAnchor}).
 
-\paragraph{There is no expired-grant cleanup function}
+\paragraph{Expired-grant cleanup}
 No asynchronous job marks lapsed grants in world state. Expiry is
 enforced at every evaluation and the world-state record is never updated to
 reflect it (Section~\ref{sec:grants}). Behavior is unaffected, since refusal is
@@ -1138,7 +1138,7 @@ three-node ordering service; the topology generator used in
 Section~\ref{sec:exp_netscale} produces the same stack at other sizes from one
 command.
 
-\paragraph{Pin the chaincode version and sequence, not the version alone}
+\paragraph{Chaincode version and sequence}
 Fabric orders chaincode definitions by \emph{sequence}, and the version string
 is a label~\cite{fabricChaincodeLifecycleDoc}. Several measurements in this paper differ only by chaincode
 generation (the freshness-read comparison in
@@ -1368,7 +1368,7 @@ Would have manufactured a scaling effect that does not exist \\
 \end{table}
 
 
-\subsection{What the relocated decision costs}
+\subsection{Cost of the relocated decision}
 
 The architecture's premise is that an authorization decision can be moved onto
 the release path without making the path feel slow. That is an empirical claim
@@ -1376,7 +1376,7 @@ about one quantity, the difference between evaluating a document access
 decision in chaincode and evaluating it against a local database, and a
 second about capacity.
 
-\subsubsection{Latency: a real difference, comfortably inside the budget}
+\subsubsection{Read-path latency}
 \label{sec:exp_latency}
 
 Both arms serve the identical HTTP request for the identical document, created
@@ -1440,7 +1440,7 @@ narrower margin is reported, since choosing one after seeing the data would
 reintroduce the same inference error. Both halves hold at once: the ledger check
 is measurably slower, and equivalent at the threshold specified in advance.
 
-\paragraph{The cost is not the freshness read}
+\paragraph{Isolating the source of the overhead}
 The obvious suspect for a newly appeared $+4$\,ms is the time-anchor freshness
 read (Section~\ref{sec:exp_timeanchor}), and it was ruled out rather than
 assumed. Three chaincode sequences were deployed back to back on the same quiet
@@ -1487,7 +1487,7 @@ entirely above the database arm.
     \label{fig:latency}
 \end{figure}
 
-\subsubsection{Capacity is gated by the batch window, not by concurrency}
+\subsubsection{Throughput and capacity}
 \label{sec:exp_throughput}
 
 Under a mixed workload of 20\,\% document registrations and 80\,\% wrapped-key
@@ -1556,7 +1556,7 @@ security-equivalent alternative, peaked near 279\,TPS before the closed-loop
 generator saturated; those points are self-flagged by the harness and excluded.
 
 
-\subsection{Whether the relocation holds, and how it fails}
+\subsection{Adversarial and failure-mode evaluation}
 
 Three experiments bear on the same question from different directions: does
 placing the decision on the ledger actually change what an adversary or an
@@ -1564,7 +1564,7 @@ outage can do? The first attacks the store the ledger is meant to displace. The
 second removes the ledger entirely. The third removes only ordering, and it
 is where the guarantee stops holding.
 
-\subsubsection{An adversary holding the operational database}
+\subsubsection{Adversarial mutation of the operational database}
 \label{sec:exp_db_mutation}
 
 Everything in this paper rests on one claim: that an adversary with write access
@@ -1607,14 +1607,14 @@ which the organization fallback was removed.}
 
 Table~\ref{tab:dbmutation} gives the four cases.
 
-\paragraph{A forged grant is inert}
+\paragraph{Forged grant (case 1)}
 Inserting a row granting read capability to a user holding no ledger grant
 changed nothing: the database reported the capability, the chaincode reported
 \texttt{false}, and both endpoints denied. An attacker with full write access to
-the operational store gains nothing on the release path. This is the paper's
-central security property, measured rather than reasoned about.
+the operational store gains nothing on the release path, which is the central
+security property this work sets out to establish.
 
-\paragraph{The database cannot revoke either, and that is easy to misread}
+\paragraph{Deleted grant (case 2)}
 The mirror case is the more operationally consequential one. Deleting a
 legitimate grant row did \emph{not} stop ciphertext release, because the ledger
 grant still authorizes: database writes are inert in both directions on the
@@ -1625,7 +1625,7 @@ denial may reasonably conclude access has been revoked. It has not been.
 Revocation must go through the ledger path, a usability hazard created by
 the design, not a feature of it.
 
-\paragraph{A permissive policy, found by measurement and then removed}
+\paragraph{Owner-organization fallback (case 3)}
 A member of the owning organization holding no grant in \emph{either} store
 received the ciphertext. The ledger path was authoritative, as claimed, but its
 policy fell through to an ownership check on the requesting organization, so the
@@ -1640,7 +1640,7 @@ served, because registration writes an explicit owner grant, and the legitimate
 cross-firm grantee of case~2 is still served. Both states are retained in the
 released dataset, so the change is verifiable rather than asserted.
 
-\paragraph{Denied attempts were not audited at all}
+\paragraph{Auditing of denied attempts}
 On the first measured run, a request refused by chaincode policy produced
 \emph{no audit record of any kind}: only successes and outage-driven denials
 were recorded, and the policy-denial branch threw its exception without logging.
@@ -1661,7 +1661,7 @@ bypassing the gateway, an adversary bounded by endorsement policy rather than by
 anything measured here. The other adjacent attack, public-key substitution, was
 the sharpest residual risk in the prior version and now has its own experiment.
 
-\subsubsection{A substituted public key is refused at grant time}
+\subsubsection{Public-key substitution}
 \label{sec:exp_pubkey}
 
 The database-mutation result shows a forged access row is inert on the read path.
@@ -1694,7 +1694,7 @@ Without that separation a refused substitution would be indistinguishable from a
 outage and silently retried; with it, the substitution is refused once and
 recorded, and only genuine outages are deferred.
 
-\subsubsection{Reads fail closed when the ledger is unreachable}
+\subsubsection{Read-path behaviour under a ledger outage}
 \label{sec:exp_failclosed}
 
 Placing authorization on the release path is only worth the cost if the path
@@ -1751,7 +1751,7 @@ same check and covered by unit tests, but is not independently timed under load.
     \label{fig:failclosed}
 \end{figure}
 
-\subsubsection{Writes do not: divergence under an ordering outage}
+\subsubsection{Write-path divergence under an ordering outage}
 \label{sec:exp_divergence}
 
 The previous experiment's outage stops peers, so reads and writes fail
@@ -1813,7 +1813,7 @@ system never recovers without an operator.}
 Table~\ref{tab:divergence} gives the sequence for both arms, and
 Fig.~\ref{fig:write_path_reconciliation} the mechanism.
 
-\paragraph{The pre-fix behavior: a silent, permanent divergence}
+\paragraph{Pre-fix behaviour}
 The revocation returned HTTP~204 and never reached the ledger. The service wrote
 the operational revocation, attempted the Fabric submit, caught the exception,
 logged a warning, and completed normally; the on-chain grant remained active,
@@ -1829,7 +1829,7 @@ looks: a prior grantee already holds the wrapped key from legitimate access, so
 continued ciphertext release defeats the revocation against precisely the party
 revocation targets.
 
-\paragraph{The post-fix behavior: bounded and self-clearing}
+\paragraph{Post-fix behaviour}
 The operational revocation and a pending-anchor outbox row are now committed in
 a single database transaction, so a submit failure leaves durable evidence
 instead of a log line; a scheduled worker drains anchors with capped exponential
@@ -1843,7 +1843,7 @@ in a median of
 the release path denied the revoked user. Every run committed on its first
 retry.
 
-\paragraph{How 15.9\,s should and should not be read}
+\paragraph{Interpreting the reconciliation window}
 It is a \emph{recovery lag}, not an exposure bound. The divergence window
 decomposes as
 \begin{equation}
@@ -1893,7 +1893,7 @@ characterized.
     \label{fig:write_path_reconciliation}
 \end{figure}
 
-\subsubsection{The same failure on the grant path, and its mirror-image exposure}
+\subsubsection{Grant-path divergence}
 \label{sec:exp_grantdivergence}
 
 The revocation result raises an immediate question: revocation and granting
@@ -1983,7 +1983,7 @@ the ledger has not committed. Its divergence is in the safe direction, so it
 carries no outbox.
 
 
-\subsection{The standing costs: scale, and the price of clock trust}
+\subsection{Scalability and standing costs}
 
 Three questions about what the deployment costs to keep running rather than to
 use: how cost grows with the archive, with the consortium, and with time. The
@@ -2109,7 +2109,7 @@ round trips, not the authorization decision, and it is the reason a geographical
 split ordering service is the expensive choice. Both configurations remain
 inside RQ2's five-second write budget at every point measured.
 
-\subsubsection{Clock trust, and what it costs to keep}
+\subsubsection{Clock trust and its cost}
 \label{sec:exp_timeanchor}
 
 Grant expiry is evaluated inside \texttt{CheckAccess} against the transaction
@@ -2148,7 +2148,7 @@ freshness read's cost is not detectable, and is bounded above by roughly
 now hot, since the heartbeat rewrites it every 60\,s and every decision reads
 it; that is an unmeasured hypothesis and we do not report it as a finding.
 
-\paragraph{The security/availability trade-off is a straight line}
+\paragraph{The security--availability trade-off}
 The staleness ceiling is both halves of the trade at once: it is the
 availability window (how long ordering can be unavailable before valid
 decisions start being refused), and it sets the backdating bound. Two
@@ -2188,7 +2188,7 @@ Ceiling & Availability window & Backdating bound & Outcome \\
 \end{tabular}
 \end{table}
 
-\paragraph{The ledger grows when nothing is happening}
+\paragraph{Idle storage growth}
 Because the heartbeat is a submit it writes a block whether or not anything else
 occurs. With \textbf{zero} document activity the block store grew at a constant
 \textbf{7.84\,MB per day per peer}: 90.7 bytes per second at $R^2 = 1.0000$ over
@@ -2209,7 +2209,7 @@ price rather than a defect, and it is tunable: a five-minute interval costs a
 fifth as much storage, traded against a proportionally looser backdating bound.
 The heartbeat interval is the single parameter setting both.
 
-\paragraph{What is evidenced, and at what strength}
+\paragraph{Evidential standing of these claims}
 Three propositions here have markedly different evidential standing, and we
 separate them rather than let the presence of tests imply uniform support.
 \emph{Measured:} the latency cost of the freshness read, the enforcement of the
@@ -2238,7 +2238,7 @@ suppressing gateway would create without demonstrating the attack itself.
 \end{figure}
 
 
-\subsection{The price of on-path enforcement against an honest baseline}
+\subsection{Comparison against a durable audit-log baseline}
 \label{sec:exp_durable_baseline}
 
 Section~\ref{sec:exp_latency} prices the authorization decision in isolation;
@@ -2446,7 +2446,7 @@ Table~\ref{tab:related}.
 \section{Discussion}
 \label{sec:discussion}
 
-\subsection{The access graph is disclosed by the same visibility that verifies it}
+\subsection{Access-graph disclosure}
 \label{sec:accessgraph}
 
 Making an authorization decision independently verifiable requires that
@@ -2492,7 +2492,7 @@ data~\cite{Finck2020,EDPB2025Pseudonymisation}. The decomposition narrows the
 problem; it does not dispose of it, and deployment under an erasure regime
 needs a legal determination this paper does not supply.
 
-\subsection{The standing price of clock trust}
+\subsection{Clock trust as a standing cost}
 \label{sec:clocktrustprice}
 
 Making grant expiry trustworthy requires an ordered heartbeat
