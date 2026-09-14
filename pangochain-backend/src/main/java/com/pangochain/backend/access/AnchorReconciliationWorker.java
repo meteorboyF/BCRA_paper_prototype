@@ -108,7 +108,8 @@ public class AnchorReconciliationWorker {
                 case "RevokeAccess" -> fabricGatewayService.revokeAccess(
                         anchor.getDocId().toString(),
                         anchor.getTargetUserId().toString(),
-                        anchor.getRevokerId().toString());
+                        anchor.getRevokerId().toString(),
+                        anchor.getId().toString());
                 case "GrantAccess" -> replayGrant(anchor);
                 case "RegisterUserKey" -> replayRegisterUserKey(anchor);
                 default -> throw new FabricException(
@@ -140,6 +141,23 @@ public class AnchorReconciliationWorker {
             // replay would only mask it. "Already anchored" on a key binding is the
             // idempotent success case; anything else deterministic is terminal.
             if (e.isDeterministicRejection()) {
+                if (e.getMessage() != null && e.getMessage().contains("already applied")) {
+                    // The chaincode consumed this command id in an earlier transaction.
+                    // Either an unrecorded-but-successful submit (benign retry) or a row
+                    // reset to PENDING by a database writer (replay attempt): in both
+                    // cases the ledger must not be written again.
+                    anchor.setStatus(PendingAnchor.Status.COMMITTED);
+                    anchor.setCommittedAt(Instant.now());
+                    anchor.setLastError("command id already applied on ledger; no re-execution");
+                    pendingAnchorRepository.save(anchor);
+                    auditService.log("OUTBOX_ANCHOR_REPLAY_SUPPRESSED", anchor.getRevokerId(),
+                            "DOCUMENT", anchor.getDocId().toString(), null,
+                            toJson(Map.of("pendingAnchorId", anchor.getId().toString(),
+                                    "chaincodeFunction", String.valueOf(anchor.getChaincodeFunction()))));
+                    log.warn("Anchor {} ({}) command id already applied; marked COMMITTED without re-execution",
+                            anchor.getId(), anchor.getChaincodeFunction());
+                    return;
+                }
                 if ("RegisterUserKey".equals(anchor.getChaincodeFunction())
                         && e.getMessage() != null && e.getMessage().contains("already anchored")) {
                     anchor.setStatus(PendingAnchor.Status.COMMITTED);
@@ -185,7 +203,8 @@ public class AnchorReconciliationWorker {
                     p.getOrDefault("expiresAt", ""),
                     p.get("wrappedKeyRef"),
                     anchor.getRevokerId().toString(),
-                    p.getOrDefault("recipientKeyHash", ""));
+                    p.getOrDefault("recipientKeyHash", ""),
+                    anchor.getId().toString());
         } catch (FabricException e) {
             throw e;
         } catch (Exception e) {

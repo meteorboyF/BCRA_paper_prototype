@@ -1,0 +1,5 @@
+case,description,result
+A,"control: legitimate grant via API","ledger=true signed=t (expect true/t)"
+B,"forge: attacker GrantAccess row with junk signature","status=FAILED ledger=false rejected=1 (expect FAILED/false/>=1)"
+C,"tamper: retarget a legitimately signed row","status=FAILED ledger=false (expect FAILED/false)"
+D,"replay: committed grant row reset to PENDING after revoke","status=COMMITTED ledger=false error=command id already applied on ledger; no re-execution (expect COMMITTED-without-reexecution/false/already applied)"

@@ -187,9 +187,9 @@ public class FabricGatewayService {
 
     public String grantAccess(String docId, String targetSubject, String subjectOrg,
             String capability, String expiresAt, String wrappedKeyRef, String grantorId,
-            String recipientKeyHash) throws FabricException {
+            String recipientKeyHash, String commandId) throws FabricException {
         return submitTransaction("GrantAccess", docId, targetSubject, subjectOrg, capability,
-                expiresAt, wrappedKeyRef, grantorId, recipientKeyHash);
+                expiresAt, wrappedKeyRef, grantorId, recipientKeyHash, commandId);
     }
 
     /**
@@ -206,8 +206,9 @@ public class FabricGatewayService {
         return evaluateTransaction("GetUserKeyBinding", userId);
     }
 
-    public String revokeAccess(String docId, String targetSubject, String revokerId) throws FabricException {
-        return submitTransaction("RevokeAccess", docId, targetSubject, revokerId);
+    public String revokeAccess(String docId, String targetSubject, String revokerId,
+            String commandId) throws FabricException {
+        return submitTransaction("RevokeAccess", docId, targetSubject, revokerId, commandId);
     }
 
     public boolean checkAccess(String docId, String userId, String userOrg) throws FabricException {

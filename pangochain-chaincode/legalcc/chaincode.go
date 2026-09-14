@@ -124,8 +124,11 @@ func (c *LegalContract) GetUserKeyBinding(
 func (c *LegalContract) GrantAccess(
 	ctx contractapi.TransactionContextInterface,
 	docID, targetSubject, subjectOrg, capability, expiresAt, wrappedKeyRef, grantorID,
-	recipientKeyHash string,
+	recipientKeyHash, commandID string,
 ) error {
+	if err := consumeCommandID(ctx, commandID); err != nil {
+		return err
+	}
 	doc, err := getDocument(ctx, docID)
 	if err != nil {
 		return err
@@ -202,14 +205,41 @@ func (c *LegalContract) GrantAccess(
 			targetSubject, capability, expiresAt, bindingChecked))
 }
 
+// consumeCommandID records a one-time application command id in world state and
+// refuses a repeat. The gateway supplies its durable outbox row's UUID, which is
+// also covered by the row's HMAC, so an unchanged signed row that a database
+// writer resets to PENDING after commit cannot be re-enacted: its id is already
+// consumed here and the resubmission fails deterministically ("already applied").
+// An empty id is permitted for legacy callers and carries no replay protection.
+func consumeCommandID(ctx contractapi.TransactionContextInterface, commandID string) error {
+	if commandID == "" {
+		return nil
+	}
+	key := fmt.Sprintf("%s:%s", CommandPrefix, commandID)
+	existing, err := ctx.GetStub().GetState(key)
+	if err != nil {
+		return fmt.Errorf("failed to read command id %s: %w", commandID, err)
+	}
+	if existing != nil {
+		return fmt.Errorf("command %s already applied in transaction %s; replay refused", commandID, string(existing))
+	}
+	if err := ctx.GetStub().PutState(key, []byte(ctx.GetStub().GetTxID())); err != nil {
+		return fmt.Errorf("failed to consume command id %s: %w", commandID, err)
+	}
+	return nil
+}
+
 // ─── RevokeAccess ────────────────────────────────────────────────────────────
 
 // RevokeAccess marks a subject's capability as REVOKED and emits a
 // KEY_ROTATION_REQUIRED event so the backend can trigger re-encryption.
 func (c *LegalContract) RevokeAccess(
 	ctx contractapi.TransactionContextInterface,
-	docID, targetSubject, revokerID string,
+	docID, targetSubject, revokerID, commandID string,
 ) error {
+	if err := consumeCommandID(ctx, commandID); err != nil {
+		return err
+	}
 	doc, err := getDocument(ctx, docID)
 	if err != nil {
 		return err

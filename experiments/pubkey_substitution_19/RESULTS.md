@@ -62,3 +62,15 @@ The token format is unchanged (125 bytes), the wrap/unwrap round-trip is verifie
 and Experiment 6 re-measured the cost as negligible (wrap P50 0.72 ms, unchanged
 within noise). This removes the "not a standardized scheme, no KDF" limitation
 and is what makes the "formal analysis is now possible" framing defensible.
+
+## 2026-09-14 rerun with the full-client-flow restore race (round-2)
+
+`results/20260914_*` (n=3, identical): cases A/B/B2/C/D as before, and case E
+now executes the genuine client sequence against the live deployment:
+substitute key -> client fetches via /users/{id}/public-key, hashes the exact
+fetched string, wraps the real document key under the parsed fetched key
+(fetch_saw_substitute=yes in every run) -> attacker restores the original DB
+key -> grant submitted with that wrap + attestation -> HTTP 403. The gateway
+also gained `access.require-key-attestation` (reject unattested grants); the
+shipped default remains permissive for legacy clients and is disclosed as
+such in the paper.

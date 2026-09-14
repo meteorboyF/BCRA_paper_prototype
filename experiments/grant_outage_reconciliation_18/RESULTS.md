@@ -88,3 +88,12 @@ Windows (outbox timestamps): 16.287240, 13.631087, 15.274115, 20.157906,
 [13.63, 20.16]). Both FIFO runs drained grant before revoke with final
 CheckAccess=false and download 403. These supersede the 20260831 grant
 windows (n=6, median 14.35 s), which describe the pre-hardening build.
+
+## 2026-09-14 rerun on the FINAL build (verification round 2)
+
+Grant arm n=5 plus two mixed-queue FIFO runs on the final build (legalcc
+v1.33 seq 13 with command-id closure; id-covered HMAC gateway). Windows:
+14.884046, 14.720040, 13.869154, 15.561401, 14.404514 s; median 14.72 s
+(mean 14.69, SD 0.62, bootstrap 95% CI [13.87, 15.56]). Both FIFO runs
+drained grant before revoke with final denial. Supersedes the 2026-09-07
+numbers above. See ../RUN_MANIFEST_2026-09.md.

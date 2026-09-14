@@ -19,4 +19,8 @@ public interface PendingAnchorRepository extends JpaRepository<PendingAnchor, UU
      */
     boolean existsByStatusAndDocIdAndTargetUserIdAndCreatedAtBefore(
             PendingAnchor.Status status, UUID docId, UUID targetUserId, Instant createdAt);
+
+    /** Inline-path variant of the FIFO guard that ignores the caller's own just-persisted row. */
+    boolean existsByStatusAndDocIdAndTargetUserIdAndCreatedAtBeforeAndIdNot(
+            PendingAnchor.Status status, UUID docId, UUID targetUserId, Instant createdAt, UUID id);
 }

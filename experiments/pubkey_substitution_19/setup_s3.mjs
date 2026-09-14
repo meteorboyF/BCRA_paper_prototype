@@ -87,6 +87,7 @@ process.stdout.write(JSON.stringify({
   docId: doc.id, granteeId: reg.json.userId ?? reg.json.id ?? null,
   granteeEmail: email, granteeMsp: 'FirmBMSP', ownerEmail: owner,
   wrappedKeyToken: wrappedGrantee,
+  docKeyB64: enc.keyB64,
   keyHash: createHash('sha256').update(pubStr, 'utf8').digest('hex'),
   legacy,
 }) + '\n')

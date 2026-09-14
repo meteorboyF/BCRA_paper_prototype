@@ -31,12 +31,21 @@ passes on the repaired one. The full suite passes.
 
 ## Measured sweep (gateway heartbeat stopped, one fresh anchor per ceiling)
 
-| Ceiling | Measured availability window | Backdating bound (window + 120 s skew) | Outcome |
+| Ceiling | Observed window | Theoretical backdating bound (ceiling + 120 s skew) | Outcome |
 |---|---|---|---|
-| 30 s | 28 s | 148 s | refused |
-| 60 s | 59 s | 179 s | refused |
-| 120 s | 119 s | 239 s | refused |
+| 30 s | 28 s | 150 s | refused |
+| 60 s | 59 s | 180 s | refused |
+| 120 s | 119 s | 240 s | refused |
 | 0 (disabled, shipped) | none within 200 s | unbounded by this mechanism | still authorizing |
+
+Semantics correction (audit v2, N10): the raw `sweep.csv` computed its bound
+column as observed window + skew; the observed window undershoots the ceiling
+by up to the 3 s poll interval, so that derivation mislabels a measurement
+artifact as the enforced bound. The enforced bound is ceiling + skew, as
+tabulated above and in `sweep_corrected_semantics.csv`; the raw file is
+retained unchanged. The harness (`sweep-staleness-v2.sh`) now emits the
+theoretical column directly. The poll instrument is a direct chaincode query,
+not the HTTP release path, and the timer starts at anchor commit.
 
 Each measured window tracks its configured ceiling to within the 3 s poll granularity,
 and the enabled ceilings now refuse from the peer clock rather than from a value the

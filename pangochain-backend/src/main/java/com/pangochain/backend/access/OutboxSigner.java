@@ -42,9 +42,13 @@ public class OutboxSigner {
         return secret != null;
     }
 
-    /** Canonical signing input: every field the worker will replay, unambiguously joined. */
+    /** Canonical signing input: every field the worker will replay, unambiguously joined.
+     * The row id leads the string so a signature cannot be copied onto a cloned row;
+     * the id itself is consumed on the ledger as a one-time command id, so the same
+     * row cannot be re-enacted by resetting its status (replay closure). */
     private static String canonical(PendingAnchor a) {
         return String.join("\n",
+                String.valueOf(a.getId()),
                 String.valueOf(a.getChaincodeFunction()),
                 String.valueOf(a.getDocId()),
                 String.valueOf(a.getTargetUserId()),

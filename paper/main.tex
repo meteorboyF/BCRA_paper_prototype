@@ -69,16 +69,18 @@ the ledger when the ordering service is unreachable. We characterize this
 divergence on both access-control mutation paths and show that their exposures
 are mirror images, since a diverged revocation continues to serve a revoked user
 whereas a diverged grant continues to refuse an authorized one. A durable
-transactional outbox bounds both, reconverging without operator action in a
-median of 14 to 15\,s in the tested short-outage runs, and preserving the order
-in which mutations were issued in the queued cases tested. A recipient public key
+transactional outbox re-anchors both without operator action, with measured
+outbox ages of 14 to 15\,s at the median in the tested short-outage runs, and
+preserved the order in which mutations were issued in every queued case
+tested. A recipient public key
 substituted in the operational identity table is refused at grant time against an
 immutable ledger-anchored binding, closing what an earlier version of this work
 identified as its sharpest residual risk. The
 relocated decision adds 4.0 to 4.4\,ms over a database lookup, a statistically
 real difference that remains well within an interactivity margin of 50\,ms fixed
-before measurement, and the ordered heartbeat that bounds clock trust for grant expiry
-consumes 7.84\,MB per peer per day even with no document activity.
+before measurement, and the ordered heartbeat underlying the backdating bound on grant expiry,
+a bound enforced only when its staleness ceiling is enabled, consumes
+7.84\,MB per peer per day even with no document activity.
 The asymmetry follows from a design that authorizes reads against committed
 state while accepting writes locally before they commit: any on-path design
 sharing those two properties inherits it, whereas designs that reject
@@ -224,10 +226,10 @@ continues to refuse an authorized one (Section~\ref{sec:exp_divergence}). The
 two exposures are mirror images, one of confidentiality and one of
 availability; given a release path that reads committed state and fails closed,
 which exposure a diverged write produces follows from the direction of the
-write rather than from the rest of the implementation. A durable outbox bounds
-both, reconverging without operator action in a median of 14 to 15\,s in the
-tested short-outage runs, and preserving intent order in the mixed grant and
-revoke queues we tested. None of the systems reviewed in
+write rather than from the rest of the implementation. A durable outbox re-anchors
+both without operator action, with measured outbox ages of 14 to 15\,s at the
+median in the tested short-outage runs, and preserved intent order in the
+mixed grant and revoke queues we tested. None of the systems reviewed in
 Section~\ref{sec:related} reports measured behavior under ledger
 unavailability in either direction.
 
@@ -556,12 +558,14 @@ document's ciphertext remains reachable. Integrity does \emph{not} rest on
 this, because hash anchoring detects tampering under A1; only availability
 does.
 
-\item[A5 Identity table.] The table binding users to their public keys has not
-been maliciously modified for any user enrolled before ledger key anchoring was
-introduced. For users enrolled since, the binding is anchored immutably on the
+\item[A5 Identity table.] The table binding users to their public keys has
+not been maliciously modified for any user without a committed ledger binding.
+That population includes users enrolled before ledger key anchoring was
+introduced and users whose enrollment-time anchoring failed and is still
+queued for retry. For bound users the binding is anchored immutably on the
 ledger at enrollment and verified at grant time
 (Section~\ref{sec:exp_pubkey}), so the assumption is required only for the
-unmigrated population. Its violation is Scenario~S3 (Section~\ref{sc:s3}).
+unbound population. Its violation is Scenario~S3 (Section~\ref{sc:s3}).
 
 \item[A6 Client endpoint.] The user's browser is uncompromised while keys are
 unlocked and plaintext is present.
@@ -704,16 +708,21 @@ recipient's identity as associated data, but this does not help here, because
 an adversary who substituted the public key holds the matching private key and
 supplies the legitimate identifier unchanged.
 
-The risk is now closed by a ledger-witnessed user-to-key binding, and the
+The risk is addressed by a ledger-witnessed user-to-key binding, and the
 closure is evaluated experimentally (Section~\ref{sec:exp_pubkey}).
-Enrollment anchors a hash of the user's wrapping key immutably on the ledger,
-the grant path requires the granter to attest the key it wrapped under, and the
-chaincode refuses the grant when the attestation does not match the anchor. A
-key substituted in the operational table therefore fails at grant time, in
-consortium-visible state, just as a forged access-control row fails on the read
-path. The remaining exposure concerns migration: while any user enrolled
-before anchoring remains unbound, the
-grant to that user proceeds and is audited as such, and closing this fully
+Enrollment anchors a hash of the user's wrapping key immutably on the ledger;
+the granting client attests the hash of the exact key it fetched and wrapped
+under; and the chaincode refuses the grant when the submitted hash does not
+match the anchor. A key substituted in the operational table therefore fails
+at grant time, in consortium-visible state, just as a forged access-control
+row fails on the read path. Two qualifications bound this. The gateway
+accepts a grant without a client attestation by falling back to hashing its
+own stored key, which retains the substitution race for clients that predate
+the attestation field; a configuration flag rejects unattested grants, and
+the closure is complete only with that flag enabled. And the check protects
+only bound recipients: any user without a committed binding, whether enrolled
+before anchoring existed or enrolled while the ledger was unreachable, is
+granted with the grant audited as unbound, and closing this fully
 requires back-anchoring outstanding users' keys.
 
 \subsubsection{S4 Storage-tier substitution}
@@ -947,9 +956,13 @@ therefore carry a durable outbox. The operational update and a pending-anchor
 row are committed in a single database transaction, so a failed submission
 leaves durable evidence of an outstanding anchor rather than a log line. A
 scheduled worker drains pending anchors with capped exponential backoff, in
-creation order per document and user so that a grant queued before a revocation
-can never be replayed after it, and the endpoint reports a pending ledger-sync
-status rather than unqualified success while an anchor is outstanding. Document
+creation order per document and user so that a queued grant is not enacted
+after the revocation that superseded it (an ordering property verified in the
+mixed queues we tested rather than proven for all interleavings), and each row
+carries a one-time command id that the chaincode consumes, so an
+already-enacted row cannot be executed a second time. The endpoint reports a
+pending ledger-sync status rather than unqualified success while an anchor is
+outstanding. Document
 registration is deliberately left availability-first without an outbox, because
 an unanchored registration denies its owner rather than over-serving anyone,
 so its divergence is in the safe direction
@@ -1373,7 +1386,11 @@ Runs are excluded on criteria fixed before the run and defined on the
 harness, never on the value observed. A run is discarded if the harness fails
 before reaching its terminal step, if the host is outside the quiescence
 condition stated above, or if a configuration defect is identified in the
-instrument rather than in the system under test. Excluded runs are retained in
+instrument rather than in the system under test. Distinct from exclusion is
+supersession: some retained runs measured an earlier build correctly, and
+several recorded genuine defects of the system as it then stood; these are
+kept and labeled as measurements of superseded code, not as instrument
+failures. Excluded and superseded runs are retained in
 the released package rather than deleted, so that every result directory it
 contains is accounted for in the corresponding experiment's write-up, and so
 that an exclusion can be checked rather than taken on trust.
@@ -1434,10 +1451,10 @@ Closed-loop generator saturation, self-flagged by the harness &
 Would have read as a database limit rather than a harness limit \\
 \addlinespace
 Consortium scale, first seven-organization majority point &
-Transient host contention gave roughly seven times the read latency of
-surrounding points, on a path that cannot scale with organization count. Re-run
-in isolation; both are released &
-Would have manufactured a scaling effect that does not exist \\
+The run's own resource record shows host contention during the point, and its
+read latency is roughly seven times the surrounding points'. Re-run in
+isolation under the quiescence condition; both runs are released &
+Would have attributed a host-contention artifact to organization count \\
 \addlinespace
 Key substitution, first two runs &
 Taken while the denial-audit and deterministic-rejection changes were still
@@ -1464,6 +1481,20 @@ check, outbox signing and FIFO guard changed the code under test; both
 generations are released &
 Earlier build's windows (medians 15.9/14.4\,s) were similar but describe
 superseded code \\
+\addlinespace
+Staleness sweep, first attempt &
+No refusal at any ceiling: a leftover gateway process was still committing
+heartbeat anchors during the sweep, and the harness itself committed a fresh
+anchor before each poll, so no anchor could age past any ceiling. Instrument
+defect on two counts; harness rewritten (one fresh anchor, heartbeat verified
+stopped) &
+Would have read as the ceiling failing to enforce, the opposite of the
+repaired behavior \\
+\addlinespace
+Staleness sweep, second attempt &
+All four deploys failed before any measurement: the chaincode upgrade was
+submitted with a stale sequence number. No data produced &
+None; no usable measurement \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1756,34 +1787,51 @@ proposition is an evidentiary record the gap is substantive rather than
 cosmetic. A denial event carrying the refusal reason and the requester's
 organization was added to that branch and the experiment re-run; the same
 document now accumulates three denial events where it previously recorded
-zero, each anchored to the ledger. The denial trail therefore carries the same
-tamper evidence as the grant trail, which allows a consortium peer to check
-that an attempt was denied and audited instead of taking it on trust.
+zero, each submitted through the same anchoring pipeline as the grant trail
+(the harness verified the rows in the operational store rather than querying
+the committed ledger transaction). What the anchored trail attests is that
+the gateway recorded and submitted the denial; a consortium peer verifying it
+still relies on the gateway having observed and reported its own refusals
+completely, because the ledger cannot independently see HTTP traffic.
 
 \paragraph{Forged outbox rows}
 The durable outbox of Section~\ref{sec:exp_divergence} creates one further
 surface for the same adversary: the reconciliation worker submits pending
 anchor rows to the ledger with the gateway's Fabric credentials, so a database
-writer who can insert a plausible \texttt{GrantAccess} row could otherwise
-have the worker enact a grant the application never issued. Each outbox row is
-therefore signed at creation with an HMAC over its function, document, target,
-issuer and payload, under a secret held only in gateway configuration and
-never in the database, and the worker refuses any row whose signature does not
-verify. Three cases were run, each three times with identical outcomes. A
-legitimate grant through the API commits and carries a valid signature. A
-forged row inserted directly with \texttt{psql}, carrying a plausible but
-invalid signature, is marked failed, generates a forged-anchor audit event,
-and never reaches the ledger. A legitimately signed row copied and retargeted
-at a different user fails the same way, because the signature covers the
-target. The outbox thus adds no authority the database writer did not already
-lack.
+writer who can insert or resurrect a plausible \texttt{GrantAccess} row could
+otherwise have the worker enact a grant the application never issued, or
+re-enact one it already had. Two mechanisms defend this. Each row is signed at
+creation with an HMAC over its row id, function, document, target, issuer and
+payload, under a secret held only in gateway configuration and never in the
+database, and the worker refuses any row whose signature does not verify. And
+the row id doubles as a one-time command id that the chaincode records in
+world state and refuses to accept twice, so even a byte-identical row whose
+status a database writer resets cannot be executed again. Four cases were
+run, each three times with identical outcomes. A legitimate grant through the
+API commits and carries a valid signature. A forged row with an invalid
+signature is marked failed, generates a forged-anchor audit event, and never
+reaches the ledger. A legitimately signed row copied and retargeted at a
+different user fails the same way, because the signature covers both the
+target and the row id. And the replay: after the grant was revoked, the
+original committed grant row was reset to \textsc{pending} with its contents
+and signature untouched; the worker resubmitted it, the chaincode refused it
+as already applied, the worker recorded the suppression, and the revoked user
+remained unauthorized. Within the tested surface, a database writer can
+neither mint, retarget, nor replay outbox commands.
 
-One adjacent attack is outside this experiment: it measures the REST release
-path and does not test a caller holding Fabric credentials directly and
-bypassing the gateway, an adversary bounded by endorsement policy rather than by
-anything measured here. A database writer who also obtains the gateway's
-configuration file holds the outbox signing secret and defeats the signature;
-the boundary defended is the database, not the gateway host. The other adjacent attack, public-key substitution, was
+Three boundaries scope this result. It measures the outbox surface, not a
+caller holding Fabric credentials directly and bypassing the gateway, an
+adversary bounded by endorsement policy rather than by anything measured
+here. The signature exists only when the secret is configured; an unset
+secret logs a warning and leaves rows unsigned, so the property is one of the
+protected configuration, and a database writer who also obtains the gateway's
+configuration file holds the signing secret and defeats it. And the signature
+authenticates that the gateway issued the command, not that the command was
+authorized wisely: the fine-grained delegation policy (who may grant which
+capability) is evaluated by the gateway against the operational database
+before signing, with the chaincode enforcing only the coarser
+owner-or-owning-organization rule, so a compromise upstream of signing is not
+detected by it. The other adjacent attack, public-key substitution, was
 the sharpest residual risk in the prior version and now has its own experiment.
 
 \subsubsection{Public-key substitution}
@@ -1809,17 +1857,23 @@ The control case grants to an unmodified, ledger-bound recipient and commits.
 The attack case substitutes the recipient's public key in the database and
 repeats the grant; the submitted key hash no longer matches the anchored
 binding, and the chaincode refuses the grant as a deterministic endorsement
-rejection (HTTP~403 on the grant request), so no wrapped key for the
-substitute is ever created. What we report is precisely a rejected grant
-submission over a persistently substituted key, not a measured
-download-endpoint denial. The client-side attestation matters for a subtler
-variant that gateway re-hashing alone would miss: substitute the key, let the
-client fetch and wrap under it, then restore the original key before the
-grant is submitted. A gateway that re-hashes its own database at submission
-time would compute the restored, anchored hash over a wrap made for the
-attacker's key. In the tested restore-race case the client's attestation
-carries the substituted key's hash, the mismatch survives the restore, and
-the grant is refused. The refusal is written to the audit trail as a denial
+rejection (HTTP~403 on the grant request). A wrap for the substitute key may
+exist on the attacker-influenced client side, but the refused grant means it
+is never accepted, stored, or served. What we report is precisely a rejected
+grant submission over a substituted key, not a measured download-endpoint
+denial. The client-side attestation matters for a subtler variant that
+gateway re-hashing alone would miss: substitute the key, let the client fetch
+and wrap under it, then restore the original key before the grant is
+submitted. A gateway that re-hashes its own database at submission time would
+compute the restored, anchored hash over a wrap made for the attacker's key.
+The tested restore-race case executes this full client flow against the live
+deployment: with the substitute in place, the granting client fetched the
+recipient key through the same endpoint the browser uses, hashed the exact
+fetched string, and wrapped the real document key under the fetched key
+(confirmed to be the substitute); the database key was then restored, and the
+grant was submitted with that wrap and attestation. The attestation carries
+the substituted key's hash, the mismatch survives the restore, and the grant
+is refused. The refusal is written to the audit trail as a denial
 event through the same anchoring path as other audit events; verifying that
 this specific event committed to the ledger was not part of the harness. The
 attacker cannot repair the mismatch by re-anchoring the substitute key,
@@ -1986,7 +2040,7 @@ that have committed. The API no longer reports success it cannot substantiate.
 Across five runs on the final hardened build, which agree on every row of
 Table~\ref{tab:divergence}, the ledger reconverged with no operator action
 in a median of
-\textbf{13.9\,s} (mean 13.59, SD 1.46, range 11.87--14.95, $n=5$), after which
+\textbf{13.8\,s} (mean 14.18, SD 1.28, range 12.92--15.91, $n=5$), after which
 the release path denied the revoked user. Every run committed on its first
 retry.
 
@@ -2002,16 +2056,20 @@ and the mechanism addresses only the second term. Here the orderers were
 restarted within seconds, so the measured window is almost entirely
 reconciliation lag over a near-zero outage, dominated by Raft leader
 re-election plus worker poll alignment rather than by anything in the outbox,
-which is what the run-to-run spread of 1.46\,s reflects. Under a one-hour outage the divergence would be
+which is what the run-to-run spread of 1.28\,s reflects. Under a one-hour outage the divergence would be
 approximately one hour. What the result establishes is accordingly narrower
 than a full bound. The pre-fix $T_{\text{reconcile}}$ was unbounded, since
-nothing ever re-anchored, whereas it is now bounded by the retry schedule
-$\min(b \cdot 2^{k}, c)$ with base 5\,s and cap 60\,s, the cap deliberately
-short because it limits how long a revoked user remains ledger-authorized after
-Fabric is already healthy. The divergence therefore no longer outlives the
-outage. We do not claim that exposure is bounded at 13.9\,s, and these five
-runs do not exercise the cap, so the schedule's behavior near its bound is
-untested.
+nothing ever re-anchored, whereas the retry schedule
+$\min(b \cdot 2^{k}, c)$ with base 5\,s and cap 60\,s now bounds the delay
+before each renewed submission attempt, the cap deliberately short because it
+limits how long a revoked user remains ledger-authorized after Fabric is
+already healthy. The retry delay is one term of the recovery lag, not all of
+it: queue position, worker scheduling, submission time and service health add
+to it, and the measured lag itself extends past the moment the orderers
+return. What the mechanism removes is the pre-fix behavior in which the
+divergence persisted indefinitely because nothing ever re-anchored. We do not
+claim that exposure is bounded at 13.8\,s, and these five runs do not
+exercise the cap, so the schedule's behavior near its bound is untested.
 
 \paragraph{What is unchanged}
 The exposure during the outage itself is not reduced at all; steps~4 and~5
@@ -2065,19 +2123,24 @@ exactly the failure that write was meant to prevent, and never the reverse
 
 With the outbox extended, the grant now returns HTTP~202 with a pending
 ledger-sync status during the outage and reconverges with no operator action in a
-median of \textbf{15.3\,s} across five runs on the final hardened build (mean
-15.89, SD 2.60, range 13.63--20.16, bootstrap 95\,\% CI $[13.63, 20.16]$),
+median of \textbf{14.7\,s} across five runs on the final hardened build (mean
+14.69, SD 0.62, range 13.87--15.56, bootstrap 95\,\% CI $[13.87, 15.56]$),
 after which the grantee is served. This window is of the same scale as the
-revocation window of 13.9\,s, and their bootstrap intervals overlap
-(Fig.~\ref{fig:write_divergence}), as the shared mechanism predicts, since
-both are dominated by Raft leader re-election plus one worker poll rather than
-by the function being replayed. The reconciliation worker refuses to submit an
-anchor while an older pending anchor exists for the same document and user, and
-drains them strictly in creation order, so intent order is preserved. In five
-runs that queued a grant and then a revocation of the same pair during one
-outage, three on the earlier build and two repeated on the final build, the
-grant committed before the revocation in every run and the final decision was
-denial, rather than a re-authorization or a lost grant.
+revocation window of 13.8\,s and their bootstrap intervals overlap
+(Fig.~\ref{fig:write_divergence}), which is consistent with a window set by
+the shared reconciliation machinery rather than by the function replayed;
+the runs do not instrument which component of the lag dominates, so that
+attribution is a hypothesis the agreement supports rather than a measured
+decomposition. The reconciliation worker refuses to submit an anchor while an
+older pending anchor exists for the same document and user, draining each
+pair's queue in creation order. Intent order was preserved in every mixed
+queue we tested: five runs queued a grant and then a revocation of the same
+pair during one outage, three on the earlier build and two repeated on the
+final build, and in all five the grant committed before the revocation with
+denial as the final decision. Concurrent submissions racing on the same pair
+are not serialized by a lock, so this is a tested property of the sequential
+queues a single client produces, not a proven invariant under arbitrary
+interleavings.
 
 \begin{table}[!t]
 \centering
@@ -2096,9 +2159,9 @@ access-control mutations are now outbox-bounded and measured.}
 Write & Divergence exposure & Class & Bounded \\
 \midrule
 \texttt{Revoke\-Access} & revoked user still authorized & confidentiality &
-  outbox, 13.9\,s \\
+  outbox, 13.8\,s \\
 \texttt{Grant\-Access} & authorized user still denied & availability &
-  outbox, 15.3\,s \\
+  outbox, 14.7\,s \\
 \texttt{Register\-Document} & document off-ledger until anchored; owner denied,
   never over-served & availability (safe direction) & fire-and-forget \\
 \bottomrule
@@ -2111,8 +2174,8 @@ Write & Divergence exposure & Class & Bounded \\
     \caption{Unattended reconvergence after an ordering outage, both
     access-control mutation paths ($n{=}5$ each, final hardened build; the
     plotted value is each run's measured outbox age at commit). The same
-    durable outbox bounds both windows and their bootstrap intervals overlap;
-    the exposures they close are mirror images.}
+    durable outbox re-anchors both paths and the two windows' bootstrap
+    intervals overlap; the exposures they close are mirror images.}
     \label{fig:write_divergence}
 \end{figure}
 
@@ -2148,8 +2211,9 @@ Fig.~\ref{fig:ledgergrowth} plots both growth terms together.
 
 Query cost is flat and storage is linear (Table~\ref{tab:docscale}). The
 archive was loaded by 200 closed-loop submitters over 3.6 hours with zero
-failures and sampled at each decade; the final point lands within 0.1\,\% of
-the extrapolation from the previous decade. The latency absolutes belong to
+failures and sampled at each decade; the final point's block-store size
+lands within 0.1\,\% of the extrapolation from the previous decade (state
+and total metadata deviate more, by roughly 2.4 and 0.5\,\%). The latency absolutes belong to
 the build measured, and the flatness is the transferable result. Across a
 thousandfold increase in world state the access decision rises by 0.64\,ms,
 about 8\,\%, and history retrieval by 1.44\,ms at constant depth, so the
@@ -2158,9 +2222,11 @@ matters when the check sits on every download. Storage runs at roughly \textbf{7
 peer} (5.6\,KB of block store plus 1.4\,KB of state database), so a million
 documents occupy about 7\,GB per peer. Re-measuring the constant after the
 authorization changes found 5{,}751\,B per document against the earlier
-5{,}618, within noise; the premise that requiring an explicit grant for every
-principal would enlarge each document's access map was simply wrong, because
-registration has always written an explicit owner grant.
+5{,}618, a 2.4\,\% increase measured once per build and not replicated, so
+we do not attach an uncertainty to it; the premise that requiring an explicit
+grant for every principal would enlarge each document's access map
+substantially was wrong, because registration has always written an explicit
+owner grant.
 
 \begin{table}[!t]
 \centering
@@ -2262,8 +2328,16 @@ three-organization deployment was re-measured under injected round-trip delay. W
 \textbf{44.8\,\%} (69.48 to 38.32\,TPS, the ratio computed before rounding;
 write P50 3{,}588\,ms); the cost is consensus
 round trips, not the authorization decision, and it is the reason a geographically
-split ordering service is the expensive choice. Both configurations remain
-inside RQ2's five-second write budget at every point measured.
+split ordering service is the expensive choice. The medians of both
+configurations remain inside RQ2's five-second write budget at every point,
+but the distribution does not: write P95 runs between roughly 6.3 and
+9.2\,s across the sweep, so the slowest twentieth of writes exceeds the
+budget in every configuration, delayed or not. The Raft-delayed
+configuration also stops being loss-free: at 150\,ms inter-orderer RTT it
+recorded 976 request errors across its five trials, against single-digit
+errors per point for the client-path-only configuration, so its throughput
+figure describes the surviving requests of a degrading service rather than a
+slower healthy one.
 
 \subsubsection{Clock trust and its cost}
 \label{sec:exp_timeanchor}
@@ -2329,8 +2403,10 @@ and an accepted proposal timestamp is at most the skew tolerance (120\,s as
 deployed) behind the anchor, so a gateway that suppresses heartbeats and
 manipulates its proposal clock can place a decision at most ceiling plus skew
 behind the peer's present. The sweep re-deploys the chaincode at each ceiling,
-stops the heartbeat, commits one fresh anchor, and polls the release path
-every three seconds until the decision flips (Table~\ref{tab:staleness});
+stops the heartbeat, commits one fresh anchor, and polls the access decision
+directly as a chaincode query every three seconds until it flips
+(Table~\ref{tab:staleness}; the HTTP release path invokes the same decision
+but is not the instrument here);
 each measured window tracks its configured ceiling to within the poll
 granularity, and the refusals come from the peer-clock comparison rather than
 from any value the caller controls. Every second of backdating tolerance
@@ -2557,10 +2633,13 @@ this paper leans on are counts rather than distributions.
 
 \begin{table}[!t]
 \centering
-\caption{Consolidated evidence with 95\,\% confidence intervals. Medians are
-central (mean-of-middle-two); intervals are bootstrap percentile CIs for the
-median, 10{,}000 resamples at seed 42, regenerated from the released
-per-sample data by \texttt{consolidated/build\_table\_v2.py}.}
+\caption{Consolidated evidence with 95\,\% confidence intervals. Latency
+and window rows are central medians (mean-of-middle-two) with bootstrap
+percentile CIs, 10{,}000 resamples at seed 42, regenerated from the released
+per-sample data by \texttt{consolidated/build\_table\_v2.py}; the two
+throughput rows are means of trial-level TPS with Student-$t$ intervals;
+rows marked categorical, rate, or per point are counts, rates, and
+single-configuration values with no resampling distribution.}
 \label{tab:consolidated}
 \scriptsize
 \setlength{\tabcolsep}{3pt}
@@ -2580,13 +2659,13 @@ Metric & $n$ & Value & 95\,\% CI \\
 \multicolumn{4}{@{}l}{\emph{Failure behavior} (Sections~\ref{sec:exp_failclosed}, \ref{sec:exp_divergence})}\\
 \quad Protected bytes released during outage & --- & 0 & categorical \\
 \quad Fail-closed denials during the outage  & --- & 1{,}340 & categorical \\
-\quad Revocation divergence window to convergence & 5 & 13.92\,s & [11.87, 14.95] \\
-\quad Grant divergence window to convergence      & 5 & 15.27\,s & [13.63, 20.16] \\
+\quad Revocation divergence window to convergence & 5 & 13.75\,s & [12.92, 15.91] \\
+\quad Grant divergence window to convergence      & 5 & 14.72\,s & [13.87, 15.56] \\
 \midrule
 \multicolumn{4}{@{}l}{\emph{Adversarial} (Sections~\ref{sec:exp_db_mutation}, \ref{sec:exp_pubkey})}\\
 \quad Ciphertext released on a forged database grant & --- & 0 & categorical \\
 \quad Wrapped keys released on a forged grant        & --- & 0 & categorical \\
-\quad Key material released on a substituted public key & --- & 0 & categorical \\
+\quad Grant submissions accepted over a substituted key & --- & 0 & categorical \\
 \midrule
 \multicolumn{4}{@{}l}{\emph{Scale} (Sections~\ref{sec:exp_ledgergrowth}, \ref{sec:exp_netscale})}\\
 \quad \texttt{CheckAccess} P50 at $10^3$ documents & 100 & 7.96\,ms & --- \\
@@ -2602,7 +2681,7 @@ Metric & $n$ & Value & 95\,\% CI \\
 \quad Fabric commit latency, size-independent      & 5 & 2{,}132\,ms & [2129, 2137] \\
 \quad Audit query P50, operational store           & 10 & 3.86\,ms & [2.40, 4.28] \\
 \quad History retrieval P50 at depth 107           & 10 & 135.5\,ms & [128.0, 137.5] \\
-\quad Storage retrieval P50, 50\,MB, cross-node    & 24 & 867\,ms & [856, 911] \\
+\quad Storage retrieval P50, 50\,MiB, cross-node   & 24 & 867\,ms & [856, 911] \\
 \quad Throughput at 150\,ms RTT, Raft delayed      & 5 & $-44.8$\,\% & per point \\
 \bottomrule
 \end{tabular}
@@ -2764,9 +2843,10 @@ Writes are availability-first and can diverge. An access-control change issued
 while the ordering service is unavailable completes operationally without
 reaching the ledger, and the two mutation paths fail in opposite directions,
 with a diverged revocation continuing to authorize a revoked user and a
-diverged grant continuing to refuse an authorized one. A durable outbox bounds
-both, reconverging without operator action in a median of 14 to 15\,s with
-intent order preserved in the mixed queues tested. The asymmetry itself is
+diverged grant continuing to refuse an authorized one. A durable outbox re-anchors
+both without operator action, with measured outbox ages of 14 to 15\,s at the
+median in the tested short-outage runs and intent order preserved in the mixed
+queues tested. The asymmetry itself is
 the central contribution. Given a release path that reads committed state and
 fails closed, which harm a diverged write produces follows from the direction
 of the write, so any on-path design sharing those two properties inherits the

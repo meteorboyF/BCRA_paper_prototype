@@ -1,0 +1,13 @@
+{
+  "experiment": "18 - grant-path outage divergence, durable outbox (mode=grant)",
+  "timestamp_utc": "2026-09-14T06:22:05Z",
+  "host": "Linux 7.0.0-31-generic x86_64",
+  "docker": "Docker version 29.7.2, build a7dcaa6",
+  "git_commit": "fc662f1b106902e9c5cbe4c438aca941b39b5953",
+  "channel": "legal-channel", "chaincode": "legalcc",
+  "orderers": "orderer1.pangochain.com orderer2.pangochain.com orderer3.pangochain.com",
+  "poll_interval_s": 2, "poll_timeout_s": 120,
+  "mem_available_kb": 7305760,
+  "load_avg": "1.91 1.76 1.18",
+  "reference_runs": "exp16 (pre-fix revoke), exp16b (post-fix revoke)"
+}

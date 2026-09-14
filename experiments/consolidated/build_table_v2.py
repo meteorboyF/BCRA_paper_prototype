@@ -60,15 +60,15 @@ def outbox_windows(pattern):
                     vals.append(float(parts[1]))
     return vals
 
-rev = outbox_windows(E / "orderer_outage_reconciliation_16b/results/202609*")
-add("Revocation divergence window (new build)", rev, "s")
+rev = outbox_windows(E / "orderer_outage_reconciliation_16b/results/20260914_*")
+add("Revocation divergence window (final build)", rev, "s")
 
 grant = []
-for d in sorted(glob.glob(str(E / "grant_outage_reconciliation_18/results/grant_202609*"))):
+for d in sorted(glob.glob(str(E / "grant_outage_reconciliation_18/results/grant_20260914_*"))):
     for r in rows(pathlib.Path(d) / "sequence.csv"):
         if "divergence window" in r["description"]:
             grant.append(float(r["result"].split()[0]))
-add("Grant divergence window (new build)", grant, "s")
+add("Grant divergence window (final build)", grant, "s")
 
 # ── Architectural comparison (durable-baseline rerun, per-request samples) ──
 s = {}

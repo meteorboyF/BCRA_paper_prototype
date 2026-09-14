@@ -4,6 +4,7 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 
@@ -178,7 +179,7 @@ func TestCheckAccess_Granted(t *testing.T) {
 	contract := &LegalContract{}
 
 	_ = contract.RegisterDocument(ctx, "doc-acl", "case-001", "hash", "Qm1", "owner-001", "TestMSP", nowTS())
-	_ = contract.GrantAccess(ctx, "doc-acl", "user-002", "TestMSP", CapRead, "", "wrapped-key", "owner-001", "")
+	_ = contract.GrantAccess(ctx, "doc-acl", "user-002", "TestMSP", CapRead, "", "wrapped-key", "owner-001", "", "")
 	commitTx(stub, "tx-acl-1")
 
 	stub.MockTransactionStart("tx-acl-check")
@@ -362,7 +363,7 @@ func TestCheckAccess_RejectsBackdatedProposal(t *testing.T) {
 	// Grant expired an hour ago.
 	expired := time.Now().Add(-1 * time.Hour).UTC().Format(time.RFC3339)
 	_ = contract.RegisterDocument(ctx, "doc-bd", "case-bd", "hash", "Qm-bd", "owner-bd", "TestMSP", nowTS())
-	_ = contract.GrantAccess(ctx, "doc-bd", "user-bd", "TestMSP", CapRead, expired, "wrapped", "owner-bd", "")
+	_ = contract.GrantAccess(ctx, "doc-bd", "user-bd", "TestMSP", CapRead, expired, "wrapped", "owner-bd", "", "")
 	commitTx(stub, "tx-backdate-setup")
 
 	// No anchor yet: the mechanism is inactive, so this is the pre-fix behaviour. The grant
@@ -400,7 +401,7 @@ func TestCheckAccess_AnchorDoesNotBlockLiveGrant(t *testing.T) {
 
 	future := time.Now().Add(24 * time.Hour).UTC().Format(time.RFC3339)
 	_ = contract.RegisterDocument(ctx, "doc-live", "case-live", "hash", "Qm-live", "owner-live", "TestMSP", nowTS())
-	_ = contract.GrantAccess(ctx, "doc-live", "user-live", "TestMSP", CapRead, future, "wrapped", "owner-live", "")
+	_ = contract.GrantAccess(ctx, "doc-live", "user-live", "TestMSP", CapRead, future, "wrapped", "owner-live", "", "")
 	commitTx(stub, "tx-anchor-live")
 
 	// Anchor a few seconds old, as a recent heartbeat would leave it.
@@ -427,7 +428,7 @@ func TestCheckAccess_StaleAnchorStillAuthorisesLiveGrant(t *testing.T) {
 
 	future := time.Now().Add(24 * time.Hour).UTC().Format(time.RFC3339)
 	_ = contract.RegisterDocument(ctx, "doc-sa", "case-sa", "hash", "Qm-sa", "owner-sa", "TestMSP", nowTS())
-	_ = contract.GrantAccess(ctx, "doc-sa", "user-sa", "TestMSP", CapRead, future, "wrapped", "owner-sa", "")
+	_ = contract.GrantAccess(ctx, "doc-sa", "user-sa", "TestMSP", CapRead, future, "wrapped", "owner-sa", "", "")
 	commitTx(stub, "tx-anchor-staleanchor")
 
 	// Anchor is two hours old: ordering has been unavailable for a while.
@@ -497,7 +498,7 @@ func TestCheckAccess_SameOrgWithExplicitGrantIsAllowed(t *testing.T) {
 	contract := &LegalContract{}
 
 	_ = contract.RegisterDocument(ctx, "doc-m5g", "case-m5g", "hash", "Qm-m5g", "owner-m5g", "FirmAMSP", nowTS())
-	_ = contract.GrantAccess(ctx, "doc-m5g", "colleague-m5g", "FirmAMSP", CapRead, "", "wrapped", "owner-m5g", "")
+	_ = contract.GrantAccess(ctx, "doc-m5g", "colleague-m5g", "FirmAMSP", CapRead, "", "wrapped", "owner-m5g", "", "")
 	commitTx(stub, "tx-m5-grant")
 
 	stub.MockTransactionStart("tx-m5-grant-check")
@@ -535,7 +536,7 @@ func TestCheckAccess_RejectsForgedFreshness_PEqualsA(t *testing.T) {
 	// Grant expired one hour ago, but it was still live two hours ago.
 	expired := time.Now().Add(-1 * time.Hour).UTC().Format(time.RFC3339)
 	_ = contract.RegisterDocument(ctx, "doc-s1", "case-s1", "hash", "Qm-s1", "owner-s1", "TestMSP", nowTS())
-	_ = contract.GrantAccess(ctx, "doc-s1", "user-s1", "TestMSP", CapRead, expired, "wrapped", "owner-s1", "")
+	_ = contract.GrantAccess(ctx, "doc-s1", "user-s1", "TestMSP", CapRead, expired, "wrapped", "owner-s1", "", "")
 	commitTx(stub, "tx-s1-setup")
 
 	// Enable a ceiling for this test; the shipped default of zero disables the
@@ -573,3 +574,46 @@ type overrideContext struct {
 
 func (tc *overrideContext) GetStub() shim.ChaincodeStubInterface { return tc.stub }
 func (tc *overrideContext) GetClientIdentity() cid.ClientIdentity { return tc.cid }
+
+// ─── Replay closure (audit v2 finding 1) ─────────────────────────────────────
+//
+// A database writer who resets a committed, legitimately signed GrantAccess
+// outbox row back to PENDING causes the worker to resubmit the identical
+// command. The chaincode must refuse the repeat: its command id was consumed by
+// the first execution, so the second submission fails deterministically and the
+// ACL entry (revoked in between) is not resurrected.
+func TestGrantAccess_ReplayedCommandIDRefused(t *testing.T) {
+	ctx, stub := setupCtx(t, "tx-rp-1")
+	contract := &LegalContract{}
+
+	_ = contract.RegisterDocument(ctx, "doc-rp", "case-rp", "hash", "Qm-rp", "owner-rp", "TestMSP", nowTS())
+	if err := contract.GrantAccess(ctx, "doc-rp", "user-rp", "TestMSP", CapRead, "", "wrapped", "owner-rp", "", "cmd-grant-1"); err != nil {
+		t.Fatalf("first grant should succeed: %v", err)
+	}
+	if err := contract.RevokeAccess(ctx, "doc-rp", "user-rp", "owner-rp", "cmd-revoke-1"); err != nil {
+		t.Fatalf("revoke should succeed: %v", err)
+	}
+	commitTx(stub, "tx-rp-1")
+
+	stub.MockTransactionStart("tx-rp-2")
+	replayCtx := &testContext{stub: stub, cid: &mockClientIdentity{mspID: "TestMSP"}}
+	err := contract.GrantAccess(replayCtx, "doc-rp", "user-rp", "TestMSP", CapRead, "", "wrapped", "owner-rp", "", "cmd-grant-1")
+	if err == nil {
+		t.Fatal("replayed command id must be refused")
+	}
+	if !strings.Contains(err.Error(), "already applied") {
+		t.Errorf("expected an 'already applied' rejection, got: %v", err)
+	}
+	commitTx(stub, "tx-rp-2")
+
+	// The revocation must have survived the replay attempt.
+	stub.MockTransactionStart("tx-rp-3")
+	checkCtx := &testContext{stub: stub, cid: &mockClientIdentity{mspID: "TestMSP"}}
+	result, err := contract.CheckAccess(checkCtx, "doc-rp", "user-rp", "TestMSP")
+	if err != nil {
+		t.Fatalf("CheckAccess errored: %v", err)
+	}
+	if result == "true" {
+		t.Error("replayed grant resurrected a revoked ACL entry")
+	}
+}

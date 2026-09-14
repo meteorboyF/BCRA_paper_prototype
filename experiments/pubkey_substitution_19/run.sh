@@ -115,25 +115,37 @@ KB=$(pg "SELECT metadata_json FROM audit_log WHERE resource_id='$DOC' AND event_
 log "[D] legacy-unbound grant: HTTP $CODE (on-chain binding empty=$([ -z "$BOUND" ] && echo yes || echo no); audit $KB)"
 step D "migration: unbound legacy user still grantable" "HTTP $CODE binding_empty=$([ -z "$BOUND" ] && echo yes || echo no) audit=$KB (expect 2xx, keyBinding=absent)"
 
-# ── E: restore race — client attests the substituted key, attacker restores DB key ──
-# This is the case the audit (S4) flagged: hashing the current DB key at submission time
-# would PASS after the attacker restores the original key, but the client attests the key
-# it actually wrapped under, so the mismatch against the anchor survives the restore.
+# ── E: restore race — the FULL client flow against a transiently substituted key ──
+# The audit (S4, verification round 2) required the actual browser sequence, not a
+# synthetic hash: (1) attacker substitutes the published key; (2) the honest client
+# fetches the recipient key from the live API, hashes the exact fetched string, and
+# wraps the real document key under the parsed fetched key (client_fetch_wrap.mjs
+# mirrors TeamAccessPanel.tsx + crypto.ts); (3) the attacker restores the original
+# DB key; (4) the grant is submitted with the client's wrap and attestation. A
+# gateway that re-hashed its own DB at submission time would now compute the
+# anchored hash over a wrap made for the attacker's key; the client attestation
+# carries the substituted key's hash instead, so the anchor mismatch survives.
 pg "UPDATE users SET status='ACTIVE' WHERE id='$GRANTEE'" >/dev/null
 ORIG_KEY_E=$(pg "SELECT public_key_ecies FROM users WHERE id='$GRANTEE'")
 ATT_KEY_E=$(node "$EXP_DIR/attacker_key.mjs")
-ATT_HASH_E=$(node "$EXP_DIR/hash_jwk.mjs" "$ATT_KEY_E")
-# 1. attacker substitutes the published key; 2. client fetches it and wraps+attests under it
+DOCKEY=$(jqf docKeyB64)
+# 1. attacker substitutes the published key
 pg "UPDATE users SET public_key_ecies='$ATT_KEY_E' WHERE id='$GRANTEE'" >/dev/null
+# 2. honest client fetches, hashes and wraps against the live API (sees the substitute)
+CLIENT_OUT=$(node "$EXP_DIR/client_fetch_wrap.mjs" "$TOK_O" "$GRANTEE" "$DOCKEY")
+echo "$CLIENT_OUT" > "$OUT_DIR/client_flow_e.json"
+ATT_HASH_E=$(echo "$CLIENT_OUT" | python3 -c "import json,sys;print(json.load(sys.stdin)['fetchedKeyHash'])")
+WRAP_E=$(echo "$CLIENT_OUT" | python3 -c "import json,sys;print(json.load(sys.stdin)['wrappedKeyToken'])")
+SUB_HASH=$(node "$EXP_DIR/hash_jwk.mjs" "$ATT_KEY_E")
+FETCH_SAW_SUB=$([ "$ATT_HASH_E" = "$SUB_HASH" ] && echo yes || echo no)
 # 3. attacker restores the original DB key before the grant is submitted
 pg "UPDATE users SET public_key_ecies='$ORIG_KEY_E' WHERE id='$GRANTEE'" >/dev/null
-# 4. grant carries the CLIENT attestation of the substituted key (what was wrapped under)
+# 4. grant carries the client's wrap and attestation of what it actually fetched
 RESP=$(curl -s -w '\n%{http_code}' -X POST "$BASE/access/grant" -H "Authorization: Bearer $TOK_O" \
   -H 'Content-Type: application/json' \
-  -d "{\"docId\":\"$DOC\",\"granteeId\":\"$GRANTEE\",\"capability\":\"read\",\"wrappedKeyToken\":\"$WRAP\",\"recipientKeyHash\":\"$ATT_HASH_E\"}")
+  -d "{\"docId\":\"$DOC\",\"granteeId\":\"$GRANTEE\",\"capability\":\"read\",\"wrappedKeyToken\":\"$WRAP_E\",\"recipientKeyHash\":\"$ATT_HASH_E\"}")
 CODE=$(echo "$RESP" | tail -1)
-DB_MATCHES_ANCHOR=$(pg "SELECT public_key_ecies FROM users WHERE id='$GRANTEE'" | head -c 20)
-log "[E] restore race (client attested substituted key, DB restored): HTTP $CODE"
-step E "restore race: client-attested substitute vs restored DB key" "HTTP $CODE (expect 4xx: attestation catches it though DB key now matches anchor)"
+log "[E] restore race, full client flow (fetch saw substitute=$FETCH_SAW_SUB): HTTP $CODE"
+step E "restore race: full fetch->wrap->restore->submit client flow" "HTTP $CODE fetch_saw_substitute=$FETCH_SAW_SUB (expect 4xx refusal, yes)"
 
 log "done — results in $OUT_DIR"

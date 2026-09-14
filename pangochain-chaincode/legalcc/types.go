@@ -91,6 +91,10 @@ const (
 	CasePrefix    = "CASE"
 	AuditPrefix   = "AUDIT"
 	UserKeyPrefix = "USERKEY"
+	// CommandPrefix namespaces consumed one-time command ids (replay closure): a
+	// mutation carrying a command id that is already recorded is refused, so a
+	// signed outbox row reset to PENDING by a database writer cannot be re-enacted.
+	CommandPrefix = "CMD"
 
 	// TimeAnchorKey is the single world-state key holding the current TimeAnchor.
 	TimeAnchorKey = "TIMEANCHOR"

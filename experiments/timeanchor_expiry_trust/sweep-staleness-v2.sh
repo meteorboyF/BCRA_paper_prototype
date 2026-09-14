@@ -38,7 +38,7 @@ mkdir -p "$OUT_DIR"
 exec > >(tee -a "$OUT_DIR/run.log") 2>&1
 log(){ printf '[sweepv2 %s] %s\n' "$(date -u +%H:%M:%S)" "$*"; }
 CSV="$OUT_DIR/sweep.csv"
-echo "ceiling_seconds,availability_window_seconds,backdating_bound_seconds,outcome" > "$CSV"
+echo "ceiling_seconds,observed_window_seconds,theoretical_backdating_bound_seconds,outcome" > "$CSV"
 
 if pgrep -f "pangochain-backend-2.0.0.jar" >/dev/null; then
   log "WARNING: a gateway process is running; its heartbeat will refresh the anchor and invalidate this sweep."
@@ -99,8 +99,12 @@ for ceiling in "${CEILINGS[@]}"; do
   done
 
   if [ "$outcome" = "refused" ]; then
-    bound=$(( window + SKEW ))
-    log "  refused after ${window}s (backdating bound ${bound}s)"
+    # The tabulated bound is the THEORETICAL ceiling+skew (what the check
+    # enforces), not observed window+skew: the observed window undershoots the
+    # ceiling by up to the poll interval, so deriving the bound from it would
+    # mislabel a measurement artifact as the enforced bound (audit v2, N10).
+    bound=$(( ceiling + SKEW ))
+    log "  refused after ${window}s (theoretical backdating bound ${bound}s)"
     echo "$ceiling,$window,$bound,refused" >> "$CSV"
   else
     log "  no refusal within ${GIVE_UP}s (expected for disabled ceiling 0)"

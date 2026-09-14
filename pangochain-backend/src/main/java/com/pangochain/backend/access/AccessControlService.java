@@ -47,6 +47,16 @@ public class AccessControlService {
     @org.springframework.beans.factory.annotation.Value("${access.require-key-binding:false}")
     private boolean requireKeyBinding;
 
+    /**
+     * When true, every grant must carry the client's own attestation of the recipient
+     * key it wrapped under ({@code recipientKeyHash}); the gateway-side fallback of
+     * re-hashing the stored key is disabled. The fallback retains the substitution
+     * race for clients that predate the field, so the protected configuration is
+     * this flag enabled.
+     */
+    @org.springframework.beans.factory.annotation.Value("${access.require-key-attestation:false}")
+    private boolean requireKeyAttestation;
+
     /** Result of {@link #revoke}: whether the ledger anchor committed inline or was queued. */
     public record RevokeResult(boolean ledgerCommitted, String fabricTxId, UUID pendingAnchorId) {}
 
@@ -102,6 +112,12 @@ public class AccessControlService {
         // Prefer the client's attestation of the key it actually wrapped under (S4);
         // fall back to hashing the stored key for clients that predate the field.
         boolean clientAttested = req.getRecipientKeyHash() != null && !req.getRecipientKeyHash().isBlank();
+        if (requireKeyAttestation && !clientAttested) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.BAD_REQUEST,
+                    "This deployment requires the granting client to attest the recipient key "
+                    + "it wrapped under (recipientKeyHash).");
+        }
         String recipientKeyHash = clientAttested
                 ? req.getRecipientKeyHash()
                 : (grantee.getPublicKeyEcies() != null ? KeyHashing.sha256Hex(grantee.getPublicKeyEcies()) : "");
@@ -136,6 +152,11 @@ public class AccessControlService {
                         "recipientKeyHash", recipientKeyHash,
                         "keyHashSource", clientAttested ? "client" : "gateway-db")))
                 .build();
+        // Persist first so the generated row id exists, then sign over it: the id is
+        // both part of the HMAC (a signature cannot be moved to a cloned row) and the
+        // one-time command id the chaincode consumes (the same row cannot be re-enacted
+        // by resetting its status).
+        anchor = pendingAnchorRepository.save(anchor);
         anchor.setSignature(outboxSigner.sign(anchor));
 
         String fabricTxId = null;
@@ -145,8 +166,8 @@ public class AccessControlService {
             // Intent-order guard for the inline path (audit finding S6): if an older
             // mutation for this (document, user) is still pending, submitting inline
             // would jump the queue, so this mutation is queued behind it instead.
-            if (pendingAnchorRepository.existsByStatusAndDocIdAndTargetUserIdAndCreatedAtBefore(
-                    PendingAnchor.Status.PENDING, docId, granteeId, Instant.now())) {
+            if (pendingAnchorRepository.existsByStatusAndDocIdAndTargetUserIdAndCreatedAtBeforeAndIdNot(
+                    PendingAnchor.Status.PENDING, docId, granteeId, Instant.now(), anchor.getId())) {
                 throw new FabricException("older pending anchors exist for this document and user; queued to preserve intent order");
             }
             fabricTxId = fabricGatewayService.grantAccess(
@@ -157,7 +178,8 @@ public class AccessControlService {
                     expiryStr,
                     req.getWrappedKeyToken(),
                     granter.getId().toString(),
-                    recipientKeyHash
+                    recipientKeyHash,
+                    anchor.getId().toString()
             );
             ledgerCommitted = true;
         } catch (FabricException e) {
@@ -250,6 +272,9 @@ public class AccessControlService {
                 .attempts(0)
                 .nextAttemptAt(Instant.now())
                 .build();
+        // Persist-then-sign for the same reasons as grant(): the id is HMAC-covered
+        // and ledger-consumed. See grant().
+        anchor = pendingAnchorRepository.save(anchor);
         anchor.setSignature(outboxSigner.sign(anchor));
 
         String fabricTxId = null;
@@ -257,11 +282,12 @@ public class AccessControlService {
         try {
             if (fabricGatewayService == null) throw new FabricException("Fabric not enabled");
             // Intent-order guard for the inline path (audit finding S6); see grant().
-            if (pendingAnchorRepository.existsByStatusAndDocIdAndTargetUserIdAndCreatedAtBefore(
-                    PendingAnchor.Status.PENDING, docId, targetUserId, Instant.now())) {
+            if (pendingAnchorRepository.existsByStatusAndDocIdAndTargetUserIdAndCreatedAtBeforeAndIdNot(
+                    PendingAnchor.Status.PENDING, docId, targetUserId, Instant.now(), anchor.getId())) {
                 throw new FabricException("older pending anchors exist for this document and user; queued to preserve intent order");
             }
-            fabricTxId = fabricGatewayService.revokeAccess(docIdStr, targetUserIdStr, revoker.getId().toString());
+            fabricTxId = fabricGatewayService.revokeAccess(docIdStr, targetUserIdStr, revoker.getId().toString(),
+                    anchor.getId().toString());
             ledgerCommitted = true;
         } catch (FabricException e) {
             log.warn("Fabric RevokeAccess failed, queuing durable retry: {}", e.getMessage());

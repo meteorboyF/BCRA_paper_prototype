@@ -225,3 +225,13 @@ Median 13.92 s (mean 13.59, SD 1.46, bootstrap 95% CI [11.87, 14.95] at seed
 42 via consolidated/build_table_v2.py). These supersede the 20260831 windows
 (median 15.92 s) quoted in earlier drafts; the earlier runs describe the
 pre-hardening build and are retained.
+
+## 2026-09-14 rerun on the FINAL build (verification round 2)
+
+The 2026-09-07 windows above are superseded in turn: round-2 verification led
+to a further chaincode change (ledger-consumed command ids, legalcc v1.33
+seq 13) and gateway change (id-covered outbox HMAC, client-attestation flag),
+so the revoke arm was rerun n=5 on the final build. Windows (outbox
+timestamps): 15.911364, 13.750130, 13.225795, 12.919122, 15.108898 s; median
+13.75 s (mean 14.18, SD 1.28, bootstrap 95% CI [12.92, 15.91] at seed 42).
+All five runs agree on every sequence row. See ../RUN_MANIFEST_2026-09.md.

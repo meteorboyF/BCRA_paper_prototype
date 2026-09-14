@@ -104,4 +104,32 @@ else
   step C "tamper: retarget a legitimately signed row" "skipped: signing disabled"
 fi
 
+# ── D: replay — reset a committed, legitimately signed grant row to PENDING ──
+# after the grant has been revoked. Round-2 audit counterexample: the row's
+# contents (and signature) are unchanged, so signature verification passes; the
+# closure is the ledger-consumed command id, which refuses re-execution. The
+# revoked user must NOT be re-authorized.
+TOK_O2="$(token "$OWNER")"
+curl -s -o /dev/null -X DELETE "$BASE/access/$DOC/user/$GRANTEE" -H "Authorization: Bearer $TOK_O2"
+sleep 3
+LG_AFTER_REVOKE=$(ledger_grant "$DOC" "$GRANTEE")
+REPLAY_ID=$(pg "SELECT id FROM pending_anchor WHERE doc_id='$DOC' AND target_user_id='$GRANTEE' AND chaincode_function='GrantAccess' AND status='COMMITTED' ORDER BY created_at DESC LIMIT 1")
+if [ -n "$REPLAY_ID" ]; then
+  pg "UPDATE pending_anchor SET status='PENDING', attempts=0, next_attempt_at=now(), committed_at=NULL WHERE id='$REPLAY_ID'" >/dev/null
+  log "[D] reset committed grant row $REPLAY_ID to PENDING (contents+signature unchanged)"
+  DOUT="still_pending"
+  for _ in $(seq 1 20); do
+    st=$(pg "SELECT status FROM pending_anchor WHERE id='$REPLAY_ID'")
+    [ "$st" = "COMMITTED" ] || [ "$st" = "FAILED" ] && { DOUT="$st"; break; }
+    sleep 2
+  done
+  LG_REPLAY=$(ledger_grant "$DOC" "$GRANTEE")
+  LERR=$(pg "SELECT last_error FROM pending_anchor WHERE id='$REPLAY_ID'")
+  log "[D] replayed row status=$DOUT ledger-grants-user=$LG_REPLAY last_error=$LERR"
+  step D "replay: committed grant row reset to PENDING after revoke" "status=$DOUT ledger=$LG_REPLAY error=$LERR (expect COMMITTED-without-reexecution/false/already applied)"
+else
+  log "[D] skipped: no committed signed grant row found"
+  step D "replay: committed grant row reset to PENDING after revoke" "skipped"
+fi
+
 log "done — results in $OUT_DIR"
