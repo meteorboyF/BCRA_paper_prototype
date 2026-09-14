@@ -20,7 +20,7 @@ assert docs == [10**3, 10**4, 10**5, 10**6] and blockstore_mb[-1] == 5618.0
 rows = [r for r in csv.DictReader(open(DATA / "ledger_size.csv")) if r["phase"] == "idle"]
 t0 = int(rows[0]["epoch_s"]); b0 = int(rows[0]["blockstore_bytes"])
 mins = [(int(r["epoch_s"]) - t0) / 60 for r in rows]
-kib = [(int(r["blockstore_bytes"]) - b0) / 1024 for r in rows]
+kb = [(int(r["blockstore_bytes"]) - b0) / 1000 for r in rows]  # decimal kB, matching MB/day
 a = json.load(open(DATA / "analysis.json"))["phase_a"]
 assert abs(a["blockstore_mb_per_day"] - 7.839) < 0.01
 
@@ -38,12 +38,12 @@ axa.legend(loc="upper left", fontsize=ps.FONT_SIZE - 1.5)
 axa.annotate("~7 KB per document per peer", xy=(0.97, 0.05), xycoords="axes fraction",
              ha="right", fontsize=ps.FONT_SIZE - 1, style="italic")
 
-axb.plot(mins, kib, marker="o", markersize=3.4, color=ps.C[1],
+axb.plot(mins, kb, marker="o", markersize=3.4, color=ps.C[1],
          label="Block store, zero document activity")
-axb.plot([0, mins[-1]], [0, a["blockstore_bytes_per_s"] * mins[-1] * 60 / 1024],
+axb.plot([0, mins[-1]], [0, a["blockstore_bytes_per_s"] * mins[-1] * 60 / 1000],
          linestyle=(0, (4, 3)), color=ps.GREY, label="Fitted 7.84 MB/day ($R^2$=1.0000)")
 axb.set_xlabel("Elapsed time, no documents registered (min)")
-axb.set_ylabel("Block store growth (KiB)")
+axb.set_ylabel("Block store growth (kB)")
 axb.set_title("(b) Growth in time", fontsize=ps.FONT_SIZE)
 axb.set_xlim(-0.8, 17)
 axb.set_ylim(0, 130)

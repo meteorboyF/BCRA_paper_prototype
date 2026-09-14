@@ -33,7 +33,9 @@ ledger_grant(){ docker exec "$CLI" peer chaincode query -C "$CHANNEL" -n "$CC" -
 
 { echo "{\"experiment\":\"20 - outbox forgery resistance (audit S2)\","
   echo " \"timestamp_utc\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\","
-  echo " \"git_commit\":\"$(git -C "$ROOT_DIR" rev-parse HEAD)\"}"; } > "$OUT_DIR/environment.json"
+  echo " \"git_commit\":\"$(git -C "$ROOT_DIR" rev-parse HEAD)\","
+  echo " \"chaincode\":\"legalcc committed: $(docker exec "$CLI" peer lifecycle chaincode querycommitted -C "$CHANNEL" -n "$CC" 2>/dev/null | grep -oE "Version: [^,]+, Sequence: [0-9]+" || echo unknown)\","
+  echo " \"cpu_model\":\"$(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2 | sed 's/^ //')\"}"; } > "$OUT_DIR/environment.json"
 
 # Fixture: fresh case + document owned by rahman, plus a would-be attacker subject (karim).
 FIX="$(node "$ROOT_DIR/experiments/grant_outage_reconciliation_18/setup_grant.mjs")"

@@ -8,10 +8,10 @@
 \begin{document}
 \section*{Highlights}
 \begin{itemize}
-\item Forged, retargeted and replayed database rows all fail: the ledger decides
+\item Forged and retargeted outbox rows fail a gateway HMAC; replays fail on-ledger
 \item Reads fail closed: an induced ledger outage released zero protected bytes
 \item Grant and revoke diverge in opposite directions; one outbox re-anchors both
-\item Re-anchoring reconverged unattended in 14 to 15 s median in tested runs
+\item Re-anchoring reconverged unattended (medians 13.8 s, 14.7 s) in tested runs
 \item Time-anchor heartbeat costs 7.84 MB per peer per day at zero activity
 \end{itemize}
 \end{document}
