@@ -8,13 +8,13 @@
 \bibitem{ico2024trends}
 {Information Commissioner's Office},
   \href{https://ico.org.uk/action-weve-taken/complaints-and-concerns-data-sets/data-security-incident-trends/}{Data
-  security incident trends}, [Online], accessed: Jun. 2026 (2024).
+  security incident trends}, [Online], {Accessed}: Jun.\ 2026 (2024).
 \newline\urlprefix\url{https://ico.org.uk/action-weve-taken/complaints-and-concerns-data-sets/data-security-incident-trends/}
 
 \bibitem{aba2023}
 {American Bar Association},
   \href{https://www.americanbar.org/groups/law_practice/resources/tech-report/2023/2023-cybersecurity-techreport/}{2023
-  cybersecurity tech report}, accessed: Dec.\ 14, 2025 (Dec. 2023).
+  cybersecurity tech report}, {Accessed}: Dec.\ 14, 2025 (Dec. 2023).
 \newline\urlprefix\url{https://www.americanbar.org/groups/law_practice/resources/tech-report/2023/2023-cybersecurity-techreport/}
 
 \bibitem{nistir8202}
@@ -48,7 +48,7 @@ M.~Steichen, B.~Fiz, R.~Norvill, W.~Shbair, R.~State, Blockchain-based,
 
 \bibitem{liu2026rbacipfs}
 N.~Liu, S.~Lu, F.~Guan, W.~Ren, A blockchain-based traceable access control
-  scheme for {IPFS}, Blockchain: Research and ApplicationsIn press, journal
+  scheme for {IPFS}, Blockchain: Research and Applications, in press, journal
   pre-proof (2026).
 \newblock \href {https://doi.org/10.1016/j.bcra.2026.100503}
   {\path{doi:10.1016/j.bcra.2026.100503}}.
@@ -57,7 +57,7 @@ N.~Liu, S.~Lu, F.~Guan, W.~Ren, A blockchain-based traceable access control
 E.~Androulaki, A.~Barger, V.~Bortnikov, C.~Cachin, K.~Christidis, A.~De~Caro,
   D.~Enyeart, C.~Ferris, G.~Laventman, Y.~Manevich, S.~Muralidharan, C.~Murthy,
   B.~Nguyen, M.~Sethi, G.~Singh, K.~Smith, A.~Sorniotti, C.~Stathakopoulou,
-  M.~Vukoli{\'c}, S.~W. Cocco, J.~Yellick, Hyperledger fabric: A distributed
+  M.~Vukoli{\'c}, S.~W. Cocco, J.~Yellick, {Hyperledger Fabric}: A distributed
   operating system for permissioned blockchains, in: Proceedings of the
   Thirteenth EuroSys Conference (EuroSys '18), ACM, 2018, pp. 1--15.
 \newblock \href {https://doi.org/10.1145/3190508.3190538}
@@ -65,7 +65,7 @@ E.~Androulaki, A.~Barger, V.~Bortnikov, C.~Cachin, K.~Christidis, A.~De~Caro,
 
 \bibitem{benet2014ipfs}
 J.~Benet, \href{https://arxiv.org/abs/1407.3561}{{IPFS}: Content addressed,
-  versioned, {P2P} file system}, arXiv preprint arXiv:1407.3561, accessed:
+  versioned, {P2P} file system}, arXiv preprint arXiv:1407.3561, {Accessed}:
   Dec.\ 14, 2025 (2014).
 \newline\urlprefix\url{https://arxiv.org/abs/1407.3561}
 
@@ -90,7 +90,7 @@ A.~Verma, P.~Bhattacharya, D.~Saraswat, S.~Tanwar, {NyaYa}: Blockchain-based
 
 \bibitem{hanafi2021ipfschain}
 J.~Hanafi, Y.~Prayudi, A.~Luthfi, {IPFSChain}: Interplanetary file system and
-  hyperledger fabric collaboration for chain of custody and digital evidence
+  {Hyperledger Fabric} collaboration for chain of custody and digital evidence
   management, International Journal of Computer Applications 183 (2021) 24--31.
 \newblock \href {https://doi.org/10.5120/ijca2021921808}
   {\path{doi:10.5120/ijca2021921808}}.
@@ -118,16 +118,17 @@ M.~S. Peelam, V.~Chamola, A.~K. Sharma, B.~K. Chaurasia, Decentralized trust:
 
 \bibitem{onyeashie2025fabricEvidence}
 B.~Onyeashie, M.~Abubakar, P.~Leimich, S.~Mckeown, G.~Russell,
-  Privacy-preserving and scalable digital evidence management: A hyperledger
-  fabric architecture with growth projections for law enforcement, in: 2025
+  Privacy-preserving and scalable digital evidence management: A {Hyperledger
+  Fabric} architecture with growth projections for law enforcement, in: 2025
   International Conference on New Trends in Computing Sciences (ICTCS), 2025,
   pp. 105--112.
 \newblock \href {https://doi.org/10.1109/ICTCS65341.2025.10989348}
   {\path{doi:10.1109/ICTCS65341.2025.10989348}}.
 
 \bibitem{guo2024efficient}
-J.~Guo, K.~Zhao, Z.~Liang, K.~Min, Efficient and secure emr storage and sharing
-  scheme based on hyperledger fabric and ipfs, Applied Sciences 14 (2024) 5005.
+J.~Guo, K.~Zhao, Z.~Liang, K.~Min, Efficient and secure {EMR} storage and
+  sharing scheme based on {Hyperledger Fabric} and {IPFS}, Applied Sciences 14
+  (2024) 5005.
 \newblock \href {https://doi.org/10.3390/app14125005}
   {\path{doi:10.3390/app14125005}}.
 
@@ -148,7 +149,7 @@ R.~Mukta, S.~Pal, K.~Chowdhury, M.~Hitchens, H.-y. Paik, S.~S. Kanhere, Zero
 \bibitem{notash2026adaptive}
 Z.~Notash, S.~Jamali, R.~Fotohi, An adaptive blockchain-enabled access control
   framework for secure and privacy-preserving e-health data sharing,
-  Blockchain: Research and ApplicationsIn press, journal pre-proof (2026).
+  Blockchain: Research and Applications, in press, journal pre-proof (2026).
 \newblock \href {https://doi.org/10.1016/j.bcra.2026.100492}
   {\path{doi:10.1016/j.bcra.2026.100492}}.
 
@@ -156,7 +157,7 @@ Z.~Notash, S.~Jamali, R.~Fotohi, An adaptive blockchain-enabled access control
 A.~Birgisson, J.~G. Politz, {\'U}.~Erlingsson, A.~Taly, M.~Vrable,
   M.~Lentczner, Macaroons: Cookies with contextual caveats for decentralized
   authorization in the cloud, in: 21st Annual Network and Distributed System
-  Security Symposium (NDSS 2014), Internet Society, San Diego, CA, 2014, nDSS
+  Security Symposium (NDSS 2014), Internet Society, San Diego, CA, 2014, {NDSS}
   proceedings are unpaginated.
 \newblock \href {https://doi.org/10.14722/ndss.2014.23212}
   {\path{doi:10.14722/ndss.2014.23212}}.
@@ -204,29 +205,30 @@ M.~Castro, B.~Liskov, Practical {Byzantine} fault tolerance, in: Proceedings of
   '99), USENIX Association, Berkeley, CA, USA, 1999, pp. 173--186.
 
 \bibitem{stathakopoulou2022smartbft}
-A.~Barger, Y.~Manevich, H.~Meir, Y.~Tock, A byzantine fault-tolerant consensus
-  library for hyperledger fabric, in: 2021 IEEE International Conference on
-  Blockchain and Cryptocurrency (ICBC), IEEE, 2021, pp. 1--9.
+A.~Barger, Y.~Manevich, H.~Meir, Y.~Tock, A {Byzantine} fault-tolerant
+  consensus library for {Hyperledger Fabric}, in: 2021 IEEE International
+  Conference on Blockchain and Cryptocurrency (ICBC), IEEE, 2021, pp. 1--9.
 \newblock \href {https://doi.org/10.1109/ICBC51069.2021.9461099}
   {\path{doi:10.1109/ICBC51069.2021.9461099}}.
 
 \bibitem{fabricBFTConfigurationDoc}
 {Hyperledger Fabric Documentation Contributors},
   \href{https://hyperledger-fabric.readthedocs.io/en/latest/bft_configuration.html}{Configuring
-  and operating a {BFT} ordering service}, hyperledger Fabric documentation.
+  and operating a {BFT} ordering service}, {Hyperledger} Fabric documentation.
   Accessed: Jun.\ 20, 2026 (2026).
 \newline\urlprefix\url{https://hyperledger-fabric.readthedocs.io/en/latest/bft_configuration.html}
 
 \bibitem{fabricCouchDBStateDB_v24}
 {Hyperledger Fabric Documentation Contributors},
   \href{https://hyperledger-fabric.readthedocs.io/en/release-2.4/couchdb_as_state_database.html}{{CouchDB}
-  as the state database}, accessed: Dec.\ 26, 2025 (2022).
+  as the state database}, {Accessed}: Dec.\ 26, 2025 (2022).
 \newline\urlprefix\url{https://hyperledger-fabric.readthedocs.io/en/release-2.4/couchdb_as_state_database.html}
 
 \bibitem{fabricChannelsDoc}
 {Hyperledger Fabric Documentation Contributors},
   \href{https://hyperledger-fabric.readthedocs.io/en/latest/channels.html}{Channels},
-  hyperledger Fabric documentation (latest). Licensed under CC BY 4.0. (2025).
+  {Hyperledger} Fabric documentation (latest). Licensed under CC BY 4.0.
+  (2025).
 \newline\urlprefix\url{https://hyperledger-fabric.readthedocs.io/en/latest/channels.html}
 
 \bibitem{Ongaro2014}
@@ -239,22 +241,22 @@ D.~Ongaro, J.~Ousterhout, \href{https://raft.github.io/raft.pdf}{In search of
 \bibitem{hyperledgerFabricOrderingService_v24}
 {Hyperledger Fabric Documentation Contributors},
   \href{https://hyperledger-fabric.readthedocs.io/en/release-2.4/orderer/ordering_service.html}{The
-  ordering service}, hyperledger Fabric documentation (release-2.4). Licensed
+  ordering service}, {Hyperledger} Fabric documentation (release-2.4). Licensed
   under CC BY 4.0. Revision 2a135189. Accessed: Dec.\ 25, 2025 (2022).
 \newline\urlprefix\url{https://hyperledger-fabric.readthedocs.io/en/release-2.4/orderer/ordering_service.html}
 
 \bibitem{fabricMSP}
 {Hyperledger Fabric Documentation Contributors},
   \href{https://hyperledger-fabric.readthedocs.io/en/latest/membership/membership.html}{Membership
-  service provider ({MSP})}, hyperledger Fabric documentation (latest).
+  service provider ({MSP})}, {Hyperledger} Fabric documentation (latest).
   Licensed under CC BY 4.0. (2025).
 \newline\urlprefix\url{https://hyperledger-fabric.readthedocs.io/en/latest/membership/membership.html}
 
 \bibitem{fabricEndorsementDoc}
 {Hyperledger Fabric Documentation Contributors},
   \href{https://hyperledger-fabric.readthedocs.io/en/release-2.4/endorsement-policies.html}{Endorsement
-  policies}, hyperledger Fabric documentation (release-2.4). Licensed under CC
-  BY 4.0. (2022).
+  policies}, {Hyperledger} Fabric documentation (release-2.4). Licensed under
+  CC BY 4.0. (2022).
 \newline\urlprefix\url{https://hyperledger-fabric.readthedocs.io/en/release-2.4/endorsement-policies.html}
 
 \bibitem{nist800131a}
@@ -300,26 +302,26 @@ M.~S{\"o}nmez~Turan, E.~Barker, W.~Burr, L.~Chen, Recommendation for
 \bibitem{springBoot325}
 P.~Webb, D.~Syer, J.~Long, S.~Nicoll, R.~Winch, A.~Wilkinson, M.~Halbritter,
   \href{https://docs.spring.io/spring-boot/docs/3.2.5/reference/html/index.html}{Spring
-  boot reference documentation, version 3.2.x}, vMware, Inc. Accessed: Jan.\
+  boot reference documentation, version 3.2.x}, {VMware}, Inc. Accessed: Jan.\
   2026 (2024).
 \newline\urlprefix\url{https://docs.spring.io/spring-boot/docs/3.2.5/reference/html/index.html}
 
 \bibitem{springSecurity}
 {VMware, Inc.},
   \href{https://docs.spring.io/spring-security/reference/index.html}{Spring
-  security reference documentation}, accessed: Jan.\ 2026 (2024).
+  security reference documentation}, {Accessed}: Jan.\ 2026 (2024).
 \newline\urlprefix\url{https://docs.spring.io/spring-security/reference/index.html}
 
 \bibitem{postgresqlTriggers}
 {The PostgreSQL Global Development Group},
   \href{https://www.postgresql.org/docs/16/plpgsql-trigger.html}{{PostgreSQL}
-  16 documentation: Trigger functions}, accessed: Jan.\ 2026 (2024).
+  16 documentation: Trigger functions}, {Accessed}: Jan.\ 2026 (2024).
 \newline\urlprefix\url{https://www.postgresql.org/docs/16/plpgsql-trigger.html}
 
 \bibitem{fabricChaincodeLifecycleDoc}
 {Hyperledger Fabric Documentation Contributors},
   \href{https://hyperledger-fabric.readthedocs.io/en/latest/chaincode_lifecycle.html}{Fabric
-  chaincode lifecycle}, accessed: Dec.\ 26, 2025 (2025).
+  chaincode lifecycle}, {Accessed}: Dec.\ 26, 2025 (2025).
 \newline\urlprefix\url{https://hyperledger-fabric.readthedocs.io/en/latest/chaincode_lifecycle.html}
 
 \bibitem{efron1993bootstrap}
@@ -345,7 +347,7 @@ D.~J. Schuirmann, A comparison of the two one-sided tests procedure and the
 
 \bibitem{thakkar2018performance}
 P.~Thakkar, S.~Nathan, B.~Viswanathan, Performance benchmarking and optimizing
-  hyperledger fabric blockchain platform, in: 2018 IEEE 26th International
+  {Hyperledger Fabric} blockchain platform, in: 2018 IEEE 26th International
   Symposium on Modeling, Analysis, and Simulation of Computer and
   Telecommunication Systems (MASCOTS), IEEE, 2018, pp. 264--276.
 \newblock \href {https://doi.org/10.1109/MASCOTS.2018.00034}
@@ -366,8 +368,8 @@ M.~Kuzlu, M.~Pipattanasomporn, L.~Gurses, S.~Rahman, Performance analysis of a
   protection of natural persons with regard to the processing of personal data
   and on the free movement of such data ({General Data Protection
   Regulation})}, Regulation 2016/679, Official Journal of the European Union,
-  oJ L 119, 4 May 2016, pp.\ 1--88. In force since 25 May 2018. Accessed: Jan.\
-  2026 (Apr. 2016).
+  {OJ} L 119, 4 May 2016, pp.\ 1--88. In force since 25 May 2018. Accessed:
+  Jan.\ 2026 (Apr. 2016).
 \newline\urlprefix\url{https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32016R0679}
 
 \bibitem{lyons2018integration}
@@ -379,8 +381,8 @@ T.~Lyons, L.~Courcelas, K.~Timsit,
 
 \bibitem{Finck2020}
 M.~Finck, F.~Pallas, They who must not be identified--distinguishing personal
-  from non-personal data under the gdpr, International Data Privacy Law 10~(1)
-  (2020) 11--36.
+  from non-personal data under the {GDPR}, International Data Privacy Law
+  10~(1) (2020) 11--36.
 \newblock \href {https://doi.org/10.1093/idpl/ipz026}
   {\path{doi:10.1093/idpl/ipz026}}.
 
@@ -388,9 +390,9 @@ M.~Finck, F.~Pallas, They who must not be identified--distinguishing personal
 {European Data Protection Board},
   \href{https://www.edpb.europa.eu/system/files/2025-01/edpb_guidelines_202501_pseudonymisation_en.pdf}{Guidelines
   01/2025 on pseudonymisation}, Guidelines 01/2025, European Data Protection
-  Board, guidelines 01/2025. Draft for public consultation adopted 16 January
-  2025; consultation closed 14 March 2025; finalisation pending at time of
-  submission (January 2025).
+  Board, {Draft} for public consultation adopted 16 January 2025; consultation
+  closed 14 March 2025; finalization pending at time of submission (January
+  2025).
 \newline\urlprefix\url{https://www.edpb.europa.eu/system/files/2025-01/edpb_guidelines_202501_pseudonymisation_en.pdf}
 
 \end{thebibliography}
