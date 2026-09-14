@@ -14,10 +14,16 @@
 \usepackage{graphicx}
 \usepackage{array}
 \usepackage{booktabs}
+\usepackage{longtable}
 \usepackage{microtype}
 \usepackage{xurl}
 \usepackage[section]{placeins}
+\usepackage{xcolor}
 \usepackage{hyperref}
+\definecolor{pangonavy}{HTML}{1D3C63}
+\definecolor{pangoslate}{HTML}{33608F}
+\hypersetup{colorlinks=true, linkcolor=pangonavy, citecolor=pangonavy,
+  urlcolor=pangoslate}
 
 \graphicspath{{figures/}}
 
@@ -1402,20 +1408,29 @@ outlier reaches a similar number by a route the reader cannot verify.
 Table~\ref{tab:excluded} lists every run excluded or superseded, the criterion
 that excluded it, and the direction it would have moved the result.
 
-\begin{table}[!t]
-\centering
+{\scriptsize
+\setlength{\tabcolsep}{4pt}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.20\columnwidth}%
+                 >{\raggedright\arraybackslash}p{0.42\columnwidth}%
+                 >{\raggedright\arraybackslash}p{0.30\columnwidth}@{}}
 \caption{Every excluded or superseded run in the campaign, all retained in
 the released package. ``Flatters us'' marks an exclusion that moved a result
 in our favor.}
-\label{tab:excluded}
-\scriptsize
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.20\columnwidth}%
-                 >{\raggedright\arraybackslash}p{0.42\columnwidth}%
-                 >{\raggedright\arraybackslash}p{0.30\columnwidth}@{}}
+\label{tab:excluded} \\
 \toprule
 Run & Why excluded & Effect if it had been kept \\
 \midrule
+\endfirsthead
+\multicolumn{3}{@{}l}{\emph{Table~\ref{tab:excluded}, continued}}\\
+\toprule
+Run & Why excluded & Effect if it had been kept \\
+\midrule
+\endhead
+\bottomrule
+\multicolumn{3}{@{}l}{\emph{continues on the next page}}\\
+\endfoot
+\bottomrule
+\endlastfoot
 Adversarial mutation, first attempt &
 The insider account was self-registered and still awaiting approval, so every
 request was rejected at the authentication filter before any access check ran.
@@ -1495,9 +1510,7 @@ Staleness sweep, second attempt &
 All four deploys failed before any measurement: the chaincode upgrade was
 submitted with a stale sequence number. No data produced &
 None; no usable measurement \\
-\bottomrule
-\end{tabular}
-\end{table}
+\end{longtable}}
 
 
 \subsection{Cost of the relocated decision}

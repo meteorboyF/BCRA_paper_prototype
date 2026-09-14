@@ -1,11 +1,11 @@
 """Shared matplotlib style for every figure in the BCRA paper.
 
 One place for the palette, fonts, borders, and grid so all data figures read as
-one system. The categorical palette is muted (no bright hues) and was validated
-computationally for color-vision-deficiency separation on a white surface
-(worst adjacent pair CVD dE 6.1, legal with the secondary encodings every
-figure here uses: direct labels, bar gaps, distinct markers). Assign hues in
-the fixed order below; never cycle or skip.
+one system. The categorical palette is a single blue family separated by
+lightness (no red, orange, or other bright hues, per author preference), which
+is inherently CVD-safe: series are told apart by lightness, direct labels,
+bar gaps, and distinct markers rather than by hue. Assign shades in the fixed
+order below (dark to light); never cycle or skip.
 
 Usage:
     import pangostyle as ps
@@ -19,13 +19,13 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-# Fixed categorical order: blue, burnt orange, green, gold, plum, then grey for
-# reference/neutral series only (never for a data series among the first five).
-C = ["#2c5f9e", "#b8541f", "#128455", "#a07400", "#a05577"]
+# Fixed categorical order: navy, medium blue, steel blue, pale blue, slate
+# blue; grey stays for reference/neutral series only.
+C = ["#1d3c63", "#4478b0", "#8ab0d6", "#c2d5e9", "#33608f"]
 GREY = "#5a5a5a"
 EDGE = "#1a1a1a"          # mark borders
 GRID = "#c9c9c9"
-BAND = "#e8e2d4"          # muted background band for outage/highlight windows
+BAND = "#e4eaf1"          # muted blue-grey band for outage/highlight windows
 
 FONT_SIZE = 9.0
 
