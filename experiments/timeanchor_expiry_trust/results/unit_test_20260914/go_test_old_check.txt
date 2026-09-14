@@ -1,0 +1,32 @@
+go: downloading github.com/hyperledger/fabric-contract-api-go v1.2.1
+go: downloading github.com/hyperledger/fabric-chaincode-go v0.0.0-20230228194215-b84622ba6a7a
+go: downloading google.golang.org/protobuf v1.28.1
+go: downloading github.com/golang/protobuf v1.5.2
+go: downloading github.com/hyperledger/fabric-protos-go v0.3.0
+go: downloading google.golang.org/grpc v1.53.0
+go: downloading github.com/xeipuuv/gojsonschema v1.2.0
+go: downloading github.com/go-openapi/spec v0.20.8
+go: downloading github.com/gobuffalo/packr v1.30.1
+go: downloading github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415
+go: downloading github.com/gobuffalo/envy v1.10.1
+go: downloading github.com/gobuffalo/packd v1.0.1
+go: downloading google.golang.org/genproto v0.0.0-20230110181048-76db0878b65f
+go: downloading golang.org/x/net v0.7.0
+go: downloading golang.org/x/sys v0.5.0
+go: downloading github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb
+go: downloading github.com/joho/godotenv v1.4.0
+go: downloading github.com/rogpeppe/go-internal v1.8.1
+go: downloading github.com/go-openapi/jsonpointer v0.19.5
+go: downloading github.com/go-openapi/jsonreference v0.20.0
+go: downloading github.com/go-openapi/swag v0.21.1
+go: downloading golang.org/x/text v0.7.0
+go: downloading gopkg.in/yaml.v2 v2.4.0
+go: downloading github.com/mailru/easyjson v0.7.7
+go: downloading github.com/josharian/intern v1.0.0
+=== RUN   TestCheckAccess_RejectsForgedFreshness_PEqualsA
+    legalcc_test.go:561: expected the stale anchor to be refused by the peer clock, got no error
+    legalcc_test.go:564: P = A forged-freshness proposal must not be authorised
+--- FAIL: TestCheckAccess_RejectsForgedFreshness_PEqualsA (0.00s)
+FAIL
+FAIL	github.com/pangochain/legalcc	0.009s
+FAIL

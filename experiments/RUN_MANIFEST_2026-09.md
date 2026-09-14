@@ -15,14 +15,25 @@ uncommitted working-tree changes on top of `fc662f1` and are superseded run
 records only where noted; their binaries are reproducible from the branch
 tip at the commit that follows this manifest.
 
+A second record caveat (found in the 2026-09-14 reviewer pass): the
+`pubkey_substitution_19` environment records of the 09-07 and 09-14 runs carry
+a hard-coded chaincode label, `legalcc v1.1 seq 2`, left over from the
+experiment's first version; the chaincode actually deployed for those runs is
+the one in the table below (v1.33 seq 13 on 09-14). The `orderer_outage_
+reconciliation_16b` records carry the bare name `legalcc` and no commit. The
+four hardening harnesses now record the committed definition via
+`peer lifecycle chaincode querycommitted` and the CPU model; existing records
+are left as written.
+
 | Run family | Date | Chaincode | Gateway build | What it measures |
 |---|---|---|---|---|
 | `timeanchor_expiry_trust/results/sweepv2_20260907_201505` | 09-07 | legalcc v1.29–1.32, seq 9–12 (one deploy per ceiling), peer-clock freshness | heartbeat stopped; no gateway | staleness ceiling enforcement (S1 repair) |
-| `timeanchor_expiry_trust/results/unit_redgreen_20260908` | 09-08 | source-level, `fabric-ccenv:2.4 go test` | n/a | red on old circular check, green on peer-clock check + replay test |
+| `pangochain-chaincode/legalcc/legalcc_test.go` (`TestCheckAccess_RejectsForgedFreshness_PEqualsA`, `TestGrantAccess_ReplayedCommandIDRefused`) | 09-08 | source-level, `fabric-ccenv:2.4 go test` | n/a | green on the peer-clock check and the replay closure. The recorded `go test` transcript is released under `timeanchor_expiry_trust/results/unit_test_20260914/`: `go_test.txt` (all five named tests pass on the shipped check) and `go_test_old_check.txt` (the same P=A test FAILS against the reverted circular check), with `go_version.txt`, `git_commit.txt` and `README.md`. This supersedes the non-existent `unit_redgreen_20260908` directory cited by an earlier version of this manifest. |
 | `outbox_forgery_20/results/20260914_*` | 09-14 | legalcc v1.33 seq 13 (command-id closure) | jar w/ signed outbox (id-covered HMAC), secret configured | forged / retargeted / replayed outbox rows (S2 + replay) |
 | `pubkey_substitution_19/results/20260914_*` | 09-14 | legalcc v1.33 seq 13 | same | substitution + full-client-flow restore race (S4), immutability, unbound posture |
 | `orderer_outage_reconciliation_16b/results/20260914_*` | 09-14 | legalcc v1.33 seq 13 | same | revoke divergence windows, final build, n=5 |
 | `grant_outage_reconciliation_18/results/{grant,fifo}_20260914_*` | 09-14 | legalcc v1.33 seq 13 | same | grant divergence n=5; mixed-queue FIFO n=2 |
+| `pubkey_substitution_19/results/20260914_133432` | 09-14 | legalcc committed v1.33 seq 13 (via querycommitted) | same, CouchDB reachable | case-D verification: reads the on-ledger `keyBinding` annotation (`contextJson.subject`-matched) from CouchDB; case D = `absent`, A/B/B2/C/E unchanged |
 | superseded: `orderer_outage_reconciliation_16b/results/20260907_*`, `grant_outage_reconciliation_18/results/*_20260907_*`, `*_20260831_*` | 09-07 / 08-31 | pre-final builds | pre-final jars | same protocols on superseded code; retained |
 
 Gateway launch for the 09-14 runs:

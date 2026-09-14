@@ -41,7 +41,8 @@ token(){ curl -s -X POST "$BASE/auth/login" -H 'Content-Type: application/json' 
 { echo "{\"experiment\":\"19 - public-key substitution S3 closure\","
   echo " \"timestamp_utc\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\","
   echo " \"git_commit\":\"$(git -C "$ROOT_DIR" rev-parse HEAD)\","
-  echo " \"chaincode\":\"legalcc v1.1 seq 2 (RegisterUserKey + GrantAccess binding check)\"}"; } > "$OUT_DIR/environment.json"
+  echo " \"chaincode\":\"legalcc committed: $(docker exec "$CLI" peer lifecycle chaincode querycommitted -C "$CHANNEL" -n "$CC" 2>/dev/null | grep -oE "Version: [^,]+, Sequence: [0-9]+" || echo unknown)\","
+  echo " \"cpu_model\":\"$(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2 | sed 's/^ //')\"}"; } > "$OUT_DIR/environment.json"
 
 # Fresh fixture: a case + document owned by rahman, and a NEW grantee registered
 # now so its key binding is anchored by the enrollment path under test.
@@ -111,7 +112,33 @@ BOUND=$(docker exec "$CLI" peer chaincode query -C "$CHANNEL" -n "$CC" -c "{\"fu
 RESP=$(curl -s -w '\n%{http_code}' -X POST "$BASE/access/grant" -H "Authorization: Bearer $TOK_O" \
   -H 'Content-Type: application/json' -d "{\"docId\":\"$DOC\",\"granteeId\":\"$LG\",\"capability\":\"read\",\"wrappedKeyToken\":\"$WRAP\"}")
 CODE=$(echo "$RESP" | tail -1)
-KB=$(pg "SELECT metadata_json FROM audit_log WHERE resource_id='$DOC' AND event_type='ACCESS_GRANTED' ORDER BY timestamp DESC LIMIT 1" | grep -o 'keyBinding[^,}]*' || echo "keyBinding:?")
+# The keyBinding annotation is written by the CHAINCODE into its on-ledger ACCESS_GRANTED
+# audit event (logAuditInternal, world-state key AUDIT:<docId>:<txId>), not into the
+# gateway's PostgreSQL audit_log, which the 2026-09-14 runs queried and therefore
+# reported "keyBinding:?" (reviewer-2 finding, minor 5). No chaincode function exposes
+# the audit keys; read the peer's CouchDB state database directly when it is reachable
+# (PANGOCHAIN_COUCH_URL, e.g. http://admin:adminpw@localhost:5984, db <channel>_<cc>),
+# and fall back to the PG row otherwise.
+KB=""
+if [ -n "${PANGOCHAIN_COUCH_URL:-}" ]; then
+  # Several ACCESS_GRANTED audit events exist for this document (case A and case D),
+  # and CouchDB orders _all_docs by key (txId), not by time, so a positional pick is
+  # wrong. Select the event whose contextJson.subject is THIS grantee ($LG) and read
+  # its keyBinding. The stored field is "contextJson" (camelCase).
+  KB=$(curl -s "${PANGOCHAIN_COUCH_URL}/${CHANNEL}_${CC}/_all_docs?include_docs=true&startkey=%22AUDIT:${DOC}:%22&endkey=%22AUDIT:${DOC}:%EF%BF%B0%22" \
+        | LG="$LG" python3 -c "
+import json,sys,os
+lg=os.environ['LG']
+for r in json.load(sys.stdin).get('rows',[]):
+    doc=r.get('doc',{})
+    if doc.get('eventType')!='ACCESS_GRANTED': continue
+    try: ctx=json.loads(doc.get('contextJson','{}'))
+    except Exception: continue
+    if ctx.get('subject')==lg:
+        print('keyBinding\":\"'+str(ctx.get('keyBinding','?'))); break
+")
+fi
+[ -n "$KB" ] || KB=$(pg "SELECT metadata_json FROM audit_log WHERE resource_id='$DOC' AND event_type='ACCESS_GRANTED' ORDER BY timestamp DESC LIMIT 1" | grep -o 'keyBinding[^,}]*' || echo "keyBinding:?")
 log "[D] legacy-unbound grant: HTTP $CODE (on-chain binding empty=$([ -z "$BOUND" ] && echo yes || echo no); audit $KB)"
 step D "migration: unbound legacy user still grantable" "HTTP $CODE binding_empty=$([ -z "$BOUND" ] && echo yes || echo no) audit=$KB (expect 2xx, keyBinding=absent)"
 

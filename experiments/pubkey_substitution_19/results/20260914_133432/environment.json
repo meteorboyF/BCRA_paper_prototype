@@ -1,0 +1,5 @@
+{"experiment":"19 - public-key substitution S3 closure",
+ "timestamp_utc":"2026-09-14T13:34:32Z",
+ "git_commit":"c30d0b3df8a38f1eca3986b43dc30d9d7d445624",
+ "chaincode":"legalcc committed: Version: 1.33, Sequence: 13",
+ "cpu_model":"Intel(R) Core(TM) i5-1035G1 CPU @ 1.00GHz"}
