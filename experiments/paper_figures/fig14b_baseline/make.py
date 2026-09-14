@@ -40,7 +40,13 @@ for ax, ylab, title in [(axa, "Gateway throughput (req/s)", "(a) Throughput"),
     ax.set_ylabel(ylab)
     ax.set_title(title, fontsize=ps.FONT_SIZE)
     ax.margins(y=0.16)
-axa.legend(loc="upper left", fontsize=ps.FONT_SIZE - 1.5)
 
-fig.tight_layout()
+# Figure-level legend above the panels: an in-axes legend overlapped the
+# tallest bar (790 req/s) and hid its value label.
+handles, labels = axa.get_legend_handles_labels()
+fig.legend(handles, labels, loc="upper center", ncol=3,
+           fontsize=ps.FONT_SIZE - 2, frameon=False,
+           columnspacing=1.0, handlelength=1.4, handletextpad=0.5,
+           bbox_to_anchor=(0.5, 1.0))
+fig.tight_layout(rect=(0, 0, 1, 0.90))
 ps.save(fig, "fig14b_durable_baseline", outdir=HERE / "out")

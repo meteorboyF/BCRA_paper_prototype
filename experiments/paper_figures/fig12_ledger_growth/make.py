@@ -33,7 +33,8 @@ axa.set_xscale("log"); axa.set_yscale("log")
 axa.set_xlabel("Documents registered")
 axa.set_ylabel("Disk usage per peer (MB)")
 axa.set_title("(a) Growth in documents", fontsize=ps.FONT_SIZE)
-axa.legend(loc="upper left")
+axa.set_ylim(top=4e4)
+axa.legend(loc="upper left", fontsize=ps.FONT_SIZE - 1.5)
 axa.annotate("~7 KB per document per peer", xy=(0.97, 0.05), xycoords="axes fraction",
              ha="right", fontsize=ps.FONT_SIZE - 1, style="italic")
 
@@ -44,8 +45,10 @@ axb.plot([0, mins[-1]], [0, a["blockstore_bytes_per_s"] * mins[-1] * 60 / 1024],
 axb.set_xlabel("Elapsed time, no documents registered (min)")
 axb.set_ylabel("Block store growth (KiB)")
 axb.set_title("(b) Growth in time", fontsize=ps.FONT_SIZE)
-axb.legend(loc="upper left")
-axb.annotate("1.00 block/min:\none ordered heartbeat/min", xy=(0.96, 0.10),
+axb.set_xlim(-0.8, 17)
+axb.set_ylim(0, 130)
+axb.legend(loc="upper left", fontsize=ps.FONT_SIZE - 1.5)
+axb.annotate("~1 block/min:\none ordered heartbeat/min", xy=(0.96, 0.10),
              xycoords="axes fraction", ha="right", fontsize=ps.FONT_SIZE - 1, style="italic")
 
 fig.tight_layout()
