@@ -2194,8 +2194,19 @@ Orgs & Peers/org & Policy & Write TPS & Write P50 & Read P50 \\
 \end{tabular}
 \end{table}
 
-All nine topologies ran in one campaign on one host, so the ratios between
-rows are internally paired. The absolute read latencies in this table belong
+\begin{figure}[!t]
+    \centering
+    \includegraphics[width=\columnwidth]{fig13_network_scaling.pdf}
+    \caption{Consortium size against (a) write throughput under both
+    endorsement policies and (b) read latency, which shows no trend in
+    organization count. Values are those of Table~\ref{tab:netscale}.}
+    \label{fig:netscale}
+\end{figure}
+
+
+Fig.~\ref{fig:netscale} plots both series; the write decline and the flat
+read latency are visible directly. All nine topologies ran in one campaign on
+one host, so the ratios between rows are internally paired. The absolute read latencies in this table belong
 to the build measured in that campaign; Section~\ref{sec:exp_latency}
 reports the current build's read latency. The transferable result is the
 shape, namely the absence of any dependence on consortium size, and we take
@@ -2204,7 +2215,7 @@ a measurement.
 
 Because a consortium's firms are geographically separated, the reference
 three-organization deployment was also measured under injected round-trip
-delay. With delay on the client path only, throughput falls
+delay (Fig.~\ref{fig:wan}). With delay on the client path only, throughput falls
 \textbf{11\,\%} from 0 to 150\,ms RTT (68.2 to 60.8\,TPS, write P50 2{,}140 to
 2{,}457\,ms). Delaying inter-orderer Raft traffic as well costs
 \textbf{44.8\,\%} (69.48 to 38.32\,TPS, the ratio computed before rounding;
@@ -2220,6 +2231,17 @@ recorded 976 request errors across its five trials, against single-digit
 errors per point for the client-path-only configuration, so its throughput
 figure describes the surviving requests of a degrading service rather than a
 slower healthy one.
+
+\begin{figure}[!t]
+    \centering
+    \includegraphics[width=0.8\columnwidth]{fig05_wan_delay.pdf}
+    \caption{Write throughput under injected round-trip delay, five trials
+    per point. Delay on the client path alone costs 11\,\%; adding it to the
+    inter-orderer Raft path costs 44.8\,\% and the 150\,ms point is no
+    longer loss-free.}
+    \label{fig:wan}
+\end{figure}
+
 
 \subsubsection{Clock trust and its cost}
 \label{sec:exp_timeanchor}
@@ -2282,8 +2304,8 @@ directly as a chaincode query every three seconds until it flips
 (Table~\ref{tab:staleness}; the HTTP release path invokes the same decision
 but is not the instrument here);
 each measured window tracks its configured ceiling to within the poll
-granularity, and the refusals come from the peer-clock comparison rather than
-from any value the caller controls. Increasing the ceiling by one second increases both the permitted anchor
+granularity (Fig.~\ref{fig:staleness}), and the refusals come from the
+peer-clock comparison rather than from any value the caller controls. Increasing the ceiling by one second increases both the permitted anchor
 age and the conditional backdating bound by one second. Thus longer
 ordering-outage tolerance also permits older accepted proposal timestamps. With the ceiling
 disabled, the chaincode query kept authorizing for the full 200\,s observation
@@ -2316,6 +2338,17 @@ Ceiling & Measured window & Backdating bound & Outcome \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+\begin{figure}[!t]
+    \centering
+    \includegraphics[width=0.75\columnwidth]{fig17_staleness_sweep.pdf}
+    \caption{The staleness sweep of Table~\ref{tab:staleness}: each measured
+    window sits on the identity line to within the 3\,s poll granularity,
+    the visual form of the one-for-one trade between outage tolerance and
+    backdating tolerance. The disabled ceiling never refused.}
+    \label{fig:staleness}
+\end{figure}
+
 
 \paragraph{Idle storage growth}
 Because the heartbeat is a submit, it writes a block whether or not anything
