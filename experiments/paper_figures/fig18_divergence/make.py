@@ -40,8 +40,8 @@ def boot_ci(vals, seed=42, n=10_000):
 ps.apply()
 fig, ax = ps.figure(width=5.2, height=3.3)
 panels = [
-    (0, "RevokeAccess\n(Exp. 16b, n=5)", revoke_w, ps.C[1]),
-    (1, "GrantAccess\n(Exp. 18, n=5)", grant_w, ps.C[0]),
+    (0, "RevokeAccess\n(n=5)", revoke_w, ps.C[1]),
+    (1, "GrantAccess\n(n=5)", grant_w, ps.C[0]),
 ]
 for i, label, xs, color in panels:
     jitter = [i + (j - (len(xs) - 1) / 2) * 0.05 for j in range(len(xs))]
@@ -60,7 +60,7 @@ ax.set_xticks([0, 1], [p[1] for p in panels])
 ax.set_ylabel("Measured outbox age at commit (s)")
 ax.set_title("Unattended reconvergence after an ordering outage")
 ax.grid(axis="y")
-ax.annotate("whiskers: bootstrap 95% CI of the median (10,000 resamples, seed 42);\nre-anchored unattended by the same durable outbox on both paths",
+ax.annotate("whiskers span the resampled range (10,000 bootstrap resamples, seed 42);\nat n=5 this coincides with the observed range",
             xy=(0.5, -0.30), xycoords="axes fraction", ha="center",
             fontsize=ps.FONT_SIZE - 1.5, style="italic", annotation_clip=False)
 ps.save(fig, "fig18_write_divergence", outdir=HERE / "out")

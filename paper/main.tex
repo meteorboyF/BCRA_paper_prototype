@@ -63,7 +63,8 @@ makes the decision. This paper evaluates a custody framework that moves the
 decision itself onto the ledger: every download is authorized by a chaincode
 query against committed Hyperledger Fabric state before ciphertext or key
 material is released, with documents encrypted in the browser and stored in a
-private IPFS swarm. We measure how this design behaves when its own
+private InterPlanetary File System (IPFS) swarm. We measure how this design
+behaves when its own
 assumptions fail. Three findings emerge. First, reads fail closed: an induced
 ledger outage released no protected bytes, and access-control rows forged
 directly in the operational database did not alter release decisions. Second,
@@ -76,10 +77,13 @@ short-outage runs; these are recovery lags, not exposure bounds. Third, the
 relocated decision is affordable but not free: it adds 4.0 to 4.4\,ms over a
 database lookup, well within a pre-specified 50\,ms margin, and the ordered
 heartbeat behind grant-expiry clock trust consumes 7.84\,MB per peer per day
-even when idle. The asymmetry comes from two design choices, reading committed
-state and accepting writes locally before they commit, so any on-path design
-sharing both inherits it. Results come from single-host deployments of a three-organization
-prototype, with all data and harnesses released.
+even when idle. Against an audit-log-only baseline with durable batched
+anchoring, on-path enforcement sustained more than three times the
+throughput. The asymmetry comes from two design choices, reading committed
+state and accepting writes locally before they commit; that any on-path
+design sharing both inherits it is a structural argument, not a measured
+generalization. Results come from single-host deployments of a
+three-organization prototype, with all data and harnesses released.
 \end{abstract}
 
 \begin{keyword}
@@ -177,8 +181,9 @@ RQ1 is answered in Sections~\ref{sec:exp_latency},
 \ref{sec:exp_db_mutation} and~\ref{sec:exp_pubkey}, RQ2 in
 Sections~\ref{sec:exp_latency}, \ref{sec:exp_throughput}
 and~\ref{sec:exp_durable_baseline}, RQ3 in Sections~\ref{sec:exp_failclosed},
-\ref{sec:exp_divergence} and~\ref{sec:exp_timeanchor}, and RQ4 in
-Sections~\ref{sec:exp_ledgergrowth} and~\ref{sec:exp_netscale}.
+\ref{sec:exp_divergence} and~\ref{sec:exp_grantdivergence}, and RQ4 in
+Sections~\ref{sec:exp_ledgergrowth}, \ref{sec:exp_netscale}
+and~\ref{sec:exp_timeanchor}.
 
 
 \subsection{Contributions}
@@ -221,7 +226,7 @@ activity, making storage linear in elapsed time as well as in documents
 (Section~\ref{sec:exp_ledgergrowth}). Query cost is flat across three
 orders of magnitude of world state, and the staleness ceiling governing the
 backdating bound is swept and enforced against the answering peer's clock
-(Sections~\ref{sec:exp_netscale} and~\ref{sec:exp_timeanchor}).
+(Sections~\ref{sec:exp_ledgergrowth} and~\ref{sec:exp_timeanchor}).
 
 \item \textbf{An end-to-end comparison against the architecture this design
 displaces.} Against an audit-log-only baseline whose anchoring backlog is
@@ -423,7 +428,7 @@ Guo et al.~\cite{guo2024efficient} & Fabric + IPFS & P & Y & N & N \\
 Onyeashie et al.~\cite{onyeashie2025fabricEvidence} & Fabric + IPFS
   & P & N & N & N \\
 Notash et al.~\cite{notash2026adaptive} & Fabric + IPFS & P & N & P & N \\
-Mukta et al.~\cite{mukta2026zerotrust} & Fabric + SSI & N & N & Y & N \\
+Mukta et al.~\cite{mukta2026zerotrust} & Fabric + self-sovereign identity (SSI) & N & N & Y & N \\
 Anchoring systems~\cite{liu2024blockchain,twoLevelBlockchain,verma2021nyaya,hanafi2021ipfschain,peelam2026decentralized}
   & various + IPFS & N & N & N & N \\
 \midrule
@@ -489,10 +494,12 @@ channel is \emph{not} assumed, and is the subject of RQ3.
 
 \item[A2 Ordering bound.] Of three ordering nodes at most one crash-fails, and
 no orderer behaves Byzantinely. This bounds block formation only. The outage
-experiments of Section~\ref{sec:exp_failclosed} (all peers stopped) and
-Sections~\ref{sec:exp_divergence} and~\ref{sec:exp_grantdivergence} (all
-orderers stopped) deliberately violate A2, and the first also A4, in order to
-observe behavior outside the assumptions.
+experiments of Sections~\ref{sec:exp_divergence}
+and~\ref{sec:exp_grantdivergence} (all orderers stopped) deliberately violate
+A2 in order to observe behavior outside the assumptions.
+Section~\ref{sec:exp_failclosed} stops all peers instead, a condition A1
+explicitly does not assume away; storage remained reachable throughout that
+run, so A4 holds there.
 
 \item[A3 Endorsement quorum.] No coalition sufficient to satisfy the channel
 endorsement policy colludes. Committing peers independently validate
@@ -639,9 +646,9 @@ path keeps authorizing from the stale grant until re-anchoring completes
 \subsubsection{S2 Induced-outage fallback}
 An insider disrupts the ledger deliberately, expecting the application to
 fall back to a table they can edit. Under P2 it does not
-(Section~\ref{sec:exp_failclosed}), and the storage tier behaves analogously,
-since disabling replicas degrades availability but never substitutes
-content.
+(Section~\ref{sec:exp_failclosed}). By construction the storage tier behaves
+analogously under A1 and P3, since disabling replicas degrades availability
+without substituting content, though no storage-tier outage was measured.
 
 \subsubsection{S3 Public-key substitution}
 \label{sc:s3}
@@ -665,8 +672,9 @@ at grant time, in consortium-visible state, just as a forged access-control
 row fails on the read path. Two qualifications bound this. The gateway
 accepts a grant without a client attestation by falling back to hashing its
 own stored key, which retains the substitution race for clients that predate
-the attestation field; a configuration flag rejects unattested grants, and
-the closure is complete only with that flag enabled. And the check protects
+the attestation field; the flag \texttt{access.require-key-attestation}
+(shipped off) rejects unattested grants, and the closure is complete only
+with it enabled. And the check protects
 only bound recipients: any user without a committed binding, whether enrolled
 before anchoring existed or enrolled while the ledger was unreachable, is
 granted, with the chaincode's audit event recording the binding as absent,
@@ -762,8 +770,9 @@ follows from this arrangement (Section~\ref{sec:assumptions}).
 \subsection{Roles and identity}
 \label{sec:roles}
 
-Within a firm, roles range from partners with full matter visibility to
-paralegals restricted to assigned documents (Fig.~\ref{fig:hierarchy}).
+Within a firm, roles range from partners with full matter visibility
+through associates and secretaries to paralegals and interns restricted to
+assigned documents.
 Several of this paper's claims turn on where each kind of authority is
 enforced. Intra-organization role structure is enforced at the application
 layer from the authenticated session, while cross-organization access is
@@ -773,15 +782,6 @@ certificates issued under the organizational membership service
 provider~\cite{fabricMSP}, so a ledger transaction is attributable to a firm and
 not to a person. User-level signatures bind a signing key to specific document content,
 which is a different and weaker property than per-user ledger attribution.
-
-\begin{figure}[!t]
-    \centering
-    \includegraphics[width=\columnwidth]{Hierarchy.pdf}
-    \caption{Role hierarchy within a firm; roles are enforced at the
-    application layer, release of protected material by the ledger
-    (Section~\ref{sec:twolayer}).}
-    \label{fig:hierarchy}
-\end{figure}
 
 \subsection{Two-layer authorization}
 \label{sec:twolayer}
@@ -872,11 +872,12 @@ On a query it originates in the caller's proposal, and under custodial
 submission the caller is the gateway. A periodic ordered heartbeat
 therefore commits a \emph{time anchor}. Because the heartbeat is ordered, each
 endorsing peer validates its timestamp against that peer's own clock before
-endorsing (refusing a heartbeat more than 120\,s from its own clock in either
-direction), and the chaincode refuses a heartbeat that does not advance the
+endorsing (the heartbeat endorsement window, 120\,s in either direction),
+and the chaincode refuses a heartbeat that does not advance the
 current anchor, so the committed anchor is a reference the gateway cannot move
-backward. The access decision then refuses any proposal sitting more than a
-fixed tolerance behind the anchor, and refuses outright when the anchor
+backward. The access decision then refuses any proposal sitting more than the
+proposal skew tolerance behind the anchor (also 120\,s as deployed; the two
+constants are independently configurable and coincide only by choice), and refuses outright when the anchor
 itself is stale by more than a configurable ceiling measured against the
 answering peer's own clock, which a query may consult because it is answered
 by one peer and never endorsed. Both comparisons apply only once an anchor
@@ -887,8 +888,10 @@ is no bound. The anchor bounds the exposure without
 removing it, and it carries two costs. Its latency cost and the security--availability
 trade-off it creates are measured in Section~\ref{sec:exp_timeanchor}, and its
 standing storage cost, which accrues whether or not the system is used, in
-Section~\ref{sec:exp_ledgergrowth}. The heartbeat interval is the single
-parameter governing both.
+Section~\ref{sec:exp_ledgergrowth}. The heartbeat interval sets the storage rate directly and floors the
+achievable staleness ceiling, since a committed anchor may be up to one
+interval old; the ceiling itself, a separate parameter, sets the enforced
+backdating bound.
 
 \subsection{The write path}
 \label{sec:writepath}
@@ -970,7 +973,9 @@ domain-separated label, following NIST~SP~800-56C~\cite{nist80056c} and
 RFC~9180~\cite{rfc9180}. The ephemeral public key supplies per-wrap freshness,
 so an empty salt with a fixed \texttt{info} label suffices, and the token
 format is unchanged at 125 bytes. The added cost is two HMAC evaluations
-(extract and expand) and is not detectable in the crypto benchmark. We describe the construction directly
+(extract and expand) and is not detectable in the crypto benchmark, itself
+a same-interface server-side measurement rather than a browser one
+(Section~\ref{sec:implementation}). We describe the construction directly
 instead of calling it ECIES. It composes standard parts under Assumption~A1,
 and with the KDF in place a chosen-ciphertext argument from the
 standard-scheme literature becomes tractable.
@@ -1017,8 +1022,9 @@ string
       \;\Vert\; \mathit{id}_D,
   \label{eq:sigpayload}
 \end{equation}
-where \textsf{b64} is base64 encoding, binding the signer to the plaintext
-hash, to the exact stored payload's hash, and to the document identifier.
+where \textsf{b64} is base64 encoding; Eq.~\ref{eq:sigpayload} binds the
+signer to the plaintext hash, to the exact stored payload's hash, and to the
+document identifier.
 Signing is a separate act performed after registration: the
 signer's client retrieves the stored ciphertext, recomputes
 $\mathcal{H}_C$ over what storage actually returns, and signs; a later
@@ -1061,8 +1067,8 @@ of Section~\ref{sec:exp_pubkey}, detection of public-key substitution at grant
 time. Each of these holds under Assumption~A1 together with the assumptions its
 mechanism actually touches: client-side properties additionally assume an
 uncompromised browser at time of use (A6), custodial-path properties assume
-the gateway boundary of A5, and anything read from the ledger assumes the
-honest-quorum condition of A2. None holds beyond those. A machine-checked proof of
+the gateway boundary of A7, and anything read from the ledger assumes the
+honest-quorum condition of A3. None holds beyond those. A machine-checked proof of
 the wrapping construction is not claimed. With the KDF in place the
 construction composes standard parts in a standard arrangement, so a formal
 chosen-ciphertext argument is now a tractable next step, and carrying it out is
@@ -1119,8 +1125,10 @@ Four scheduled workers run alongside request handling. The time-anchor
 heartbeat submits the ordered transaction that makes grant expiry
 clock-trustworthy and is the source of the storage term in
 Section~\ref{sec:exp_ledgergrowth}. The anchor reconciliation worker drains
-the access-control outbox, covering both grants and revocations, with capped
-exponential backoff at a base of five seconds and a cap of sixty. The audit
+the access-control outbox, covering both grants and revocations: it polls
+every five seconds, and a failed submission is retried after
+$\min(5 \cdot 2^{k}, 60)$ seconds. The poll interval and the backoff base
+are distinct constants that happen to share a value. The audit
 anchor backfill worker implements the durable batched pipeline built for
 Section~\ref{sec:exp_durable_baseline} and ships disabled, because the
 on-path design's guarantee does not depend on the audit pipeline. An
@@ -1190,8 +1198,9 @@ Table~\ref{tab:excluded}. Second, the development launcher enables the
 operational access-control fallback, which is the opposite of the shipped
 default; a measurement taken under it would characterize the fallback rather
 than the ledger decision and would silently invert
-Section~\ref{sec:exp_failclosed}. Every experiment in this paper sets the
-flag explicitly instead of inheriting it.
+Section~\ref{sec:exp_failclosed}. Every experiment taken after the flag was introduced sets it explicitly
+instead of inheriting it; the run of Section~\ref{sec:exp_failclosed}
+predates the flag, and its scope is stated there.
 
 
 \section{Evaluation}
@@ -1217,7 +1226,8 @@ original campaign ran on an Intel Core Ultra~5 125H with 18 hardware threads,
 namely the write-path divergence windows of Section~\ref{sec:exp_divergence},
 the staleness-ceiling sweep of Section~\ref{sec:exp_timeanchor}, and the
 forged-outbox and key-substitution runs, were measured on a second host, an
-Intel Core i5-1035G1 with 14\,GB of memory running the same container stack,
+Intel Core i5-1035G1 with 16\,GB of memory (14.9\,GiB usable) running the
+same container stack,
 after the corresponding code changes; each released run's environment record
 or the run manifest names its host. Absolute values from the two hosts are not compared anywhere,
 consistent with the build-comparability rule below. The consortium is three organizations (two law firms and a
@@ -1240,7 +1250,11 @@ releases, and two Node.js versions, alongside chaincode that was redeployed
 repeatedly as the system changed. Each released run carries its own machine
 record so that any figure can be traced to the state that produced it.
 
-The consequence is stated once here and relied on throughout: \textbf{absolute
+All read-path latency measurements, including the freshness-read toggle of
+Section~\ref{sec:exp_timeanchor}, come from the original-campaign host;
+payload sizes are quoted in binary units (MiB) where the fixture is
+byte-defined. The consequence of the two-host campaign is stated once here
+and relied on throughout: \textbf{absolute
 latencies are not comparable across experiments or across builds. Only paired
 differences measured within a single run transfer.} Where this paper compares
 two arms, those arms were measured against each other in the same run, on the
@@ -1308,13 +1322,17 @@ expectation.
 
 \subsubsection*{Statistical conventions}
 
-Confidence intervals on medians are bootstrap percentile
+Confidence intervals on medians are 95\,\% bootstrap percentile
 intervals~\cite{efron1993bootstrap}, 10{,}000 resamples at a fixed seed
-(42 for the consolidated table's generator), computed from per-sample data. Intervals on means of
+(42 for the consolidated table's generator), computed from per-sample data.
+Intervals on mean differences are 90\,\%, matching the one-sided form of
+the equivalence tests. Intervals on means of
 trial-level throughput are Student-$t$ intervals over the trials. Categorical
 outcomes and single-run measurements carry no interval and are labeled as
 such. Differences between arms are tested with the
-Mann--Whitney $U$ statistic~\cite{mannwhitney1947}.
+Mann--Whitney $U$ statistic~\cite{mannwhitney1947}; the handful of tests
+reported are individually pre-specified and no multiplicity correction is
+applied, so borderline $p$ values should be read accordingly.
 
 Every headline figure is repeated with its interval and its sample size in
 Section~\ref{sec:exp_consolidated}, so any number quoted in the running text can
@@ -1343,7 +1361,8 @@ difference is reported as such.
 Runs are excluded on criteria fixed before the run and defined on the
 harness, never on the value observed; superseded runs, which measured earlier
 builds correctly, are retained and labeled as such rather than treated as
-instrument failures. Appendix~\ref{app:excluded} lists every excluded or
+instrument failures. Table~\ref{tab:excluded} (Appendix~\ref{app:excluded})
+lists every excluded or
 superseded run, the criterion that excluded it, and the direction it would
 have moved the result; all are retained in the released package. Where a
 measurement is disturbed by a single identifiable event, the run is repeated
@@ -1382,7 +1401,9 @@ recorded at each arm and were consistent across the citable run.
 \begin{table}[!t]
 \centering
 \caption{Read-path latency, warmed window, quiet host; the pooled Fabric
-median is the reported figure.}
+median is the reported figure. The pooled row's interval uses the
+consolidated generator's convention (Table~\ref{tab:consolidated}); the
+bracket rows use the experiment's own analysis.}
 \label{tab:readpath}
 \footnotesize
 \setlength{\tabcolsep}{5pt}
@@ -1394,7 +1415,7 @@ Fabric \texttt{CheckAccess}, bracket 1 & 100 & 11.30 & [10.86, 11.96] & 18.11 \\
 PostgreSQL access lookup               & 100 & \textbf{6.44}  & \textbf{[6.21, 6.70]}   & 13.38 \\
 Fabric \texttt{CheckAccess}, bracket 2 & 100 & 10.71 & [10.43, 11.07] & 14.75 \\
 \midrule
-\textbf{Fabric pooled}                 & 200 & \textbf{10.99} & \textbf{[10.71, 11.25]} & 17.30 \\
+\textbf{Fabric pooled}                 & 200 & \textbf{10.99} & \textbf{[10.70, 11.24]} & 17.30 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1470,8 +1491,9 @@ entirely above that of the database arm.
 \label{sec:exp_throughput}
 
 Under a mixed workload of 20\,\% document registrations and 80\,\% wrapped-key
-reads, the gateway sustained roughly \textbf{62--70\,TPS} across a concurrency
-sweep from 50 to 600 clients, with processor utilization below 23\,\%. The
+reads, the gateway sustained roughly \textbf{61--70 transactions per second
+(TPS)} across a concurrency sweep from 50 to 600 clients, with gateway-host processor utilization below
+23\,\% of the host's 18 hardware threads. The
 sweep used a fixed-count load tool with five trials per point after a
 discarded warm-up: 61.5, 63.5, 69.0, 66.9, 66.4, 70.0, 68.6 and 68.2\,TPS at
 50, 100, 150, 200, 300, 400, 500 and 600 clients. The two lowest points sit
@@ -1487,7 +1509,10 @@ an order of magnitude higher (Section~\ref{sec:exp_durable_baseline}).
 
 The plateau is set by configuration rather than architecture, and almost all
 of the gain arrives on the first reduction (Table~\ref{tab:batchtimeout}): the move
-from two seconds to 500\,ms is worth \textbf{2.9$\times$}. That ordering
+from two seconds to 500\,ms is worth \textbf{2.9$\times$} (193.0 against
+the ten-run default-window figure of 67.7\,TPS in
+Table~\ref{tab:batchtimeout}; the five-run figure of 66.3\,TPS gives the
+same ratio to one decimal). That ordering
 parameters rather than application logic set the ceiling is consistent with
 earlier Fabric benchmarking, where block size and endorsement policy alone moved
 throughput by more than an order of
@@ -1543,13 +1568,15 @@ generator saturated; those points are self-flagged by the harness and excluded.
 
 \subsection{Adversarial and failure-mode evaluation}
 
-Four experiments address the same question from different directions, namely
+Five experiments address the same question from different directions, namely
 whether placing the decision on the ledger changes what an adversary or an
 outage can do. The first attacks the store the ledger is meant to
 displace, and the second attacks the identity binding behind the grant path.
-The third removes the ledger entirely, and the fourth removes only ordering,
-which is where the guarantee stops holding. Both outages exceed the
-crash-failure bound of Assumption~A2 by design.
+The third removes the ledger entirely, the fourth removes only ordering,
+which is where the guarantee stops holding, and the fifth repeats that
+ordering-outage geometry on the grant path, completing the asymmetry. The
+ordering outages exceed the crash-failure bound of Assumption~A2 by
+design.
 
 \subsubsection{Adversarial mutation of the operational database}
 \label{sec:exp_db_mutation}
@@ -1734,9 +1761,9 @@ audit event records the binding as absent (the released harness queried the
 gateway's operational audit log, which does not carry that field, so the
 annotation is established from the chaincode rather than from the run
 record). Two mitigations narrow this: a failed enrollment anchor is now queued through the
-same signed outbox and retried instead of dropped, and a configuration flag
-refuses grants to unbound recipients outright where a deployment prefers
-strictness to migration tolerance. The permissive default is the migration
+same signed outbox and retried instead of dropped, and a second, independent flag, \texttt{access.require-key-binding}
+(also shipped off), refuses grants to unbound recipients outright where a
+deployment prefers strictness to migration tolerance. The permissive default is the migration
 posture stated in the threat model rather than a bypass.
 
 The fix turns on the distinction that an endorsement rejection is
@@ -1903,7 +1930,8 @@ decomposes as
     + \underbrace{T_{\text{reconcile}}}_{\text{controlled}},
   \label{eq:divergence_window}
 \end{equation}
-and the mechanism addresses only the second term. Here the orderers were
+and the mechanism addresses only the second term of
+Eq.~\ref{eq:divergence_window}. Here the orderers were
 restarted within seconds, so the measured window is almost entirely
 reconciliation lag over a near-zero outage, dominated by Raft leader
 re-election plus worker poll alignment rather than by anything in the outbox,
@@ -1944,11 +1972,13 @@ characterized.
     \centering
     \includegraphics[width=\columnwidth,height=0.78\textheight,keepaspectratio]%
         {write_path_reconciliation.pdf}
-    \caption{Durable re-anchoring of a mutation issued during an
-    ordering-service outage: the ledger write is deferred rather than lost,
-    and a background worker resubmits it once ordering recovers. The window
-    annotated in the diagram (15.9\,s) is the earlier build's median; the
-    final hardened build's median is 13.8\,s (Table~\ref{tab:divergence}).}
+    \caption{Durable re-anchoring of a revocation issued during an
+    ordering-service outage: the operational revoke and a signed outbox row
+    commit in one database transaction, the failed ledger submission is
+    deferred rather than lost, and the reconciliation worker resubmits it
+    once ordering recovers. The annotated median reconciliation lag after
+    recovery is the final build's (13.8\,s, $n{=}5$;
+    Table~\ref{tab:divergence}).}
     \label{fig:write_path_reconciliation}
 \end{figure}
 
@@ -1976,10 +2006,11 @@ the failure that write was meant to prevent, and never the reverse
 With the outbox extended, the grant returns HTTP~202 with a pending
 ledger-sync status during the outage and reconverges without operator action:
 a median reconciliation lag of \textbf{14.7\,s} after recovery across five
-runs (mean 14.69, SD 0.62, range 13.87--15.56, bootstrap 95\,\% CI
-$[13.87, 15.56]$), after which the grantee is served. This window is of the same scale as the
-revocation window of 13.8\,s and their bootstrap intervals overlap
-(Fig.~\ref{fig:write_divergence}), which is consistent with a window set by
+runs (mean 14.69, SD 0.62, range 13.87--15.56; at $n=5$ a bootstrap
+percentile interval on the median coincides with the observed range, so no
+separate interval is quoted), after which the grantee is served. This window
+is of the same scale as the revocation window of 13.8\,s and the two
+observed ranges overlap (Fig.~\ref{fig:write_divergence}), which is consistent with a window set by
 the shared reconciliation machinery rather than by the function replayed;
 the runs do not instrument which component of the lag dominates, so that
 attribution is a hypothesis the agreement supports rather than a measured
@@ -2000,7 +2031,8 @@ interleavings.
 side, not the write side: a fail-closed release path converts a diverged
 access-control write into the failure that write was meant to prevent. The
 last column gives the re-anchoring mechanism and, where measured, the median
-outbox age at commit in the tested short-outage runs; it is a recovery lag,
+reconciliation lag after recovery in the tested short-outage runs, taken from
+the outbox row's age at commit; it is a recovery lag,
 not an exposure bound (Section~\ref{sec:exp_divergence}).}
 \label{tab:writepaths}
 \footnotesize
@@ -2350,7 +2382,9 @@ else occurs. With zero document activity the block store grew at a constant
 $R^2 = 1.0000$ over a twenty-minute idle window, at approximately one block
 per minute (20 blocks against 20.1 heartbeat intervals) against one heartbeat
 per minute, so the attribution is direct. This amounts to approximately
-2.86\,GB per peer per year and 28.6\,GB over a decade, roughly four times
+2.86\,GB per peer per year and 28.6\,GB over a decade, assuming no ledger
+snapshotting or pruning (Fabric's snapshot facility would change the decade
+figure and was not evaluated), roughly four times
 the ledger and state metadata that a million documents occupy, for an archive
 that never receives another document. The storage model is
 therefore not linear in documents alone but takes the form
@@ -2361,10 +2395,11 @@ therefore not linear in documents alone but takes the form
 where $b$ did not exist when the earlier campaign ran. The totals remain
 within commodity-hardware capacity, but storage does not grow linearly with
 document count alone. The time term is a price, not a defect, and it is
-tunable; a
-five-minute interval costs a fifth as much storage, traded against a
-proportionally looser backdating bound. The heartbeat interval is the single
-parameter that sets both.
+tunable: a five-minute interval costs a fifth as much storage. The trade is
+indirect. The interval floors the achievable staleness ceiling, because an
+anchor may be one full interval old, so a cheaper heartbeat loosens the
+tightest enforceable backdating bound (ceiling plus skew) in proportion,
+while the ceiling remains the parameter that enforces it.
 
 \paragraph{Evidential standing of these claims}
 Three propositions in this subsection have different evidential standing.
@@ -2422,7 +2457,8 @@ row whose insert had not yet executed. Mode~C is durable backfill over
 persisted rows, not persist-before-release, and it retains the per-event
 anchoring path alongside the backfill worker rather than replacing it.
 Against a 39{,}450-row backlog the worker drained at \textbf{53.3
-events per second}, roughly ten times the fire-and-forget rate; that rate is
+events per second}, roughly seven to eighteen times the fire-and-forget
+rate of 3 to 8 per second; that rate is
 below the
 request rates in Table~\ref{tab:durable_baseline}, so sustained audit intake
 at full load would grow the backlog, and this experiment does not measure the
@@ -2486,7 +2522,9 @@ database query and nothing else differs between arms. This section compares
 whole architectures, in which the database-deciding arm also carries
 asynchronous anchoring work that on-path enforcement does not, and a cheaper
 decision inside a more expensive architecture is not a contradiction. The end-to-end difference between modes A and B at
-concurrency~10 is $-4.08$\,ms, with a 90\,\% confidence interval of
+concurrency~10 is a mean difference of $-4.08$\,ms (medians 16.6 against
+15.6\,ms; the mean favors A because B's anchoring work lands unevenly on the
+request path), with a 90\,\% confidence interval of
 $[-5.63, -2.52]$\,ms lying entirely inside RQ2's pre-specified $\pm 50$\,ms
 margin; two one-sided tests give $p < 10^{-15}$. The direction is visible in the
 dispersion, the database-deciding arm carrying roughly double the standard
@@ -2527,7 +2565,8 @@ campaign rests on single runs instead of replicates.
 It follows Section~\ref{sec:testbed}'s conventions throughout, and is generated
 from the released per-sample data by a script with a fixed resampling seed.
 Rows without an interval are categorical outcomes or single-run measurements;
-three of the results this paper relies on are counts, not distributions.
+five rows are counts rather than distributions, and three of them carry
+the paper's failure-behavior claims.
 
 \begin{table}[!t]
 \centering
@@ -2540,7 +2579,14 @@ rows are the floor-index P50 values of Table~\ref{tab:docscale} (their central
 medians are 7.94 and 8.54\,ms) and carry no interval. The two throughput rows
 are means of trial-level TPS with Student-$t$ intervals; rows marked
 categorical, rate, or per point are counts, rates, and single-configuration
-values with no resampling distribution, copied from their experiments.}
+values with no resampling distribution, copied from their experiments. The
+default-batch throughput here is the five-run figure (66.3\,TPS); the 2.9$\times$
+batching gain in the text uses the ten-run 67.7\,TPS of
+Table~\ref{tab:batchtimeout}. The three registration-latency values in this
+paper (2{,}087\,ms, the 2{,}132\,ms size-independence constant, and
+Table~\ref{tab:netscale}'s write P50s) come from different builds and are not
+comparable, per Section~\ref{sec:testbed}. For the two $n{=}5$ lag rows the
+interval coincides with the observed range and is labeled as such.}
 \label{tab:consolidated}
 \scriptsize
 \setlength{\tabcolsep}{3pt}
@@ -2560,8 +2606,8 @@ Metric & $n$ & Value & 95\,\% CI \\
 \multicolumn{4}{@{}l}{\emph{Failure behavior} (Sections~\ref{sec:exp_failclosed}, \ref{sec:exp_divergence})}\\
 \quad Protected bytes released during outage & --- & 0 & categorical \\
 \quad Fail-closed denials during the outage  & --- & 1{,}340 & categorical \\
-\quad Revocation divergence window to convergence & 5 & 13.75\,s & [12.92, 15.91] \\
-\quad Grant divergence window to convergence      & 5 & 14.72\,s & [13.87, 15.56] \\
+\quad Revocation reconciliation lag after recovery & 5 & 13.75\,s & range [12.92, 15.91] \\
+\quad Grant reconciliation lag after recovery      & 5 & 14.72\,s & range [13.87, 15.56] \\
 \midrule
 \multicolumn{4}{@{}l}{\emph{Adversarial} (Sections~\ref{sec:exp_db_mutation}, \ref{sec:exp_pubkey})}\\
 \quad Ciphertext released on a forged database grant & --- & 0 & categorical \\
@@ -2581,7 +2627,7 @@ Metric & $n$ & Value & 95\,\% CI \\
 \multicolumn{4}{@{}l}{\emph{Compressed experiments}, reported only here}\\
 \quad Fabric commit latency, size-independent      & 5 & 2{,}132\,ms & [2129, 2137] \\
 \quad Audit query P50, operational store           & 10 & 3.86\,ms & [2.40, 4.28] \\
-\quad History retrieval P50 at depth 107           & 10 & 135.5\,ms & [128.0, 137.5] \\
+\quad History retrieval at depth 107 (deep-history probe) & 10 & 135.5\,ms & [128.0, 137.5] \\
 \quad Storage retrieval P50, 50\,MiB, cross-node   & 24 & 867\,ms & [856, 911] \\
 \quad Throughput at 150\,ms RTT, Raft delayed      & 5 & $-44.8$\,\% & per point \\
 \bottomrule
@@ -2688,8 +2734,9 @@ whether or not anyone uses the system. A security property paid for in
 storage that accrues independently of use is an unusual cost. It does not
 appear under load and does not scale with load, so ordinary throughput
 measurements do not capture it (Section~\ref{sec:exp_ledgergrowth}). Two
-independent parameters govern the trade: the heartbeat interval sets the
-storage rate and the staleness ceiling sets the backdating bound. The
+parameters govern the trade, coupled but separately configured: the heartbeat
+interval sets the storage rate and floors the achievable staleness ceiling,
+and the ceiling sets the enforced backdating bound. The
 prototype ships with the ceiling disabled, preferring availability and accepting
 the weaker bound. That is a deployment judgment about which failure is less
 acceptable, and a legal deployment where expiry carries contractual weight may
@@ -2701,8 +2748,9 @@ reasonably choose differently.
 Limitations specific to individual measurements are stated where those
 measurements are reported. Three cut across all of them.
 
-Everything was measured on a single host running a three-organization
-consortium. Absolute throughput is conservative as a result, and the
+Every deployment measured was a single-host, three-organization consortium,
+on one of the two hosts of Section~\ref{sec:testbed}; no comparison crosses
+them. Absolute throughput is conservative as a result, and the
 transferable quantities are ratios between arms measured in the same run rather
 than absolute values, a constraint stated in Section~\ref{sec:testbed} and
 applied throughout, in particular in Section~\ref{sec:exp_netscale}, where
