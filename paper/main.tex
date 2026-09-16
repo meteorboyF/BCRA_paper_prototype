@@ -116,9 +116,9 @@ court. Each party must be able to satisfy itself about how the other side
 handled material it produced, yet the party asking has the least reason to
 accept the other side's logs on trust. Insider action
 rather than external intrusion accounts for a substantial share of security
-incidents in the legal sector~\cite{ico2024trends,aba2023}, and NIST identifies
-administrator control as a first-order risk in permissioned
-deployments~\cite{nistir8202}.
+incidents in the legal sector~\cite{ico2024trends,aba2023}, and NIST documents the power of infrastructure administrators, including
+rewriting block history and excluding users, among the principal limitations
+of permissioned deployments~\cite{nistir8202}.
 
 \subsection{Limitations of record anchoring}
 \label{sec:anchoring_insufficient}
@@ -332,7 +332,8 @@ al.~\cite{onyeashie2025fabricEvidence} separate law-enforcement, forensic and
 judicial workflows across three Fabric channels, with role privileges enforced
 at the API and zero-knowledge proofs used for evidence \emph{integrity}. Guo et
 al.~\cite{guo2024efficient} combine Fabric and IPFS for medical records,
-verifying user identity in chaincode with zero-knowledge proofs at registration
+issuing zero-knowledge identity proofs at registration, verifying them in
+chaincode on each access request,
 and governing subsequent sharing through proxy re-encryption. In both,
 channel membership and identity verification are access-control mechanisms,
 but neither system evaluates a per-document decision at the moment of
@@ -344,10 +345,11 @@ A fourth line makes the access decision the contribution, and it is where our
 closest neighbors sit.
 
 Steichen et al.~\cite{steichen2018blockchain} provide the architectural
-starting point. Their \texttt{acl-IPFS} modifies the storage daemon so that a
-\texttt{checkAccess} contract call gates retrieval per chunk, with an Ethereum
-contract holding the access list; once a file is added, only the owner can
-retrieve it until access is granted. This is an on-path authorization
+starting point. Their \texttt{acl-IPFS} modifies the storage daemon to consult a
+\texttt{checkAccess} contract call on retrieval, with an Ethereum contract
+holding the access list in which file chunks are registered individually;
+once a file is added, only the owner can retrieve it until access is
+granted. This is an on-path authorization
 decision, and we claim no priority over it.
 
 Liu et al.~\cite{liu2026rbacipfs} bring the idea to a consortium ledger and
