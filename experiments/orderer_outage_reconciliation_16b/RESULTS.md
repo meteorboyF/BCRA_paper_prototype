@@ -28,7 +28,9 @@ prices that window.
   submit failure now leaves the row `PENDING` instead of being logged and
   dropped.
 - `AnchorReconciliationWorker` (`@Scheduled(fixedDelay=5000)`) drains `PENDING`
-  anchors with capped exponential backoff (5 s base, 300 s cap).
+  anchors with capped exponential backoff (5 s base, 60 s cap — see
+  `anchor-retry.max-backoff-seconds` in `application.yml`; an earlier draft of
+  this note said 300 s, which never matched the configured value).
 - `DELETE /api/access/{docId}/user/{userId}` returns **202 Accepted** with
   `ledgerSyncStatus: pending` while the anchor is queued, and **204** only once
   the anchor has committed.
