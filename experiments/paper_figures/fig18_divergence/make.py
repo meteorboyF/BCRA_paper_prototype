@@ -58,7 +58,6 @@ ax.set_xlim(-0.6, 1.9)
 ax.set_ylim(10, 18)
 ax.set_xticks([0, 1], [p[1] for p in panels])
 ax.set_ylabel("Measured outbox age at commit (s)")
-ax.set_title("Unattended reconvergence after an ordering outage")
 ax.grid(axis="y")
 ax.annotate("whiskers span the resampled range (10,000 bootstrap resamples, seed 42);\nat n=5 this coincides with the observed range",
             xy=(0.5, -0.30), xycoords="axes fraction", ha="center",

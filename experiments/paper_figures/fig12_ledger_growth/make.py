@@ -45,7 +45,7 @@ axb.plot([0, mins[-1]], [0, a["blockstore_bytes_per_s"] * mins[-1] * 60 / 1000],
 axb.set_xlabel("Elapsed time, no documents registered (min)")
 axb.set_ylabel("Block store growth (kB)")
 axb.set_title("(b) Growth in time", fontsize=ps.FONT_SIZE)
-axb.set_xlim(-0.8, 17)
+axb.set_xlim(-0.8, 21)
 axb.set_ylim(0, 130)
 axb.legend(loc="upper left", fontsize=ps.FONT_SIZE - 1.5)
 axb.annotate("~1 block/min:\none ordered heartbeat/min", xy=(0.96, 0.10),

@@ -36,7 +36,7 @@ for x, name in LANES:
     ax.plot([x, x], [0.6, 9.0], color=ps.GRID, linewidth=1.0, zorder=1)
 
 # outage band on the ordering lane
-ax.add_patch(Rectangle((8.45, 4.6), 1.1, 4.4, facecolor=ps.BAND,
+ax.add_patch(Rectangle((8.45, 4.85), 1.1, 4.15, facecolor=ps.BAND,
                        edgecolor="none", zorder=0))
 ax.text(9.0, 8.72, "ordering\noutage", ha="center", va="top",
         fontsize=ps.FONT_SIZE-1.5, style="italic", color=ps.GREY)
@@ -49,9 +49,9 @@ def msg(x1, x2, y, text, style="-", color=ps.C[0], above=True, fs_off=1):
             fontsize=ps.FONT_SIZE - fs_off)
 
 msg(1.0, 3.2, 8.4, "revoke access")
-msg(3.2, 5.4, 7.8, "DB revoke + signed outbox row\n(one transaction)")
+msg(3.2, 5.4, 7.8, "DB revoke +\nsigned outbox row\n(one transaction)")
 msg(3.2, 9.0, 7.1, "submit RevokeAccess", color=ps.C[2])
-ax.text(6.1, 6.82, "fails: ordering unreachable", fontsize=ps.FONT_SIZE-1.5,
+ax.text(6.35, 6.82, "fails:\nordering unreachable", fontsize=ps.FONT_SIZE-1.5, va="top",
         style="italic", color=ps.GREY, ha="center")
 msg(3.2, 1.0, 6.6, "HTTP 202, ledger sync pending")
 ax.text(9.0, 6.05, "CheckAccess still\nauthorizes from\nlast-committed state",

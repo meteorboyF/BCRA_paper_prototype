@@ -47,7 +47,6 @@ ax.annotate("Raft-delayed 150 ms: 976 request errors across five trials",
 ax.set_xticks(RTTS)
 ax.set_xlabel("Injected round-trip delay (ms)")
 ax.set_ylabel("Write throughput (TPS)")
-ax.set_title("Throughput under injected WAN delay")
 ax.set_ylim(30, 78)
 ax.legend(loc="upper right", fontsize=ps.FONT_SIZE - 1.5)
 ax.grid(axis="y")
