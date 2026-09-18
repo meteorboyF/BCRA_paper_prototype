@@ -402,8 +402,10 @@ decision evaluated against ledger state, per protected object, on the request
 that returns it, before content or key material is released. Network-level
 partitioning scores \textbf{P} rather than \textbf{Y}, since channel
 membership determines which organizations can see a data set but does not
-decide an individual request; identity verification performed once at
-enrollment likewise scores \textbf{P}. A system scores \textbf{Y} only when a
+decide an individual request. Identity verification likewise scores \textbf{P},
+whether it is performed once at enrollment or re-verified in chaincode on every
+request, because establishing who the requester is does not decide whether that
+requester may have this object. A system scores \textbf{Y} only when a
 per-object check stands between the request and the bytes.
 
 \begin{table}[!t]
