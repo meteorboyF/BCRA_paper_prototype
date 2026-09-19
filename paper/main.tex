@@ -32,15 +32,13 @@
 
 \journal{Blockchain: Research and Applications}
 
-% The class's preprint footer leaves a stray space after its \hbox, which
-% overfills the line by 2.6pt at 12pt; rebuild the footer without it.
+% Suppress the class's title-page footer ("Preprint submitted to ... <date>").
+% This also removes the stray space after the class's \hbox, which overfilled
+% that line by 2.6pt at 12pt.
 \makeatletter
 \def\ps@pprintTitle{%
   \let\@oddhead\@empty \let\@evenhead\@empty
-  \def\@oddfoot{\hbox to \textwidth{\@myfooterfont
-    Preprint submitted to \ifx\@journal\@empty Elsevier\else\@journal\fi
-    \hfill\@date}}%
-  \let\@evenfoot\@oddfoot}
+  \let\@oddfoot\@empty \let\@evenfoot\@empty}
 \makeatother
 
 \begin{document}
